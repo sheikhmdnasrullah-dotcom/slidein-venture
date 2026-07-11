@@ -3,6 +3,8 @@
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
+import SolutionsModal from '@/components/SolutionsModal/SolutionsModal';
+import VideoModal from '@/components/VideoModal/VideoModal';
 
 const companies = [
   { name: 'OpenAI', icon: '⊙' }, { name: 'Figma', icon: '◈' },
@@ -20,9 +22,15 @@ const cardData = [
 ];
 
 export default function Hero() {
+  const [solutionsOpen, setSolutionsOpen] = useState(false);
+  const [videoOpen, setVideoOpen] = useState(false);
+
   return (
     <section className="bg-[#F7F6F3] pt-[calc(56px+72px)] pb-0 overflow-hidden">
       <div className="max-w-[1200px] mx-auto px-6 md:px-10 flex flex-col items-center text-center">
+
+        <SolutionsModal open={solutionsOpen} onClose={() => setSolutionsOpen(false)} />
+        <VideoModal open={videoOpen} onClose={() => setVideoOpen(false)} />
 
         {/* Headline */}
         <motion.h1
@@ -52,21 +60,25 @@ export default function Hero() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.55, delay: 0.22, ease: [0.16, 1, 0.3, 1] }}
         >
-          <Link
-            href="/signup"
-            className="inline-flex items-center gap-2 px-6 py-3 text-[15px] font-[600] text-white bg-[#191919] rounded-[7px] hover:bg-[#2d2d2d] transition-all duration-150 shadow-[0_1px_3px_rgba(0,0,0,0.22),0_1px_1px_rgba(0,0,0,0.10)] hover:shadow-[0_4px_14px_rgba(0,0,0,0.25)] hover:-translate-y-[1px] tracking-[-0.01em]"
+          <button
+            onClick={() => setSolutionsOpen(true)}
+            className="inline-flex items-center gap-2 px-6 py-3 text-[15px] font-[600] text-white bg-[#191919] rounded-[7px] hover:bg-[#2d2d2d] transition-all duration-150 shadow-[0_1px_3px_rgba(0,0,0,0.22),0_1px_1px_rgba(0,0,0,0.10)] hover:shadow-[0_4px_14px_rgba(0,0,0,0.25)] hover:-translate-y-[1px] tracking-[-0.01em] cursor-pointer"
           >
-            Get SlideIn Venture free
-          </Link>
-          <Link
-            href="/demo"
-            className="inline-flex items-center gap-2 px-6 py-3 text-[15px] font-[500] text-[#37352F] bg-white border border-[#E3E2E0] rounded-[7px] hover:bg-[#F7F6F3] hover:border-[#C7C5C3] transition-all duration-150 shadow-[0_1px_2px_rgba(0,0,0,0.06)] hover:shadow-[0_2px_8px_rgba(0,0,0,0.08)] tracking-[-0.01em]"
-          >
-            Request a demo
+            Solutions
             <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
               <path d="M1 6.5H12M7 1.5L12 6.5L7 11.5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
             </svg>
-          </Link>
+          </button>
+          <button
+            onClick={() => setVideoOpen(true)}
+            className="inline-flex items-center gap-2 px-6 py-3 text-[15px] font-[500] text-[#37352F] bg-white border border-[#E3E2E0] rounded-[7px] hover:bg-[#F7F6F3] hover:border-[#C7C5C3] transition-all duration-150 shadow-[0_1px_2px_rgba(0,0,0,0.06)] hover:shadow-[0_2px_8px_rgba(0,0,0,0.08)] tracking-[-0.01em] cursor-pointer"
+          >
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+              <circle cx="7" cy="7" r="6" stroke="currentColor" strokeWidth="1.3" opacity="0.5"/>
+              <path d="M5 4.5L10 7L5 9.5V4.5Z" fill="currentColor" opacity="0.7"/>
+            </svg>
+            Watch This
+          </button>
         </motion.div>
 
         {/* Pile Visual */}
