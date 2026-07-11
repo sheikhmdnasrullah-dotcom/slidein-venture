@@ -37,9 +37,9 @@ export default function Hero() {
 
         {/* Subtext */}
         <motion.p
-          className="text-[clamp(1.125rem,2.2vw,1.375rem)] leading-[1.6] bg-gradient-to-r from-[#37352F] via-[#2383E2] to-[#0F8A8A] bg-clip-text text-transparent max-w-[560px] mb-9 font-[500] tracking-[-0.01em]"
+          className="text-[clamp(1.125rem,2.2vw,1.375rem)] leading-[1.6] text-[#37352F] max-w-[560px] mb-9 font-[500] tracking-[-0.01em]"
           initial={{ opacity: 0, y: 18 }}
-          animate
+          animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.55, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
         >
           A complete framework built to accelerate your revenue
