@@ -252,9 +252,9 @@ export default function SolutionsPage() {
               <p className="text-[16px] text-[#787774] leading-[1.65] mb-7">
                 Ask AI to draft, rewrite, translate, or summarize — right inside your doc, with full context of your workspace.
               </p>
-              <Button asChild className="bg-[#191919] hover:bg-[#2d2d2d] text-white font-[600] rounded-[7px] h-10 px-5 hover:-translate-y-px transition-all duration-150">
-                <Link href="/product/ai">Explore AI features →</Link>
-              </Button>
+              <Link href="/product/ai" className={buttonVariants({ className: "bg-[#191919] hover:bg-[#2d2d2d] text-white font-[600] rounded-[7px] h-10 px-5 hover:-translate-y-px transition-all duration-150" })}>
+                Explore AI features →
+              </Link>
             </div>
             {/*
               ── Video Slot ─────────────────────────────────────────────
