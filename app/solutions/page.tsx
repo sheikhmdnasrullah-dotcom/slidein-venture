@@ -5,7 +5,7 @@ import HorizontalCarousel from '@/components/HorizontalCarousel/HorizontalCarous
 import CTABanner from '@/components/CTABanner/CTABanner';
 import { VideoEmbedPlaceholder } from '@/components/VideoEmbed/VideoEmbed';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
+import { buttonVariants } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import type { CarouselTab } from '@/components/FeatureCarousel/FeatureCarousel';
 import type { HSlide } from '@/components/HorizontalCarousel/HorizontalCarousel';
@@ -146,12 +146,12 @@ export default function SolutionsPage() {
           </p>
 
           <div className="flex items-center gap-3 flex-wrap justify-center mb-16">
-            <Button asChild size="lg" className="bg-[#191919] hover:bg-[#2d2d2d] text-white font-[600] tracking-[-0.01em] shadow-[0_1px_3px_rgba(0,0,0,0.22)] hover:shadow-[0_4px_14px_rgba(0,0,0,0.25)] hover:-translate-y-px transition-all duration-150 rounded-[7px] h-11 px-6">
-              <Link href="/signup">Get started free</Link>
-            </Button>
-            <Button asChild variant="outline" size="lg" className="font-[500] tracking-[-0.01em] rounded-[7px] h-11 px-6 border-[#E3E2E0] hover:bg-[#F7F6F3]">
-              <Link href="#features">See features ↓</Link>
-            </Button>
+            <Link href="/signup" className={buttonVariants({ size: "lg", className: "bg-[#191919] hover:bg-[#2d2d2d] text-white font-[600] tracking-[-0.01em] shadow-[0_1px_3px_rgba(0,0,0,0.22)] hover:shadow-[0_4px_14px_rgba(0,0,0,0.25)] hover:-translate-y-px transition-all duration-150 rounded-[7px] h-11 px-6" })}>
+              Get started free
+            </Link>
+            <Link href="#features" className={buttonVariants({ variant: "outline", size: "lg", className: "font-[500] tracking-[-0.01em] rounded-[7px] h-11 px-6 border-[#E3E2E0] hover:bg-[#F7F6F3]" })}>
+              See features ↓
+            </Link>
           </div>
 
           {/* Hero Doc Visual */}
