@@ -1,8 +1,8 @@
 'use client';
 
-import { useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const companies = [
   { name: 'OpenAI', icon: '⊙' }, { name: 'Figma', icon: '◈' },
@@ -24,20 +24,6 @@ export default function Hero() {
     <section className="bg-[#F7F6F3] pt-[calc(56px+72px)] pb-0 overflow-hidden">
       <div className="max-w-[1200px] mx-auto px-6 md:px-10 flex flex-col items-center text-center">
 
-        {/* Badge */}
-        <motion.div
-          initial={{ opacity: 0, y: 14 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
-          className="mb-7"
-        >
-          <span className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-white border border-[#E3E2E0] rounded-full text-[13px] font-[500] text-[#37352F] shadow-[0_1px_4px_rgba(0,0,0,0.06)]">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 pulse-dot flex-shrink-0" />
-            Introducing Agents — automate any workflow
-            <span className="text-[#9B9A97] font-normal">→</span>
-          </span>
-        </motion.div>
-
         {/* Headline */}
         <motion.h1
           className="text-[clamp(2.75rem,7vw,5.25rem)] font-[700] leading-[1.04] tracking-[-0.03em] text-[#191919] max-w-[820px] mb-6"
@@ -45,8 +31,8 @@ export default function Hero() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.55, delay: 0.08, ease: [0.16, 1, 0.3, 1] }}
         >
-          The AI workspace<br />
-          <span className="text-[#787774]">that works for you.</span>
+          Helping Founders with{' '}
+          <AnimatedWordSwap />
         </motion.h1>
 
         {/* Subtext */}
@@ -56,8 +42,7 @@ export default function Hero() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.55, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
         >
-          Build custom agents, search across all your apps, and automate busywork.
-          The AI workspace where teams get more done, faster.
+          A complete framework built to accelerate your revenue
         </motion.p>
 
         {/* CTAs */}
@@ -118,6 +103,37 @@ export default function Hero() {
         </motion.div>
       </div>
     </section>
+  );
+}
+
+function AnimatedWordSwap() {
+  const words = ['Content.', 'Outreach.', 'and complex backend tasks.'];
+  const [index, setIndex] = useState(0);
+
+  useEffect(() => {
+    if (index >= words.length - 1) return;
+    const timer = setTimeout(() => setIndex((i) => i + 1), 1000);
+    return () => clearTimeout(timer);
+  }, [index]);
+
+  return (
+    <span className="inline-block text-[#787774]">
+      <AnimatePresence mode="wait">
+        <motion.span
+          key={words[index]}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={
+            index === 0
+              ? { opacity: 0, y: -20, transition: { duration: 0.3 } }
+              : { opacity: 0, y: -20, transition: { duration: 0.3 } }
+          }
+          transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+        >
+          {words[index]}
+        </motion.span>
+      </AnimatePresence>
+    </span>
   );
 }
 
