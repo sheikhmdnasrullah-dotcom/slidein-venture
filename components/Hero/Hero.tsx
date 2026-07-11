@@ -37,7 +37,7 @@ export default function Hero() {
 
         {/* Subtext */}
         <motion.p
-          className="text-[clamp(1rem,2vw,1.1875rem)] leading-[1.7] text-[#787774] max-w-[500px] mb-9 font-[400]"
+          className="text-[clamp(1.125rem,2.2vw,1.375rem)] leading-[1.6] bg-gradient-to-r from-[#37352F] via-[#2383E2] to-[#0F8A8A] bg-clip-text text-transparent max-w-[560px] mb-9 font-[500] tracking-[-0.01em]"
           initial={{ opacity: 0, y: 18 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.55, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
@@ -107,19 +107,19 @@ export default function Hero() {
 }
 
 function AnimatedWordSwap() {
-  const words = ['Content.', 'Outreach.', 'and complex backend tasks.'];
+  const words = ['Content.', 'Outreach.', 'complex backend tasks.'];
   const [index, setIndex] = useState(0);
 
   useEffect(() => {
     const timer = setTimeout(
       () => setIndex((i) => (i + 1) % words.length),
-      1000
+      2000
     );
     return () => clearTimeout(timer);
   }, [index, words.length]);
 
   return (
-    <span className="inline-block text-[#787774]">
+    <span className="inline-block text-[#37352F]">
       <AnimatePresence mode="popLayout">
         <motion.span
           key={words[index]}
