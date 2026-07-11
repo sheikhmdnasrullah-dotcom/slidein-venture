@@ -26,7 +26,7 @@ export default function Hero() {
 
         {/* Headline */}
         <motion.h1
-          className="text-[clamp(2.75rem,7vw,5.25rem)] font-[700] leading-[1.04] tracking-[-0.03em] text-[#191919] max-w-[820px] mb-6"
+          className="text-[clamp(2rem,5.5vw,4rem)] font-[700] leading-[1.04] tracking-[-0.03em] text-[#191919] max-w-[820px] mb-6"
           initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.55, delay: 0.08, ease: [0.16, 1, 0.3, 1] }}
@@ -111,24 +111,23 @@ function AnimatedWordSwap() {
   const [index, setIndex] = useState(0);
 
   useEffect(() => {
-    if (index >= words.length - 1) return;
-    const timer = setTimeout(() => setIndex((i) => i + 1), 1000);
+    const timer = setTimeout(
+      () => setIndex((i) => (i + 1) % words.length),
+      1000
+    );
     return () => clearTimeout(timer);
-  }, [index]);
+  }, [index, words.length]);
 
   return (
     <span className="inline-block text-[#787774]">
-      <AnimatePresence mode="wait">
+      <AnimatePresence mode="popLayout">
         <motion.span
           key={words[index]}
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={
-            index === 0
-              ? { opacity: 0, y: -20, transition: { duration: 0.3 } }
-              : { opacity: 0, y: -20, transition: { duration: 0.3 } }
-          }
-          transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+          initial={{ opacity: 0, y: 12, filter: 'blur(4px)' }}
+          animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+          exit={{ opacity: 0, y: -12, filter: 'blur(4px)', transition: { duration: 0.25 } }}
+          transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+          className="inline-block"
         >
           {words[index]}
         </motion.span>
