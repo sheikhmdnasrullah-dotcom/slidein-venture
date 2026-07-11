@@ -119,7 +119,7 @@ export default function Hero() {
 }
 
 function AnimatedWordSwap() {
-  const words = ['Content Production.', 'Outreach systems.', 'Complex Backend Tasks.'];
+  const words = ['Content Production.', 'Outreach System.', 'Complex Backend Tasks.'];
   const [index, setIndex] = useState(0);
 
   useEffect(() => {

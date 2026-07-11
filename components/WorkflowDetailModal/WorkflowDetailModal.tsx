@@ -23,7 +23,7 @@ const slides: WorkflowSlide[] = [
     id: 'outreach-detail',
     headline: 'Outreach Systems Workflow',
     description: 'Step-by-step: Lead research → Personalization → Send sequence → Track replies → Follow-up automation. Tailor every touchpoint.',
-    eyebrow: 'Outreach Systems',
+    eyebrow: 'Outreach System',
     bg: 'linear-gradient(135deg, #1a0533 0%, #2d0b6e 50%, #3a0d8a 100%)',
   },
   {
@@ -52,7 +52,7 @@ export default function WorkflowDetailModal({ open, onClose }: WorkflowDetailMod
     <AnimatePresence>
       {open && (
         <motion.div
-          className="fixed inset-0 z-[60] flex items-center justify-center"
+          className="fixed inset-0 z-[60] flex items-center justify-center p-4"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
@@ -67,9 +67,9 @@ export default function WorkflowDetailModal({ open, onClose }: WorkflowDetailMod
             onClick={onClose}
           />
 
-          {/* Modal */}
+          {/* Modal - fits within screen, no scroll */}
           <motion.div
-            className="relative bg-[#F7F6F3] rounded-2xl shadow-[0_40px_80px_rgba(0,0,0,0.3)] max-w-[900px] w-[92vw] max-h-[85vh] overflow-auto border border-[#E3E2E0]"
+            className="relative bg-[#F7F6F3] rounded-2xl shadow-[0_40px_80px_rgba(0,0,0,0.3)] max-w-[900px] w-full border border-[#E3E2E0]"
             initial={{ opacity: 0, y: 24, scale: 0.97 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 24, scale: 0.97 }}
@@ -78,33 +78,23 @@ export default function WorkflowDetailModal({ open, onClose }: WorkflowDetailMod
             {/* Close button */}
             <button
               onClick={onClose}
-              className="absolute top-4 right-4 w-8 h-8 rounded-full bg-white border border-[#E3E2E0] flex items-center justify-center text-[#787774] hover:text-[#191919] hover:border-[#9B9A97] transition-all duration-150 z-10"
+              className="absolute top-3 right-3 w-7 h-7 rounded-full bg-white border border-[#E3E2E0] flex items-center justify-center text-[#787774] hover:text-[#191919] hover:border-[#9B9A97] transition-all duration-150 z-10"
               aria-label="Close"
             >
-              <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+              <svg width="12" height="12" viewBox="0 0 14 14" fill="none">
                 <path d="M3 3L11 11M11 3L3 11" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"/>
               </svg>
             </button>
 
-            {/* Content */}
-            <div className="p-8 md:p-10">
-              <div className="mb-8">
-                <p className="text-[11.5px] font-[700] tracking-[0.08em] uppercase text-[#D9730D] mb-2">
-                  Detailed Workflow
-                </p>
-                <h2 className="text-[clamp(1.5rem,3vw,2.25rem)] font-[700] leading-[1.1] tracking-[-0.025em] text-[#191919]">
-                  Customize your workflow
-                </h2>
-              </div>
-
+            {/* Content - compact padding */}
+            <div className="p-5 md:p-6">
               {/* Stage / Carousel */}
               <div
-                className="relative rounded-2xl overflow-hidden shadow-[0_24px_60px_rgba(0,0,0,0.14),0_8px_20px_rgba(0,0,0,0.08)] mb-6"
+                className="relative rounded-2xl overflow-hidden shadow-[0_24px_60px_rgba(0,0,0,0.14),0_8px_20px_rgba(0,0,0,0.08)]"
                 style={{
                   background: slide.bg || '#F1F1EF',
-                  minHeight: 300,
                   aspectRatio: '16/9',
-                  maxHeight: 500,
+                  maxHeight: 420,
                 }}
               >
                 <AnimatePresence mode="wait">
@@ -116,16 +106,16 @@ export default function WorkflowDetailModal({ open, onClose }: WorkflowDetailMod
                     exit={{ opacity: 0, y: -16 }}
                     transition={{ duration: 0.32, ease: [0.16, 1, 0.3, 1] }}
                   >
-                    <div className="w-full h-full flex items-center justify-center p-10">
-                      <div className="bg-white/10 backdrop-blur-sm border border-white/15 rounded-2xl p-8 max-w-[520px] w-full">
-                        <div className="flex flex-col gap-3">
+                    <div className="w-full h-full flex items-center justify-center p-8">
+                      <div className="bg-white/10 backdrop-blur-sm border border-white/15 rounded-2xl p-6 max-w-[480px] w-full">
+                        <div className="flex flex-col gap-2">
                           {[80, 55, 0, 100, 88, 70, 48].map((w, i) =>
-                            w === 0 ? <div key={i} className="h-2" /> : (
+                            w === 0 ? <div key={i} className="h-1.5" /> : (
                               <div
                                 key={i}
                                 className="rounded-full"
                                 style={{
-                                  height: i === 0 ? 18 : 10,
+                                  height: i === 0 ? 14 : 8,
                                   width: `${w}%`,
                                   background: 'rgba(255,255,255,0.18)',
                                 }}
@@ -139,7 +129,7 @@ export default function WorkflowDetailModal({ open, onClose }: WorkflowDetailMod
                 </AnimatePresence>
 
                 {/* Text overlay */}
-                <div className="absolute bottom-0 left-0 right-0 p-7 md:p-9 bg-gradient-to-t from-black/75 via-black/30 to-transparent">
+                <div className="absolute bottom-0 left-0 right-0 p-5 md:p-6 bg-gradient-to-t from-black/75 via-black/30 to-transparent">
                   <AnimatePresence mode="wait">
                     <motion.div
                       key={slide.id + '-txt'}
@@ -149,14 +139,14 @@ export default function WorkflowDetailModal({ open, onClose }: WorkflowDetailMod
                       transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
                     >
                       {slide.eyebrow && (
-                        <span className="block text-[11px] font-[700] tracking-[0.08em] uppercase text-white/60 mb-2">
+                        <span className="block text-[10px] font-[700] tracking-[0.08em] uppercase text-white/60 mb-1">
                           {slide.eyebrow}
                         </span>
                       )}
-                      <h3 className="text-[clamp(1.125rem,2.5vw,1.875rem)] font-[700] leading-[1.2] tracking-[-0.02em] text-white mb-2">
+                      <h3 className="text-[clamp(0.875rem,1.8vw,1.25rem)] font-[700] leading-[1.2] tracking-[-0.02em] text-white mb-1">
                         {slide.headline}
                       </h3>
-                      <p className="text-[14.5px] text-white/75 leading-[1.55] max-w-[480px]">
+                      <p className="text-[12px] md:text-[13px] text-white/75 leading-[1.5] max-w-[440px]">
                         {slide.description}
                       </p>
                     </motion.div>
@@ -165,13 +155,13 @@ export default function WorkflowDetailModal({ open, onClose }: WorkflowDetailMod
               </div>
 
               {/* Controls */}
-              <div className="flex items-center justify-center gap-4">
+              <div className="flex items-center justify-center gap-4 mt-3">
                 <button
                   onClick={prev}
                   aria-label="Previous"
-                  className="w-9 h-9 rounded-full border border-[#E3E2E0] bg-white flex items-center justify-center text-[#37352F] hover:border-[#9B9A97] hover:shadow-[0_2px_8px_rgba(0,0,0,0.08)] transition-all duration-150 shadow-sm"
+                  className="w-8 h-8 rounded-full border border-[#E3E2E0] bg-white flex items-center justify-center text-[#37352F] hover:border-[#9B9A97] hover:shadow-[0_2px_8px_rgba(0,0,0,0.08)] transition-all duration-150 shadow-sm"
                 >
-                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                  <svg width="12" height="12" viewBox="0 0 14 14" fill="none">
                     <path d="M9 2.5L4.5 7L9 11.5" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"/>
                   </svg>
                 </button>
@@ -184,8 +174,8 @@ export default function WorkflowDetailModal({ open, onClose }: WorkflowDetailMod
                       aria-label={`Go to slide ${i + 1}`}
                       className={`rounded-full transition-all duration-250 ${
                         i === current
-                          ? 'w-5 h-[6px] bg-[#191919]'
-                          : 'w-[6px] h-[6px] bg-[#E3E2E0] hover:bg-[#9B9A97]'
+                          ? 'w-4 h-[5px] bg-[#191919]'
+                          : 'w-[5px] h-[5px] bg-[#E3E2E0] hover:bg-[#9B9A97]'
                       }`}
                     />
                   ))}
@@ -194,9 +184,9 @@ export default function WorkflowDetailModal({ open, onClose }: WorkflowDetailMod
                 <button
                   onClick={next}
                   aria-label="Next"
-                  className="w-9 h-9 rounded-full border border-[#E3E2E0] bg-white flex items-center justify-center text-[#37352F] hover:border-[#9B9A97] hover:shadow-[0_2px_8px_rgba(0,0,0,0.08)] transition-all duration-150 shadow-sm"
+                  className="w-8 h-8 rounded-full border border-[#E3E2E0] bg-white flex items-center justify-center text-[#37352F] hover:border-[#9B9A97] hover:shadow-[0_2px_8px_rgba(0,0,0,0.08)] transition-all duration-150 shadow-sm"
                 >
-                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                  <svg width="12" height="12" viewBox="0 0 14 14" fill="none">
                     <path d="M5 2.5L9.5 7L5 11.5" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"/>
                   </svg>
                 </button>
