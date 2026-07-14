@@ -4,13 +4,16 @@ import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 
-// ─── Notion Logo ──────────────────────────────────────────────────────────────
-const NotionLogo = () => (
-  <svg width="26" height="26" viewBox="0 0 33 34" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path d="M3.8051 3.26755L20.5301 2.04319C22.5839 1.86808 23.1124 1.98538 24.4032 2.91756L29.7421 6.64773C30.623 7.28917 30.9165 7.46381 30.9165 8.16307V28.6217C30.9165 29.9038 30.4468 30.6622 28.804 30.7782L9.38138 31.9442C8.14825 32.0027 7.56135 31.8279 6.91556 31.0114L2.98395 25.9405C2.27947 25.0072 1.98651 24.3088 1.98651 23.4918V5.3068C1.98651 4.25826 2.45649 3.38366 3.8051 3.26755Z" fill="white"/>
-    <path fillRule="evenodd" clipRule="evenodd" d="M3.64643 1.29903L20.3723 0.0746037C22.5839 -0.0595444 24.141 0.353054 25.5578 1.31054L30.9002 5.04319C31.8354 5.71564 32.9031 7.45237 32.9031 8.16303V28.6217C32.9031 30.5442 31.967 31.4425 28.9448 32.7479L9.48857 33.916C8.01197 33.9383 6.41395 33.3586 5.35391 32.2318L1.40271 27.1359C0.55231 26.0092 0 24.8994 0 23.4918V5.30675C0 3.55089 1.51537 1.84231 3.6337 1.30013L3.64643 1.29903Z" fill="white"/>
-    <path d="M20.5301 2.04318C22.5838 1.86808 23.1124 1.98541 24.4031 2.91757L29.7421 6.64778C30.623 7.28918 30.9167 7.46383 30.9167 8.16301V28.6217C30.9167 29.9039 30.4468 30.6622 28.804 30.7782L9.38127 31.944C8.14822 32.0025 7.56137 31.8279 6.9156 31.0114L2.98396 25.9405C2.27951 25.0072 1.98647 24.3088 1.98645 23.492V5.30687C1.98645 4.25835 2.45646 3.38365 3.80508 3.26754L20.5301 2.04318ZM28.9214 9.91165C28.9214 9.15462 28.6285 8.74625 27.9818 8.80449L8.91064 9.91165C8.20688 9.97045 7.9722 10.3204 7.9722 11.0779V28.4466C7.97222 29.3801 8.44147 29.7293 9.49759 29.6715L27.7471 28.6217C28.8037 28.5641 28.9214 27.922 28.9214 27.1636V9.91165ZM25.988 12.0096C26.1051 12.5347 25.988 13.0592 25.4588 13.1182L24.5795 13.2926V26.1151C23.816 26.5231 23.1122 26.7563 22.5256 26.7563C21.5863 26.7563 21.351 26.4646 20.6475 25.5908L14.8959 16.6149V25.2992L16.7158 25.7076C16.7158 25.7076 16.7159 26.7563 15.2475 26.7563L11.1994 26.9897C11.0818 26.7563 11.1995 26.1739 11.6101 26.0571L12.6664 25.7662V14.2837L11.1997 14.1668C11.0822 13.6417 11.3751 12.8847 12.1972 12.8259L16.5398 12.5349L22.5256 21.6277V13.5839L20.9993 13.4098C20.8821 12.7679 21.351 12.3018 21.9379 12.244L25.988 12.0096Z" fill="#37352F"/>
-  </svg>
+// ─── SlideIn Logo ──────────────────────────────────────────────────────────────
+const SlideInLogo = () => (
+  <div className="flex flex-col items-center justify-center">
+    <span className="font-[800] text-[22px] leading-none text-white tracking-tight">
+      SlideIn
+    </span>
+    <span className="font-[700] text-[9px] leading-none text-[#191919] tracking-[0.2em] mt-[3px] ml-[2px]">
+      VENTURE
+    </span>
+  </div>
 );
 
 // ─── Dropdown Data ────────────────────────────────────────────────────────────
@@ -139,18 +142,15 @@ export default function Navbar() {
         fixed top-0 left-0 right-0 z-[1000] h-14
         transition-all duration-200 ease-out
         ${scrolled
-          ? 'bg-white/85 backdrop-blur-xl border-b border-black/[0.06] shadow-[0_1px_0_rgba(55,53,47,0.05),0_4px_16px_rgba(0,0,0,0.04)]'
-          : 'bg-[#F7F6F3]/80 backdrop-blur-sm border-b border-transparent'
+          ? 'bg-[#B90B0F]/95 backdrop-blur-xl shadow-[0_4px_16px_rgba(185,11,15,0.2)]'
+          : 'bg-[#B90B0F] border-b border-transparent'
         }
       `}>
         <div className="max-w-[1200px] mx-auto px-5 md:px-10 h-full flex items-center gap-0">
 
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2.5 mr-6 flex-shrink-0 group" aria-label="SlideIn Venture">
-            <NotionLogo />
-            <span className="text-[15px] font-semibold text-[#191919] tracking-[-0.01em]">
-              SlideIn Venture
-            </span>
+            <SlideInLogo />
           </Link>
 
           {/* Desktop Links */}
@@ -165,18 +165,18 @@ export default function Navbar() {
                 {link.href ? (
                   <Link
                     href={link.href}
-                    className="flex items-center gap-1 px-3 py-1.5 text-[14px] font-[450] text-[#37352F] rounded-[6px] hover:bg-black/[0.05] transition-colors duration-100 tracking-[-0.01em]"
+                    className="flex items-center gap-1 px-3 py-1.5 text-[14px] font-[500] text-white/90 rounded-[6px] hover:text-white hover:bg-white/10 transition-colors duration-100 tracking-[-0.01em]"
                   >
                     {link.label}
                   </Link>
                 ) : (
                   <button
-                    className={`flex items-center gap-1 px-3 py-1.5 text-[14px] font-[450] text-[#37352F] rounded-[6px] transition-colors duration-100 tracking-[-0.01em] ${activeDropdown === link.dropdown ? 'bg-black/[0.05]' : 'hover:bg-black/[0.05]'}`}
+                    className={`flex items-center gap-1 px-3 py-1.5 text-[14px] font-[500] text-white/90 rounded-[6px] transition-colors duration-100 tracking-[-0.01em] ${activeDropdown === link.dropdown ? 'bg-white/10 text-white' : 'hover:bg-white/10 hover:text-white'}`}
                     aria-expanded={activeDropdown === link.dropdown}
                   >
                     {link.label}
                     <svg
-                      className={`w-2.5 h-2.5 text-[#9B9A97] transition-transform duration-200 ${activeDropdown === link.dropdown ? 'rotate-180' : ''}`}
+                      className={`w-2.5 h-2.5 opacity-70 transition-transform duration-200 ${activeDropdown === link.dropdown ? 'rotate-180' : ''}`}
                       viewBox="0 0 10 6" fill="none"
                     >
                       <path d="M1 1L5 5L9 1" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
@@ -208,13 +208,13 @@ export default function Navbar() {
           <div className="hidden lg:flex items-center gap-2 ml-auto">
             <Link
               href="/login"
-              className="px-3.5 py-1.5 text-[14px] font-[450] text-[#37352F] rounded-[6px] hover:bg-black/[0.05] transition-colors duration-100 tracking-[-0.01em]"
+              className="px-3.5 py-1.5 text-[14px] font-[500] text-white/90 rounded-[6px] hover:text-white hover:bg-white/10 transition-colors duration-100 tracking-[-0.01em]"
             >
               Log in
             </Link>
             <Link
               href="/signup"
-              className="inline-flex items-center gap-1.5 px-4 py-2 text-[13.5px] font-[550] text-white bg-[#191919] rounded-[6px] hover:bg-[#2d2d2d] transition-all duration-150 shadow-[0_1px_2px_rgba(0,0,0,0.20)] hover:shadow-[0_2px_8px_rgba(0,0,0,0.25)] hover:-translate-y-px tracking-[-0.01em]"
+              className="inline-flex items-center gap-1.5 px-4 py-2 text-[13.5px] font-[600] text-[#B90B0F] bg-white rounded-[6px] hover:bg-white/95 transition-all duration-150 shadow-[0_1px_2px_rgba(0,0,0,0.1)] hover:shadow-[0_2px_8px_rgba(255,255,255,0.25)] hover:-translate-y-px tracking-[-0.01em]"
             >
               Get started free
             </Link>
@@ -222,14 +222,14 @@ export default function Navbar() {
 
           {/* Mobile Hamburger */}
           <button
-            className="lg:hidden ml-auto p-2 rounded-lg hover:bg-black/[0.05] transition-colors"
+            className="lg:hidden ml-auto p-2 rounded-lg hover:bg-white/10 transition-colors"
             onClick={() => setMobileOpen(!mobileOpen)}
             aria-label="Toggle menu"
           >
             <div className="w-5 flex flex-col gap-[5px]">
-              <span className={`block h-[2px] bg-[#37352F] rounded transition-transform duration-200 ${mobileOpen ? 'translate-y-[7px] rotate-45' : ''}`} />
-              <span className={`block h-[2px] bg-[#37352F] rounded transition-opacity duration-200 ${mobileOpen ? 'opacity-0' : ''}`} />
-              <span className={`block h-[2px] bg-[#37352F] rounded transition-transform duration-200 ${mobileOpen ? '-translate-y-[7px] -rotate-45' : ''}`} />
+              <span className={`block h-[2px] bg-white rounded transition-transform duration-200 ${mobileOpen ? 'translate-y-[7px] rotate-45' : ''}`} />
+              <span className={`block h-[2px] bg-white rounded transition-opacity duration-200 ${mobileOpen ? 'opacity-0' : ''}`} />
+              <span className={`block h-[2px] bg-white rounded transition-transform duration-200 ${mobileOpen ? '-translate-y-[7px] -rotate-45' : ''}`} />
             </div>
           </button>
         </div>
