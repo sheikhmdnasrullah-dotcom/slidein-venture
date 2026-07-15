@@ -213,6 +213,21 @@ export default function HomePage() {
   return (
     <>
       <Hero />
+      
+      {/* ── Mega Creator Visual ───────────────────────────────────── */}
+      <section className="py-20 bg-white border-b border-[#E3E2E0]">
+        <div className="max-w-[1200px] mx-auto px-6 md:px-10">
+          <div className="rounded-2xl overflow-hidden border border-[#E3E2E0] shadow-sm">
+            <img
+              src="/mega-creator.png"
+              alt="Mega Creator — SlideIn Venture"
+              className="w-full h-auto"
+              loading="eager"
+            />
+          </div>
+        </div>
+      </section>
+
       <StatsSection />
       <FeatureCarousel
         eyebrow="One workspace, every team"
