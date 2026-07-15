@@ -34,10 +34,9 @@ const solutionsItems = [
 ];
 
 const navLinks = [
-  { label: 'Product', dropdown: 'product' },
   { label: 'Solutions', dropdown: 'solutions' },
+  { label: 'Portfolio', href: '/portfolio' },
   { label: 'Pricing', href: '/pricing' },
-  { label: 'Download', href: '/download' },
 ];
 
 // ─── Product Mega-Dropdown ────────────────────────────────────────────────────
@@ -253,12 +252,9 @@ export default function Navbar() {
           {/* ── CTA Button (right side, white pill) ──────────────────── */}
           <div className="hidden lg:block">
             <Link
-              href="/signup"
-              onClick={(e) => {
-                // If you want the copy interaction like the Dribbble ref, uncomment below:
-                // e.preventDefault();
-                // handleCtaClick();
-              }}
+              href="https://calendar.notion.so/meet/nasrullah_tanim/schedule"
+              target="_blank"
+              rel="noopener noreferrer"
               className="relative inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-[14px] font-[600] transition-all duration-200 whitespace-nowrap overflow-hidden"
               style={{
                 background: 'white',
@@ -277,7 +273,7 @@ export default function Navbar() {
                     exit={{ opacity: 0, y: -8 }}
                     transition={{ duration: 0.2 }}
                   >
-                    Get started free
+                    Book a Call
                   </motion.span>
                 ) : (
                   <motion.span
@@ -387,7 +383,9 @@ export default function Navbar() {
                     Log in
                   </Link>
                   <Link
-                    href="/signup"
+                    href="https://calendar.notion.so/meet/nasrullah_tanim/schedule"
+                    target="_blank"
+                    rel="noopener noreferrer"
                     className="block text-center mt-1 py-3 text-[15px] font-[650] rounded-full transition-all duration-200"
                     style={{
                       background: 'white',
@@ -395,7 +393,7 @@ export default function Navbar() {
                     }}
                     onClick={() => setMobileOpen(false)}
                   >
-                    Get started free
+                    Book a Call
                   </Link>
                 </div>
               </div>

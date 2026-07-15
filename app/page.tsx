@@ -2,7 +2,6 @@ import Hero from '@/components/Hero/Hero';
 import FeatureCarousel from '@/components/FeatureCarousel/FeatureCarousel';
 import HorizontalCarousel from '@/components/HorizontalCarousel/HorizontalCarousel';
 import CTABanner from '@/components/CTABanner/CTABanner';
-import BookingCalendar from '@/components/BookingCalendar/BookingCalendar';
 import { VideoEmbedPlaceholder } from '@/components/VideoEmbed/VideoEmbed';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -242,8 +241,6 @@ export default function HomePage() {
         secondaryLabel="Request a demo"
       />
 
-      {/* ── Book a Call Section ─────────────────────────────────────────── */}
-      <BookingCalendar />
     </>
   );
 }
