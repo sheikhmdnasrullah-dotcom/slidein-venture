@@ -248,30 +248,26 @@ function TrackItem({
    ═══════════════════════════════════════════════════════════════════════ */
 
 function Track({
-  title,
-  subtitle,
+  startBoxLabel,
   items,
   openItems,
   onToggle,
   animate,
-  headerIcon,
   pulseDelay = '0s',
 }: {
-  title: string;
-  subtitle: string;
+  startBoxLabel: string;
   items: TrackItemData[];
   openItems: Record<string, boolean>;
   onToggle: (id: string) => void;
   animate: boolean;
-  headerIcon?: ReactNode;
   pulseDelay?: string;
 }) {
   return (
-    <div className="relative">
+    <div className="relative flex flex-col">
       {/* ── Animated red thread line — desktop only ─────────────── */}
       <div
         className="
-          absolute left-0 top-0 bottom-0 w-[1.5px]
+          absolute left-[24px] top-0 bottom-0 w-[1.5px]
           hidden md:block overflow-hidden
         "
         style={{ backgroundColor: `${RED}/12` }}
@@ -284,60 +280,33 @@ function Track({
         />
       </div>
 
-      <div className="md:pl-7">
-        {/* Track header */}
-        <div className="flex items-center gap-2.5 mb-5">
-          {/* Icon slot — swap this out for your brand icon */}
-          {headerIcon && (
-            <span
-              className="
-                w-7 h-7 rounded flex items-center justify-center flex-shrink-0
-                border
-              "
-              style={{
-                backgroundColor: `${RED}08`,
-                borderColor: `${RED}18`,
-              }}
-            >
-              {headerIcon}
-            </span>
-          )}
-          <div>
-            <p
-              className="text-[10.5px] font-semibold tracking-[0.1em] uppercase"
-              style={{ color: RED }}
-            >
-              {title}
-            </p>
-            <p className="text-[10.5px] mt-px" style={{ color: '#A3A3A3' }}>
-              {subtitle}
-            </p>
-          </div>
+      {/* Starting Node Box */}
+      <div className="relative z-10 flex items-center mb-8 pl-[20px] md:pl-[56px] mt-4 md:mt-0">
+        {/* Connector from thread to box (horizontal) */}
+        <div className="absolute left-[24px] w-[32px] h-[1.5px] hidden md:block" style={{ backgroundColor: `${RED}/12`, top: '50%' }} />
+        
+        <div className="flex items-center gap-3 px-5 py-3 rounded-lg border bg-white shadow-sm" style={{ borderColor: FROST }}>
+           <span className="w-[7px] h-[7px] rounded-full flex-shrink-0" style={{ backgroundColor: RED }} />
+           <span className="text-[13.5px] font-medium tracking-[-0.01em]" style={{ color: BLACK }}>{startBoxLabel}</span>
         </div>
+      </div>
 
-        {/* Items — mobile gets a subtle left border for flow continuity */}
+      {/* Items List */}
+      <div className="md:pl-[56px] pl-[20px]">
         <div
-          className="md:border-l-0 pl-4 md:pl-0"
-          style={{
-            borderLeftWidth: '1.5px',
-            borderLeftColor: `${RED}0A`,
-          }}
+          className="divide-y"
+          style={{ '--tw-divide-opacity': 1, borderColor: FROST } as React.CSSProperties}
         >
-          <div
-            className="divide-y"
-            style={{ '--tw-divide-opacity': 1, borderColor: FROST } as React.CSSProperties}
-          >
-            {items.map((item, i) => (
-              <TrackItem
-                key={item.id}
-                item={item}
-                index={i}
-                isOpen={!!openItems[item.id]}
-                onToggle={() => onToggle(item.id)}
-                animate={animate}
-              />
-            ))}
-          </div>
+          {items.map((item, i) => (
+            <TrackItem
+              key={item.id}
+              item={item}
+              index={i}
+              isOpen={!!openItems[item.id]}
+              onToggle={() => onToggle(item.id)}
+              animate={animate}
+            />
+          ))}
         </div>
       </div>
     </div>
@@ -412,173 +381,69 @@ export default function CompleteFramework() {
         {/* ════════════════════════════════════════════════════════
             Section Header
            ════════════════════════════════════════════════════════ */}
-        <motion.div className="text-center mb-4" {...entrance(0)}>
-          <p
-            className="text-[10.5px] font-bold tracking-[0.14em] uppercase mb-5"
-            style={{ color: RED }}
-          >
-            The Complete Framework
-          </p>
+        <motion.div className="text-center mb-8" {...entrance(0)}>
           <h2
             className="font-bold leading-[1.06] tracking-[-0.04em]"
             style={{
-              fontSize: 'clamp(2rem, 4.5vw, 3.25rem)',
+              fontSize: 'clamp(2.5rem, 5.5vw, 4.5rem)',
               color: BLACK,
             }}
           >
-            Everything runs after
-            <br />
-            <span style={{ color: '#A3A3A3' }}>you show up once.</span>
+            The Complete Framework
           </h2>
-        </motion.div>
-
-        <motion.p
-          className="text-center mb-16 md:mb-20 mx-auto max-w-[400px] leading-[1.7] tracking-[-0.01em]"
-          style={{ fontSize: '15px', color: STONE }}
-          {...entrance(0.04)}
-        >
-          You record once, you tell us who to reach —<br className="hidden sm:block" />
-          we handle everything else.
-        </motion.p>
-
-        {/* ════════════════════════════════════════════════════════
-            Starting Nodes
-           ════════════════════════════════════════════════════════ */}
-        <motion.div
-          className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-5 mb-3"
-          {...entrance(0.08)}
-        >
-          {/* Input 1 */}
-          <div
-            className="flex items-center gap-3 px-5 py-3 rounded-lg border"
-            style={{
-              backgroundColor: '#FFFFFF',
-              borderColor: FROST,
-              boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
-            }}
-          >
-            <span
-              className="w-[7px] h-[7px] rounded-full flex-shrink-0"
-              style={{ backgroundColor: RED }}
-            />
-            <span
-              className="text-[13.5px] font-medium tracking-[-0.01em]"
-              style={{ color: BLACK }}
-            >
-              You Record Video Once
-            </span>
-          </div>
-
-          {/* Ampersand */}
-          <span
-            className="hidden sm:block text-[10px] font-semibold tracking-[0.12em] uppercase select-none"
-            style={{ color: '#D4D4D4' }}
-          >
-            &amp;
-          </span>
-
-          {/* Input 2 */}
-          <div
-            className="flex items-center gap-3 px-5 py-3 rounded-lg border"
-            style={{
-              backgroundColor: '#FFFFFF',
-              borderColor: FROST,
-              boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
-            }}
-          >
-            <span
-              className="w-[7px] h-[7px] rounded-full flex-shrink-0"
-              style={{ backgroundColor: RED }}
-            />
-            <span
-              className="text-[13.5px] font-medium tracking-[-0.01em]"
-              style={{ color: BLACK }}
-            >
-              You Tell Us Who to Reach
-            </span>
-          </div>
         </motion.div>
 
         {/* ════════════════════════════════════════════════════════
             Fork connector
            ════════════════════════════════════════════════════════ */}
-        <div className="flex justify-center mb-8 md:mb-12" aria-hidden="true">
-          {/* Desktop: curved fork SVG */}
-          <svg
-            viewBox="0 0 100 14"
-            className="hidden md:block w-full max-w-[520px] h-auto"
-            fill="none"
-            preserveAspectRatio="xMidYMid meet"
-          >
-            <circle cx="50" cy="1.5" r="1.2" fill={RED} opacity="0.3" />
-            <path
-              d="M50 1.5 Q 50 11 24 13"
-              stroke={RED}
-              strokeWidth="0.35"
-              opacity="0.18"
-              fill="none"
-            />
-            <path
-              d="M50 1.5 Q 50 11 76 13"
-              stroke={RED}
-              strokeWidth="0.35"
-              opacity="0.18"
-              fill="none"
-            />
-          </svg>
-          {/* Mobile: simple vertical line */}
-          <div
-            className="md:hidden w-[1.5px] h-7"
-            style={{
-              background: `linear-gradient(to bottom, ${FROST}, ${RED}25)`,
-            }}
-          />
-        </div>
+        <motion.div className="hidden md:block w-full mb-4" {...entrance(0.04)} aria-hidden="true">
+          <div className="w-[1.5px] h-[30px] mx-auto" style={{ backgroundColor: `${RED}/25` }} />
+          <div className="grid grid-cols-2 gap-8 w-full">
+            <div className="relative">
+              <div className="absolute top-0 left-[24.75px] right-[-16px] h-[1.5px]" style={{ backgroundColor: `${RED}/25` }} />
+              <div className="absolute top-0 left-[24px] w-[1.5px] h-[30px]" style={{ backgroundColor: `${RED}/25` }} />
+            </div>
+            <div className="relative">
+              <div className="absolute top-0 left-[-16px] w-[41.5px] h-[1.5px]" style={{ backgroundColor: `${RED}/25` }} />
+              <div className="absolute top-0 left-[24px] w-[1.5px] h-[30px]" style={{ backgroundColor: `${RED}/25` }} />
+            </div>
+          </div>
+        </motion.div>
+        {/* Mobile vertical line */}
+        <motion.div className="md:hidden flex justify-center mb-4" {...entrance(0.04)}>
+          <div className="w-[1.5px] h-[40px]" style={{ background: `linear-gradient(to bottom, ${RED}00, ${RED}40)` }} />
+        </motion.div>
 
         {/* ════════════════════════════════════════════════════════
             Two-column Track Area
            ════════════════════════════════════════════════════════ */}
         <motion.div
-          className="grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-14"
+          className="grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-8 relative"
           {...entrance(0.14)}
         >
           {/* Track 1: Content Production */}
           <Track
-            title="Content Production"
-            subtitle="8 deliverables from one recording"
+            startBoxLabel="You Record Video Once"
             items={CONTENT_ITEMS}
             openItems={openItems}
             onToggle={toggle}
             animate={shouldAnimate}
             pulseDelay="0s"
-            headerIcon={
-              <svg width="13" height="13" viewBox="0 0 13 13" fill="none" aria-hidden="true">
-                <rect x="1" y="1" width="4.5" height="4.5" rx="1" fill={RED} opacity="0.72" />
-                <rect x="7.5" y="1" width="4.5" height="4.5" rx="1" fill={RED} opacity="0.32" />
-                <rect x="1" y="7.5" width="4.5" height="4.5" rx="1" fill={RED} opacity="0.32" />
-                <rect x="7.5" y="7.5" width="4.5" height="4.5" rx="1" fill={RED} opacity="0.14" />
-              </svg>
-            }
           />
 
           {/* Mobile separator */}
-          <div className="md:hidden h-px" style={{ backgroundColor: FROST }} />
+          <div className="md:hidden flex justify-center py-4">
+             <div className="w-12 h-px" style={{ backgroundColor: FROST }} />
+          </div>
 
           {/* Track 2: Manual Outreach */}
           <Track
-            title="Manual Outreach"
-            subtitle="7 steps to qualified conversations"
+            startBoxLabel="You Tell Us Who to Reach"
             items={OUTREACH_ITEMS}
             openItems={openItems}
             onToggle={toggle}
             animate={shouldAnimate}
             pulseDelay="2.5s"
-            headerIcon={
-              <svg width="13" height="13" viewBox="0 0 13 13" fill="none" aria-hidden="true">
-                <circle cx="6.5" cy="6.5" r="2.2" fill={RED} opacity="0.72" />
-                <circle cx="6.5" cy="6.5" r="5" stroke={RED} strokeWidth="0.8" opacity="0.24" />
-              </svg>
-            }
           />
         </motion.div>
 
