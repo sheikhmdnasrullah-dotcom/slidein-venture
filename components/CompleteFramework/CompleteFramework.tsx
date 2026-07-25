@@ -7,20 +7,21 @@ import {
   useInView,
   useReducedMotion,
 } from 'framer-motion';
-import { Plus } from 'lucide-react';
+import { Plus, ChevronDown } from 'lucide-react';
 
-/* ═══════════════════════════════════════════════════════════════════════════
+/* ═══════════════════════════════════════════════════════════════════════
    PALETTE — white / black / red, matched to globals.css brand tokens
    ═══════════════════════════════════════════════════════════════════════ */
 
-const RED       = '#7A0A0E';   // brand deep red (from existing CompleteFramework)
-const RED_WARM  = '#C24B4B';   // --color-rose
-const BLACK     = '#1A1A1A';   // --color-soil
-const STONE     = '#6B6B6B';   // --color-stone
-const FROST     = '#E8E8E4';   // --color-frost
+const RED       = '#7A0A0E';
+const RED_WARM  = '#C24B4B';
+const BLACK     = '#1A1A1A';
+const STONE     = '#6B6B6B';
+const FROST     = '#E8E8E4';
 const SECTION_BG = '#FAFAF8';
+const NODE_BG   = '#FFFFFF';
 
-/* ═══════════════════════════════════════════════════════════════════════════
+/* ═══════════════════════════════════════════════════════════════════════
    Types
    ═══════════════════════════════════════════════════════════════════════ */
 
@@ -28,13 +29,11 @@ interface TrackItemData {
   id: string;
   label: string;
   description: string;
-  /** Optional slot for a custom icon, logo, or image. Renders before the label. */
   icon?: ReactNode;
 }
 
-/* ═══════════════════════════════════════════════════════════════════════════
+/* ═══════════════════════════════════════════════════════════════════════
    Content Data
-   Replace any description with final copy — sizing is correct as-is.
    ═══════════════════════════════════════════════════════════════════════ */
 
 const CONTENT_ITEMS: TrackItemData[] = [
@@ -133,7 +132,204 @@ const OUTREACH_ITEMS: TrackItemData[] = [
   },
 ];
 
-/* ═══════════════════════════════════════════════════════════════════════════
+/* ═══════════════════════════════════════════════════════════════════════
+   Flowchart SVG Connector — animated dashed line with flowing dot
+   ═══════════════════════════════════════════════════════════════════════ */
+
+function FlowConnector({
+  fromX,
+  fromY,
+  toX,
+  toY,
+  delay = 0,
+  color = RED,
+  opacity = 0.35,
+}: {
+  fromX: number;
+  fromY: number;
+  toX: number;
+  toY: number;
+  delay?: number;
+  color?: string;
+  opacity?: number;
+}) {
+  const midY = (fromY + toY) / 2;
+  const path = `M ${fromX} ${fromY} C ${fromX} ${midY}, ${toX} ${midY}, ${toX} ${toY}`;
+
+  return (
+    <g>
+      <path
+        d={path}
+        fill="none"
+        stroke={color}
+        strokeWidth="1.5"
+        strokeOpacity={opacity}
+        strokeDasharray="6 4"
+      >
+        <animate
+          attributeName="stroke-dashoffset"
+          from="0"
+          to="-20"
+          dur="1.5s"
+          repeatCount="indefinite"
+        />
+      </path>
+      <circle r="3.5" fill={color} opacity={0.7}>
+        <animateMotion
+          dur="2s"
+          repeatCount="indefinite"
+          path={path}
+          begin={`${delay}s`}
+        />
+      </circle>
+    </g>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   FlowNode — a visually designed node box
+   ═══════════════════════════════════════════════════════════════════════ */
+
+function FlowNode({
+  label,
+  subtitle,
+  icon,
+  color = RED,
+  bg = NODE_BG,
+  delay = 0,
+  animate,
+}: {
+  label: string;
+  subtitle?: string;
+  icon?: ReactNode;
+  color?: string;
+  bg?: string;
+  delay?: number;
+  animate: boolean;
+}) {
+  return (
+    <motion.div
+      initial={animate ? { opacity: 0, y: 24, scale: 0.95 } : false}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      transition={{
+        duration: 0.5,
+        delay,
+        ease: [0.16, 1, 0.3, 1],
+      }}
+      className="relative"
+    >
+      <div
+        className="
+          relative flex items-center gap-3 px-6 py-3.5 rounded-2xl
+          border shadow-lg cursor-default
+          transition-shadow duration-300 hover:shadow-xl
+        "
+        style={{
+          backgroundColor: bg,
+          borderColor: `${color}22`,
+          boxShadow: `0 4px 24px ${color}0D, 0 1px 3px rgba(0,0,0,0.06)`,
+        }}
+      >
+        {/* Top accent line */}
+        <div
+          className="absolute top-0 left-1/2 -translate-x-1/2 w-10 h-[3px] rounded-b-full"
+          style={{ backgroundColor: color, opacity: 0.5 }}
+        />
+
+        {/* Icon circle */}
+        {icon && (
+          <div
+            className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0"
+            style={{ backgroundColor: `${color}12`, color }}
+          >
+            {icon}
+          </div>
+        )}
+
+        <div className="flex flex-col">
+          <span
+            className="text-[14px] font-semibold tracking-[-0.01em]"
+            style={{ color: BLACK }}
+          >
+            {label}
+          </span>
+          {subtitle && (
+            <span className="text-[11px] mt-0.5" style={{ color: STONE }}>
+              {subtitle}
+            </span>
+          )}
+        </div>
+
+        {/* Arrow indicator */}
+        <div className="ml-auto flex-shrink-0" style={{ color: `${color}60` }}>
+          <ChevronDown size={16} strokeWidth={2} />
+        </div>
+      </div>
+    </motion.div>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   HubNode — the central "Complete Framework" node
+   ═══════════════════════════════════════════════════════════════════════ */
+
+function HubNode({ animate }: { animate: boolean }) {
+  return (
+    <motion.div
+      initial={animate ? { opacity: 0, scale: 0.85 } : false}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+      className="relative"
+    >
+      {/* Pulsing ring */}
+      <motion.div
+        className="absolute inset-0 rounded-3xl"
+        style={{ backgroundColor: `${RED}08` }}
+        animate={{ scale: [1, 1.08, 1], opacity: [0.4, 0.1, 0.4] }}
+        transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
+        aria-hidden="true"
+      />
+
+      <div
+        className="
+          relative flex flex-col items-center gap-3 px-8 py-5 rounded-3xl
+          border shadow-xl cursor-default
+        "
+        style={{
+          backgroundColor: NODE_BG,
+          borderColor: `${RED}33`,
+          boxShadow: `0 8px 40px ${RED}1A, 0 2px 8px rgba(0,0,0,0.08)`,
+        }}
+      >
+        {/* Central dot */}
+        <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-4 h-4 rounded-full border-2" style={{ borderColor: RED, backgroundColor: NODE_BG }} />
+
+        <div
+          className="w-10 h-10 rounded-2xl flex items-center justify-center mb-1"
+          style={{ backgroundColor: `${RED}14`, color: RED }}
+        >
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M12 2L2 7l10 5 10-5-10-5z" />
+            <path d="M2 17l10 5 10-5" />
+            <path d="M2 12l10 5 10-5" />
+          </svg>
+        </div>
+
+        <h3
+          className="text-[18px] font-bold tracking-[-0.02em] text-center"
+          style={{ color: BLACK }}
+        >
+          Complete Framework
+        </h3>
+        <p className="text-[11px] text-center max-w-[220px]" style={{ color: STONE }}>
+          Two powerful tracks — one unified system
+        </p>
+      </div>
+    </motion.div>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
    TrackItem — A single expandable row inside a track
    ═══════════════════════════════════════════════════════════════════════ */
 
@@ -172,7 +368,7 @@ function TrackItem({
           {stepNum}
         </span>
 
-        {/* Optional icon slot — user can drop in <img>, SVG, Lucide icon, etc. */}
+        {/* Optional icon slot */}
         {item.icon && (
           <span className="w-5 h-5 flex items-center justify-center flex-shrink-0 text-[#A3A3A3]">
             {item.icon}
@@ -193,7 +389,7 @@ function TrackItem({
           {item.label}
         </span>
 
-        {/* Expand / collapse toggle — + rotates to × */}
+        {/* Expand / collapse toggle */}
         <motion.span
           className={`
             w-[22px] h-[22px] rounded-full border flex items-center justify-center
@@ -243,8 +439,8 @@ function TrackItem({
   );
 }
 
-/* ═══════════════════════════════════════════════════════════════════════════
-   Track — A full column (header + thread line + items list)
+/* ═══════════════════════════════════════════════════════════════════════
+   Track — A full column (header node + connector + items list)
    ═══════════════════════════════════════════════════════════════════════ */
 
 function Track({
@@ -254,6 +450,7 @@ function Track({
   onToggle,
   animate,
   pulseDelay = '0s',
+  nodeDelay = 0,
 }: {
   startBoxLabel: string;
   items: TrackItemData[];
@@ -261,6 +458,7 @@ function Track({
   onToggle: (id: string) => void;
   animate: boolean;
   pulseDelay?: string;
+  nodeDelay?: number;
 }) {
   return (
     <div className="relative flex flex-col">
@@ -273,7 +471,6 @@ function Track({
         style={{ backgroundColor: `${RED}/12` }}
         aria-hidden="true"
       >
-        {/* Traveling glow */}
         <div
           className="thread-glow absolute w-[6px] left-[-2.25px] h-[55px] rounded-full"
           style={{ animationDelay: pulseDelay }}
@@ -282,13 +479,20 @@ function Track({
 
       {/* Starting Node Box */}
       <div className="relative z-10 flex items-center mb-8 pl-[20px] md:pl-[56px] mt-4 md:mt-0">
-        {/* Connector from thread to box (horizontal) */}
         <div className="absolute left-[24px] w-[32px] h-[1.5px] hidden md:block" style={{ backgroundColor: `${RED}/12`, top: '50%' }} />
-        
-        <div className="flex items-center gap-3 px-5 py-3 rounded-lg border bg-white shadow-sm" style={{ borderColor: FROST }}>
-           <span className="w-[7px] h-[7px] rounded-full flex-shrink-0" style={{ backgroundColor: RED }} />
-           <span className="text-[13.5px] font-medium tracking-[-0.01em]" style={{ color: BLACK }}>{startBoxLabel}</span>
-        </div>
+
+        <FlowNode
+          label={startBoxLabel}
+          icon={
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M12 5v14" />
+              <path d="M5 12h14" />
+            </svg>
+          }
+          color={RED}
+          delay={nodeDelay}
+          animate={animate}
+        />
       </div>
 
       {/* Items List */}
@@ -313,8 +517,8 @@ function Track({
   );
 }
 
-/* ═══════════════════════════════════════════════════════════════════════════
-   CompleteFramework — Main export
+/* ═══════════════════════════════════════════════════════════════════════
+   CompleteFramework — Main export with flowchart layout
    ═══════════════════════════════════════════════════════════════════════ */
 
 export default function CompleteFramework() {
@@ -376,12 +580,23 @@ export default function CompleteFramework() {
         }
       `}</style>
 
-      <div className="max-w-[1080px] mx-auto px-5 md:px-10">
+      {/* ── Background decorative grid ────────────────────────── */}
+      <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
+        <div
+          className="absolute inset-0"
+          style={{
+            backgroundImage: `radial-gradient(circle at 1px 1px, ${RED}06 1px, transparent 0)`,
+            backgroundSize: '48px 48px',
+          }}
+        />
+      </div>
+
+      <div className="relative max-w-[1080px] mx-auto px-5 md:px-10">
 
         {/* ════════════════════════════════════════════════════════
             Section Header
            ════════════════════════════════════════════════════════ */}
-        <motion.div className="text-center mb-8" {...entrance(0)}>
+        <motion.div className="text-center mb-12" {...entrance(0)}>
           <h2
             className="font-bold leading-[1.06] tracking-[-0.04em]"
             style={{
@@ -391,49 +606,78 @@ export default function CompleteFramework() {
           >
             The Complete Framework
           </h2>
+          <motion.p
+            className="text-[14px] mt-4 max-w-lg mx-auto"
+            style={{ color: STONE }}
+            initial={shouldAnimate ? { opacity: 0 } : false}
+            animate={isInView ? { opacity: 1 } : { opacity: 0 }}
+            transition={{ duration: 0.5, delay: 0.1 }}
+          >
+            Two powerful tracks that work together to grow your presence and
+            pipeline — from recording to outreach.
+          </motion.p>
         </motion.div>
 
         {/* ════════════════════════════════════════════════════════
-            Fork connector
+            Flowchart — Hub → Branches → Services
            ════════════════════════════════════════════════════════ */}
-        <motion.div className="hidden md:block w-full mb-4" {...entrance(0.04)} aria-hidden="true">
-          <div className="w-[1.5px] h-[30px] mx-auto" style={{ backgroundColor: `${RED}/25` }} />
-          <div className="grid grid-cols-2 gap-8 w-full">
-            <div className="relative">
-              <div className="absolute top-0 left-[24.75px] right-[-16px] h-[1.5px]" style={{ backgroundColor: `${RED}/25` }} />
-              <div className="absolute top-0 left-[24px] w-[1.5px] h-[30px]" style={{ backgroundColor: `${RED}/25` }} />
-            </div>
-            <div className="relative">
-              <div className="absolute top-0 left-[-16px] w-[41.5px] h-[1.5px]" style={{ backgroundColor: `${RED}/25` }} />
-              <div className="absolute top-0 left-[24px] w-[1.5px] h-[30px]" style={{ backgroundColor: `${RED}/25` }} />
-            </div>
+
+        {/* ── SVG Overlay for connecting arrows (desktop) ──────── */}
+        <svg
+          className="hidden md:block absolute inset-0 w-full h-full pointer-events-none"
+          viewBox="0 0 100 100"
+          preserveAspectRatio="none"
+          aria-hidden="true"
+          style={{ zIndex: 1 }}
+        >
+          {/* Hub → Left branch arrow */}
+          <FlowConnector fromX={50} fromY={18} toX={25} toY={38} delay={0.3} />
+          {/* Hub → Right branch arrow */}
+          <FlowConnector fromX={50} fromY={18} toX={75} toY={38} delay={0.4} />
+          {/* Left branch → services arrow */}
+          <FlowConnector fromX={25} fromY={48} toX={25} toY={55} delay={0.6} />
+          {/* Right branch → services arrow */}
+          <FlowConnector fromX={75} fromY={48} toX={75} toY={55} delay={0.7} />
+        </svg>
+
+        {/* ── Mobile vertical connectors ───────────────────────── */}
+        <div className="md:hidden flex flex-col items-center mb-6 relative" style={{ zIndex: 2 }}>
+          <div className="w-[1.5px] h-8" style={{ background: `linear-gradient(to bottom, ${RED}40, ${RED}10)` }} />
+          <div className="w-6 h-6 rounded-full flex items-center justify-center" style={{ backgroundColor: `${RED}20` }}>
+            <div className="w-2 h-2 rounded-full" style={{ backgroundColor: RED }} />
           </div>
-        </motion.div>
-        {/* Mobile vertical line */}
-        <motion.div className="md:hidden flex justify-center mb-4" {...entrance(0.04)}>
-          <div className="w-[1.5px] h-[40px]" style={{ background: `linear-gradient(to bottom, ${RED}00, ${RED}40)` }} />
+          <div className="w-[1.5px] h-8" style={{ background: `linear-gradient(to bottom, ${RED}10, ${RED}40)` }} />
+        </div>
+
+        {/* ── Hub Node ─────────────────────────────────────────── */}
+        <motion.div
+          className="flex justify-center mb-8 md:mb-12"
+          style={{ zIndex: 2, position: 'relative' }}
+          {...entrance(0.05)}
+        >
+          <HubNode animate={shouldAnimate} />
         </motion.div>
 
-        {/* ════════════════════════════════════════════════════════
-            Two-column Track Area
-           ════════════════════════════════════════════════════════ */}
+        {/* ── Two-column Track Area ────────────────────────────── */}
         <motion.div
           className="grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-8 relative"
-          {...entrance(0.14)}
+          style={{ zIndex: 2 }}
+          {...entrance(0.15)}
         >
           {/* Track 1: Content Production */}
           <Track
-            startBoxLabel="You Record Video Once"
+            startBoxLabel="Record Video Once"
             items={CONTENT_ITEMS}
             openItems={openItems}
             onToggle={toggle}
             animate={shouldAnimate}
             pulseDelay="0s"
+            nodeDelay={0.2}
           />
 
           {/* Mobile separator */}
           <div className="md:hidden flex justify-center py-4">
-             <div className="w-12 h-px" style={{ backgroundColor: FROST }} />
+            <div className="w-12 h-px" style={{ backgroundColor: FROST }} />
           </div>
 
           {/* Track 2: Manual Outreach */}
@@ -444,14 +688,14 @@ export default function CompleteFramework() {
             onToggle={toggle}
             animate={shouldAnimate}
             pulseDelay="2.5s"
+            nodeDelay={0.35}
           />
         </motion.div>
 
         {/* ════════════════════════════════════════════════════════
             Outcomes & Convergence
            ════════════════════════════════════════════════════════ */}
-        <motion.div className="mt-16 md:mt-24" {...entrance(0.22)}>
-
+        <motion.div className="mt-16 md:mt-24" {...entrance(0.25)}>
           {/* Convergence SVG (desktop) */}
           <svg
             viewBox="0 0 100 14"
