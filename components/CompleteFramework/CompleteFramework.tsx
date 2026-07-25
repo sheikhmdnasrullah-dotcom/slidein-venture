@@ -1,378 +1,682 @@
 'use client';
 
-import { motion, useReducedMotion, type Variants } from 'framer-motion';
-import { Card } from '@/components/ui/card';
+import React, { useState, useCallback, useRef, type ReactNode } from 'react';
+import {
+  motion,
+  AnimatePresence,
+  useInView,
+  useReducedMotion,
+} from 'framer-motion';
+import { Plus } from 'lucide-react';
 
-const RED = '#7A0A0E';
-const BLACK = '#191919';
-const BORDER = 'rgba(25,25,25,0.12)';
+/* ═══════════════════════════════════════════════════════════════════════════
+   PALETTE — white / black / red, matched to globals.css brand tokens
+   ═══════════════════════════════════════════════════════════════════════ */
 
-const startingPoints = [
-  'You Record Video Once',
-  'You Tell Us Who to Reach, Once',
-] as const;
+const RED       = '#7A0A0E';   // brand deep red (from existing CompleteFramework)
+const RED_WARM  = '#C24B4B';   // --color-rose
+const BLACK     = '#1A1A1A';   // --color-soil
+const STONE     = '#6B6B6B';   // --color-stone
+const FROST     = '#E8E8E4';   // --color-frost
+const SECTION_BG = '#FAFAF8';
 
-const contentProduction = [
-  'Audio & Video Editing',
-  'Show Notes',
-  'Transcripts',
-  'Short Form Clips',
-  'Thumbnails & Cover Art',
-  'Blog Articles',
-  'LinkedIn & Social Posts',
-  'Publishing & Scheduling',
-] as const;
+/* ═══════════════════════════════════════════════════════════════════════════
+   Types
+   ═══════════════════════════════════════════════════════════════════════ */
 
-const manualOutreach = [
-  'Ideal Client Research',
-  'Hand-Built Prospect Lists',
-  'Email Verification',
-  'Email Writing',
-  'Sending & Follow-Ups',
-  'Reply Sorting & Handoff',
-] as const;
+interface TrackItemData {
+  id: string;
+  label: string;
+  description: string;
+  /** Optional slot for a custom icon, logo, or image. Renders before the label. */
+  icon?: ReactNode;
+}
 
-const outcomes = [
-  'Consistent Multi-Platform Presence',
-  'Qualified Conversations with the Right People',
-] as const;
+/* ═══════════════════════════════════════════════════════════════════════════
+   Content Data
+   Replace any description with final copy — sizing is correct as-is.
+   ═══════════════════════════════════════════════════════════════════════ */
 
-const cardReveal: Variants = {
-  hidden: { opacity: 0, y: 20 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.55, ease: [0.16, 1, 0.3, 1] as const },
+const CONTENT_ITEMS: TrackItemData[] = [
+  {
+    id: 'c-audio',
+    label: 'Audio & Video Editing',
+    description:
+      'We take your raw recording and produce a polished, publish-ready episode — cleaned audio, color-corrected video, branded intro and outro, all handled.',
   },
-};
+  {
+    id: 'c-notes',
+    label: 'Show Notes',
+    description:
+      'SEO-optimised episode summaries with chapter timestamps, guest bios, and resource links — written to drive organic discovery.',
+  },
+  {
+    id: 'c-transcripts',
+    label: 'Transcripts',
+    description:
+      'Speaker-labeled transcripts in multiple formats, opening your content to search engines and unlocking repurposing workflows.',
+  },
+  {
+    id: 'c-clips',
+    label: 'Short Form Clips',
+    description:
+      'Up to 10 vertical clips per episode, hook-first edited with auto-captions — sized and styled for TikTok, Reels, and Shorts.',
+  },
+  {
+    id: 'c-thumbnails',
+    label: 'Thumbnails & Cover Art',
+    description:
+      'Custom-designed episode artwork matching your brand system, with A/B test variants included for every episode.',
+  },
+  {
+    id: 'c-blog',
+    label: 'Blog Articles',
+    description:
+      'Each episode becomes a 1,500+ word SEO article with keyword targeting, internal linking, and embedded calls-to-action.',
+  },
+  {
+    id: 'c-social',
+    label: 'LinkedIn & Social Posts',
+    description:
+      'Three to five native posts per episode — carousels, text hooks, and conversation starters written for each platform.',
+  },
+  {
+    id: 'c-publish',
+    label: 'Publishing & Scheduling',
+    description:
+      'We handle distribution across all podcast platforms and schedule your social content. Nothing publishes without your approval.',
+  },
+];
 
-export default function CompleteFramework() {
-  const reduceMotion = useReducedMotion();
+const OUTREACH_ITEMS: TrackItemData[] = [
+  {
+    id: 'o-research',
+    label: 'Ideal Client Research',
+    description:
+      'Deep-dive ICP profiling with industry mapping, role filtering, and pain-point validation so every message hits the right person.',
+  },
+  {
+    id: 'o-lists',
+    label: 'Hand-Built Prospect Lists',
+    description:
+      'Manually curated lists of verified decision-makers — 500 to 2,000 contacts per month, triple-verified for accuracy.',
+  },
+  {
+    id: 'o-verify',
+    label: 'Email Verification',
+    description:
+      'Every address validated with real-time SMTP checks before sending. Bounce rates stay below 2%, always.',
+  },
+  {
+    id: 'o-write',
+    label: 'Email Writing',
+    description:
+      'Human-written sequences that feel personal, not templated. Personalised first lines, A/B subject testing, single-action CTAs.',
+  },
+  {
+    id: 'o-send',
+    label: 'Sending & Follow-Ups',
+    description:
+      'Timezone-optimised sending with automated follow-up cadence. Volume limits respected, out-of-office replies handled automatically.',
+  },
+  {
+    id: 'o-sort',
+    label: 'Reply Sorting & Handoff',
+    description:
+      'Every reply categorised within hours. Hot leads get same-day alerts with booking links ready to go.',
+  },
+  {
+    id: 'o-perf',
+    label: 'Performance Tracking & Optimization',
+    description:
+      'Weekly reporting on open rates, reply rates, and pipeline. We adjust messaging, targeting, and timing based on real data.',
+  },
+];
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   TrackItem — A single expandable row inside a track
+   ═══════════════════════════════════════════════════════════════════════ */
+
+function TrackItem({
+  item,
+  index,
+  isOpen,
+  onToggle,
+  animate,
+}: {
+  item: TrackItemData;
+  index: number;
+  isOpen: boolean;
+  onToggle: () => void;
+  animate: boolean;
+}) {
+  const stepNum = String(index + 1).padStart(2, '0');
 
   return (
-    <section
-      aria-labelledby="complete-framework-title"
-      className="bg-white py-20 md:py-24"
-    >
-      <div className="mx-auto max-w-[1240px] px-6 md:px-10">
-        <motion.h2
-          id="complete-framework-title"
-          className="mx-auto max-w-[760px] text-center text-[clamp(2rem,4.8vw,3.7rem)] font-[700] leading-[1.04] tracking-[-0.03em] text-[#191919]"
-          initial={reduceMotion ? false : { opacity: 0, y: 18 }}
-          whileInView={reduceMotion ? {} : { opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.65 }}
-          transition={{ duration: 0.55, ease: [0.16, 1, 0.3, 1] }}
+    <div className="relative">
+      <button
+        onClick={onToggle}
+        aria-expanded={isOpen}
+        className="
+          group w-full flex items-center gap-3 sm:gap-4 py-[14px]
+          text-left cursor-pointer select-none outline-none
+          focus-visible:ring-2 focus-visible:ring-[#7A0A0E]/60 focus-visible:ring-offset-2
+          focus-visible:rounded-sm
+        "
+      >
+        {/* Step number */}
+        <span
+          className="text-[10.5px] font-semibold w-5 flex-shrink-0 text-right"
+          style={{ color: RED, fontVariantNumeric: 'tabular-nums' }}
         >
-          A complete framework built to accelerate your revenue
-        </motion.h2>
+          {stepNum}
+        </span>
 
-        <div className="relative mt-14 md:mt-16">
-          <DesktopFrameworkLines />
+        {/* Optional icon slot — user can drop in <img>, SVG, Lucide icon, etc. */}
+        {item.icon && (
+          <span className="w-5 h-5 flex items-center justify-center flex-shrink-0 text-[#A3A3A3]">
+            {item.icon}
+          </span>
+        )}
 
-          <div className="relative z-10 flex flex-col gap-9 md:gap-12">
-            <motion.div
-              className="flex flex-col items-center"
-              initial={reduceMotion ? false : { opacity: 0, y: 18 }}
-              whileInView={reduceMotion ? {} : { opacity: 1, y: 0 }}
-              viewport={{ once: true, amount: 0.6 }}
-              transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-            >
-              <span
-                aria-hidden="true"
-                className="mb-8 hidden h-3.5 w-3.5 rounded-full md:block"
-                style={{ backgroundColor: BLACK }}
-              />
+        {/* Label */}
+        <span
+          className={`
+            flex-1 text-[14px] tracking-[-0.01em] transition-colors duration-150
+            ${isOpen
+              ? 'font-medium'
+              : 'font-normal group-hover:text-[#1A1A1A]'
+            }
+          `}
+          style={{ color: isOpen ? BLACK : '#404040' }}
+        >
+          {item.label}
+        </span>
 
-              <div className="grid w-full max-w-[980px] gap-5 md:grid-cols-2 md:gap-12">
-                {startingPoints.map((item, index) => (
-                  <StartCard key={item} label={item} accent={index === 0 ? RED : BLACK} />
-                ))}
-              </div>
-            </motion.div>
+        {/* Expand / collapse toggle — + rotates to × */}
+        <motion.span
+          className={`
+            w-[22px] h-[22px] rounded-full border flex items-center justify-center
+            flex-shrink-0 transition-colors duration-150
+            ${isOpen
+              ? 'border-[#7A0A0E] text-[#7A0A0E] bg-[#7A0A0E]/[0.06]'
+              : 'border-[#D4D4D4] text-[#A3A3A3] group-hover:border-[#999] group-hover:text-[#999]'
+            }
+          `}
+          animate={{ rotate: isOpen ? 45 : 0 }}
+          transition={{ duration: animate ? 0.2 : 0 }}
+        >
+          <Plus size={11} strokeWidth={2.2} />
+        </motion.span>
+      </button>
 
-            <div className="grid gap-6 lg:grid-cols-2 lg:gap-8">
-              <TrackCard
-                id="content-production"
-                accent={RED}
-                title="Content Production"
-                items={contentProduction}
-              />
-              <TrackCard
-                id="manual-outreach"
-                accent={BLACK}
-                title="Manual Outreach"
-                items={manualOutreach}
-              />
-            </div>
-
-            <motion.div
-              className="grid items-center gap-4 lg:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] lg:gap-6"
-              initial={reduceMotion ? false : { opacity: 0, y: 18 }}
-              whileInView={reduceMotion ? {} : { opacity: 1, y: 0 }}
-              viewport={{ once: true, amount: 0.4 }}
-              transition={{ duration: 0.55, ease: [0.16, 1, 0.3, 1] }}
-            >
-              <OutcomeCard accent={RED} label={outcomes[0]} />
-
-              <div className="mx-auto flex w-full max-w-[240px] flex-col items-center gap-2 lg:max-w-none">
-                <div
-                  aria-hidden="true"
-                  className="hidden h-px w-16 lg:block"
-                  style={{ backgroundColor: 'rgba(25,25,25,0.18)' }}
-                />
-                <div className="flex items-center gap-3 text-center text-[12px] font-[600] tracking-[-0.01em] text-[#191919] lg:flex-col lg:gap-2">
-                  <span className="rounded-full border px-3 py-1" style={{ borderColor: BORDER }}>
-                    Builds Trust
-                  </span>
-                  <span className="rounded-full border px-3 py-1" style={{ borderColor: BORDER }}>
-                    Expands Reach
-                  </span>
-                </div>
-                <div
-                  aria-hidden="true"
-                  className="hidden h-px w-16 lg:block"
-                  style={{ backgroundColor: 'rgba(25,25,25,0.18)' }}
-                />
-              </div>
-
-              <OutcomeCard accent={BLACK} label={outcomes[1]} />
-            </motion.div>
-
-            <motion.div
-              className="flex justify-center pt-1"
-              initial={reduceMotion ? false : { opacity: 0, y: 20 }}
-              whileInView={reduceMotion ? {} : { opacity: 1, y: 0 }}
-              viewport={{ once: true, amount: 0.5 }}
-              transition={{ duration: 0.55, ease: [0.16, 1, 0.3, 1] }}
-            >
-              <div className="relative w-full max-w-[540px]">
-                <div
-                  aria-hidden="true"
-                  className="absolute left-1/2 top-[-26px] h-[26px] w-px -translate-x-1/2 bg-black/15"
-                />
-                <motion.div
-                  whileHover={reduceMotion ? undefined : { y: -2, scale: 1.01 }}
-                  transition={{ type: 'spring', stiffness: 260, damping: 20 }}
-                  className="rounded-[28px] px-8 py-6 text-center shadow-[0_10px_30px_rgba(122,10,14,0.14)]"
-                  style={{ backgroundColor: RED }}
+      {/* Expanded description panel */}
+      <AnimatePresence initial={false}>
+        {isOpen && (
+          <motion.div
+            initial={animate ? { height: 0, opacity: 0 } : false}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={animate ? { height: 0, opacity: 0 } : { opacity: 0 }}
+            transition={{
+              height: { duration: 0.35, ease: [0.16, 1, 0.3, 1] },
+              opacity: { duration: 0.22, delay: 0.04 },
+            }}
+            className="overflow-hidden"
+          >
+            <div className="pb-3 pl-8 sm:pl-9 pr-4">
+              <div
+                className="pl-4 py-1"
+                style={{ borderLeft: `1.5px solid ${RED_WARM}`, borderLeftStyle: 'solid' }}
+              >
+                <p
+                  className="text-[13px] leading-[1.72]"
+                  style={{ color: STONE }}
                 >
-                  <p className="text-[clamp(1.375rem,2.7vw,1.875rem)] font-[700] tracking-[-0.025em] text-white">
-                    More Clients, Faster
-                  </p>
-                </motion.div>
+                  {item.description}
+                </p>
               </div>
-            </motion.div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   Track — A full column (header + thread line + items list)
+   ═══════════════════════════════════════════════════════════════════════ */
+
+function Track({
+  title,
+  subtitle,
+  items,
+  openItems,
+  onToggle,
+  animate,
+  headerIcon,
+  pulseDelay = '0s',
+}: {
+  title: string;
+  subtitle: string;
+  items: TrackItemData[];
+  openItems: Record<string, boolean>;
+  onToggle: (id: string) => void;
+  animate: boolean;
+  headerIcon?: ReactNode;
+  pulseDelay?: string;
+}) {
+  return (
+    <div className="relative">
+      {/* ── Animated red thread line — desktop only ─────────────── */}
+      <div
+        className="
+          absolute left-0 top-0 bottom-0 w-[1.5px]
+          hidden md:block overflow-hidden
+        "
+        style={{ backgroundColor: `${RED}/12` }}
+        aria-hidden="true"
+      >
+        {/* Traveling glow */}
+        <div
+          className="thread-glow absolute w-[6px] left-[-2.25px] h-[55px] rounded-full"
+          style={{ animationDelay: pulseDelay }}
+        />
+      </div>
+
+      <div className="md:pl-7">
+        {/* Track header */}
+        <div className="flex items-center gap-2.5 mb-5">
+          {/* Icon slot — swap this out for your brand icon */}
+          {headerIcon && (
+            <span
+              className="
+                w-7 h-7 rounded flex items-center justify-center flex-shrink-0
+                border
+              "
+              style={{
+                backgroundColor: `${RED}08`,
+                borderColor: `${RED}18`,
+              }}
+            >
+              {headerIcon}
+            </span>
+          )}
+          <div>
+            <p
+              className="text-[10.5px] font-semibold tracking-[0.1em] uppercase"
+              style={{ color: RED }}
+            >
+              {title}
+            </p>
+            <p className="text-[10.5px] mt-px" style={{ color: '#A3A3A3' }}>
+              {subtitle}
+            </p>
+          </div>
+        </div>
+
+        {/* Items — mobile gets a subtle left border for flow continuity */}
+        <div
+          className="md:border-l-0 pl-4 md:pl-0"
+          style={{
+            borderLeftWidth: '1.5px',
+            borderLeftColor: `${RED}0A`,
+          }}
+        >
+          <div
+            className="divide-y"
+            style={{ '--tw-divide-opacity': 1, borderColor: FROST } as React.CSSProperties}
+          >
+            {items.map((item, i) => (
+              <TrackItem
+                key={item.id}
+                item={item}
+                index={i}
+                isOpen={!!openItems[item.id]}
+                onToggle={() => onToggle(item.id)}
+                animate={animate}
+              />
+            ))}
           </div>
         </div>
       </div>
-    </section>
+    </div>
   );
 }
 
-function StartCard({ label, accent }: { label: string; accent: string }) {
+/* ═══════════════════════════════════════════════════════════════════════════
+   CompleteFramework — Main export
+   ═══════════════════════════════════════════════════════════════════════ */
+
+export default function CompleteFramework() {
+  const [openItems, setOpenItems] = useState<Record<string, boolean>>({});
+  const prefersReducedMotion = useReducedMotion();
+  const shouldAnimate = !prefersReducedMotion;
+  const sectionRef = useRef<HTMLElement>(null);
+  const isInView = useInView(sectionRef, { once: true, margin: '-60px' });
+
+  const toggle = useCallback((id: string) => {
+    setOpenItems((prev) => ({ ...prev, [id]: !prev[id] }));
+  }, []);
+
+  /* Entrance animation shorthand */
+  const show = { opacity: 1, y: 0 };
+  const hide = shouldAnimate ? { opacity: 0, y: 18 } : show;
+
+  const entrance = (delay: number) => ({
+    initial: shouldAnimate ? hide : (false as const),
+    animate: isInView ? show : hide,
+    transition: shouldAnimate
+      ? { duration: 0.55, delay, ease: [0.16, 1, 0.3, 1] as const }
+      : { duration: 0 },
+  });
+
   return (
-    <motion.div
-      variants={cardReveal}
-      initial="hidden"
-      whileInView="visible"
-      viewport={{ once: true, amount: 0.65 }}
-      whileHover={{ y: -2 }}
-      transition={{ type: 'spring', stiffness: 260, damping: 22 }}
-      className="relative"
+    <section
+      ref={sectionRef}
+      className="relative overflow-hidden"
+      style={{
+        backgroundColor: SECTION_BG,
+        paddingTop: 'clamp(5rem, 8vw, 8rem)',
+        paddingBottom: 'clamp(5rem, 8vw, 8rem)',
+      }}
+      aria-label="The Complete Framework — how SlideIn Venture works"
     >
-      <div aria-hidden="true" className="mx-auto mb-5 h-8 w-px bg-black/15 md:hidden" />
-      <Card
-        className="rounded-[26px] border bg-white px-6 py-5 text-center shadow-[0_12px_32px_rgba(25,25,25,0.06)]"
-        style={{ borderColor: accent }}
-      >
-        <p className="text-[1rem] font-[650] tracking-[-0.02em] text-[#191919] md:text-[1.05rem]">
-          {label}
-        </p>
-      </Card>
-      <div aria-hidden="true" className="mx-auto mt-5 h-8 w-px bg-black/15" />
-    </motion.div>
-  );
-}
+      {/* ── Thread pulse keyframes ─────────────────────────────── */}
+      <style>{`
+        @keyframes flow-thread {
+          0%   { transform: translateY(-55px); opacity: 0; }
+          8%   { opacity: 1; }
+          92%  { opacity: 1; }
+          100% { transform: translateY(calc(100% + 55px)); opacity: 0; }
+        }
+        .thread-glow {
+          background: radial-gradient(
+            ellipse at center,
+            rgba(122, 10, 14, 0.48) 0%,
+            rgba(122, 10, 14, 0.14) 45%,
+            transparent 72%
+          );
+          animation: flow-thread 5s ease-in-out infinite;
+        }
+        @media (prefers-reduced-motion: reduce) {
+          .thread-glow {
+            animation: none;
+            opacity: 0;
+          }
+        }
+      `}</style>
 
-function TrackCard({
-  id,
-  accent,
-  title,
-  items,
-}: {
-  id: string;
-  accent: string;
-  title: string;
-  items: readonly string[];
-}) {
-  return (
-    <motion.article
-      variants={cardReveal}
-      initial="hidden"
-      whileInView="visible"
-      viewport={{ once: true, amount: 0.2 }}
-      className="relative rounded-[32px] border bg-white p-5 shadow-[0_16px_40px_rgba(25,25,25,0.06)] md:p-6"
-      style={{ borderColor: BORDER }}
-      aria-labelledby={`${id}-heading`}
-    >
-      <div
-        aria-hidden="true"
-        className="absolute inset-x-5 top-0 h-1 rounded-full md:inset-x-6"
-        style={{ backgroundColor: accent }}
-      />
+      <div className="max-w-[1080px] mx-auto px-5 md:px-10">
 
-      <header className="px-1 pb-5 pt-3 md:pb-6">
-        <h3
-          id={`${id}-heading`}
-          className="text-[1.15rem] font-[700] tracking-[-0.02em]"
-          style={{ color: accent }}
-        >
-          {title}
-        </h3>
-      </header>
-
-      <ol className="space-y-3" aria-label={title}>
-        {items.map((item, index) => (
-          <motion.li
-            key={item}
-            whileHover={{ x: 2 }}
-            transition={{ type: 'spring', stiffness: 280, damping: 18 }}
-            className="group"
+        {/* ════════════════════════════════════════════════════════
+            Section Header
+           ════════════════════════════════════════════════════════ */}
+        <motion.div className="text-center mb-4" {...entrance(0)}>
+          <p
+            className="text-[10.5px] font-bold tracking-[0.14em] uppercase mb-5"
+            style={{ color: RED }}
           >
-            <Card
-              className="flex items-center gap-4 rounded-[22px] border bg-white px-4 py-4 shadow-none transition-shadow duration-200 group-hover:shadow-[0_10px_24px_rgba(25,25,25,0.06)] md:px-5"
-              style={{ borderColor: accent }}
+            The Complete Framework
+          </p>
+          <h2
+            className="font-bold leading-[1.06] tracking-[-0.04em]"
+            style={{
+              fontSize: 'clamp(2rem, 4.5vw, 3.25rem)',
+              color: BLACK,
+            }}
+          >
+            Everything runs after
+            <br />
+            <span style={{ color: '#A3A3A3' }}>you show up once.</span>
+          </h2>
+        </motion.div>
+
+        <motion.p
+          className="text-center mb-16 md:mb-20 mx-auto max-w-[400px] leading-[1.7] tracking-[-0.01em]"
+          style={{ fontSize: '15px', color: STONE }}
+          {...entrance(0.04)}
+        >
+          You record once, you tell us who to reach —<br className="hidden sm:block" />
+          we handle everything else.
+        </motion.p>
+
+        {/* ════════════════════════════════════════════════════════
+            Starting Nodes
+           ════════════════════════════════════════════════════════ */}
+        <motion.div
+          className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-5 mb-3"
+          {...entrance(0.08)}
+        >
+          {/* Input 1 */}
+          <div
+            className="flex items-center gap-3 px-5 py-3 rounded-lg border"
+            style={{
+              backgroundColor: '#FFFFFF',
+              borderColor: FROST,
+              boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
+            }}
+          >
+            <span
+              className="w-[7px] h-[7px] rounded-full flex-shrink-0"
+              style={{ backgroundColor: RED }}
+            />
+            <span
+              className="text-[13.5px] font-medium tracking-[-0.01em]"
+              style={{ color: BLACK }}
+            >
+              You Record Video Once
+            </span>
+          </div>
+
+          {/* Ampersand */}
+          <span
+            className="hidden sm:block text-[10px] font-semibold tracking-[0.12em] uppercase select-none"
+            style={{ color: '#D4D4D4' }}
+          >
+            &amp;
+          </span>
+
+          {/* Input 2 */}
+          <div
+            className="flex items-center gap-3 px-5 py-3 rounded-lg border"
+            style={{
+              backgroundColor: '#FFFFFF',
+              borderColor: FROST,
+              boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
+            }}
+          >
+            <span
+              className="w-[7px] h-[7px] rounded-full flex-shrink-0"
+              style={{ backgroundColor: RED }}
+            />
+            <span
+              className="text-[13.5px] font-medium tracking-[-0.01em]"
+              style={{ color: BLACK }}
+            >
+              You Tell Us Who to Reach
+            </span>
+          </div>
+        </motion.div>
+
+        {/* ════════════════════════════════════════════════════════
+            Fork connector
+           ════════════════════════════════════════════════════════ */}
+        <div className="flex justify-center mb-8 md:mb-12" aria-hidden="true">
+          {/* Desktop: curved fork SVG */}
+          <svg
+            viewBox="0 0 100 14"
+            className="hidden md:block w-full max-w-[520px] h-auto"
+            fill="none"
+            preserveAspectRatio="xMidYMid meet"
+          >
+            <circle cx="50" cy="1.5" r="1.2" fill={RED} opacity="0.3" />
+            <path
+              d="M50 1.5 Q 50 11 24 13"
+              stroke={RED}
+              strokeWidth="0.35"
+              opacity="0.18"
+              fill="none"
+            />
+            <path
+              d="M50 1.5 Q 50 11 76 13"
+              stroke={RED}
+              strokeWidth="0.35"
+              opacity="0.18"
+              fill="none"
+            />
+          </svg>
+          {/* Mobile: simple vertical line */}
+          <div
+            className="md:hidden w-[1.5px] h-7"
+            style={{
+              background: `linear-gradient(to bottom, ${FROST}, ${RED}25)`,
+            }}
+          />
+        </div>
+
+        {/* ════════════════════════════════════════════════════════
+            Two-column Track Area
+           ════════════════════════════════════════════════════════ */}
+        <motion.div
+          className="grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-14"
+          {...entrance(0.14)}
+        >
+          {/* Track 1: Content Production */}
+          <Track
+            title="Content Production"
+            subtitle="8 deliverables from one recording"
+            items={CONTENT_ITEMS}
+            openItems={openItems}
+            onToggle={toggle}
+            animate={shouldAnimate}
+            pulseDelay="0s"
+            headerIcon={
+              <svg width="13" height="13" viewBox="0 0 13 13" fill="none" aria-hidden="true">
+                <rect x="1" y="1" width="4.5" height="4.5" rx="1" fill={RED} opacity="0.72" />
+                <rect x="7.5" y="1" width="4.5" height="4.5" rx="1" fill={RED} opacity="0.32" />
+                <rect x="1" y="7.5" width="4.5" height="4.5" rx="1" fill={RED} opacity="0.32" />
+                <rect x="7.5" y="7.5" width="4.5" height="4.5" rx="1" fill={RED} opacity="0.14" />
+              </svg>
+            }
+          />
+
+          {/* Mobile separator */}
+          <div className="md:hidden h-px" style={{ backgroundColor: FROST }} />
+
+          {/* Track 2: Manual Outreach */}
+          <Track
+            title="Manual Outreach"
+            subtitle="7 steps to qualified conversations"
+            items={OUTREACH_ITEMS}
+            openItems={openItems}
+            onToggle={toggle}
+            animate={shouldAnimate}
+            pulseDelay="2.5s"
+            headerIcon={
+              <svg width="13" height="13" viewBox="0 0 13 13" fill="none" aria-hidden="true">
+                <circle cx="6.5" cy="6.5" r="2.2" fill={RED} opacity="0.72" />
+                <circle cx="6.5" cy="6.5" r="5" stroke={RED} strokeWidth="0.8" opacity="0.24" />
+              </svg>
+            }
+          />
+        </motion.div>
+
+        {/* ════════════════════════════════════════════════════════
+            Outcomes & Convergence
+           ════════════════════════════════════════════════════════ */}
+        <motion.div className="mt-16 md:mt-24" {...entrance(0.22)}>
+
+          {/* Convergence SVG (desktop) */}
+          <svg
+            viewBox="0 0 100 14"
+            className="hidden md:block w-full max-w-[520px] h-auto mx-auto mb-8"
+            fill="none"
+            preserveAspectRatio="xMidYMid meet"
+            aria-hidden="true"
+          >
+            <path d="M24 1 Q 24 11 50 13" stroke={RED} strokeWidth="0.35" opacity="0.18" fill="none" />
+            <path d="M76 1 Q 76 11 50 13" stroke={RED} strokeWidth="0.35" opacity="0.18" fill="none" />
+            <circle cx="50" cy="13" r="1.2" fill={RED} opacity="0.3" />
+          </svg>
+
+          {/* Two outcomes linked */}
+          <div className="grid grid-cols-1 md:grid-cols-[1fr_auto_1fr] gap-5 md:gap-6 items-center mb-10">
+            {/* Left outcome */}
+            <div className="text-center md:text-right">
+              <p
+                className="text-[14.5px] font-semibold tracking-[-0.01em] leading-snug"
+                style={{ color: BLACK }}
+              >
+                Consistent Multi-Platform Presence
+              </p>
+              <p
+                className="text-[11px] mt-1.5 italic"
+                style={{ color: '#A3A3A3' }}
+              >
+                builds trust →
+              </p>
+            </div>
+
+            {/* Centre link */}
+            <div className="hidden md:flex items-center" aria-hidden="true">
+              <div className="w-16 h-px relative" style={{ backgroundColor: FROST }}>
+                <span
+                  className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[6px] h-[6px] rounded-full"
+                  style={{ backgroundColor: RED, opacity: 0.25 }}
+                />
+              </div>
+            </div>
+
+            {/* Right outcome */}
+            <div className="text-center md:text-left">
+              <p
+                className="text-[14.5px] font-semibold tracking-[-0.01em] leading-snug"
+                style={{ color: BLACK }}
+              >
+                Qualified Conversations with the Right People
+              </p>
+              <p
+                className="text-[11px] mt-1.5 italic"
+                style={{ color: '#A3A3A3' }}
+              >
+                ← expands reach
+              </p>
+            </div>
+          </div>
+
+          {/* Final convergence line + result */}
+          <div className="flex flex-col items-center">
+            <div
+              className="w-[1.5px] h-9"
+              style={{
+                background: `linear-gradient(to bottom, ${FROST}, ${RED}40)`,
+              }}
+              aria-hidden="true"
+            />
+            <div
+              className="mt-1 flex items-center gap-3.5 px-9 py-[18px] rounded-xl"
+              style={{
+                backgroundColor: BLACK,
+                boxShadow: `0 8px 32px rgba(122,10,14,0.14), 0 2px 8px rgba(0,0,0,0.10)`,
+              }}
             >
               <span
-                aria-hidden="true"
-                className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full border text-[12px] font-[700] tracking-[-0.01em]"
-                style={{ borderColor: accent, color: accent }}
+                className="w-[9px] h-[9px] rounded-full flex-shrink-0"
+                style={{
+                  backgroundColor: RED_WARM,
+                  boxShadow: `0 0 12px ${RED_WARM}AA`,
+                }}
+              />
+              <span
+                className="text-[17px] font-bold text-white tracking-[-0.025em]"
               >
-                {String(index + 1).padStart(2, '0')}
+                More Clients, Faster
               </span>
-              <span className="text-[14.5px] font-[600] leading-[1.45] tracking-[-0.01em] text-[#191919] md:text-[15px]">
-                {item}
-              </span>
-            </Card>
-          </motion.li>
-        ))}
-      </ol>
-    </motion.article>
-  );
-}
-
-function OutcomeCard({ accent, label }: { accent: string; label: string }) {
-  return (
-    <motion.div
-      variants={cardReveal}
-      initial="hidden"
-      whileInView="visible"
-      viewport={{ once: true, amount: 0.55 }}
-      whileHover={{ y: -2 }}
-      transition={{ type: 'spring', stiffness: 260, damping: 20 }}
-      className="relative"
-    >
-      <div aria-hidden="true" className="mx-auto mb-4 h-7 w-px bg-black/15 lg:hidden" />
-      <Card
-        className="rounded-[26px] border bg-white px-5 py-5 text-center shadow-[0_12px_32px_rgba(25,25,25,0.06)] md:px-7"
-        style={{ borderColor: accent }}
-      >
-        <p className="text-[1rem] font-[650] leading-[1.35] tracking-[-0.02em] text-[#191919] md:text-[1.05rem]">
-          {label}
-        </p>
-      </Card>
-    </motion.div>
-  );
-}
-
-function DesktopFrameworkLines() {
-  return (
-    <div aria-hidden="true" className="pointer-events-none absolute inset-0 hidden md:block">
-      <svg
-        className="absolute left-0 top-0 h-[300px] w-full"
-        viewBox="0 0 1200 300"
-        fill="none"
-        preserveAspectRatio="none"
-      >
-        <motion.path
-          d="M600 20 L330 150"
-          stroke="rgba(25,25,25,0.28)"
-          strokeWidth="1.5"
-          strokeLinecap="round"
-          initial={{ pathLength: 0, opacity: 0 }}
-          whileInView={{ pathLength: 1, opacity: 1 }}
-          viewport={{ once: true, amount: 0.9 }}
-          transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-        />
-        <motion.path
-          d="M600 20 L870 150"
-          stroke="rgba(25,25,25,0.28)"
-          strokeWidth="1.5"
-          strokeLinecap="round"
-          initial={{ pathLength: 0, opacity: 0 }}
-          whileInView={{ pathLength: 1, opacity: 1 }}
-          viewport={{ once: true, amount: 0.9 }}
-          transition={{ duration: 0.8, delay: 0.08, ease: [0.16, 1, 0.3, 1] }}
-        />
-      </svg>
-
-      <svg
-        className="absolute bottom-[84px] left-0 h-[170px] w-full"
-        viewBox="0 0 1200 170"
-        fill="none"
-        preserveAspectRatio="none"
-      >
-        <motion.path
-          d="M305 0 L305 70"
-          stroke="rgba(25,25,25,0.22)"
-          strokeWidth="1.5"
-          strokeLinecap="round"
-          initial={{ pathLength: 0, opacity: 0 }}
-          whileInView={{ pathLength: 1, opacity: 1 }}
-          viewport={{ once: true, amount: 0.6 }}
-          transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-        />
-        <motion.path
-          d="M895 0 L895 70"
-          stroke="rgba(25,25,25,0.22)"
-          strokeWidth="1.5"
-          strokeLinecap="round"
-          initial={{ pathLength: 0, opacity: 0 }}
-          whileInView={{ pathLength: 1, opacity: 1 }}
-          viewport={{ once: true, amount: 0.6 }}
-          transition={{ duration: 0.6, delay: 0.08, ease: [0.16, 1, 0.3, 1] }}
-        />
-        <motion.path
-          d="M305 70 C305 120 455 120 522 120"
-          stroke="rgba(25,25,25,0.22)"
-          strokeWidth="1.5"
-          strokeLinecap="round"
-          initial={{ pathLength: 0, opacity: 0 }}
-          whileInView={{ pathLength: 1, opacity: 1 }}
-          viewport={{ once: true, amount: 0.6 }}
-          transition={{ duration: 0.7, delay: 0.14, ease: [0.16, 1, 0.3, 1] }}
-        />
-        <motion.path
-          d="M895 70 C895 120 745 120 678 120"
-          stroke="rgba(25,25,25,0.22)"
-          strokeWidth="1.5"
-          strokeLinecap="round"
-          initial={{ pathLength: 0, opacity: 0 }}
-          whileInView={{ pathLength: 1, opacity: 1 }}
-          viewport={{ once: true, amount: 0.6 }}
-          transition={{ duration: 0.7, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
-        />
-        <motion.path
-          d="M600 120 L600 170"
-          stroke="rgba(25,25,25,0.22)"
-          strokeWidth="1.5"
-          strokeLinecap="round"
-          initial={{ pathLength: 0, opacity: 0 }}
-          whileInView={{ pathLength: 1, opacity: 1 }}
-          viewport={{ once: true, amount: 0.6 }}
-          transition={{ duration: 0.6, delay: 0.28, ease: [0.16, 1, 0.3, 1] }}
-        />
-      </svg>
-    </div>
+            </div>
+          </div>
+        </motion.div>
+      </div>
+    </section>
   );
 }
