@@ -1,9 +1,7 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
-import Link from 'next/link';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import SolutionsModal from '@/components/SolutionsModal/SolutionsModal';
 import VideoModal from '@/components/VideoModal/VideoModal';
 
 const companies = [
@@ -22,14 +20,12 @@ const cardData = [
 ];
 
 export default function Hero() {
-  const [solutionsOpen, setSolutionsOpen] = useState(false);
   const [videoOpen, setVideoOpen] = useState(false);
 
   return (
-    <section className="bg-[#F7F6F3] pt-[calc(56px+72px)] pb-0 overflow-hidden">
+    <section className="bg-[#F7F6F3] pt-[calc(56px+32px)] md:pt-[calc(56px+40px)] pb-0 overflow-hidden">
       <div className="max-w-[1200px] mx-auto px-6 md:px-10 flex flex-col items-center text-center">
 
-        <SolutionsModal open={solutionsOpen} onClose={() => setSolutionsOpen(false)} />
         <VideoModal open={videoOpen} onClose={() => setVideoOpen(false)} />
 
         {/* Headline */}
@@ -43,32 +39,13 @@ export default function Hero() {
           <AnimatedWordSwap />
         </motion.h1>
 
-        {/* Subtext */}
-        <motion.p
-          className="text-[clamp(1.125rem,2.2vw,1.375rem)] leading-[1.6] text-[#37352F] max-w-[560px] mb-9 font-[500] tracking-[-0.01em]"
-          initial={{ opacity: 0, y: 18 }}
+        {/* CTAs */}
+        <motion.div
+          className="flex items-center gap-3 flex-wrap justify-center mb-14 mt-1"
+          initial={{ opacity: 0, y: 14 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.55, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
         >
-          A complete framework built to accelerate your revenue
-        </motion.p>
-
-        {/* CTAs */}
-        <motion.div
-          className="flex items-center gap-3 flex-wrap justify-center mb-16"
-          initial={{ opacity: 0, y: 14 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.55, delay: 0.22, ease: [0.16, 1, 0.3, 1] }}
-        >
-          <button
-            onClick={() => setSolutionsOpen(true)}
-            className="inline-flex items-center gap-2 px-6 py-3 text-[15px] font-[600] text-white bg-[#191919] rounded-[7px] hover:bg-[#2d2d2d] transition-all duration-150 shadow-[0_1px_3px_rgba(0,0,0,0.22),0_1px_1px_rgba(0,0,0,0.10)] hover:shadow-[0_4px_14px_rgba(0,0,0,0.25)] hover:-translate-y-[1px] tracking-[-0.01em] cursor-pointer"
-          >
-            Solutions
-            <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
-              <path d="M1 6.5H12M7 1.5L12 6.5L7 11.5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
-          </button>
           <button
             onClick={() => setVideoOpen(true)}
             className="inline-flex items-center gap-2 px-6 py-3 text-[15px] font-[500] text-[#37352F] bg-white border border-[#E3E2E0] rounded-[7px] hover:bg-[#F7F6F3] hover:border-[#C7C5C3] transition-all duration-150 shadow-[0_1px_2px_rgba(0,0,0,0.06)] hover:shadow-[0_2px_8px_rgba(0,0,0,0.08)] tracking-[-0.01em] cursor-pointer"
@@ -86,7 +63,7 @@ export default function Hero() {
           className="w-full max-w-[860px] relative h-[320px] mb-16"
           initial={{ opacity: 0, y: 36, scale: 0.97 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
-          transition={{ duration: 0.8, delay: 0.28, ease: [0.16, 1, 0.3, 1] }}
+          transition={{ duration: 0.8, delay: 0.22, ease: [0.16, 1, 0.3, 1] }}
         >
           <HeroPile />
         </motion.div>

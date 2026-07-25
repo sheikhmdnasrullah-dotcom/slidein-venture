@@ -1,14 +1,12 @@
 import Hero from '@/components/Hero/Hero';
+import CompleteFramework from '@/components/CompleteFramework/CompleteFramework';
 import FeatureCarousel from '@/components/FeatureCarousel/FeatureCarousel';
 import HorizontalCarousel from '@/components/HorizontalCarousel/HorizontalCarousel';
 import CTABanner from '@/components/CTABanner/CTABanner';
 import { VideoEmbedPlaceholder } from '@/components/VideoEmbed/VideoEmbed';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import type { CarouselTab } from '@/components/FeatureCarousel/FeatureCarousel';
 import type { HSlide } from '@/components/HorizontalCarousel/HorizontalCarousel';
-import Link from 'next/link';
 
 // ─── Feature Carousel #1 ──────────────────────────────────────────────────────
 const workspaceTabs: CarouselTab[] = [
@@ -123,7 +121,7 @@ const stats = [
 
 function StatsSection() {
   return (
-    <section className="py-20 bg-white border-y border-[#E3E2E0]">
+    <section className="py-20 bg-white">
       <div className="max-w-[1200px] mx-auto px-6 md:px-10">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12">
           {stats.map((stat) => (
@@ -213,6 +211,7 @@ export default function HomePage() {
   return (
     <>
       <Hero />
+      <CompleteFramework />
       <StatsSection />
       <FeatureCarousel
         eyebrow="One workspace, every team"
