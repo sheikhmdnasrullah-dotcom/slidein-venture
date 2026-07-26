@@ -1,0 +1,260 @@
+'use client';
+
+import React, { useState, useRef } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import Link from 'next/link';
+
+/* ─── Spring config mirrors the Framer component's transition1/2/7 ─────── */
+const SPRING_FAST   = { type: 'spring', bounce: 0.1, duration: 0.55 } as const;
+const SPRING_CARD   = { type: 'spring', bounce: 0.15, duration: 0.7 } as const;
+const SPRING_AVATAR = { type: 'spring', bounce: 0.2, duration: 0.8 } as const;
+
+/* ─── Brand colours ─────────────────────────────────────────────────────── */
+const RED  = '#7A0A0E';
+
+/* ─── Verified badge SVG (blue checkmark, same path as the Framer source) ─ */
+function VerifiedBadge({ size = 18 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 29 29" fill="none" aria-hidden="true">
+      <path
+        d="M18.38 0l2.37 3.666 4.364.214.221 4.364L29 10.613l-1.989 3.887L29 18.38l-3.666 2.369-.214 4.364-4.364.221L18.387 29 14.5 27.011 10.62 29l-2.369-3.666-4.364-.214-.221-4.364L0 18.387l1.989-3.887L0 10.62l3.666-2.369.214-4.363 4.364-.221L10.613 0 14.5 1.989z"
+        fill="#42A5F5"
+      />
+      <path
+        d="M12.7 19.994L8.22 15.512l1.464-1.463 3.045 3.038 6.601-6.401 1.443 1.484z"
+        fill="#fff"
+      />
+    </svg>
+  );
+}
+
+/* ─── Email row (replicates ElementsEmailHover) ─────────────────────────── */
+function EmailRow({ email }: { email: string }) {
+  const [copied, setCopied] = useState(false);
+
+  const copy = () => {
+    navigator.clipboard.writeText(email).catch(() => {});
+    setCopied(true);
+    setTimeout(() => setCopied(false), 1800);
+  };
+
+  return (
+    <div className="flex items-center justify-between w-full gap-3 mt-3 pt-3" style={{ borderTop: '1px solid #EBEBEB' }}>
+      <div className="flex flex-col gap-0.5">
+        <span className="text-[10px] font-medium uppercase tracking-wider" style={{ color: '#B0B0B0' }}>
+          Email
+        </span>
+        <span className="text-[13px] font-semibold" style={{ color: '#111', letterSpacing: '-0.01em' }}>
+          {email}
+        </span>
+      </div>
+      <button
+        onClick={copy}
+        className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-semibold transition-all duration-200"
+        style={{
+          background: copied ? '#111' : '#F2F2F2',
+          color: copied ? '#fff' : '#111',
+        }}
+      >
+        {copied ? (
+          <>
+            <svg width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true">
+              <path d="M1.5 5L4 7.5l4.5-5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+            Copied
+          </>
+        ) : (
+          <>
+            <svg width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true">
+              <rect x="1" y="3" width="6" height="6" rx="1" stroke="currentColor" strokeWidth="1.2"/>
+              <path d="M3 3V2a1 1 0 011-1h4a1 1 0 011 1v5a1 1 0 01-1 1H7" stroke="currentColor" strokeWidth="1.2"/>
+            </svg>
+            Copy
+          </>
+        )}
+      </button>
+    </div>
+  );
+}
+
+/* ─── The card that pops up on hover ───────────────────────────────────── */
+function ContactCard() {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: -10, scale: 0.95 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      exit={{ opacity: 0, y: -8, scale: 0.96 }}
+      transition={SPRING_CARD}
+      className="absolute top-[calc(100%+12px)] right-0 z-50 w-[310px] overflow-hidden"
+      style={{
+        background: 'rgba(255,255,255,0.96)',
+        backdropFilter: 'blur(16px)',
+        WebkitBackdropFilter: 'blur(16px)',
+        border: '1px solid rgba(0,0,0,0.08)',
+        borderRadius: 24,
+        boxShadow: '0 20px 60px rgba(0,0,0,0.12), 0 4px 16px rgba(0,0,0,0.06)',
+        padding: 20,
+      }}
+      // Prevent card from closing when user moves mouse into it
+      onMouseEnter={() => {}}
+    >
+      {/* ── Top row: avatar + credentials ── */}
+      <div className="flex items-start gap-4">
+        {/* Avatar */}
+        <motion.div
+          initial={{ scale: 0.85, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={SPRING_AVATAR}
+          className="relative flex-shrink-0"
+        >
+          <div
+            className="w-[72px] h-[72px] rounded-2xl overflow-hidden"
+            style={{ border: '1.5px solid rgba(0,0,0,0.08)' }}
+          >
+            {/* Placeholder avatar — replace src with real photo */}
+            <div
+              className="w-full h-full flex items-center justify-center text-[28px] font-bold"
+              style={{ background: `linear-gradient(135deg, ${RED}22 0%, ${RED}0A 100%)`, color: RED }}
+            >
+              N
+            </div>
+          </div>
+          {/* Verified badge */}
+          <div className="absolute -bottom-1.5 -right-1.5">
+            <VerifiedBadge size={18} />
+          </div>
+        </motion.div>
+
+        {/* Name + title + availability */}
+        <motion.div
+          initial={{ opacity: 0, x: 6 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ ...SPRING_FAST, delay: 0.06 }}
+          className="flex flex-col gap-1 pt-0.5"
+        >
+          {/* Available dot + name */}
+          <div className="flex items-center gap-2">
+            {/* Green pulse dot */}
+            <span className="relative flex h-[8px] w-[8px]">
+              <span
+                className="absolute inline-flex h-full w-full rounded-full animate-ping"
+                style={{ backgroundColor: '#7AFC62', opacity: 0.7 }}
+              />
+              <span className="relative inline-flex rounded-full h-[8px] w-[8px]" style={{ backgroundColor: '#7AFC62' }} />
+            </span>
+            <span className="text-[16px] font-bold leading-tight" style={{ color: '#111', letterSpacing: '-0.025em' }}>
+              Nasrullah Tanim
+            </span>
+          </div>
+
+          {/* Title */}
+          <span className="text-[12.5px] leading-snug" style={{ color: '#B0B0B0', letterSpacing: '-0.01em' }}>
+            Founder, SlideIn Venture
+          </span>
+
+          {/* Book a call CTA */}
+          <motion.div
+            initial={{ opacity: 0, y: 4 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ ...SPRING_FAST, delay: 0.15 }}
+          >
+            <Link
+              href="https://calendar.notion.so/meet/nasrullah_tanim/schedule"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 mt-2 px-3.5 py-1.5 rounded-full text-[12px] font-semibold transition-all duration-200 hover:opacity-90"
+              style={{
+                background: RED,
+                color: '#fff',
+                boxShadow: `0 4px 12px ${RED}40`,
+              }}
+            >
+              {/* Calendar icon */}
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <rect x="3" y="4" width="18" height="18" rx="3"/>
+                <path d="M3 9h18M8 2v4M16 2v4"/>
+              </svg>
+              Book a Call
+            </Link>
+          </motion.div>
+        </motion.div>
+      </div>
+
+      {/* ── Email row ── */}
+      <motion.div
+        initial={{ opacity: 0, y: 6 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ ...SPRING_FAST, delay: 0.22 }}
+      >
+        <EmailRow email="nasrullahthq@gmail.com" />
+      </motion.div>
+    </motion.div>
+  );
+}
+
+/* ─── The main exported button ──────────────────────────────────────────── */
+export default function LetsTalkButton() {
+  const [isHovered, setIsHovered] = useState(false);
+  const leaveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const handleEnter = () => {
+    if (leaveTimer.current) clearTimeout(leaveTimer.current);
+    setIsHovered(true);
+  };
+
+  const handleLeave = () => {
+    // Small delay so user can move mouse into the card
+    leaveTimer.current = setTimeout(() => setIsHovered(false), 140);
+  };
+
+  return (
+    <div
+      className="relative"
+      onMouseEnter={handleEnter}
+      onMouseLeave={handleLeave}
+    >
+      {/* ── Button ── */}
+      <motion.button
+        animate={isHovered
+          ? { background: '#111', color: '#fff', scale: 1.03 }
+          : { background: '#fff', color: RED, scale: 1 }
+        }
+        transition={SPRING_FAST}
+        className="relative inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-[14px] font-[600] whitespace-nowrap outline-none cursor-pointer overflow-hidden"
+        style={{
+          background: '#fff',
+          color: RED,
+          boxShadow: isHovered
+            ? '0 2px 12px rgba(0,0,0,0.18)'
+            : '0 1px 4px rgba(0,0,0,0.08)',
+          letterSpacing: '-0.01em',
+          transition: 'box-shadow 200ms',
+        }}
+        aria-expanded={isHovered}
+        aria-haspopup="true"
+      >
+        {/* Arrow icon — rotates on hover */}
+        <motion.span
+          animate={{ rotate: isHovered ? -45 : 0 }}
+          transition={SPRING_FAST}
+          className="inline-flex items-center justify-center"
+          aria-hidden="true"
+        >
+          <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
+            <path d="M2 11L11 2M11 2H4M11 2v7" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+        </motion.span>
+        <span>Let&apos;s Talk</span>
+      </motion.button>
+
+      {/* ── Popup card ── */}
+      <AnimatePresence>
+        {isHovered && (
+          <div onMouseEnter={handleEnter} onMouseLeave={handleLeave}>
+            <ContactCard />
+          </div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}

@@ -1,8 +1,9 @@
 'use client';
 
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
+import LetsTalkButton from './LetsTalkButton';
 
 // ─── Dropdown Data ────────────────────────────────────────────────────────────
 const productItems = [
@@ -107,9 +108,7 @@ export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [ctaState, setCtaState] = useState<'idle' | 'copied'>('idle');
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const ctaTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 10);
@@ -128,12 +127,6 @@ export default function Navbar() {
     if (timeoutRef.current) clearTimeout(timeoutRef.current);
   };
 
-  // CTA interaction — click triggers "copied" state (like the Dribbble reference)
-  const handleCtaClick = useCallback(() => {
-    setCtaState('copied');
-    if (ctaTimeoutRef.current) clearTimeout(ctaTimeoutRef.current);
-    ctaTimeoutRef.current = setTimeout(() => setCtaState('idle'), 2000);
-  }, []);
 
   return (
     <>
@@ -251,47 +244,7 @@ export default function Navbar() {
 
           {/* ── CTA Button (right side, white pill) ──────────────────── */}
           <div className="hidden lg:block">
-            <Link
-              href="https://calendar.notion.so/meet/nasrullah_tanim/schedule"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="relative inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-[14px] font-[600] transition-all duration-200 whitespace-nowrap overflow-hidden"
-              style={{
-                background: 'white',
-                color: '#7A0A0E',
-                boxShadow: '0 1px 4px rgba(0,0,0,0.08)',
-                letterSpacing: '-0.01em',
-              }}
-            >
-              <AnimatePresence mode="wait">
-                {ctaState === 'idle' ? (
-                  <motion.span
-                    key="idle"
-                    className="inline-flex items-center gap-1.5"
-                    initial={{ opacity: 0, y: 8 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -8 }}
-                    transition={{ duration: 0.2 }}
-                  >
-                    Book a Call
-                  </motion.span>
-                ) : (
-                  <motion.span
-                    key="copied"
-                    className="inline-flex items-center gap-1.5"
-                    initial={{ opacity: 0, y: 8 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -8 }}
-                    transition={{ duration: 0.2 }}
-                  >
-                    <svg className="w-4 h-4 text-emerald-500" viewBox="0 0 20 20" fill="none">
-                      <path d="M4 10l4 4 8-8" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"/>
-                    </svg>
-                    Signed up!
-                  </motion.span>
-                )}
-              </AnimatePresence>
-            </Link>
+            <LetsTalkButton />
           </div>
 
           {/* ── Mobile Hamburger ─────────────────────────────────────── */}
@@ -393,7 +346,7 @@ export default function Navbar() {
                     }}
                     onClick={() => setMobileOpen(false)}
                   >
-                    Book a Call
+                    Let&apos;s Talk
                   </Link>
                 </div>
               </div>
