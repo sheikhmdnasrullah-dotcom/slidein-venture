@@ -88,225 +88,150 @@ function Hub({ active }: { active: Group | null }) {
   const reduce = useReducedMotion();
   const isActive = active !== null;
 
-  /* SVG circuit-trace coordinates (180×180 viewBox, centred at 90,90) */
-  const outerR  = 84;   // outer precision ring
-  const midR    = 68;   // mid ring
-  const innerR  = 50;   // inner ring
-  const coreR   = 32;   // hex core
-
-  /* Hexagon path centred at 90,90 with given radius */
-  const hex = (r: number) =>
-    Array.from({ length: 6 })
-      .map((_, i) => {
-        const a = (i * 60 - 30) * (Math.PI / 180);
-        return `${i === 0 ? 'M' : 'L'}${(90 + r * Math.cos(a)).toFixed(2)},${(90 + r * Math.sin(a)).toFixed(2)}`;
-      })
-      .join(' ') + ' Z';
+  /* Outer ring radius — SVG is 180×180, centre at 90,90 */
+  const outerR = 82;
+  const innerR = 58;
 
   return (
     <div className="relative flex flex-col items-center">
-      {/* ── Ambient radial wash ── */}
+
+      {/* ── Ambient glow that deepens on hover ── */}
       <span
         aria-hidden="true"
-        className="absolute rounded-full pointer-events-none"
+        className="absolute pointer-events-none"
         style={{
-          width: 260, height: 260,
+          width: 280, height: 280,
           top: '50%', left: '50%',
-          transform: 'translate(-50%, -50%)',
-          background: `radial-gradient(circle, ${RED}${isActive ? '22' : '0E'} 0%, transparent 70%)`,
-          transition: 'background 600ms ease',
+          transform: 'translate(-50%,-50%)',
+          borderRadius: '50%',
+          background: `radial-gradient(circle at 50% 50%, ${RED}${isActive ? '1E' : '0A'} 0%, transparent 68%)`,
+          transition: 'background 700ms ease',
         }}
       />
 
-      {/* ── Pulse halos — 3 staggered rings ── */}
-      {!reduce && [0, 1, 2].map((i) => (
-        <motion.span
-          key={i}
-          aria-hidden="true"
-          className="absolute rounded-full pointer-events-none"
-          style={{ width: 180, height: 180, top: '50%', left: '50%', marginTop: -90, marginLeft: -90, border: `1px solid ${RED}` }}
-          initial={{ scale: 0.75, opacity: 0 }}
-          animate={{ scale: [0.75, 1.7], opacity: [0.35, 0] }}
-          transition={{ duration: 4.5, delay: i * 1.5, repeat: Infinity, ease: 'easeOut' }}
-        />
-      ))}
-
-      {/* ── SVG precision rings + circuit traces ── */}
+      {/* ── Outer SVG ring + traveling orbital dots ── */}
       <FlowNode id="hub" className="relative" style={{ width: 180, height: 180 }}>
+
+        {/* Static guide ring with cardinal anchors */}
         <svg
           aria-hidden="true"
           className="absolute inset-0"
           width="180" height="180" viewBox="0 0 180 180"
           fill="none"
         >
-          {/* Outer precision ring — dashed */}
-          <circle cx="90" cy="90" r={outerR} stroke={`${RED}22`} strokeWidth="1" strokeDasharray="3 5" />
+          {/* Dashed outer ring */}
+          <circle cx="90" cy="90" r={outerR} stroke={`${RED}20`} strokeWidth="1" strokeDasharray="4 6" />
 
-          {/* Tick marks at outer ring */}
-          <CircuitTicks r={outerR - 4} count={12} color={`${RED}30`} />
-
-          {/* Mid ring — solid, faint */}
-          <circle cx="90" cy="90" r={midR} stroke={`${RED}18`} strokeWidth="1" />
-
-          {/* Radial circuit traces — 4 cardinal lines from mid ring to inner */}
-          {[0, 90, 180, 270].map((angle, i) => {
-            const rad = (angle * Math.PI) / 180;
-            const x1 = 90 + midR * Math.cos(rad);
-            const y1 = 90 + midR * Math.sin(rad);
-            const x2 = 90 + innerR * Math.cos(rad);
-            const y2 = 90 + innerR * Math.sin(rad);
-            return <line key={i} x1={x1} y1={y1} x2={x2} y2={y2} stroke={`${RED}28`} strokeWidth="1" />;
-          })}
-
-          {/* Diagonal traces — 4 at 45° */}
-          {[45, 135, 225, 315].map((angle, i) => {
-            const rad = (angle * Math.PI) / 180;
-            const x1 = 90 + outerR * Math.cos(rad);
-            const y1 = 90 + outerR * Math.sin(rad);
-            const x2 = 90 + midR * Math.cos(rad);
-            const y2 = 90 + midR * Math.sin(rad);
-            return <line key={i} x1={x1} y1={y1} x2={x2} y2={y2} stroke={`${RED}18`} strokeWidth="0.75" strokeDasharray="2 3" />;
-          })}
-
-          {/* Inner ring */}
-          <circle cx="90" cy="90" r={innerR} stroke={`${RED}30`} strokeWidth="1" />
-
-          {/* Hex core outline */}
-          <path d={hex(coreR)} stroke={`${RED}55`} strokeWidth="1.2" />
-          <path d={hex(coreR - 6)} stroke={`${RED}22`} strokeWidth="0.75" />
-        </svg>
-
-        {/* Outer rotating ring with conic sweep */}
-        <motion.span
-          aria-hidden="true"
-          className="absolute inset-0 rounded-full"
-          style={{
-            background: `conic-gradient(from 0deg, transparent 0deg, transparent 200deg, ${ROSE}44 310deg, ${RED}CC 355deg, transparent 360deg)`,
-            willChange: 'transform',
-          }}
-          animate={reduce ? undefined : { rotate: 360 }}
-          transition={{ duration: 18, repeat: Infinity, ease: 'linear' }}
-        />
-
-        {/* Counter-rotating inner conic — creates depth */}
-        <motion.span
-          aria-hidden="true"
-          className="absolute rounded-full"
-          style={{
-            inset: 22,
-            background: `conic-gradient(from 180deg, transparent 0deg, transparent 230deg, ${RED}28 320deg, ${ROSE}88 358deg, transparent 360deg)`,
-            willChange: 'transform',
-          }}
-          animate={reduce ? undefined : { rotate: -360 }}
-          transition={{ duration: 26, repeat: Infinity, ease: 'linear' }}
-        />
-
-        {/* BG mask ring between outer and mid */}
-        <span
-          aria-hidden="true"
-          className="absolute rounded-full"
-          style={{ inset: 1, backgroundColor: BG }}
-        />
-        {/* Restore mid-to-inner gap */}
-        <span
-          aria-hidden="true"
-          className="absolute rounded-full"
-          style={{ inset: 23, backgroundColor: BG }}
-        />
-
-        {/* Core hex fill */}
-        <svg
-          aria-hidden="true"
-          className="absolute inset-0"
-          width="180" height="180" viewBox="0 0 180 180"
-          fill="none"
-        >
-          <path d={hex(coreR)} fill={CARD} />
-          {/* Subtle hex facets inside the core */}
-          <path d={hex(coreR - 6)} stroke={`${RED}18`} strokeWidth="0.75" fill="none" />
-          {/* 3 axis lines through core centre */}
-          {[0, 60, 120].map((angle, i) => {
-            const rad = (angle * Math.PI) / 180;
+          {/* Cardinal anchor dots */}
+          {[0, 90, 180, 270].map((deg) => {
+            const rad = (deg * Math.PI) / 180;
             return (
-              <line
-                key={i}
-                x1={90 - (coreR - 8) * Math.cos(rad)} y1={90 - (coreR - 8) * Math.sin(rad)}
-                x2={90 + (coreR - 8) * Math.cos(rad)} y2={90 + (coreR - 8) * Math.sin(rad)}
-                stroke={`${RED}14`} strokeWidth="0.75"
+              <circle
+                key={deg}
+                cx={90 + outerR * Math.cos(rad)}
+                cy={90 + outerR * Math.sin(rad)}
+                r="2.5"
+                fill={`${RED}55`}
               />
             );
           })}
-          {/* Centre dot */}
-          <circle cx="90" cy="90" r="3.5" fill={RED} opacity="0.7" />
-          <circle cx="90" cy="90" r="1.5" fill={RED} />
+
+          {/* Traveling orbital dot 1 */}
+          {!reduce && <OrbitalDot radius={outerR} size={4} durationSec={8} phaseOffset={0} color={RED} />}
+          {/* Traveling orbital dot 2 — slower, offset start */}
+          {!reduce && <OrbitalDot radius={outerR} size={3} durationSec={13} phaseOffset={180} color={ROSE} />}
+
+          {/* Inner connector ring */}
+          <circle cx="90" cy="90" r={innerR} stroke={`${RED}12`} strokeWidth="1" />
         </svg>
 
-        {/* Breathing scale on the core */}
+        {/* ── Dark orb core ── */}
         <motion.div
-          className="absolute inset-0 flex items-center justify-center"
-          animate={reduce ? undefined : { scale: [1, 1.015, 1] }}
-          transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut' }}
+          className="absolute flex flex-col items-center justify-center rounded-full"
+          style={{
+            top: 90 - innerR,
+            left: 90 - innerR,
+            width: innerR * 2,
+            height: innerR * 2,
+            backgroundColor: INK,
+            boxShadow: [
+              `0 0 0 1px ${RED}30`,
+              `0 0 28px ${RED}${isActive ? '44' : '1C'}`,
+              `inset 0 1px 0 rgba(255,255,255,0.06)`,
+            ].join(', '),
+            transition: 'box-shadow 600ms ease',
+          }}
+          animate={reduce ? undefined : { scale: [1, 1.018, 1] }}
+          transition={{ duration: 5.5, repeat: Infinity, ease: 'easeInOut' }}
         >
-          {/* Intentionally empty — the SVG hex IS the core */}
+          {/* Radial inner glow */}
+          <span
+            aria-hidden="true"
+            className="absolute rounded-full pointer-events-none"
+            style={{
+              inset: 10,
+              background: `radial-gradient(circle at 40% 35%, ${RED}${isActive ? '55' : '30'} 0%, transparent 65%)`,
+              transition: 'background 600ms ease',
+            }}
+          />
+
+          {/* Brand mark */}
+          <span
+            className="relative z-10 select-none font-bold text-white"
+            style={{ fontSize: 22, letterSpacing: '-0.04em', lineHeight: 1, textShadow: `0 0 18px ${RED}CC` }}
+          >
+            SV
+          </span>
+          <span
+            className="relative z-10 mt-[5px] font-semibold"
+            style={{ fontSize: 7.5, letterSpacing: '0.22em', color: 'rgba(255,255,255,0.38)', textTransform: 'uppercase' }}
+          >
+            Venture
+          </span>
         </motion.div>
       </FlowNode>
 
-      {/* ── Label + state pill ── */}
-      <div className="mt-4 flex flex-col items-center gap-2">
+      {/* ── Label strip ── */}
+      <div className="mt-5 flex flex-col items-center gap-1.5">
         <div className="flex items-center gap-1.5">
-          {/* Live indicator dot */}
-          <span
-            className="relative flex h-[7px] w-[7px]"
-          >
+          <span className="relative flex h-[7px] w-[7px]" aria-hidden="true">
             {!reduce && (
               <motion.span
                 className="absolute inline-flex h-full w-full rounded-full"
                 style={{ backgroundColor: RED }}
-                animate={{ scale: [1, 1.8], opacity: [0.6, 0] }}
-                transition={{ duration: 1.8, repeat: Infinity, ease: 'easeOut' }}
+                animate={{ scale: [1, 2], opacity: [0.7, 0] }}
+                transition={{ duration: 1.6, repeat: Infinity, ease: 'easeOut' }}
               />
             )}
-            <span
-              className="relative inline-flex rounded-full h-[7px] w-[7px]"
-              style={{ backgroundColor: RED }}
-            />
+            <span className="relative inline-flex h-[7px] w-[7px] rounded-full" style={{ backgroundColor: RED }} />
           </span>
-          <span
-            className="text-[10px] font-bold uppercase tracking-widest"
-            style={{ color: RED, letterSpacing: '0.2em' }}
-          >
+          <span className="text-[9.5px] font-bold uppercase" style={{ color: RED, letterSpacing: '0.22em' }}>
             The Nerve Center
           </span>
         </div>
 
-        {/* State label — switches on hover */}
         <AnimatePresence mode="wait" initial={false}>
-          <motion.div
+          <motion.span
             key={active ?? 'idle'}
-            initial={{ opacity: 0, y: 5, filter: 'blur(3px)' }}
+            initial={{ opacity: 0, y: 4, filter: 'blur(4px)' }}
             animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-            exit={{ opacity: 0, y: -5, filter: 'blur(3px)' }}
+            exit={{ opacity: 0, y: -4, filter: 'blur(4px)' }}
             transition={{ duration: 0.22, ease: EASE }}
-            className="flex items-center gap-1.5 rounded-full px-3 py-1"
-            style={{
-              backgroundColor: isActive ? `${RED}0D` : 'transparent',
-              border: `1px solid ${isActive ? `${RED}22` : 'transparent'}`,
-              transition: 'background 300ms, border 300ms',
-            }}
+            className="text-[12px] text-center"
+            style={{ color: STONE }}
           >
-            <span className="text-[11.5px]" style={{ color: STONE }}>
-              {active === 'content'
-                ? 'Producing your content'
-                : active === 'outreach'
-                  ? 'Reaching your buyers'
-                  : 'Two tracks. One system.'}
-            </span>
-          </motion.div>
+            {active === 'content'
+              ? 'Producing your content'
+              : active === 'outreach'
+                ? 'Reaching your buyers'
+                : 'Two tracks. One system.'}
+          </motion.span>
         </AnimatePresence>
       </div>
     </div>
   );
 }
+
 
 /* ── Input card ─────────────────────────────────────────────────────────── */
 
