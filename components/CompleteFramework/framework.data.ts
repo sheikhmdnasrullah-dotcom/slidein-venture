@@ -139,6 +139,11 @@ export const ENGINES: Engine[] = [
     icon: 'send',
     items: [
       {
+        id: 'o-icp',
+        label: 'ICP Mapping',
+        description: "Nail down exactly who's worth reaching out to: industry, company size, job title, budget, location. This becomes the filter for everything after."
+      },
+      {
         id: 'o-lists',
         label: 'Hand-Built Prospect Lists',
         description:
@@ -155,6 +160,12 @@ export const ENGINES: Engine[] = [
         label: 'Email Verification',
         description:
           "Every address gets checked before it's ever used to make sure it won't bounce, so dead or fake emails never hurt your sender reputation.",
+      },
+      {
+        id: 'o-pain',
+        label: 'Pain Point Intelligence',
+        description:
+          "Messages built around what we actually found on them, episode titles, quotes, recent launches.",
       },
       {
         id: 'o-write',

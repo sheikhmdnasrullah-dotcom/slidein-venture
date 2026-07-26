@@ -9,48 +9,32 @@
   --font-sans: var(--font-inter), system-ui, -apple-system, sans-serif;
   --font-mono: 'JetBrains Mono', ui-monospace, monospace;
 
-  /* Brand Colors — refined palette */
-  --color-background:   #F7F6F3;
-  --color-foreground:   #191919;
+  /* Brand Colors — black, white, dark red */
+  --color-background:   #FAFAF8;
+  --color-foreground:   #0A0A0A;
   --color-card:         #FFFFFF;
-  --color-card-foreground: #191919;
-  --color-primary:      #191919;
+  --color-card-foreground: #0A0A0A;
+  --color-primary:      #7A0A0E;
   --color-primary-foreground: #FFFFFF;
-  --color-secondary:    #F1F1EF;
-  --color-secondary-foreground: #37352F;
-  --color-muted:        #F1F1EF;
+  --color-secondary:    #F5F5F5;
+  --color-secondary-foreground: #0A0A0A;
+  --color-muted:        #F5F5F5;
   --color-muted-foreground: #787774;
-  --color-accent:       #F1F1EF;
-  --color-accent-foreground: #191919;
-  --color-destructive:  #E03E3E;
-  --color-border:       #E3E2E0;
-  --color-input:        #E3E2E0;
-  --color-ring:         #191919;
+  --color-accent:       #7A0A0E;
+  --color-accent-foreground: #FFFFFF;
+  --color-destructive:  #7A0A0E;
+  --color-border:       #E5E5E5;
+  --color-input:        #E5E5E5;
+  --color-ring:         #7A0A0E;
 
-  /* Brand Palette — earthier, more refined */
-  --color-soil:         #1A1A1A;
-  --color-clay:         #2D2D2D;
-  --color-stone:        #6B6B6B;
-  --color-pebble:       #A3A3A3;
-  --color-sand:         #D4D4D4;
-  --color-cream:        #F5F5F0;
-  --color-warm-bg:      #FAF9F6;
-  --color-cool-bg:      #F8F8FA;
-
-  /* Accent palette — muted, sophisticated */
-  --color-ink:          #1A1A1A;
+  /* Brand Palette — minimal, sophisticated */
+  --color-ink:          #0A0A0A;
   --color-ink-light:    #4A4A4A;
-  --color-mist:         #8B8B8B;
+  --color-mist:         #787774;
   --color-fog:          #C4C4C4;
   --color-frost:        #E8E8E4;
-  --color-rose:         #C24B4B;
-  --color-rose-soft:    #F2E0E0;
-  --color-azure:        #4A7D8C;
-  --color-azure-soft:   #DCE8EC;
-  --color-amber:        #B8863D;
-  --color-amber-soft:   #F5EDE0;
-  --color-sage:         #6B8F71;
-  --color-sage-soft:    #E0EDE2;
+  --color-rose:         #7A0A0E;
+  --color-rose-soft:    #F5E8E8;
 
   /* Radius */
   --radius-sm: 4px;
@@ -156,8 +140,8 @@ html {
 
 body {
   font-family: var(--font-sans);
-  background-color: #FAF9F6;
-  color: #1A1A1A;
+  background-color: #FAFAF8;
+  color: #0A0A0A;
   line-height: 1.6;
   overflow-x: hidden;
 }
@@ -169,10 +153,10 @@ body {
 ::-webkit-scrollbar-thumb:hover { background: #A3A3A3; }
 
 /* ─── Selection ──────────────────────────────────────────────────────────── */
-::selection { background: rgba(74, 125, 140, 0.15); }
+::selection { background: rgba(122, 10, 14, 0.12); }
 
 /* ─── Focus ──────────────────────────────────────────────────────────────── */
-:focus-visible { outline: 2px solid #4A7D8C; outline-offset: 2px; border-radius: 2px; }
+:focus-visible { outline: 2px solid #7A0A0E; outline-offset: 2px; border-radius: 2px; }
 
 /* ─── Logo scroll animation ──────────────────────────────────────────────── */
 @keyframes logoScroll {
@@ -193,14 +177,14 @@ body {
 
 /* ─── Gradient text utility ──────────────────────────────────────────────── */
 .gradient-text {
-  background: linear-gradient(135deg, #1A1A1A 0%, #6B6B6B 100%);
+  background: linear-gradient(135deg, #0A0A0A 0%, #7A0A0E 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 
 .gradient-text-warm {
-  background: linear-gradient(135deg, #C24B4B 0%, #B8863D 50%, #4A7D8C 100%);
+  background: linear-gradient(135deg, #7A0A0E 0%, #C24B4B 50%, #0A0A0A 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -213,7 +197,7 @@ body {
 }
 
 .shimmer {
-  background: linear-gradient(90deg, #F1F1EF 25%, #E8E7E4 50%, #F1F1EF 75%);
+  background: linear-gradient(90deg, #F5F5F5 25%, #E8E8E4 50%, #F5F5F5 75%);
   background-size: 200% 100%;
   animation: shimmer 2s infinite;
 }

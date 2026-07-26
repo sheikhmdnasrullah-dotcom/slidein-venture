@@ -23,12 +23,12 @@ export default function CTABanner({
   secondaryHref = '/demo',
 }: CTABannerProps) {
   return (
-    <section className="relative bg-[#191919] py-24 overflow-hidden">
+    <section className="relative bg-[#0A0A0A] py-24 overflow-hidden">
       {/* Decorative blobs */}
-      <div className="absolute w-[400px] h-[400px] rounded-full -top-24 -left-20 opacity-[0.12] blur-[80px]"
-        style={{ background: 'radial-gradient(circle, #2383E2, transparent)' }} aria-hidden />
-      <div className="absolute w-[320px] h-[320px] rounded-full -bottom-16 -right-10 opacity-[0.10] blur-[80px]"
-        style={{ background: 'radial-gradient(circle, #9065B0, transparent)' }} aria-hidden />
+      <div className="absolute w-[400px] h-[400px] rounded-full -top-24 -left-20 opacity-[0.08] blur-[80px]"
+        style={{ background: 'radial-gradient(circle, #7A0A0E, transparent)' }} aria-hidden />
+      <div className="absolute w-[320px] h-[320px] rounded-full -bottom-16 -right-10 opacity-[0.06] blur-[80px]"
+        style={{ background: 'radial-gradient(circle, #7A0A0E, transparent)' }} aria-hidden />
 
       <div className="relative z-10 max-w-[800px] mx-auto px-6 md:px-10 text-center">
         <motion.div
@@ -57,7 +57,7 @@ export default function CTABanner({
             {/* White filled button — shadcn-style */}
             <Link
               href={primaryHref}
-              className="inline-flex items-center gap-2 px-6 py-3 text-[15px] font-[600] text-[#191919] bg-white rounded-[7px] hover:bg-[#F7F6F3] transition-all duration-150 shadow-[0_1px_3px_rgba(0,0,0,0.12)] hover:shadow-[0_4px_16px_rgba(0,0,0,0.18)] hover:-translate-y-px tracking-[-0.01em]"
+              className="inline-flex items-center gap-2 px-6 py-3 text-[15px] font-[600] text-[#0A0A0A] bg-white rounded-[7px] hover:bg-[#F5F5F5] transition-all duration-150 shadow-[0_1px_3px_rgba(0,0,0,0.12)] hover:shadow-[0_4px_16px_rgba(0,0,0,0.18)] hover:-translate-y-px tracking-[-0.01em]"
             >
               {primaryLabel}
             </Link>

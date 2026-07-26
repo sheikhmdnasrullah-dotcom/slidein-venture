@@ -2,9 +2,9 @@
 
 import React, { useState, useCallback, useRef } from 'react';
 import { motion, useInView } from 'framer-motion';
-import { Plus, ChevronDown, Video, Target, Sparkles, Send } from 'lucide-react';
+import { Plus, Video, Target, Sparkles, Send, CheckCircle2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { ENGINES, OUTPUTS } from './framework.data';
+import { ENGINES } from './framework.data';
 import ServiceDetailModal from '@/components/ServiceDetailModal/ServiceDetailModal';
 
 const RED = '#7A0A0E';
@@ -23,11 +23,13 @@ function verticalBezier(p1: Point, p2: Point) {
   return `M ${p1.x} ${p1.y} C ${p1.x} ${p1.y + offset}, ${p2.x} ${p2.y - offset}, ${p2.x} ${p2.y}`;
 }
 
-function Connection({ p1, p2, delay = 0 }: { p1: Point; p2: Point; delay?: number }) {
+function AnimatedConnection({ p1, p2, delay = 0, strokeDasharray = "none" }: { p1: Point; p2: Point; delay?: number; strokeDasharray?: string }) {
   const path = verticalBezier(p1, p2);
   return (
     <g>
-      <path d={path} fill="none" stroke={RED} strokeWidth={1.5} opacity={0.3} />
+      {/* Base faint line */}
+      <path d={path} fill="none" stroke={RED} strokeWidth={1.5} opacity={0.2} strokeDasharray={strokeDasharray} />
+      {/* Animated glowing line */}
       <motion.path
         d={path}
         fill="none"
@@ -38,14 +40,19 @@ function Connection({ p1, p2, delay = 0 }: { p1: Point; p2: Point; delay?: numbe
         viewport={{ once: true, margin: "-50px" }}
         transition={{ duration: 1.5, delay, ease: "easeOut" }}
       />
+      {/* Pulsing travel dot */}
+      <circle r="3" fill={RED} opacity={0.8} filter="blur(1px)">
+        <animateMotion dur="3s" repeatCount="indefinite" path={path} keyPoints="0;1" keyTimes="0;1" calcMode="linear" />
+        <animate attributeName="opacity" values="0;0.8;0" dur="3s" repeatCount="indefinite" />
+      </circle>
     </g>
   );
 }
 
 function PillNode({ 
-  x, y, label, icon: Icon, delay, onClick 
+  x, y, label, icon: Icon, delay, onClick, bg = WHITE, color = BLACK 
 }: { 
-  x: number; y: number; label: string; icon?: any; delay: number; onClick?: () => void;
+  x: number; y: number; label: string; icon?: any; delay: number; onClick?: () => void; bg?: string; color?: string;
 }) {
   return (
     <motion.div
@@ -54,55 +61,73 @@ function PillNode({
       viewport={{ once: true, margin: "-50px" }}
       transition={{ duration: 0.5, delay }}
       className={cn(
-        "absolute -translate-x-1/2 -translate-y-1/2 flex items-center gap-3 px-4 py-2.5 rounded-full border bg-white shadow-sm transition-all duration-300",
+        "absolute -translate-x-1/2 -translate-y-1/2 flex items-center gap-3 px-5 py-3 rounded-full border shadow-sm transition-all duration-300",
         onClick ? "cursor-pointer hover:shadow-md hover:scale-[1.02]" : ""
       )}
       style={{
         left: x,
         top: y,
-        borderColor: `${RED}30`,
-        borderLeft: `4px solid ${RED}`,
+        backgroundColor: bg,
+        borderColor: color === WHITE ? `${WHITE}40` : `${RED}30`,
+        color: color,
       }}
       onClick={onClick}
     >
       {Icon && (
-        <div className="w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0" style={{ backgroundColor: `${RED}10`, color: RED }}>
-          <Icon size={12} strokeWidth={2.5} />
+        <div className="w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0" style={{ backgroundColor: color === WHITE ? `${WHITE}20` : `${RED}10`, color: color === WHITE ? WHITE : RED }}>
+          <Icon size={14} strokeWidth={2.5} />
         </div>
       )}
-      <span className="text-xs font-semibold whitespace-nowrap" style={{ color: BLACK }}>{label}</span>
+      <span className="text-sm font-bold whitespace-nowrap">{label}</span>
     </motion.div>
   );
 }
 
-function TrackItemPanel({ items, isOpen, onOpenService }: { items: { id: string; label: string; description: string }[]; isOpen: boolean; onOpenService?: (id: string) => void }) {
-  if (!isOpen) return null;
-
+function ColumnContainer({ 
+  x, y, title, items, icon: Icon, delay, onOpenService 
+}: { 
+  x: number; y: number; title: string; items: any[]; icon: any; delay: number; onOpenService: (id: string) => void;
+}) {
   return (
     <motion.div
-      initial={{ opacity: 0, y: 10, height: 0 }}
-      animate={{ opacity: 1, y: 0, height: 'auto' }}
-      exit={{ opacity: 0, y: 10, height: 0 }}
-      transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-      className="overflow-hidden"
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-50px" }}
+      transition={{ duration: 0.6, delay }}
+      className="absolute -translate-x-1/2 p-6 rounded-3xl border bg-white/60 backdrop-blur-md shadow-lg"
+      style={{
+        left: x,
+        top: y,
+        width: 440,
+        borderColor: `${RED}20`,
+        boxShadow: `0 20px 40px ${BLACK}05, inset 0 0 0 1px ${WHITE}`
+      }}
     >
-      <div className="mt-4 space-y-2">
+      <div className="flex items-center gap-3 mb-6 pb-4 border-b" style={{ borderColor: `${BLACK}10` }}>
+        <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ backgroundColor: `${RED}10`, color: RED }}>
+          <Icon size={20} strokeWidth={2} />
+        </div>
+        <h3 className="text-xl font-bold tracking-tight" style={{ color: BLACK }}>{title}</h3>
+        <span className="ml-auto text-[10px] font-bold px-2 py-0.5 rounded-full" style={{ backgroundColor: `${RED}10`, color: RED }}>{items.length} steps</span>
+      </div>
+
+      <div className="space-y-2.5">
         {items.map((item, i) => (
           <motion.button
             key={item.id}
             initial={{ opacity: 0, x: -10 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: i * 0.05 }}
-            className="flex items-start gap-3 p-3 rounded-xl border w-full text-left cursor-pointer transition-all duration-200 hover:shadow-md bg-white"
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: delay + 0.2 + i * 0.05 }}
+            className="flex items-center gap-3 p-3.5 rounded-xl border w-full text-left cursor-pointer transition-all duration-200 hover:shadow-md bg-white hover:scale-[1.01]"
             style={{ borderColor: `${BLACK}10` }}
             onClick={() => onOpenService?.(item.id)}
           >
-            <div className="w-5 h-5 rounded-md flex items-center justify-center flex-shrink-0 mt-0.5" style={{ border: `1px solid ${BLACK}20`, color: BLACK }}>
-              <Plus size={12} strokeWidth={2.5} />
+            <div className="w-6 h-6 rounded-md flex items-center justify-center flex-shrink-0" style={{ border: `1px solid ${RED}30`, color: RED }}>
+              <Plus size={14} strokeWidth={2.5} />
             </div>
-            <div>
+            <div className="flex-1">
               <p className="text-[13px] font-bold" style={{ color: BLACK }}>{item.label}</p>
-              <p className="text-[11px] mt-0.5 leading-relaxed" style={{ color: BLACK, opacity: 0.7 }}>{item.description.slice(0, 100)}...</p>
             </div>
           </motion.button>
         ))}
@@ -112,8 +137,6 @@ function TrackItemPanel({ items, isOpen, onOpenService }: { items: { id: string;
 }
 
 export default function CompleteFramework() {
-  const [openContent, setOpenContent] = useState(false);
-  const [openOutreach, setOpenOutreach] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [modalServiceId, setModalServiceId] = useState<string | undefined>(undefined);
   
@@ -130,214 +153,122 @@ export default function CompleteFramework() {
     setTimeout(() => setModalServiceId(undefined), 300);
   }, []);
 
-  // Vertical Flowchart Coordinates
-  const W = 1000; // SVG canvas width
+  // Coordinates
+  const W = 1100;
+  const H = 1080;
   const centerX = W / 2;
   
-  const in1 = { x: centerX - 250, y: 100 };
-  const in2 = { x: centerX + 250, y: 100 };
+  const hub = { x: centerX, y: 0 };
+  const in1 = { x: centerX - 250, y: 120 };
+  const in2 = { x: centerX + 250, y: 120 };
   
-  const centerHub = { x: centerX, y: 280 };
+  const colY = 200;
+  const col1Top = { x: centerX - 250, y: colY };
+  const col2Top = { x: centerX + 250, y: colY };
   
-  const H = 850; // Flowchart container height
-
-  // Arranging 7 outputs in two columns below the center hub
-  const outputs = OUTPUTS.map((out, i) => {
-    // 0, 1, 2 go to the left. 3, 4, 5 go to the right. 6 goes to the middle bottom.
-    const isLeft = i % 2 === 0;
-    const isLast = i === 6;
-    
-    // Y position drops for every pair
-    const row = Math.floor(i / 2);
-    
-    const yPos = 400 + row * 80;
-    const xPos = isLast ? centerX : (isLeft ? centerX - 200 : centerX + 200);
-    
-    return { ...out, x: xPos, y: yPos };
-  });
+  // Height calculation for the bottoms of the columns
+  const col1Bottom = { x: centerX - 250, y: colY + 85 + (ENGINES[0].items.length * 60) + 20 };
+  const col2Bottom = { x: centerX + 250, y: colY + 85 + (ENGINES[1].items.length * 60) + 20 };
+  
+  const outY = Math.max(col1Bottom.y, col2Bottom.y) + 160;
+  const out1 = { x: centerX - 250, y: outY };
+  const out2 = { x: centerX + 250, y: outY };
+  
+  const final = { x: centerX, y: outY + 120 };
 
   return (
-    <section ref={sectionRef} className="relative overflow-hidden" style={{ backgroundColor: BG, paddingTop: '8rem', paddingBottom: '8rem' }}>
+    <section ref={sectionRef} className="relative overflow-hidden" style={{ backgroundColor: BG, paddingTop: '6rem', paddingBottom: '6rem' }}>
       
-      {/* ── Section Header ─────────────────────────────────────────── */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-        transition={{ duration: 0.6 }}
-        className="text-center mb-16 relative z-20 px-6"
-      >
-        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border mb-6 bg-white" style={{ borderColor: `${RED}20` }}>
-          <div className="w-2 h-2 rounded-full" style={{ backgroundColor: RED }} />
-          <span className="text-[11px] font-bold uppercase tracking-[0.15em]" style={{ color: RED }}>Complete Framework</span>
-        </div>
-        <h2 className="text-4xl md:text-5xl font-bold tracking-tight text-black">Inside The Nerve Center</h2>
-      </motion.div>
+      {/* ── Background Grid ─────────────────────────────────────────── */}
+      <div className="absolute inset-0 pointer-events-none" style={{ backgroundImage: `radial-gradient(circle at 1px 1px, ${RED}08 1px, transparent 0)`, backgroundSize: '40px 40px' }} />
+      
+      <div className="relative w-full max-w-[1200px] mx-auto px-6">
+        
+        {/* ── Section Header ─────────────────────────────────────────── */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+          transition={{ duration: 0.6 }}
+          className="text-center relative z-20"
+        >
+          <h2 className="text-4xl md:text-5xl font-bold tracking-tight pb-4" style={{ color: BLACK }}>The Complete Framework</h2>
+        </motion.div>
 
-      {/* ── Vertical Flowchart Visualization ───────────────────────────── */}
-      <div className="w-full overflow-x-auto pb-12 hide-scrollbar mask-edges relative z-10">
-        <div className="relative mx-auto" style={{ width: `${W}px`, height: `${H}px`, minWidth: `${W}px` }}>
-          
-          {/* SVG Connections */}
-          <svg className="absolute inset-0 w-full h-full pointer-events-none z-0 overflow-visible">
-            <Connection p1={{ x: in1.x, y: in1.y + 24 }} p2={{ x: centerHub.x, y: centerHub.y - 40 }} delay={0} />
-            <Connection p1={{ x: in2.x, y: in2.y + 24 }} p2={{ x: centerHub.x, y: centerHub.y - 40 }} delay={0.2} />
+        {/* ── Visual Flowchart ───────────────────────────── */}
+        <div className="w-full overflow-x-auto pb-12 hide-scrollbar mask-edges relative z-10">
+          <div className="relative mx-auto" style={{ width: `${W}px`, height: `${H}px`, minWidth: `${W}px` }}>
             
-            {outputs.map((out, i) => (
-              <Connection key={out.id} p1={{ x: centerHub.x, y: centerHub.y + 40 }} p2={{ x: out.x, y: out.y - 24 }} delay={0.4 + i * 0.1} />
-            ))}
-          </svg>
-
-          {/* HTML Nodes */}
-          <div className="absolute inset-0 z-10 pointer-events-none">
-            
-            {/* Inputs */}
-            <div className="pointer-events-auto">
-              <PillNode x={in1.x} y={in1.y} label="You Record the Video" icon={Video} delay={0.1} />
-              <PillNode x={in2.x} y={in2.y} label="We Discuss Your ICP" icon={Target} delay={0.3} />
-            </div>
-
-            {/* Central Nerve Center */}
-            <motion.div
-              initial={{ opacity: 0, scale: 0.8 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.5, duration: 0.6 }}
-              className="absolute -translate-x-1/2 -translate-y-1/2 flex flex-col items-center pointer-events-auto"
-              style={{ left: centerHub.x, top: centerHub.y }}
-            >
-              <div className="w-24 h-24 rounded-full flex flex-col items-center justify-center relative" style={{ backgroundColor: BLACK, boxShadow: `0 0 40px ${RED}30` }}>
-                <span className="text-xl font-bold text-white tracking-tight">SV</span>
-                <span className="text-[8px] uppercase tracking-widest text-white/70 mt-0.5">Venture</span>
-                
-                {/* Orbit dots matching old design */}
-                <svg className="absolute inset-[-20px] w-[calc(100%+40px)] h-[calc(100%+40px)] animate-spin-slow pointer-events-none" viewBox="0 0 100 100">
-                  <circle cx="50" cy="50" r="48" fill="none" stroke={RED} strokeWidth="0.5" strokeDasharray="2 6" opacity="0.5" />
-                  <circle cx="50" cy="2" r="2" fill={RED} />
-                  <circle cx="98" cy="50" r="1.5" fill={RED} opacity="0.6" />
-                  <circle cx="2" cy="50" r="1.5" fill={RED} opacity="0.6" />
-                </svg>
-              </div>
+            {/* SVG Connections Layer */}
+            <svg className="absolute inset-0 w-full h-full pointer-events-none z-0 overflow-visible">
               
-              <div className="mt-8 flex items-center gap-1.5 bg-white/80 backdrop-blur-sm px-3 py-1 rounded-full">
-                <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: RED }} />
-                <span className="text-[10px] font-bold uppercase tracking-widest" style={{ color: RED }}>The Nerve Center</span>
+              {/* Hub to Inputs */}
+              <AnimatedConnection p1={{ x: hub.x, y: hub.y }} p2={{ x: in1.x, y: in1.y - 24 }} delay={0} />
+              <AnimatedConnection p1={{ x: hub.x, y: hub.y }} p2={{ x: in2.x, y: in2.y - 24 }} delay={0.2} />
+              
+              {/* Inputs to Columns */}
+              <AnimatedConnection p1={{ x: in1.x, y: in1.y + 24 }} p2={{ x: col1Top.x, y: col1Top.y }} delay={0.4} strokeDasharray="4 4" />
+              <AnimatedConnection p1={{ x: in2.x, y: in2.y + 24 }} p2={{ x: col2Top.x, y: col2Top.y }} delay={0.5} strokeDasharray="4 4" />
+              
+              {/* Columns to Outcomes */}
+              {/* Direct Drops */}
+              <AnimatedConnection p1={col1Bottom} p2={{ x: out1.x, y: out1.y - 24 }} delay={0.7} />
+              <AnimatedConnection p1={col2Bottom} p2={{ x: out2.x, y: out2.y - 24 }} delay={0.8} />
+
+              {/* Outcomes to Final */}
+              <AnimatedConnection p1={{ x: out1.x, y: out1.y + 24 }} p2={{ x: final.x, y: final.y - 28 }} delay={1.0} />
+              <AnimatedConnection p1={{ x: out2.x, y: out2.y + 24 }} p2={{ x: final.x, y: final.y - 28 }} delay={1.1} />
+              
+            </svg>
+
+            {/* HTML Nodes Layer */}
+            <div className="absolute inset-0 z-10 pointer-events-none">
+              
+              {/* Futuristic Routing Nodes on the vertical paths */}
+              <motion.div
+                initial={{ opacity: 0, scale: 0 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: 0.8 }}
+                className="absolute w-3 h-3 rotate-45 border"
+                style={{ left: col1Bottom.x - 6, top: (col1Bottom.y + out1.y) / 2 - 6, backgroundColor: WHITE, borderColor: RED, boxShadow: `0 0 10px ${RED}50` }}
+              />
+              <motion.div
+                initial={{ opacity: 0, scale: 0 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: 0.9 }}
+                className="absolute w-3 h-3 rotate-45 border"
+                style={{ left: col2Bottom.x - 6, top: (col1Bottom.y + out1.y) / 2 - 6, backgroundColor: WHITE, borderColor: RED, boxShadow: `0 0 10px ${RED}50` }}
+              />
+              
+              {/* Inputs */}
+              <div className="pointer-events-auto">
+                <PillNode x={in1.x} y={in1.y} label="You Record Video Once" icon={Video} delay={0.2} />
+                <PillNode x={in2.x} y={in2.y} label="You Tell Us Who to Reach" icon={Target} delay={0.4} />
               </div>
-            </motion.div>
 
-            {/* Outputs */}
-            <div className="pointer-events-auto">
-              {outputs.map((out, i) => (
-                <PillNode 
-                  key={out.id} 
-                  x={out.x} 
-                  y={out.y} 
-                  label={out.label} 
-                  icon={out.group === 'content' ? Sparkles : Send} 
-                  delay={0.6 + i * 0.1} 
-                />
-              ))}
+              {/* Columns */}
+              <div className="pointer-events-auto">
+                <ColumnContainer x={col1Top.x} y={col1Top.y} title="Content Production" items={ENGINES[0].items} icon={Sparkles} delay={0.6} onOpenService={openService} />
+                <ColumnContainer x={col2Top.x} y={col2Top.y} title="Manual Outreach" items={ENGINES[1].items} icon={Send} delay={0.7} onOpenService={openService} />
+              </div>
+
+              {/* Outcomes */}
+              <div className="pointer-events-auto">
+                <PillNode x={out1.x} y={out1.y} label="Consistent Multi-Platform Presence" icon={Sparkles} delay={1.0} />
+                <PillNode x={out2.x} y={out2.y} label="Qualified Conversations with the Right People" icon={Send} delay={1.1} />
+              </div>
+
+              {/* Final Node */}
+              <div className="pointer-events-auto">
+                <PillNode x={final.x} y={final.y} label="More Clients, Faster" icon={CheckCircle2} delay={1.3} bg={BLACK} color={WHITE} />
+              </div>
+
             </div>
-
           </div>
         </div>
       </div>
-
-      {/* ── Accordion Lists ──────────────────────────────── */}
-      <div className="relative max-w-[1200px] mx-auto px-6 grid grid-cols-1 md:grid-cols-2 gap-8 relative z-20 -mt-12">
-        {/* Content Production */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-          transition={{ delay: 0.8, duration: 0.5 }}
-          className="p-6 rounded-3xl border bg-white shadow-sm"
-          style={{ borderColor: `${BLACK}10` }}
-        >
-          <div className="flex items-center justify-between cursor-pointer" onClick={() => setOpenContent(!openContent)}>
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ backgroundColor: `${RED}10`, color: RED }}>
-                <Sparkles size={20} strokeWidth={2} />
-              </div>
-              <div>
-                <div className="flex items-center gap-2">
-                  <h3 className="text-lg font-bold" style={{ color: BLACK }}>Content Production</h3>
-                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full" style={{ backgroundColor: `${RED}10`, color: RED }}>{ENGINES[0].items.length} steps</span>
-                </div>
-                <p className="text-[12px] mt-0.5 opacity-70" style={{ color: BLACK }}>One recording becomes everything you publish this month.</p>
-              </div>
-            </div>
-            <motion.div animate={{ rotate: openContent ? 180 : 0 }} className="w-8 h-8 flex items-center justify-center opacity-50"><ChevronDown size={18} /></motion.div>
-          </div>
-          <TrackItemPanel items={ENGINES[0].items} isOpen={openContent} onOpenService={openService} />
-        </motion.div>
-
-        {/* Manual Outreach */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-          transition={{ delay: 1, duration: 0.5 }}
-          className="p-6 rounded-3xl border bg-white shadow-sm"
-          style={{ borderColor: `${BLACK}10` }}
-        >
-          <div className="flex items-center justify-between cursor-pointer" onClick={() => setOpenOutreach(!openOutreach)}>
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ backgroundColor: `${RED}10`, color: RED }}>
-                <Send size={20} strokeWidth={2} />
-              </div>
-              <div>
-                <div className="flex items-center gap-2">
-                  <h3 className="text-lg font-bold" style={{ color: BLACK }}>Manual Outreach</h3>
-                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full" style={{ backgroundColor: `${RED}10`, color: RED }}>{ENGINES[1].items.length} steps</span>
-                </div>
-                <p className="text-[12px] mt-0.5 opacity-70" style={{ color: BLACK }}>Hand-built lists, human-written emails, replies sorted.</p>
-              </div>
-            </div>
-            <motion.div animate={{ rotate: openOutreach ? 180 : 0 }} className="w-8 h-8 flex items-center justify-center opacity-50"><ChevronDown size={18} /></motion.div>
-          </div>
-          <TrackItemPanel items={ENGINES[1].items} isOpen={openOutreach} onOpenService={openService} />
-        </motion.div>
-      </div>
-
-      {/* ── Outcomes Node ──────────────────────────────── */}
-      <motion.div
-        initial={{ opacity: 0, y: 30 }}
-        animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
-        transition={{ delay: 1.2, duration: 0.6 }}
-        className="mt-24 max-w-3xl mx-auto flex flex-col items-center"
-      >
-        <div className="flex flex-col md:flex-row items-center gap-12 w-full justify-center">
-          <div className="flex items-center gap-3 px-6 py-4 bg-white rounded-xl border border-black/5 shadow-sm min-w-[280px]">
-            <div className="w-8 h-8 rounded-full bg-[#7A0A0E10] text-[#7A0A0E] flex items-center justify-center"><Sparkles size={14}/></div>
-            <div>
-              <p className="text-[13px] font-bold text-black">Consistent Multi-Platform</p>
-              <p className="text-[11px] italic text-black/50">builds trust</p>
-            </div>
-          </div>
-          
-          <div className="flex items-center gap-3 px-6 py-4 bg-white rounded-xl border border-black/5 shadow-sm min-w-[280px]">
-            <div className="w-8 h-8 rounded-full bg-[#7A0A0E10] text-[#7A0A0E] flex items-center justify-center"><Send size={14}/></div>
-            <div>
-              <p className="text-[13px] font-bold text-black">Qualified Conversations</p>
-              <p className="text-[11px] italic text-black/50">expands reach</p>
-            </div>
-          </div>
-        </div>
-
-        {/* SVG converging to final output */}
-        <div className="relative w-[300px] h-[100px] my-4 pointer-events-none">
-          <svg className="absolute inset-0 w-full h-full" viewBox="0 0 300 100">
-            <path d="M 50 0 C 50 50, 150 20, 150 100" fill="none" stroke={RED} strokeWidth="1.5" opacity="0.3" />
-            <path d="M 250 0 C 250 50, 150 20, 150 100" fill="none" stroke={RED} strokeWidth="1.5" opacity="0.3" />
-          </svg>
-        </div>
-
-        <div className="px-8 py-4 rounded-full flex items-center gap-3 shadow-xl z-10" style={{ backgroundColor: BLACK }}>
-          <div className="w-6 h-6 rounded-full flex items-center justify-center" style={{ backgroundColor: RED }}>
-            <Sparkles size={12} strokeWidth={3} color={WHITE} />
-          </div>
-          <span className="text-white font-bold tracking-wide">More Clients, Faster</span>
-        </div>
-      </motion.div>
-
+      
       <ServiceDetailModal open={modalOpen} onClose={closeModal} serviceId={modalServiceId} />
     </section>
   );

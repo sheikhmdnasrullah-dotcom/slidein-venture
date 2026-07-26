@@ -50,7 +50,7 @@ export default function ServiceDetailModal({ open, onClose, serviceId }: Service
           >
             {/* Subtle background glow/gradient to make it "futuristic white" */}
             <div className="absolute inset-0 pointer-events-none" style={{
-              background: 'radial-gradient(circle at 50% 0%, rgba(122,10,14,0.03) 0%, transparent 60%)'
+              background: 'radial-gradient(circle at 50% 0%, rgba(122,10,14,0.05) 0%, transparent 60%)'
             }} />
 
             {/* Close Button */}

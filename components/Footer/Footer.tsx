@@ -43,7 +43,7 @@ const NotionLogoSm = () => (
 
 export default function Footer() {
   return (
-    <footer className="bg-[#F7F6F3] border-t border-[#E3E2E0] pt-16">
+    <footer className="bg-[#FAFAF8] border-t border-[#E5E5E5] pt-16">
       <div className="max-w-[1200px] mx-auto px-6 md:px-10">
 
         {/* Top grid */}
@@ -53,7 +53,7 @@ export default function Footer() {
           <div className="flex flex-col gap-4">
             <Link href="/" className="flex items-center gap-2 group">
               <NotionLogoSm />
-              <span className="text-[14.5px] font-[650] text-[#191919] tracking-[-0.01em]">SlideIn Venture</span>
+          <span className="text-[14.5px] font-[650] text-[#0A0A0A] tracking-[-0.01em]">SlideIn Venture</span>
             </Link>
             <p className="text-[13.5px] text-[#9B9A97] leading-[1.65] max-w-[180px]">
               The AI workspace that works for you.
@@ -68,7 +68,7 @@ export default function Footer() {
                   key={s.label}
                   href={s.href}
                   aria-label={s.label}
-                  className="w-8 h-8 rounded-lg border border-[#E3E2E0] bg-white flex items-center justify-center text-[12.5px] font-[700] text-[#9B9A97] hover:text-[#191919] hover:border-[#9B9A97] transition-all duration-150"
+              className="w-8 h-8 rounded-lg border border-[#E5E5E5] bg-white flex items-center justify-center text-[12.5px] font-[700] text-[#9B9A97] hover:text-[#0A0A0A] hover:border-[#9B9A97] transition-all duration-150"
                 >
                   {s.icon}
                 </a>
@@ -80,14 +80,14 @@ export default function Footer() {
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-8">
             {Object.entries(footerLinks).map(([group, links]) => (
               <div key={group} className="flex flex-col gap-3">
-                <p className="text-[11px] font-[700] tracking-[0.06em] uppercase text-[#191919] mb-1">
+                <p className="text-[11px] font-[700] tracking-[0.06em] uppercase text-[#0A0A0A] mb-1">
                   {group}
                 </p>
                 {links.map((link) => (
                   <Link
                     key={link.label}
                     href={link.href}
-                    className="text-[13.5px] text-[#9B9A97] hover:text-[#191919] transition-colors duration-120 leading-tight"
+                  className="text-[13.5px] text-[#9B9A97] hover:text-[#0A0A0A] transition-colors duration-120 leading-tight"
                   >
                     {link.label}
                   </Link>
@@ -98,7 +98,7 @@ export default function Footer() {
         </div>
 
         {/* Bottom bar */}
-        <div className="flex flex-wrap items-center justify-between gap-3 py-5 border-t border-[#E3E2E0]">
+        <div className="flex flex-wrap items-center justify-between gap-3 py-5 border-t border-[#E5E5E5]">
           <p className="text-[12.5px] text-[#9B9A97]">
             © {new Date().getFullYear()} SlideIn Venture, Inc.
           </p>
