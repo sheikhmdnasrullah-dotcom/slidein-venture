@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useCallback, useRef } from 'react';
+import React, { useState, useCallback } from 'react';
 import { Plus, Video, Target, Sparkles, Send, CheckCircle2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { ENGINES } from './framework.data';
@@ -146,10 +146,7 @@ export default function CompleteFramework() {
   const final = { x: centerX, y: outY + 120 };
 
   return (
-    <section className="relative overflow-hidden section-grid pt-24 pb-24">
-      
-      {/* ── Background Grid ─────────────────────────────────────────── */}
-      <div className="absolute inset-0 pointer-events-none" style={{ backgroundImage: `radial-gradient(circle at 1px 1px, ${RED}10 1px, transparent 0)`, backgroundSize: '40px 40px' }} />
+    <section className="relative overflow-hidden pt-24 pb-24">
 
       <div className="relative w-full max-w-[1200px] mx-auto px-6">
         

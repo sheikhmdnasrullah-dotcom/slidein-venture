@@ -1,11 +1,16 @@
-# Nerve Center Redesign - Progress Tracker
+# TODO: Remove decorative background effects causing white border/square artifacts
 
-## Steps
+## Completed Steps ✓
+- [x] Removed `body::after` aurora animation from `globals.css`
+- [x] Removed `body::before` noise texture from `globals.css`
+- [x] Removed `.vignette-overlay` class from `globals.css`
+- [x] Removed `.tech-grid-bg` class from `globals.css`
+- [x] Removed `.section-grid::before` class from `globals.css`
+- [x] Removed `@layer base` `*` universal border/outline from `globals.css`
+- [x] Removed `.beam-sweep::after` and `.glow-border::before` from `globals.css`
+- [x] Removed `aurora-shift` keyframes animation from `globals.css`
+- [x] Removed `<div className="tech-grid-bg">` and `<div className="vignette-overlay">` from `layout.tsx`
+- [x] Removed background grid patterns from `CompleteFramework.tsx`
+- [x] Removed unused `useRef` import from `CompleteFramework.tsx`
+- [x] Build verification: ✅ Passed (compiled successfully, no errors)
 
-- [x] 0. Create TODO.md
-- [x] 1. Update `app/globals.css` - Brand color overhaul
-- [x] 2. Redesign `components/CompleteFramework/CompleteFramework.tsx` - Vertical orbit layout
-- [x] 3. Update `components/Hero/Hero.tsx` - Brand color alignment
-- [x] 4. Update `components/Footer/Footer.tsx` - Brand color alignment
-- [x] 5. Update `components/CTABanner/CTABanner.tsx` - Brand color alignment
-- [x] 6. Update `components/ServiceDetailModal/ServiceDetailModal.tsx` - Minor color tweak
