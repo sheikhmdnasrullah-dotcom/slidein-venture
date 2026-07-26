@@ -28,6 +28,7 @@ export default function RootLayout({
     <html lang="en" className={cn("font-sans", geist.variable)}>
       <body className={`${inter.className} antialiased`}>
         <div className="tech-grid-bg"></div>
+        <div className="vignette-overlay"></div>
         <Navbar />
         <main>{children}</main>
 

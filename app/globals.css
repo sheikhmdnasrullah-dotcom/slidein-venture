@@ -163,12 +163,12 @@ body::before {
   mix-blend-mode: multiply;
 }
 
-/* Subtle, futuristic animated aurora glow in the background */
+/* Subtle, futuristic animated aurora glow mixing darkish and red tones */
 @keyframes aurora-shift {
-  0% { transform: translate(0, 0) scale(1); opacity: 0.5; }
-  33% { transform: translate(2vw, 2vh) scale(1.05); opacity: 0.7; }
-  66% { transform: translate(-2vw, 1vh) scale(0.95); opacity: 0.6; }
-  100% { transform: translate(0, 0) scale(1); opacity: 0.5; }
+  0% { transform: translate(0, 0) scale(1); opacity: 0.6; }
+  33% { transform: translate(3vw, 3vh) scale(1.1); opacity: 0.8; }
+  66% { transform: translate(-3vw, 2vh) scale(0.9); opacity: 0.7; }
+  100% { transform: translate(0, 0) scale(1); opacity: 0.6; }
 }
 
 body::after {
@@ -177,13 +177,27 @@ body::after {
   top: -20vh;
   left: 0;
   width: 100vw;
-  height: 100vh;
+  height: 120vh;
   z-index: -3;
   pointer-events: none;
   background: 
-    radial-gradient(circle at 15% 30%, rgba(122, 10, 14, 0.03) 0%, transparent 40%),
-    radial-gradient(circle at 85% 20%, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0) 50%);
-  animation: aurora-shift 15s ease-in-out infinite;
+    /* Deep darkish red sweep */
+    radial-gradient(circle at 20% 40%, rgba(122, 10, 14, 0.08) 0%, transparent 50%),
+    /* Almost black shadow sweep for that "darkish" rich contrast */
+    radial-gradient(circle at 80% 60%, rgba(10, 10, 10, 0.06) 0%, transparent 50%),
+    /* Bright white core to maintain the white futuristic theme */
+    radial-gradient(circle at 50% 10%, rgba(255, 255, 255, 0.8) 0%, transparent 60%);
+  animation: aurora-shift 20s ease-in-out infinite alternate;
+}
+
+/* Cinematic dark/red vignette around the edges */
+.vignette-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  pointer-events: none;
+  background: radial-gradient(circle at center, transparent 40%, rgba(122, 10, 14, 0.04) 100%);
+  box-shadow: inset 0 0 120px rgba(10, 10, 10, 0.03);
 }
 
 /* High-tech faint dot grid */
