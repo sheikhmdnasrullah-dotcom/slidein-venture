@@ -3,9 +3,6 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import VideoModal from '@/components/VideoModal/VideoModal';
-import WatchThisButton from './WatchThisButton';
-
-
 
 export default function Hero() {
   const [videoOpen, setVideoOpen] = useState(false);
@@ -26,16 +23,6 @@ export default function Hero() {
           Helping Founders with{' '}
           <AnimatedWordSwap />
         </motion.h1>
-
-        {/* Watch This — creepy flip button */}
-        <motion.div
-          className="mb-20"
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
-        >
-          <WatchThisButton onClick={() => setVideoOpen(true)} />
-        </motion.div>
 
       </div>
     </section>
