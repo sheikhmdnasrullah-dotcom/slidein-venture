@@ -148,40 +148,55 @@ body {
 }
 
 /* ─── Futuristic Background Overlay ──────────────────────────────────────── */
-/* Subtle noise texture for depth */
+
+/* Base ultra-fine noise texture for premium depth */
 body::before {
   content: '';
   position: fixed;
   inset: 0;
-  z-index: -1;
+  z-index: -2;
   pointer-events: none;
-  opacity: 0.35;
+  opacity: 0.15;
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E");
   background-repeat: repeat;
   background-size: 128px 128px;
   mix-blend-mode: multiply;
 }
 
-/* Elegant radial vignette - glass-like soft glow at top */
+/* Subtle, futuristic animated aurora glow in the background */
+@keyframes aurora-shift {
+  0% { transform: translate(0, 0) scale(1); opacity: 0.5; }
+  33% { transform: translate(2vw, 2vh) scale(1.05); opacity: 0.7; }
+  66% { transform: translate(-2vw, 1vh) scale(0.95); opacity: 0.6; }
+  100% { transform: translate(0, 0) scale(1); opacity: 0.5; }
+}
+
 body::after {
   content: '';
   position: fixed;
-  top: -40%;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 90vw;
-  height: 90vh;
-  z-index: -1;
+  top: -20vh;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: -3;
   pointer-events: none;
-  background: radial-gradient(
-    ellipse at center,
-    rgba(122, 10, 14, 0.03) 0%,
-    rgba(122, 10, 14, 0.02) 30%,
-    transparent 70%
-  );
+  background: 
+    radial-gradient(circle at 15% 30%, rgba(122, 10, 14, 0.03) 0%, transparent 40%),
+    radial-gradient(circle at 85% 20%, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0) 50%);
+  animation: aurora-shift 15s ease-in-out infinite;
 }
 
-/* Futuristic subtle grid overlay for sections */
+/* High-tech faint dot grid */
+.tech-grid-bg {
+  position: fixed;
+  inset: 0;
+  z-index: -4;
+  pointer-events: none;
+  background-image: radial-gradient(rgba(10, 10, 10, 0.05) 1px, transparent 1px);
+  background-size: 32px 32px;
+}
+
+/* Futuristic subtle grid overlay for sections (if needed) */
 .section-grid {
   position: relative;
 }
@@ -193,17 +208,18 @@ body::after {
   z-index: 0;
   pointer-events: none;
   background-image: 
-    linear-gradient(rgba(122, 10, 14, 0.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(122, 10, 14, 0.03) 1px, transparent 1px);
+    linear-gradient(rgba(122, 10, 14, 0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(122, 10, 14, 0.02) 1px, transparent 1px);
   background-size: 60px 60px;
 }
 
-/* Glass card effect */
+/* Glass card effect - ultra premium */
 .glass-card {
-  background: rgba(255, 255, 255, 0.6);
-  backdrop-filter: blur(20px) saturate(1.2);
-  -webkit-backdrop-filter: blur(20px) saturate(1.2);
-  border: 1px solid rgba(122, 10, 14, 0.06);
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(24px) saturate(1.4);
+  -webkit-backdrop-filter: blur(24px) saturate(1.4);
+  border: 1px solid rgba(122, 10, 14, 0.04);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.02), inset 0 0 0 1px rgba(255, 255, 255, 0.5);
 }
 
 /* Subtle beam effect - like light rays */
