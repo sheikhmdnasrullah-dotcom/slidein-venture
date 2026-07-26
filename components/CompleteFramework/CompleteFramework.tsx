@@ -1,901 +1,556 @@
 'use client';
 
-import * as React from 'react';
-import { AnimatePresence, motion, useInView, useReducedMotion } from 'framer-motion';
+import React, { useState, useCallback, useRef, useEffect } from 'react';
+import { motion, useInView, useReducedMotion, useScroll, useTransform } from 'framer-motion';
+import { Plus, Sparkles, CheckCircle2, ChevronDown, Globe } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { FlowStage, FlowNode, type EdgeSpec } from './flow/FlowStage';
-import { Artwork, FlowIcon } from './FlowIcon';
-import { BRAND, ENGINES, INPUTS, OUTPUTS, type Engine, type IconKey } from './framework.data';
 
-/* ── Brand tokens (mirrors app/globals.css) ─────────────────────────────── */
 const RED = '#7A0A0E';
-const ROSE = '#C24B4B';
-const INK = '#191919';
+const RED_WARM = '#C24B4B';
+const BLACK = '#0A0A0A';
 const STONE = '#6B6B6B';
-const PEBBLE = '#A3A3A3';
-const RAIL = '#E1DFDA';
-const BORDER = '#E3E2E0';
-const BG = '#F7F6F3';
-const CARD = '#FFFFFF';
-const EASE = [0.16, 1, 0.3, 1] as const;
+const FROST = '#E8E8E4';
+const SECTION_BG = '#FAFAF8';
+const NODE_BG = '#FFFFFF';
 
-type Group = 'content' | 'outreach';
-
-function useMedia(query: string) {
-  const [matches, setMatches] = React.useState(false);
-  React.useEffect(() => {
-    const mql = window.matchMedia(query);
-    setMatches(mql.matches);
-    const onChange = (e: MediaQueryListEvent) => setMatches(e.matches);
-    mql.addEventListener('change', onChange);
-    return () => mql.removeEventListener('change', onChange);
-  }, [query]);
-  return matches;
-}
-
-/* ── Nerve Center Hub ───────────────────────────────────────────────────── */
-
-/**
- * A single orbital dot that travels around the ring at a given speed and phase.
- * Implemented with a CSS animation so it's one transform — no JS per-frame work.
- */
-function OrbitalDot({
-  radius,
-  size,
-  durationSec,
-  phaseOffset,
-  color,
-}: {
-  radius: number;
-  size: number;
-  durationSec: number;
-  phaseOffset: number; // 0–360 starting angle
-  color: string;
-}) {
-  const id = React.useId();
-  const circumference = 2 * Math.PI * radius;
-  return (
-    <>
-      <style>{`
-        @keyframes orbit-${id.replace(/:/g, '')} {
-          from { stroke-dashoffset: ${circumference - phaseOffset * (circumference / 360)}; }
-          to   { stroke-dashoffset: ${circumference - phaseOffset * (circumference / 360) - circumference}; }
-        }
-        @media (prefers-reduced-motion: reduce) {
-          .orbit-dot-${id.replace(/:/g, '')} { animation: none !important; }
-        }
-      `}</style>
-      {/* Invisible full-circle path the dot follows */}
-      <circle
-        className={`orbit-dot-${id.replace(/:/g, '')}`}
-        cx="90" cy="90"
-        r={radius}
-        fill="none"
-        stroke={color}
-        strokeWidth={size}
-        strokeLinecap="round"
-        strokeDasharray={`0 ${circumference}`}
-        style={{
-          animation: `orbit-${id.replace(/:/g, '')} ${durationSec}s linear infinite`,
-          transformOrigin: '90px 90px',
-        }}
-      />
-    </>
-  );
-}
-
-function Hub({ active }: { active: Group | null }) {
-  const reduce = useReducedMotion();
-  const isActive = active !== null;
-
-  /* Outer ring radius — SVG is 180×180, centre at 90,90 */
-  const outerR = 82;
-  const innerR = 58;
-
-  return (
-    <div className="relative flex flex-col items-center">
-
-      {/* ── Ambient glow that deepens on hover ── */}
-      <span
-        aria-hidden="true"
-        className="absolute pointer-events-none"
-        style={{
-          width: 280, height: 280,
-          top: '50%', left: '50%',
-          transform: 'translate(-50%,-50%)',
-          borderRadius: '50%',
-          background: `radial-gradient(circle at 50% 50%, ${RED}${isActive ? '1E' : '0A'} 0%, transparent 68%)`,
-          transition: 'background 700ms ease',
-        }}
-      />
-
-      {/* ── Outer SVG ring + traveling orbital dots ── */}
-      <FlowNode id="hub" className="relative" style={{ width: 180, height: 180 }}>
-
-        {/* Static guide ring with cardinal anchors */}
-        <svg
-          aria-hidden="true"
-          className="absolute inset-0"
-          width="180" height="180" viewBox="0 0 180 180"
-          fill="none"
-        >
-          {/* Dashed outer ring */}
-          <circle cx="90" cy="90" r={outerR} stroke={`${RED}20`} strokeWidth="1" strokeDasharray="4 6" />
-
-          {/* Cardinal anchor dots */}
-          {[0, 90, 180, 270].map((deg) => {
-            const rad = (deg * Math.PI) / 180;
-            return (
-              <circle
-                key={deg}
-                cx={90 + outerR * Math.cos(rad)}
-                cy={90 + outerR * Math.sin(rad)}
-                r="2.5"
-                fill={`${RED}55`}
-              />
-            );
-          })}
-
-          {/* Traveling orbital dot 1 */}
-          {!reduce && <OrbitalDot radius={outerR} size={4} durationSec={8} phaseOffset={0} color={RED} />}
-          {/* Traveling orbital dot 2 — slower, offset start */}
-          {!reduce && <OrbitalDot radius={outerR} size={3} durationSec={13} phaseOffset={180} color={ROSE} />}
-
-          {/* Inner connector ring */}
-          <circle cx="90" cy="90" r={innerR} stroke={`${RED}12`} strokeWidth="1" />
-        </svg>
-
-        {/* ── Dark orb core ── */}
-        <motion.div
-          className="absolute flex flex-col items-center justify-center rounded-full"
-          style={{
-            top: 90 - innerR,
-            left: 90 - innerR,
-            width: innerR * 2,
-            height: innerR * 2,
-            backgroundColor: INK,
-            boxShadow: [
-              `0 0 0 1px ${RED}30`,
-              `0 0 28px ${RED}${isActive ? '44' : '1C'}`,
-              `inset 0 1px 0 rgba(255,255,255,0.06)`,
-            ].join(', '),
-            transition: 'box-shadow 600ms ease',
-          }}
-          animate={reduce ? undefined : { scale: [1, 1.018, 1] }}
-          transition={{ duration: 5.5, repeat: Infinity, ease: 'easeInOut' }}
-        >
-          {/* Radial inner glow */}
-          <span
-            aria-hidden="true"
-            className="absolute rounded-full pointer-events-none"
-            style={{
-              inset: 10,
-              background: `radial-gradient(circle at 40% 35%, ${RED}${isActive ? '55' : '30'} 0%, transparent 65%)`,
-              transition: 'background 600ms ease',
-            }}
-          />
-
-          {/* Brand mark */}
-          <span
-            className="relative z-10 select-none font-bold text-white"
-            style={{ fontSize: 22, letterSpacing: '-0.04em', lineHeight: 1, textShadow: `0 0 18px ${RED}CC` }}
-          >
-            SV
-          </span>
-          <span
-            className="relative z-10 mt-[5px] font-semibold"
-            style={{ fontSize: 7.5, letterSpacing: '0.22em', color: 'rgba(255,255,255,0.38)', textTransform: 'uppercase' }}
-          >
-            Venture
-          </span>
-        </motion.div>
-      </FlowNode>
-
-      {/* ── Label strip ── */}
-      <div className="mt-5 flex flex-col items-center gap-1.5">
-        <div className="flex items-center gap-1.5">
-          <span className="relative flex h-[7px] w-[7px]" aria-hidden="true">
-            {!reduce && (
-              <motion.span
-                className="absolute inline-flex h-full w-full rounded-full"
-                style={{ backgroundColor: RED }}
-                animate={{ scale: [1, 2], opacity: [0.7, 0] }}
-                transition={{ duration: 1.6, repeat: Infinity, ease: 'easeOut' }}
-              />
-            )}
-            <span className="relative inline-flex h-[7px] w-[7px] rounded-full" style={{ backgroundColor: RED }} />
-          </span>
-          <span className="text-[9.5px] font-bold uppercase" style={{ color: RED, letterSpacing: '0.22em' }}>
-            The Nerve Center
-          </span>
-        </div>
-
-        {active && (
-          <AnimatePresence mode="wait" initial={false}>
-            <motion.span
-              key={active}
-              initial={{ opacity: 0, y: 4, filter: 'blur(4px)' }}
-              animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-              exit={{ opacity: 0, y: -4, filter: 'blur(4px)' }}
-              transition={{ duration: 0.22, ease: EASE }}
-              className="text-[12px] text-center"
-              style={{ color: STONE }}
-            >
-              {active === 'content'
-                ? 'Producing your content'
-                : 'Reaching your buyers'}
-            </motion.span>
-          </AnimatePresence>
-        )}
-      </div>
-    </div>
-  );
-}
-
-
-/* ── Input card ─────────────────────────────────────────────────────────── */
-
-function InputCard({
-  id,
-  label,
-  caption,
-  icon,
-  logo,
-  delay,
-  dimmed,
-  onHover,
-}: {
+interface TrackItemData {
   id: string;
-  label: string;
-  caption?: string;
-  icon: IconKey;
-  logo?: string;
-  delay: number;
-  dimmed: boolean;
-  onHover: (g: Group | null) => void;
-}) {
-  const reduce = useReducedMotion();
-  return (
-    <motion.div
-      initial={{ opacity: 0, x: -20 }}
-      whileInView={{ opacity: 1, x: 0 }}
-      viewport={{ once: true, margin: '-10%' }}
-      transition={{ duration: 0.55, delay, ease: EASE }}
-      onMouseEnter={() => onHover(null)}
-      onMouseLeave={() => onHover(null)}
-      style={{ opacity: dimmed ? 0.35 : 1, transition: 'opacity 380ms cubic-bezier(0.16,1,0.3,1)' }}
-    >
-      <FlowNode id={id}>
-        <motion.div
-          whileHover={reduce ? undefined : { y: -2, boxShadow: `0 12px 32px ${RED}18, 0 2px 8px rgba(0,0,0,0.06)` }}
-          transition={{ type: 'spring', stiffness: 300, damping: 24 }}
-          className="group relative flex items-center gap-3.5 rounded-2xl px-4 py-4 overflow-hidden"
-          style={{
-            backgroundColor: CARD,
-            border: `1px solid ${BORDER}`,
-            boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 6px 20px rgba(0,0,0,0.04)',
-          }}
-        >
-          {/* Left accent bar */}
-          <span
-            aria-hidden="true"
-            className="absolute left-0 top-3 bottom-3 w-[2.5px] rounded-full"
-            style={{ backgroundColor: RED, opacity: 0.55 }}
-          />
-
-          {/* Icon badge */}
-          <span
-            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl relative"
-            style={{
-              background: `linear-gradient(135deg, ${RED}15 0%, ${RED}08 100%)`,
-              border: `1px solid ${RED}22`,
-              color: RED,
-            }}
-          >
-            <Artwork logo={logo} icon={icon} label={label} size={19} />
-          </span>
-
-          {/* Text */}
-          <span className="flex min-w-0 flex-col gap-0.5">
-            <span
-              className="truncate text-[13.5px] font-semibold leading-tight"
-              style={{ color: INK, letterSpacing: '-0.015em' }}
-            >
-              {label}
-            </span>
-            {caption && (
-              <span className="truncate text-[11px] font-medium" style={{ color: PEBBLE }}>
-                {caption}
-              </span>
-            )}
-          </span>
-
-          {/* Flow arrow — signals direction toward hub */}
-          <span className="ml-auto flex-shrink-0" style={{ color: `${RED}50` }}>
-            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
-              <path d="M3 7h8M8 4l3 3-3 3" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-          </span>
-        </motion.div>
-      </FlowNode>
-    </motion.div>
-  );
-}
-
-/* ── Output chip ────────────────────────────────────────────────────────── */
-
-function OutputChip({
-  id,
-  label,
-  icon,
-  logo,
-  delay,
-  dimmed,
-  index,
-}: {
-  id: string;
-  label: string;
-  icon: IconKey;
-  logo?: string;
-  delay: number;
-  dimmed: boolean;
-  index: number;
-}) {
-  const reduce = useReducedMotion();
-  return (
-    <motion.div
-      initial={{ opacity: 0, x: 20 }}
-      whileInView={{ opacity: 1, x: 0 }}
-      viewport={{ once: true, margin: '-10%' }}
-      transition={{ duration: 0.5, delay, ease: EASE }}
-      className="flex items-center gap-3"
-      style={{ opacity: dimmed ? 0.28 : 1, transition: 'opacity 380ms cubic-bezier(0.16,1,0.3,1)' }}
-    >
-      <FlowNode id={id}>
-        <motion.div
-          whileHover={reduce ? undefined : { scale: 1.08, boxShadow: `0 8px 24px ${RED}18` }}
-          transition={{ type: 'spring', stiffness: 340, damping: 22 }}
-          className="relative flex items-center justify-center"
-          style={{
-            width: 48,
-            height: 48,
-            backgroundColor: CARD,
-            border: `1px solid ${BORDER}`,
-            borderRadius: 14,
-            boxShadow: '0 1px 4px rgba(0,0,0,0.05), 0 6px 20px rgba(0,0,0,0.05)',
-            color: INK,
-          }}
-        >
-          <Artwork logo={logo} icon={icon} label={label} size={20} />
-          {/* Sequence number badge */}
-          <span
-            aria-hidden="true"
-            className="absolute -top-[5px] -right-[5px] flex h-[15px] min-w-[15px] items-center justify-center rounded-full px-[3px] text-[8.5px] font-bold"
-            style={{
-              backgroundColor: RED,
-              color: '#fff',
-              fontVariantNumeric: 'tabular-nums',
-              lineHeight: 1,
-            }}
-          >
-            {String(index + 1).padStart(2, '0')}
-          </span>
-        </motion.div>
-      </FlowNode>
-      <span
-        className="text-[12.5px] font-medium leading-tight"
-        style={{ color: STONE, letterSpacing: '-0.01em' }}
-      >
-        {label}
-      </span>
-    </motion.div>
-  );
-}
-
-/* ── Engine detail ──────────────────────────────────────────────────────── */
-
-function DeliverableRow({
-  index,
-  label,
-  description,
-  logo,
-  isOpen,
-  onToggle,
-}: {
-  index: number;
   label: string;
   description: string;
-  logo?: string;
-  isOpen: boolean;
-  onToggle: () => void;
+  icon?: React.ReactNode;
+}
+
+const CONTENT_ITEMS: TrackItemData[] = [
+  { id: 'c-audio', label: 'Audio & Video Editing', description: 'Polished, publish-ready episodes — cleaned audio, color-corrected video, branded intro/outro.' },
+  { id: 'c-notes', label: 'Show Notes', description: 'SEO-optimised summaries with timestamps, guest bios, and resource links.' },
+  { id: 'c-transcripts', label: 'Transcripts', description: 'Speaker-labeled transcripts in multiple formats for search and repurposing.' },
+  { id: 'c-clips', label: 'Short Form Clips', description: 'Up to 10 vertical clips per episode with auto-captions for TikTok, Reels, and Shorts.' },
+  { id: 'c-thumbnails', label: 'Thumbnails & Cover Art', description: 'Custom-designed artwork matching your brand with A/B test variants.' },
+  { id: 'c-blog', label: 'Blog Articles', description: '1,500+ word SEO articles with keyword targeting and embedded CTAs.' },
+  { id: 'c-social', label: 'LinkedIn & Social Posts', description: '3-5 native posts per episode — carousels, text hooks, and conversation starters.' },
+  { id: 'c-publish', label: 'Publishing & Scheduling', description: 'Distribution across all platforms with scheduled social content.' },
+];
+
+const OUTREACH_ITEMS: TrackItemData[] = [
+  { id: 'o-research', label: 'Ideal Client Research', description: 'Deep-dive ICP profiling with industry mapping and pain-point validation.' },
+  { id: 'o-lists', label: 'Hand-Built Prospect Lists', description: 'Manually curated lists of verified decision-makers — 500 to 2,000 contacts per month.' },
+  { id: 'o-verify', label: 'Email Verification', description: 'Real-time SMTP checks before sending. Bounce rates stay below 2%.' },
+  { id: 'o-write', label: 'Email Writing', description: 'Human-written sequences with personalised first lines and A/B testing.' },
+  { id: 'o-send', label: 'Sending & Follow-Ups', description: 'Timezone-optimised sending with automated follow-up cadence.' },
+  { id: 'o-sort', label: 'Reply Sorting & Handoff', description: 'Every reply categorised within hours with same-day alerts for hot leads.' },
+  { id: 'o-perf', label: 'Performance Tracking', description: 'Weekly reporting on open rates, reply rates, and pipeline optimization.' },
+];
+
+/* ─── Orbital math ─────────────────────────────────────────────────────────── */
+
+function polarToCartesian(cx: number, cy: number, r: number, angleDeg: number) {
+  const rad = (angleDeg - 90) * (Math.PI / 180);
+  return { x: cx + r * Math.cos(rad), y: cy + r * Math.sin(rad) };
+}
+
+function describeArc(cx: number, cy: number, r: number, startAngle: number, endAngle: number) {
+  const start = polarToCartesian(cx, cy, r, startAngle);
+  const end = polarToCartesian(cx, cy, r, endAngle);
+  const largeArcFlag = endAngle - startAngle <= 180 ? '0' : '1';
+  return `M ${start.x} ${start.y} A ${r} ${r} 0 ${largeArcFlag} 1 ${end.x} ${end.y}`;
+}
+
+/* ─── Animated Orbital Ring ────────────────────────────────────────────────── */
+
+function OrbitalRing({
+  radius,
+  rotation,
+  duration,
+  color = RED,
+  opacity = 0.12,
+  dashArray = '4 8',
+  direction = 1,
+}: {
+  radius: number;
+  rotation: number;
+  duration: number;
+  color?: string;
+  opacity?: number;
+  dashArray?: string;
+  direction?: number;
 }) {
-  const reduce = useReducedMotion();
+  const path = describeArc(150, 150, radius, 0, 359.9);
 
   return (
-    <div style={{ borderTop: `1px solid ${BORDER}` }}>
-      <button
-        type="button"
-        onClick={onToggle}
-        aria-expanded={isOpen}
-        className={cn(
-          'group flex w-full cursor-pointer items-center gap-3.5 rounded-lg px-2 py-3.5 text-left',
-          'outline-none transition-colors duration-200 hover:bg-black/[0.015]',
-          'focus-visible:ring-2 focus-visible:ring-[#7A0A0E]/40'
-        )}
+    <g transform={`rotate(${rotation * direction})`}>
+      <path
+        d={path}
+        fill="none"
+        stroke={color}
+        strokeWidth="1"
+        opacity={opacity}
+        strokeDasharray={dashArray}
+        strokeLinecap="round"
       >
-        <span
-          className="w-[22px] shrink-0 text-right text-[11px] font-semibold"
-          style={{ color: isOpen ? RED : PEBBLE, fontVariantNumeric: 'tabular-nums' }}
-        >
-          {String(index + 1).padStart(2, '0')}
-        </span>
-
-        {logo && (
-          <span
-            className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg"
-            style={{ backgroundColor: `${RED}0D` }}
-          >
-            <Artwork logo={logo} icon="layers" label={label} size={16} />
-          </span>
-        )}
-
-        <span
-          className="flex-1 truncate text-[14px] transition-colors duration-200"
-          style={{
-            color: isOpen ? INK : '#3D3D3D',
-            fontWeight: isOpen ? 600 : 450,
-            letterSpacing: '-0.01em',
-          }}
-        >
-          {label}
-        </span>
-
-        <motion.span
-          className="flex h-[22px] w-[22px] shrink-0 items-center justify-center rounded-full"
-          animate={{ rotate: isOpen ? 135 : 0 }}
-          transition={{ duration: reduce ? 0 : 0.32, ease: EASE }}
-          style={{
-            border: `1px solid ${isOpen ? RED : '#D8D6D2'}`,
-            color: isOpen ? RED : PEBBLE,
-            backgroundColor: isOpen ? `${RED}0A` : 'transparent',
-          }}
-        >
-          <svg width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true">
-            <path d="M5 1v8M1 5h8" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
-          </svg>
-        </motion.span>
-      </button>
-
-      <AnimatePresence initial={false}>
-        {isOpen && (
-          <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: 'auto', opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{
-              height: { duration: reduce ? 0 : 0.36, ease: EASE },
-              opacity: { duration: reduce ? 0 : 0.24, delay: isOpen ? 0.06 : 0 },
-            }}
-            className="overflow-hidden"
-          >
-            <p
-              className="ml-[38px] mr-8 mb-4 pl-4 text-[13px] leading-[1.75]"
-              style={{ color: STONE, borderLeft: `2px solid ${ROSE}66` }}
-            >
-              {description}
-            </p>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </div>
+        <animateTransform
+          attributeName="transform"
+          type="rotate"
+          from={`0 150 150`}
+          to={`${360 * direction} 150 150`}
+          dur={`${duration}s`}
+          repeatCount="indefinite"
+        />
+      </path>
+    </g>
   );
 }
 
-function EngineDetail({
-  engine,
-  open,
-  onToggle,
-  onHover,
-  isActive,
-}: {
-  engine: Engine;
-  open: Record<string, boolean>;
-  onToggle: (id: string) => void;
-  onHover: (g: Group | null) => void;
-  isActive: boolean;
-}) {
-  return (
-    <div
-      onMouseEnter={() => onHover(engine.id)}
-      onMouseLeave={() => onHover(null)}
-      className="rounded-[20px] p-5 transition-shadow duration-500 sm:p-7"
-      style={{
-        backgroundColor: CARD,
-        border: `1px solid ${isActive ? `${RED}33` : BORDER}`,
-        boxShadow: isActive
-          ? `0 2px 6px rgba(0,0,0,0.03), 0 24px 60px ${RED}14`
-          : '0 1px 2px rgba(0,0,0,0.03), 0 14px 40px rgba(0,0,0,0.04)',
-      }}
-    >
-      <div className="flex items-start gap-3.5">
-        <span
-          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl"
-          style={{ backgroundColor: `${RED}0D`, color: RED }}
-        >
-          <Artwork logo={engine.logo} icon={engine.icon} label={engine.label} size={21} />
-        </span>
-        <div className="flex min-w-0 flex-col gap-1">
-          <div className="flex items-center gap-2.5">
-            <h3
-              className="text-[17px] font-bold"
-              style={{ color: INK, letterSpacing: '-0.02em' }}
-            >
-              {engine.label}
-            </h3>
-            <span
-              className="rounded-full px-2 py-[3px] text-[10px] font-semibold"
-              style={{ backgroundColor: `${RED}0D`, color: RED }}
-            >
-              {engine.items.length} steps
-            </span>
-          </div>
-          <p className="text-[13px] leading-[1.6]" style={{ color: STONE }}>
-            {engine.tagline}
-          </p>
-        </div>
-      </div>
+/* ─── Glowing Node ────────────────────────────────────────────────────────── */
 
-      <div className="mt-5">
-        {engine.items.map((item, i) => (
-          <DeliverableRow
+function GlowNode({
+  x, y, label, subtitle, icon, color = RED, delay = 0, onClick, isExpanded,
+  isHub = false, isOutcome = false,
+}: {
+  x: number;
+  y: number;
+  label: string;
+  subtitle?: string;
+  icon?: React.ReactNode;
+  color?: string;
+  delay?: number;
+  onClick?: () => void;
+  isExpanded?: boolean;
+  isHub?: boolean;
+  isOutcome?: boolean;
+}) {
+  const glowSize = isHub ? 60 : isOutcome ? 40 : 32;
+  const nodeSize = isHub ? 56 : isOutcome ? 44 : 36;
+
+  return (
+    <motion.g
+      initial={{ opacity: 0, scale: 0.5 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{ duration: 0.6, delay, ease: [0.16, 1, 0.3, 1] }}
+      style={{ cursor: onClick ? 'pointer' : 'default' }}
+      onClick={onClick}
+    >
+      {/* Outer glow */}
+      <circle cx={x} cy={y} r={glowSize} fill={color} opacity={isHub ? 0.08 : 0.05}>
+        <animate attributeName="r" values={`${glowSize};${glowSize + 6};${glowSize}`} dur="4s" repeatCount="indefinite" />
+        <animate attributeName="opacity" values={isHub ? '0.08;0.04;0.08' : '0.05;0.02;0.05'} dur="4s" repeatCount="indefinite" />
+      </circle>
+
+      {/* Node body */}
+      <circle
+        cx={x} cy={y} r={nodeSize}
+        fill={NODE_BG}
+        stroke={color}
+        strokeWidth={isHub ? 2.5 : isOutcome ? 2 : 1.5}
+        opacity={0.95}
+        style={{ filter: `drop-shadow(0 4px 12px ${color}25)` }}
+      />
+
+      {/* Icon or text */}
+      {isHub ? (
+        <g>
+          <text x={x} y={y - 6} textAnchor="middle" fill={color} fontSize="18" fontWeight="700" fontFamily="system-ui">
+            {label.length > 12 ? label.slice(0, 11) + '…' : label}
+          </text>
+          <text x={x} y={y + 10} textAnchor="middle" fill={STONE} fontSize="9" fontFamily="system-ui">
+            {subtitle}
+          </text>
+        </g>
+      ) : isOutcome ? (
+        <text x={x} y={y + 4} textAnchor="middle" fill={BLACK} fontSize="9" fontWeight="600" fontFamily="system-ui">
+          {label.length > 18 ? label.slice(0, 17) + '…' : label}
+        </text>
+      ) : (
+        <text x={x} y={y + 3} textAnchor="middle" fill={BLACK} fontSize="8" fontWeight="500" fontFamily="system-ui">
+          {label.length > 10 ? label.slice(0, 9) + '…' : label}
+        </text>
+      )}
+
+      {/* Glow dot at center */}
+      <circle cx={x} cy={y} r={isHub ? 3 : 2} fill={color} opacity={0.6}>
+        <animate attributeName="opacity" values="0.6;1;0.6" dur="2s" repeatCount="indefinite" />
+      </circle>
+    </motion.g>
+  );
+}
+
+/* ─── Track Item Detail Panel ─────────────────────────────────────────────── */
+
+function TrackItemPanel({ items, isOpen, color = RED }: { items: TrackItemData[]; isOpen: boolean; color?: string }) {
+  if (!isOpen) return null;
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 10, height: 0 }}
+      animate={{ opacity: 1, y: 0, height: 'auto' }}
+      exit={{ opacity: 0, y: 10, height: 0 }}
+      transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+      className="overflow-hidden"
+    >
+      <div className="mt-3 space-y-2">
+        {items.map((item, i) => (
+          <motion.div
             key={item.id}
-            index={i}
-            label={item.label}
-            description={item.description}
-            logo={item.logo}
-            isOpen={!!open[item.id]}
-            onToggle={() => onToggle(item.id)}
-          />
+            initial={{ opacity: 0, x: -10 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: i * 0.05 }}
+            className="flex items-start gap-3 p-3 rounded-xl border"
+            style={{ borderColor: `${color}18`, backgroundColor: `${color}06` }}
+          >
+            <div className="w-5 h-5 rounded-md flex items-center justify-center flex-shrink-0 mt-0.5" style={{ backgroundColor: `${color}18`, color }}>
+              <Plus size={12} strokeWidth={2.5} />
+            </div>
+            <div>
+              <p className="text-[13px] font-semibold" style={{ color: BLACK }}>{item.label}</p>
+              <p className="text-[11px] mt-0.5 leading-relaxed" style={{ color: STONE }}>{item.description}</p>
+            </div>
+          </motion.div>
         ))}
       </div>
-    </div>
-  );
-}
-
-/* ── Outcome + result ───────────────────────────────────────────────────── */
-
-function OutcomeCard({
-  id,
-  label,
-  caption,
-  icon,
-  delay,
-}: {
-  id: string;
-  label: string;
-  caption: string;
-  icon: IconKey;
-  delay: number;
-}) {
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 18 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: '-10%' }}
-      transition={{ duration: 0.55, delay, ease: EASE }}
-    >
-      <FlowNode id={id}>
-        <div
-          className="flex items-center gap-3.5 rounded-2xl px-5 py-4"
-          style={{
-            backgroundColor: CARD,
-            border: `1px solid ${BORDER}`,
-            boxShadow: '0 1px 2px rgba(0,0,0,0.04), 0 10px 30px rgba(0,0,0,0.04)',
-          }}
-        >
-          <span
-            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl"
-            style={{ backgroundColor: `${RED}0D`, color: RED }}
-          >
-            <FlowIcon name={icon} size={18} />
-          </span>
-          <span className="flex flex-col">
-            <span
-              className="text-[13.5px] font-semibold leading-snug"
-              style={{ color: INK, letterSpacing: '-0.01em' }}
-            >
-              {label}
-            </span>
-            <span className="text-[11.5px] italic" style={{ color: PEBBLE }}>
-              {caption}
-            </span>
-          </span>
-        </div>
-      </FlowNode>
     </motion.div>
   );
 }
 
-function ResultNode() {
-  const reduce = useReducedMotion();
-  return (
-    <motion.div
-      initial={{ opacity: 0, scale: 0.94, y: 16 }}
-      whileInView={{ opacity: 1, scale: 1, y: 0 }}
-      viewport={{ once: true, margin: '-10%' }}
-      transition={{ duration: 0.65, delay: 0.2, ease: EASE }}
-      className="relative"
-    >
-      {!reduce && (
-        <motion.span
-          aria-hidden="true"
-          className="absolute inset-0 rounded-full"
-          style={{ background: `radial-gradient(circle, ${RED}33 0%, ${RED}00 70%)` }}
-          animate={{ scale: [1, 1.35, 1], opacity: [0.55, 0.15, 0.55] }}
-          transition={{ duration: 4.5, repeat: Infinity, ease: 'easeInOut' }}
-        />
-      )}
-      <FlowNode id="result" className="relative">
-        <div
-          className="flex items-center gap-3 rounded-full py-3.5 pl-4 pr-7"
-          style={{
-            backgroundColor: INK,
-            boxShadow: `0 20px 56px ${RED}2E, 0 6px 18px rgba(0,0,0,0.14)`,
-          }}
-        >
-          <span
-            className="flex h-9 w-9 items-center justify-center rounded-full"
-            style={{ backgroundColor: ROSE, color: INK }}
-          >
-            <svg
-              width="17"
-              height="17"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              aria-hidden="true"
-            >
-              <path d="M13 2L4.5 13.5H11l-1 8.5 8.5-11.5H12z" />
-            </svg>
-          </span>
-          <span
-            className="text-[17px] font-bold text-white"
-            style={{ letterSpacing: '-0.02em' }}
-          >
-            More Clients, Faster
-          </span>
-        </div>
-      </FlowNode>
-    </motion.div>
-  );
-}
-
-/* ── Section ────────────────────────────────────────────────────────────── */
+/* ─── Main Orbit Flowchart Component ──────────────────────────────────────── */
 
 export default function CompleteFramework() {
-  const [open, setOpen] = React.useState<Record<string, boolean>>({});
-  const [hovered, setHovered] = React.useState<Group | null>(null);
-  const isCompact = !useMedia('(min-width: 1024px)');
-  const headerRef = React.useRef<HTMLDivElement>(null);
-  const headerInView = useInView(headerRef, { once: true, margin: '-15%' });
+  const [openContent, setOpenContent] = useState(false);
+  const [openOutreach, setOpenOutreach] = useState(false);
+  const prefersReducedMotion = useReducedMotion();
+  const shouldAnimate = !prefersReducedMotion;
+  const sectionRef = useRef<HTMLElement>(null);
+  const isInView = useInView(sectionRef, { once: true, margin: '-80px' });
 
-  const toggle = React.useCallback((id: string) => {
-    setOpen((prev) => ({ ...prev, [id]: !prev[id] }));
-  }, []);
-
-  /**
-   * Edges are declared, not measured by hand — each one names a node and the
-   * side it attaches to, so the curve lands on the border every time. The
-   * compact set reroutes top-to-bottom for the stacked mobile layout.
-   */
-  const stageEdges = React.useMemo<EdgeSpec[]>(() => {
-    if (isCompact) {
-      return [
-        ...INPUTS.map((input, i) => ({
-          from: input.id,
-          to: 'hub',
-          fromSide: 'bottom' as const,
-          toSide: 'top' as const,
-          group: input.group,
-          delay: 0.1 + i * 0.12,
-        })),
-        {
-          from: 'hub',
-          to: 'outputs',
-          fromSide: 'bottom' as const,
-          toSide: 'top' as const,
-          delay: 0.45,
-        },
-      ];
-    }
-    return [
-      ...INPUTS.map((input, i) => ({
-        from: input.id,
-        to: 'hub',
-        fromSide: 'right' as const,
-        toSide: 'left' as const,
-        group: input.group,
-        delay: 0.1 + i * 0.1,
-      })),
-      ...OUTPUTS.map((output, i) => ({
-        from: 'hub',
-        to: output.id,
-        fromSide: 'right' as const,
-        toSide: 'left' as const,
-        group: output.group,
-        delay: 0.42 + i * 0.075,
-      })),
-    ];
-  }, [isCompact]);
-
-  const convergeEdges = React.useMemo<EdgeSpec[]>(
-    () => [
-      {
-        from: 'outcome-content',
-        to: 'result',
-        fromSide: 'bottom',
-        toSide: 'top',
-        group: 'content',
-        delay: 0.1,
-      },
-      {
-        from: 'outcome-outreach',
-        to: 'result',
-        fromSide: 'bottom',
-        toSide: 'top',
-        group: 'outreach',
-        delay: 0.2,
-      },
-    ],
-    []
-  );
+  const { scrollY } = useScroll({ target: sectionRef, offset: ['start start', 'end start'] });
+  const orbitRotation = useTransform(scrollY, [0, 600], [0, 15]);
+  const orbitOpacity = useTransform(scrollY, [0, 300], [0.3, 0.15]);
 
   return (
     <section
+      ref={sectionRef}
       className="relative overflow-hidden"
       style={{
-        backgroundColor: BG,
-        paddingTop: 'clamp(3rem, 5vw, 5rem)',
-        paddingBottom: 'clamp(5rem, 9vw, 9rem)',
+        backgroundColor: SECTION_BG,
+        paddingTop: 'clamp(5rem, 8vw, 8rem)',
+        paddingBottom: 'clamp(5rem, 8vw, 8rem)',
       }}
       aria-label="The Complete Framework — how SlideIn Venture works"
     >
-      {/* Barely-there grid, keeps the diagram from floating in a void */}
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-0"
-        style={{
-          backgroundImage: `linear-gradient(${RAIL}55 1px, transparent 1px), linear-gradient(90deg, ${RAIL}55 1px, transparent 1px)`,
-          backgroundSize: '64px 64px',
-          maskImage: 'radial-gradient(ellipse 75% 55% at 50% 32%, #000 0%, transparent 100%)',
-          WebkitMaskImage:
-            'radial-gradient(ellipse 75% 55% at 50% 32%, #000 0%, transparent 100%)',
-          opacity: 0.5,
-        }}
-      />
+      {/* ── Background grid ─────────────────────────────────────────── */}
+      <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
+        <div
+          className="absolute inset-0"
+          style={{
+            backgroundImage: `radial-gradient(circle at 1px 1px, ${RED}06 1px, transparent 0)`,
+            backgroundSize: '48px 48px',
+          }}
+        />
+        <motion.div
+          className="absolute inset-0"
+          style={{
+            background: `radial-gradient(ellipse at center, ${RED}08 0%, transparent 60%)`,
+            opacity: orbitOpacity,
+          }}
+        />
+      </div>
 
-      <div className="relative mx-auto max-w-[1180px] px-5 md:px-10">
-
-        {/* ── Flow stage ─────────────────────────────────────────────── */}
-        <FlowStage
-          gradientId="framework-stage-gradient"
-          edges={stageEdges}
-          activeGroup={hovered}
-          revision={`${isCompact}`}
-          color={RED}
-          trackColor={RAIL}
-          className="mt-16 md:mt-20"
+      <div className="relative max-w-[1200px] mx-auto px-6 md:px-10">
+        {/* ── Section Header ─────────────────────────────────────────── */}
+        <motion.div
+          initial={shouldAnimate ? { opacity: 0, y: 20 } : false}
+          animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+          transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+          className="text-center mb-12 md:mb-16"
         >
-          <div
-            className={cn(
-              'relative z-10 grid items-center',
-              'grid-cols-1 gap-y-14',
-              'lg:grid-cols-[minmax(190px,232px)_1fr_minmax(200px,236px)] lg:gap-x-[clamp(3rem,7vw,6.5rem)] lg:gap-y-0'
-            )}
+          <motion.div
+            initial={shouldAnimate ? { opacity: 0, scale: 0.9 } : false}
+            animate={isInView ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.9 }}
+            transition={{ duration: 0.5, delay: 0.1 }}
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-full border mb-6"
+            style={{ borderColor: `${RED}25`, backgroundColor: `${RED}08` }}
           >
-            {/* Inputs */}
-            <div className="flex flex-col gap-4 lg:gap-9">
-              {INPUTS.map((input, i) => (
-                <InputCard
-                  key={input.id}
-                  id={input.id}
-                  label={input.label}
-                  caption={input.caption}
-                  icon={input.icon}
-                  logo={input.logo}
-                  delay={i * 0.09}
-                  dimmed={!!hovered && input.group !== hovered}
-                  onHover={setHovered}
-                />
-              ))}
-            </div>
+            <div className="w-2 h-2 rounded-full" style={{ backgroundColor: RED, boxShadow: `0 0 8px ${RED}80` }} />
+            <span className="text-[11px] font-[700] uppercase tracking-[0.12em]" style={{ color: RED }}>
+              Complete Framework
+            </span>
+          </motion.div>
 
-            {/* Hub */}
-            <div className="flex justify-center py-6 lg:py-0">
-              <Hub active={hovered} />
-            </div>
+          <h2
+            className="font-bold leading-[1.04] tracking-[-0.04em]"
+            style={{
+              fontSize: 'clamp(2.5rem, 6vw, 4.5rem)',
+              color: BLACK,
+            }}
+          >
+            One system. Infinite output.
+          </h2>
+          <motion.p
+            initial={shouldAnimate ? { opacity: 0, y: 12 } : false}
+            animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 12 }}
+            transition={{ duration: 0.5, delay: 0.15 }}
+            className="text-[16px] mt-5 max-w-xl mx-auto"
+            style={{ color: STONE }}
+          >
+            Record once. Target precisely. Two parallel engines compound into a complete growth machine.
+          </motion.p>
+        </motion.div>
 
-            {/* Outputs */}
-            <FlowNode id="outputs">
-              <div className="mx-auto grid w-fit grid-cols-2 gap-x-6 gap-y-4 sm:gap-x-10 lg:grid-cols-1 lg:gap-y-[13px]">
-                {OUTPUTS.map((output, i) => (
-                  <OutputChip
-                    key={output.id}
-                    id={output.id}
-                    label={output.label}
-                    icon={output.icon}
-                    logo={output.logo}
-                    delay={0.28 + i * 0.06}
-                    dimmed={!!hovered && output.group !== hovered}
-                    index={i}
-                  />
-                ))}
-              </div>
-            </FlowNode>
-          </div>
-        </FlowStage>
-
-        {/* ── Engine detail ──────────────────────────────────────────── */}
-        <div className="mt-20 md:mt-28">
-          <div className="mb-8 flex flex-col items-center text-center">
-            <h2
-              className="font-bold"
-              style={{
-                fontSize: 'clamp(1.75rem, 3.5vw, 2.75rem)',
-                lineHeight: 1.08,
-                letterSpacing: '-0.035em',
-                color: INK,
-              }}
-            >
-              Inside The Nerve Center
-            </h2>
-          </div>
-
-          <div className="grid grid-cols-1 gap-6 lg:grid-cols-2 lg:gap-7 lg:items-start">
-            {ENGINES.map((engine) => (
-              <EngineDetail
-                key={engine.id}
-                engine={engine}
-                open={open}
-                onToggle={toggle}
-                onHover={setHovered}
-                isActive={hovered === engine.id}
-              />
-            ))}
-          </div>
-        </div>
-
-        {/* ── Convergence ───────────────────────────────────────────── */}
-        <FlowStage
-          gradientId="framework-converge-gradient"
-          edges={convergeEdges}
-          activeGroup={hovered}
-          color={RED}
-          trackColor={RAIL}
-          className="mt-20 md:mt-24"
+        {/* ── Orbit Network Visualization ───────────────────────────── */}
+        <motion.div
+          initial={shouldAnimate ? { opacity: 0, scale: 0.95 } : false}
+          animate={isInView ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.95 }}
+          transition={{ duration: 0.8, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
+          className="relative mx-auto"
+          style={{ maxWidth: '600px', height: '600px' }}
         >
-          <div className="relative z-10 flex flex-col items-center">
-            <div className="grid w-full max-w-[720px] grid-cols-1 gap-5 sm:grid-cols-2 sm:gap-10">
-              {ENGINES.map((engine, i) => (
-                <OutcomeCard
-                  key={engine.id}
-                  id={`outcome-${engine.id}`}
-                  label={engine.outcome.label}
-                  caption={engine.outcome.caption}
-                  icon={engine.outcome.icon}
-                  delay={i * 0.1}
-                />
-              ))}
-            </div>
+          {/* SVG Orbit Diagram */}
+          <svg
+            viewBox="0 0 300 300"
+            className="w-full h-full"
+            style={{ filter: 'drop-shadow(0 0 40px rgba(122,10,14,0.06))' }}
+          >
+            <defs>
+              <radialGradient id="hubGlow" cx="50%" cy="50%" r="50%">
+                <stop offset="0%" stopColor={RED} stopOpacity={0.15} />
+                <stop offset="100%" stopColor={RED} stopOpacity={0} />
+              </radialGradient>
+              <filter id="nodeShadow" x="-50%" y="-50%" width="200%" height="200%">
+                <feDropShadow dx="0" dy="2" stdDeviation="4" floodColor={RED} floodOpacity={0.15} />
+              </filter>
+            </defs>
 
-            <div className="mt-[104px] sm:mt-[120px]">
-              <ResultNode />
+            {/* Outer orbital ring */}
+            <OrbitalRing radius={120} rotation={0} duration={60} color={RED} opacity={0.08} dashArray="2 12" direction={1} />
+            <OrbitalRing radius={120} rotation={60} duration={60} color={RED_WARM} opacity={0.05} dashArray="1 16" direction={-1} />
+
+            {/* Inner orbital ring */}
+            <OrbitalRing radius={75} rotation={30} duration={45} color={RED} opacity={0.12} dashArray="3 10" direction={-1} />
+            <OrbitalRing radius={75} rotation={90} duration={45} color={RED_WARM} opacity={0.06} dashArray="2 14" direction={1} />
+
+            {/* Connection lines from hub to branch nodes */}
+            <line x1="150" y1="150" x2="150" y2="75" stroke={RED} strokeWidth="1.5" opacity={0.2} strokeDasharray="4 4">
+              <animate attributeName="stroke-dashoffset" from="0" to="-8" dur="2s" repeatCount="indefinite" />
+            </line>
+            <line x1="150" y1="150" x2="150" y2="225" stroke={RED_WARM} strokeWidth="1.5" opacity={0.2} strokeDasharray="4 4">
+              <animate attributeName="stroke-dashoffset" from="0" to="-8" dur="2s" repeatCount="indefinite" begin="0.5s" />
+            </line>
+
+            {/* Connection lines from branch to outcome nodes */}
+            <line x1="150" y1="75" x2="60" y2="30" stroke={RED} strokeWidth="1" opacity={0.15} strokeDasharray="3 6">
+              <animate attributeName="stroke-dashoffset" from="0" to="-9" dur="2.5s" repeatCount="indefinite" />
+            </line>
+            <line x1="150" y1="75" x2="240" y2="30" stroke={RED} strokeWidth="1" opacity={0.15} strokeDasharray="3 6">
+              <animate attributeName="stroke-dashoffset" from="0" to="-9" dur="2.5s" repeatCount="indefinite" begin="0.3s" />
+            </line>
+            <line x1="150" y1="225" x2="60" y2="270" stroke={RED_WARM} strokeWidth="1" opacity={0.15} strokeDasharray="3 6">
+              <animate attributeName="stroke-dashoffset" from="0" to="-9" dur="2.5s" repeatCount="indefinite" begin="0.6s" />
+            </line>
+            <line x1="150" y1="225" x2="240" y2="270" stroke={RED_WARM} strokeWidth="1" opacity="0.15" strokeDasharray="3 6">
+              <animate attributeName="stroke-dashoffset" from="0" to="-9" dur="2.5s" repeatCount="indefinite" begin="0.9s" />
+            </line>
+
+            {/* Convergence lines to center bottom */}
+            <line x1="60" y1="270" x2="150" y2="255" stroke={RED} strokeWidth="1" opacity={0.12} strokeDasharray="2 8">
+              <animate attributeName="stroke-dashoffset" from="0" to="-10" dur="3s" repeatCount="indefinite" />
+            </line>
+            <line x1="240" y1="270" x2="150" y2="255" stroke={RED_WARM} strokeWidth="1" opacity={0.12} strokeDasharray="2 8">
+              <animate attributeName="stroke-dashoffset" from="0" to="-10" dur="3s" repeatCount="indefinite" begin="0.5s" />
+            </line>
+
+            {/* Central hub glow */}
+            <circle cx="150" cy="150" r="45" fill="url(#hubGlow)">
+              <animate attributeName="r" values="45;50;45" dur="4s" repeatCount="indefinite" />
+            </circle>
+
+            {/* ── NODES ─────────────────────────────────────────────── */}
+
+            {/* Central Hub */}
+            <g transform={`translate(${isInView ? 0 : -20}, ${isInView ? 0 : 20})`}>
+              <circle cx="150" cy="150" r="28" fill={NODE_BG} stroke={RED} strokeWidth="2.5" filter="url(#nodeShadow)" />
+              <text x="150" y="147" textAnchor="middle" fill={BLACK} fontSize="9" fontWeight="700" fontFamily="system-ui">
+                COMPLETE
+              </text>
+              <text x="150" y="158" textAnchor="middle" fill={RED} fontSize="9" fontWeight="700" fontFamily="system-ui">
+                FRAMEWORK
+              </text>
+              <circle cx="150" cy="150" r="3" fill={RED} opacity={0.7}>
+                <animate attributeName="opacity" values="0.7;1;0.7" dur="2s" repeatCount="indefinite" />
+              </circle>
+            </g>
+
+            {/* Track 1: Record Video Once */}
+            <motion.g
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={isInView ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.8 }}
+              transition={{ delay: 0.3, duration: 0.5 }}
+            >
+              <circle cx="150" cy="75" r="22" fill={NODE_BG} stroke={RED} strokeWidth="2" filter="url(#nodeShadow)" />
+              <text x="150" y="72" textAnchor="middle" fill={BLACK} fontSize="7" fontWeight="600" fontFamily="system-ui">
+                RECORD
+              </text>
+              <text x="150" y="81" textAnchor="middle" fill={RED} fontSize="6" fontWeight="600" fontFamily="system-ui">
+                VIDEO ONCE
+              </text>
+              <circle cx="150" cy="75" r="2.5" fill={RED} opacity={0.6} />
+            </motion.g>
+
+            {/* Track 2: You Tell Us Who to Reach */}
+            <motion.g
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={isInView ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.8 }}
+              transition={{ delay: 0.4, duration: 0.5 }}
+            >
+              <circle cx="150" cy="225" r="22" fill={NODE_BG} stroke={RED_WARM} strokeWidth="2" filter="url(#nodeShadow)" />
+              <text x="150" y="222" textAnchor="middle" fill={BLACK} fontSize="6.5" fontWeight="600" fontFamily="system-ui">
+                TELL US WHO
+              </text>
+              <text x="150" y="231" textAnchor="middle" fill={RED_WARM} fontSize="6.5" fontWeight="600" fontFamily="system-ui">
+                TO REACH
+              </text>
+              <circle cx="150" cy="225" r="2.5" fill={RED_WARM} opacity={0.6} />
+            </motion.g>
+
+            {/* Outcome nodes */}
+            {[
+              { x: 60, y: 30, label: 'Multi-Platform', sublabel: 'Presence', color: RED },
+              { x: 240, y: 30, label: 'Qualified', sublabel: 'Conversations', color: RED_WARM },
+              { x: 60, y: 270, label: 'More Clients', sublabel: 'Faster', color: BLACK },
+              { x: 240, y: 270, label: 'Revenue', sublabel: 'Growth', color: RED },
+            ].map((node, i) => (
+              <motion.g
+                key={i}
+                initial={{ opacity: 0, scale: 0.7 }}
+                animate={isInView ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.7 }}
+                transition={{ delay: 0.5 + i * 0.1, duration: 0.5 }}
+              >
+                <circle cx={node.x} cy={node.y} r="16" fill={NODE_BG} stroke={node.color} strokeWidth="1.5" opacity={0.9} />
+                <text x={node.x} y={node.y - 3} textAnchor="middle" fill={node.color} fontSize="6" fontWeight="600" fontFamily="system-ui">
+                  {node.label}
+                </text>
+                <text x={node.x} y={node.y + 6} textAnchor="middle" fill={STONE} fontSize="5.5" fontFamily="system-ui">
+                  {node.sublabel}
+                </text>
+                <circle cx={node.x} cy={node.y} r="1.5" fill={node.color} opacity={0.5} />
+              </motion.g>
+            ))}
+
+            {/* Animated particles along connections */}
+            {[
+              { x1: 150, y1: 150, x2: 150, y2: 75, delay: 0, color: RED },
+              { x1: 150, y1: 150, x2: 150, y2: 225, delay: 0.5, color: RED_WARM },
+              { x1: 150, y1: 75, x2: 60, y2: 30, delay: 1, color: RED },
+              { x1: 150, y1: 75, x2: 240, y2: 30, delay: 1.3, color: RED },
+              { x1: 150, y1: 225, x2: 60, y2: 270, delay: 1.6, color: RED_WARM },
+              { x1: 150, y1: 225, x2: 240, y2: 270, delay: 1.9, color: RED_WARM },
+            ].map((p, i) => (
+              <circle key={i} r="2" fill={p.color} opacity={0.7}>
+                <animateMotion
+                  path={`M ${p.x1} ${p.y1} L ${p.x2} ${p.y2}`}
+                  dur="3s"
+                  repeatCount="indefinite"
+                  begin={`${p.delay}s`}
+                />
+              </circle>
+            ))}
+          </svg>
+        </motion.div>
+
+        {/* ── Expandable Track Details ──────────────────────────────── */}
+        <motion.div
+          initial={shouldAnimate ? { opacity: 0, y: 20 } : false}
+          animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+          transition={{ delay: 0.6, duration: 0.5 }}
+          className="mt-12 max-w-3xl mx-auto space-y-4"
+        >
+          {/* Content Production Toggle */}
+          <div
+            className="p-6 rounded-2xl border cursor-pointer transition-all duration-200 hover:shadow-lg"
+            style={{ borderColor: `${RED}18`, backgroundColor: NODE_BG }}
+            onClick={() => setOpenContent(!openContent)}
+          >
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ backgroundColor: `${RED}12`, color: RED }}>
+                  <Sparkles size={20} strokeWidth={2} />
+                </div>
+                <div>
+                  <h3 className="text-[15px] font-semibold" style={{ color: BLACK }}>Content Production Track</h3>
+                  <p className="text-[11px] mt-0.5" style={{ color: STONE }}>{CONTENT_ITEMS.length} services — expand to view</p>
+                </div>
+              </div>
+              <motion.div
+                animate={{ rotate: openContent ? 180 : 0 }}
+                transition={{ duration: 0.2 }}
+                className="w-8 h-8 rounded-full flex items-center justify-center"
+                style={{ border: `1.5px solid ${RED}30`, color: RED }}
+              >
+                <ChevronDown size={16} strokeWidth={2.5} />
+              </motion.div>
+            </div>
+            <TrackItemPanel items={CONTENT_ITEMS} isOpen={openContent} color={RED} />
+          </div>
+
+          {/* Manual Outreach Toggle */}
+          <div
+            className="p-6 rounded-2xl border cursor-pointer transition-all duration-200 hover:shadow-lg"
+            style={{ borderColor: `${RED_WARM}18`, backgroundColor: NODE_BG }}
+            onClick={() => setOpenOutreach(!openOutreach)}
+          >
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ backgroundColor: `${RED_WARM}12`, color: RED_WARM }}>
+                  <Globe size={20} strokeWidth={2} />
+                </div>
+                <div>
+                  <h3 className="text-[15px] font-semibold" style={{ color: BLACK }}>Manual Outreach Track</h3>
+                  <p className="text-[11px] mt-0.5" style={{ color: STONE }}>{OUTREACH_ITEMS.length} services — expand to view</p>
+                </div>
+              </div>
+              <motion.div
+                animate={{ rotate: openOutreach ? 180 : 0 }}
+                transition={{ duration: 0.2 }}
+                className="w-8 h-8 rounded-full flex items-center justify-center"
+                style={{ border: `1.5px solid ${RED_WARM}30`, color: RED_WARM }}
+              >
+                <ChevronDown size={16} strokeWidth={2.5} />
+              </motion.div>
+            </div>
+            <TrackItemPanel items={OUTREACH_ITEMS} isOpen={openOutreach} color={RED_WARM} />
+          </div>
+        </motion.div>
+
+        {/* ── Outcomes ─────────────────────────────────────────────── */}
+        <motion.div
+          initial={shouldAnimate ? { opacity: 0, y: 20 } : false}
+          animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+          transition={{ delay: 0.8, duration: 0.5 }}
+          className="mt-16 flex flex-col items-center gap-6"
+        >
+          <div className="flex items-center gap-4">
+            <div className="text-center">
+              <p className="text-[14px] font-semibold" style={{ color: BLACK }}>Consistent Multi-Platform Presence</p>
+              <p className="text-[11px] italic mt-1" style={{ color: STONE }}>builds trust</p>
+            </div>
+            <div className="w-16 h-px" style={{ background: `linear-gradient(90deg, ${FROST}, ${RED}40)` }} />
+            <div className="text-center">
+              <p className="text-[14px] font-semibold" style={{ color: BLACK }}>Qualified Conversations</p>
+              <p className="text-[11px] italic mt-1" style={{ color: STONE }}>expands reach</p>
             </div>
           </div>
-        </FlowStage>
+
+          <motion.div
+            initial={shouldAnimate ? { scale: 0.9, opacity: 0 } : false}
+            animate={isInView ? { scale: 1, opacity: 1 } : { scale: 0.9, opacity: 0 }}
+            transition={{ delay: 1, duration: 0.5 }}
+            className="flex items-center gap-3 px-8 py-4 rounded-2xl"
+            style={{
+              backgroundColor: BLACK,
+              boxShadow: `0 12px 40px ${RED}20, 0 4px 12px rgba(0,0,0,0.1)`,
+            }}
+          >
+            <span className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ backgroundColor: RED_WARM, boxShadow: `0 0 12px ${RED_WARM}80` }} />
+            <span className="text-[16px] font-bold text-white tracking-[-0.02em]">More Clients, Faster</span>
+          </motion.div>
+        </motion.div>
       </div>
     </section>
   );
