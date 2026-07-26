@@ -210,23 +210,23 @@ function Hub({ active }: { active: Group | null }) {
           </span>
         </div>
 
-        <AnimatePresence mode="wait" initial={false}>
-          <motion.span
-            key={active ?? 'idle'}
-            initial={{ opacity: 0, y: 4, filter: 'blur(4px)' }}
-            animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-            exit={{ opacity: 0, y: -4, filter: 'blur(4px)' }}
-            transition={{ duration: 0.22, ease: EASE }}
-            className="text-[12px] text-center"
-            style={{ color: STONE }}
-          >
-            {active === 'content'
-              ? 'Producing your content'
-              : active === 'outreach'
-                ? 'Reaching your buyers'
-                : 'Two tracks. One system.'}
-          </motion.span>
-        </AnimatePresence>
+        {active && (
+          <AnimatePresence mode="wait" initial={false}>
+            <motion.span
+              key={active}
+              initial={{ opacity: 0, y: 4, filter: 'blur(4px)' }}
+              animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+              exit={{ opacity: 0, y: -4, filter: 'blur(4px)' }}
+              transition={{ duration: 0.22, ease: EASE }}
+              className="text-[12px] text-center"
+              style={{ color: STONE }}
+            >
+              {active === 'content'
+                ? 'Producing your content'
+                : 'Reaching your buyers'}
+            </motion.span>
+          </AnimatePresence>
+        )}
       </div>
     </div>
   );
@@ -758,7 +758,7 @@ export default function CompleteFramework() {
       className="relative overflow-hidden"
       style={{
         backgroundColor: BG,
-        paddingTop: 'clamp(5rem, 9vw, 9rem)',
+        paddingTop: 'clamp(3rem, 5vw, 5rem)',
         paddingBottom: 'clamp(5rem, 9vw, 9rem)',
       }}
       aria-label="The Complete Framework — how SlideIn Venture works"
@@ -778,60 +778,6 @@ export default function CompleteFramework() {
       />
 
       <div className="relative mx-auto max-w-[1180px] px-5 md:px-10">
-        {/* Header */}
-        <div ref={headerRef} className="flex flex-col items-center text-center">
-          <motion.span
-            initial={{ opacity: 0, y: 12 }}
-            animate={headerInView ? { opacity: 1, y: 0 } : undefined}
-            transition={{ duration: 0.5, ease: EASE }}
-            className="inline-flex items-center gap-2 rounded-full px-3.5 py-1.5"
-            style={{
-              backgroundColor: CARD,
-              border: `1px solid ${BORDER}`,
-              color: RED,
-              boxShadow: '0 1px 2px rgba(0,0,0,0.03)',
-            }}
-          >
-            <span
-              className="h-1.5 w-1.5 rounded-full"
-              style={{ backgroundColor: RED, boxShadow: `0 0 0 3px ${RED}1A` }}
-            />
-            <span
-              className="text-[10.5px] font-semibold uppercase"
-              style={{ letterSpacing: '0.16em' }}
-            >
-              The Complete Framework
-            </span>
-          </motion.span>
-
-          <motion.h2
-            initial={{ opacity: 0, y: 20 }}
-            animate={headerInView ? { opacity: 1, y: 0 } : undefined}
-            transition={{ duration: 0.7, delay: 0.06, ease: EASE }}
-            className="mt-6 font-bold"
-            style={{
-              fontSize: 'clamp(2.25rem, 5.2vw, 3.9rem)',
-              lineHeight: 1.05,
-              letterSpacing: '-0.04em',
-              color: INK,
-            }}
-          >
-            Two inputs in.
-            <br className="sm:hidden" />{' '}
-            <span style={{ color: STONE }}>Everything out.</span>
-          </motion.h2>
-
-          <motion.p
-            initial={{ opacity: 0, y: 16 }}
-            animate={headerInView ? { opacity: 1, y: 0 } : undefined}
-            transition={{ duration: 0.6, delay: 0.14, ease: EASE }}
-            className="mt-5 max-w-[540px] text-[15.5px] leading-[1.65]"
-            style={{ color: STONE }}
-          >
-            You record once and tell us who to reach. Both engines run in parallel from
-            there — and keep compounding.
-          </motion.p>
-        </div>
 
         {/* ── Flow stage ─────────────────────────────────────────────── */}
         <FlowStage
@@ -894,16 +840,18 @@ export default function CompleteFramework() {
 
         {/* ── Engine detail ──────────────────────────────────────────── */}
         <div className="mt-20 md:mt-28">
-          <div className="mb-8 flex flex-col items-center gap-2.5 text-center">
-            <span
-              className="text-[10.5px] font-semibold uppercase"
-              style={{ color: PEBBLE, letterSpacing: '0.16em' }}
+          <div className="mb-8 flex flex-col items-center text-center">
+            <h2
+              className="font-bold"
+              style={{
+                fontSize: 'clamp(1.75rem, 3.5vw, 2.75rem)',
+                lineHeight: 1.08,
+                letterSpacing: '-0.035em',
+                color: INK,
+              }}
             >
-              Inside the nerve center
-            </span>
-            <p className="text-[13.5px]" style={{ color: STONE }}>
-              Hover a column to trace it through the diagram. Tap any line for detail.
-            </p>
+              Inside The Nerve Center
+            </h2>
           </div>
 
           <div className="grid grid-cols-1 gap-6 lg:grid-cols-2 lg:gap-7 lg:items-start">

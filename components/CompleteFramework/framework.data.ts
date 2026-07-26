@@ -47,15 +47,13 @@ export interface FlowItem {
 export const INPUTS: FlowItem[] = [
   {
     id: 'in-record',
-    label: 'You Record Once',
-    caption: 'One raw video file',
+    label: 'You Record the Video Once',
     icon: 'video',
     group: 'content',
   },
   {
     id: 'in-targets',
-    label: 'You Name the Targets',
-    caption: 'Who you want to reach',
+    label: 'We Discuss Your Ideal Client Profile',
     icon: 'target',
     group: 'outreach',
   },
