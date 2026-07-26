@@ -35,19 +35,51 @@ function useMedia(query: string) {
 
 /* ── Nerve Center Hub ───────────────────────────────────────────────────── */
 
-/** Six evenly-spaced radial tick marks — drawn as SVG so they're crisp at any DPR */
-function CircuitTicks({ r, count = 6, color }: { r: number; count?: number; color: string }) {
+/**
+ * A single orbital dot that travels around the ring at a given speed and phase.
+ * Implemented with a CSS animation so it's one transform — no JS per-frame work.
+ */
+function OrbitalDot({
+  radius,
+  size,
+  durationSec,
+  phaseOffset,
+  color,
+}: {
+  radius: number;
+  size: number;
+  durationSec: number;
+  phaseOffset: number; // 0–360 starting angle
+  color: string;
+}) {
+  const id = React.useId();
+  const circumference = 2 * Math.PI * radius;
   return (
     <>
-      {Array.from({ length: count }).map((_, i) => {
-        const angle = (i * 360) / count;
-        const rad = (angle * Math.PI) / 180;
-        const x1 = 90 + r * Math.cos(rad);
-        const y1 = 90 + r * Math.sin(rad);
-        const x2 = 90 + (r + 7) * Math.cos(rad);
-        const y2 = 90 + (r + 7) * Math.sin(rad);
-        return <line key={i} x1={x1} y1={y1} x2={x2} y2={y2} stroke={color} strokeWidth="1" strokeLinecap="round" />;
-      })}
+      <style>{`
+        @keyframes orbit-${id.replace(/:/g, '')} {
+          from { stroke-dashoffset: ${circumference - phaseOffset * (circumference / 360)}; }
+          to   { stroke-dashoffset: ${circumference - phaseOffset * (circumference / 360) - circumference}; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+          .orbit-dot-${id.replace(/:/g, '')} { animation: none !important; }
+        }
+      `}</style>
+      {/* Invisible full-circle path the dot follows */}
+      <circle
+        className={`orbit-dot-${id.replace(/:/g, '')}`}
+        cx="90" cy="90"
+        r={radius}
+        fill="none"
+        stroke={color}
+        strokeWidth={size}
+        strokeLinecap="round"
+        strokeDasharray={`0 ${circumference}`}
+        style={{
+          animation: `orbit-${id.replace(/:/g, '')} ${durationSec}s linear infinite`,
+          transformOrigin: '90px 90px',
+        }}
+      />
     </>
   );
 }
