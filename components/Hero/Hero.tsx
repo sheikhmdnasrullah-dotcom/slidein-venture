@@ -8,7 +8,7 @@ export default function Hero() {
   const [videoOpen, setVideoOpen] = useState(false);
 
   return (
-    <section className="bg-[#FAFAF8] pt-[calc(56px+14px)] md:pt-[calc(56px+18px)] pb-0 overflow-hidden relative">
+    <section className="pt-[calc(56px+14px)] md:pt-[calc(56px+18px)] pb-0 overflow-hidden relative">
       {/* Futuristic beam sweep */}
       <div className="absolute inset-0 pointer-events-none beam-sweep" />
       <div className="max-w-[1200px] mx-auto px-6 md:px-10 flex flex-col items-center text-center">

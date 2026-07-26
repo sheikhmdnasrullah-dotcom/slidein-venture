@@ -10,7 +10,6 @@ import ServiceDetailModal from '@/components/ServiceDetailModal/ServiceDetailMod
 const RED = '#7A0A0E';
 const BLACK = '#0A0A0A';
 const WHITE = '#FFFFFF';
-const BG = '#FAFAF8';
 
 interface Point {
   x: number;
@@ -177,7 +176,7 @@ export default function CompleteFramework() {
   const final = { x: centerX, y: outY + 120 };
 
   return (
-    <section ref={sectionRef} className="relative overflow-hidden section-grid" style={{ backgroundColor: BG, paddingTop: '6rem', paddingBottom: '6rem' }}>
+    <section ref={sectionRef} className="relative overflow-hidden section-grid pt-24 pb-24">
       
       {/* ── Background Grid ─────────────────────────────────────────── */}
       <div className="absolute inset-0 pointer-events-none" style={{ backgroundImage: `radial-gradient(circle at 1px 1px, ${RED}08 1px, transparent 0)`, backgroundSize: '40px 40px' }} />

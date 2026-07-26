@@ -412,7 +412,7 @@ export default function PricingPage() {
   return (
     <>
       {/* ── Hero ────────────────────────────────────────────────────── */}
-      <section className="relative pt-36 pb-16 overflow-hidden" style={{ background: '#FAFAF8' }}>
+      <section className="relative pt-36 pb-16 overflow-hidden">
         <div className="absolute inset-0 pointer-events-none overflow-hidden">
           <div
             className="absolute -top-40 left-1/2 -translate-x-1/2 w-[700px] h-[400px] rounded-full opacity-30 blur-[120px]"
@@ -466,7 +466,7 @@ export default function PricingPage() {
       </section>
 
       {/* ── Services Grid ─────────────────────────────────────────── */}
-      <section className="pb-40" style={{ background: '#FAFAF8' }}>
+      <section className="pb-40">
         <div className="max-w-[1100px] mx-auto px-6 md:px-10">
           <DiscountHint count={count} />
 

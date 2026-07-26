@@ -104,11 +104,14 @@ export default function Navbar() {
         <motion.div
           className="flex items-center gap-1 pl-2 pr-2 py-2"
           style={{
-            background: '#7A0A0E',
+            background: 'rgba(255, 255, 255, 0.72)',
+            backdropFilter: 'blur(24px) saturate(1.4)',
+            WebkitBackdropFilter: 'blur(24px) saturate(1.4)',
             borderRadius: '9999px',
+            border: '1px solid rgba(122, 10, 14, 0.08)',
             boxShadow: scrolled
-              ? '0 8px 40px rgba(122,10,14,0.35), 0 2px 8px rgba(0,0,0,0.15), inset 0 1px 0 rgba(255,255,255,0.08)'
-              : '0 4px 24px rgba(122,10,14,0.25), 0 1px 4px rgba(0,0,0,0.12), inset 0 1px 0 rgba(255,255,255,0.08)',
+              ? '0 8px 32px rgba(0,0,0,0.08), 0 2px 8px rgba(0,0,0,0.04)'
+              : '0 4px 24px rgba(0,0,0,0.06), 0 1px 4px rgba(0,0,0,0.03)',
           }}
           initial={{ y: -20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
@@ -119,8 +122,9 @@ export default function Navbar() {
             href="/"
             className="flex items-center gap-1 h-[44px] px-4 rounded-full flex-shrink-0 transition-transform duration-200 hover:scale-[1.02]"
             style={{
-              background: 'white',
-              boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
+              background: 'rgba(122, 10, 14, 0.06)',
+              border: '1px solid rgba(122, 10, 14, 0.12)',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
             }}
             aria-label="SlideIn Venture"
           >
@@ -153,7 +157,7 @@ export default function Navbar() {
               <Link
                 key={link.label}
                 href={link.href}
-                className="px-4 py-2 text-[15px] font-[500] text-white/85 rounded-full hover:text-white hover:bg-white/10 transition-all duration-150 whitespace-nowrap inline-flex items-center"
+                className="px-4 py-2 text-[15px] font-[500] text-[#0A0A0A]/80 rounded-full hover:text-black hover:bg-black/[0.04] transition-all duration-150 whitespace-nowrap inline-flex items-center"
               >
                 {link.label}
               </Link>
@@ -168,23 +172,23 @@ export default function Navbar() {
           {/* ── Mobile Hamburger ─────────────────────────────────────── */}
           <button
             className="lg:hidden flex items-center justify-center w-[44px] h-[44px] rounded-full transition-colors duration-150"
-            style={{ background: mobileOpen ? 'rgba(255,255,255,0.15)' : 'transparent' }}
+            style={{ background: mobileOpen ? 'rgba(0,0,0,0.06)' : 'transparent' }}
             onClick={() => setMobileOpen(!mobileOpen)}
             aria-label="Toggle menu"
           >
             <div className="w-[18px] flex flex-col gap-[4px]">
-              <span
-                className="block h-[2px] bg-white rounded-full origin-center transition-transform duration-200"
-                style={{ transform: mobileOpen ? 'translateY(6px) rotate(45deg)' : 'none' }}
-              />
-              <span
-                className="block h-[2px] bg-white rounded-full transition-opacity duration-200"
-                style={{ opacity: mobileOpen ? 0 : 1 }}
-              />
-              <span
-                className="block h-[2px] bg-white rounded-full origin-center transition-transform duration-200"
-                style={{ transform: mobileOpen ? 'translateY(-6px) rotate(-45deg)' : 'none' }}
-              />
+                <span
+                  className="block h-[2px] bg-[#0A0A0A] rounded-full origin-center transition-transform duration-200"
+                  style={{ transform: mobileOpen ? 'translateY(6px) rotate(45deg)' : 'none' }}
+                />
+                <span
+                  className="block h-[2px] bg-[#0A0A0A] rounded-full transition-opacity duration-200"
+                  style={{ opacity: mobileOpen ? 0 : 1 }}
+                />
+                <span
+                  className="block h-[2px] bg-[#0A0A0A] rounded-full origin-center transition-transform duration-200"
+                  style={{ transform: mobileOpen ? 'translateY(-6px) rotate(-45deg)' : 'none' }}
+                />
             </div>
           </button>
         </motion.div>
@@ -195,9 +199,12 @@ export default function Navbar() {
             <motion.div
               className="lg:hidden mt-2 overflow-hidden"
               style={{
-                background: '#7A0A0E',
+                background: 'rgba(255, 255, 255, 0.88)',
+                backdropFilter: 'blur(24px) saturate(1.4)',
+                WebkitBackdropFilter: 'blur(24px) saturate(1.4)',
                 borderRadius: '24px',
-                boxShadow: '0 12px 48px rgba(122,10,14,0.35), 0 2px 8px rgba(0,0,0,0.15)',
+                border: '1px solid rgba(122, 10, 14, 0.08)',
+                boxShadow: '0 12px 48px rgba(0,0,0,0.08), 0 2px 8px rgba(0,0,0,0.04)',
               }}
               initial={{ opacity: 0, height: 0, scale: 0.95 }}
               animate={{ opacity: 1, height: 'auto', scale: 1 }}
@@ -209,7 +216,7 @@ export default function Navbar() {
                   <Link
                     key={link.label}
                     href={link.href}
-                    className="block px-4 py-3 text-[15px] font-[500] text-white/85 rounded-2xl hover:text-white hover:bg-white/10 transition-colors"
+                    className="block px-4 py-3 text-[15px] font-[500] text-[#0A0A0A]/80 rounded-2xl hover:text-black hover:bg-black/[0.04] transition-colors"
                     onClick={() => setMobileOpen(false)}
                   >
                     {link.label}
@@ -217,10 +224,10 @@ export default function Navbar() {
                 ))}
 
                 {/* Mobile CTA */}
-                <div className="pt-3 mt-2" style={{ borderTop: '1px solid rgba(255,255,255,0.1)' }}>
+                <div className="pt-3 mt-2" style={{ borderTop: '1px solid rgba(0,0,0,0.06)' }}>
                   <Link
                     href="/login"
-                    className="block text-center py-3 text-[15px] font-[500] text-white/85 rounded-2xl hover:bg-white/10 transition-colors"
+                    className="block text-center py-3 text-[15px] font-[500] text-[#0A0A0A]/80 rounded-2xl hover:bg-black/[0.04] transition-colors"
                     onClick={() => setMobileOpen(false)}
                   >
                     Log in
@@ -231,8 +238,8 @@ export default function Navbar() {
                     rel="noopener noreferrer"
                     className="block text-center mt-1 py-3 text-[15px] font-[650] rounded-full transition-all duration-200"
                     style={{
-                      background: 'white',
-                      color: '#7A0A0E',
+                      background: '#7A0A0E',
+                      color: 'white',
                     }}
                     onClick={() => setMobileOpen(false)}
                   >

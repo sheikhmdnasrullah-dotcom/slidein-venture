@@ -10,7 +10,7 @@
   --font-mono: 'JetBrains Mono', ui-monospace, monospace;
 
   /* Brand Colors — black, white, dark red */
-  --color-background:   #FAFAF8;
+  --color-background:   #FDFCFB;
   --color-foreground:   #0A0A0A;
   --color-card:         #FFFFFF;
   --color-card-foreground: #0A0A0A;
@@ -80,7 +80,7 @@
   --chart-3: oklch(0.439 0 0);
   --chart-4: oklch(0.371 0 0);
   --chart-5: oklch(0.269 0 0);
-  --background: oklch(1 0 0);
+  --background: #FDFCFB;
   --foreground: oklch(0.145 0 0);
   --sidebar: oklch(0.985 0 0);
   --sidebar-foreground: oklch(0.145 0 0);
@@ -140,7 +140,11 @@ html {
 
 body {
   font-family: var(--font-sans);
-  background-color: #FAFAF8;
+  background-color: #FDFCFB;
+  background-image:
+    radial-gradient(ellipse at 15% 10%, rgba(122,10,14,0.05) 0%, transparent 55%),
+    radial-gradient(ellipse at 85% 85%, rgba(10,10,10,0.04) 0%, transparent 55%),
+    radial-gradient(ellipse at 50% 30%, rgba(255,255,255,0.4) 0%, transparent 65%);
   color: #0A0A0A;
   line-height: 1.6;
   overflow-x: hidden;
@@ -182,11 +186,11 @@ body::after {
   pointer-events: none;
   background: 
     /* Deep darkish red sweep */
-    radial-gradient(circle at 20% 40%, rgba(122, 10, 14, 0.08) 0%, transparent 50%),
+    radial-gradient(circle at 20% 40%, rgba(122, 10, 14, 0.14) 0%, transparent 50%),
     /* Almost black shadow sweep for that "darkish" rich contrast */
-    radial-gradient(circle at 80% 60%, rgba(10, 10, 10, 0.06) 0%, transparent 50%),
+    radial-gradient(circle at 80% 60%, rgba(10, 10, 10, 0.12) 0%, transparent 50%),
     /* Bright white core to maintain the white futuristic theme */
-    radial-gradient(circle at 50% 10%, rgba(255, 255, 255, 0.8) 0%, transparent 60%);
+    radial-gradient(circle at 50% 10%, rgba(255, 255, 255, 0.9) 0%, transparent 60%);
   animation: aurora-shift 20s ease-in-out infinite alternate;
 }
 

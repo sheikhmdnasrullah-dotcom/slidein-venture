@@ -194,7 +194,7 @@ export default function SolutionsPage() {
   const [activeFeature, setActiveFeature] = useState(features[0].id);
 
   return (
-    <div className="bg-white min-h-screen">
+    <div className="min-h-screen">
       {/* ── Hero Section ─────────────────────────────────────────────── */}
       <section className="relative pt-[calc(56px+80px)] pb-24 overflow-hidden">
         {/* Decorative background elements */}
@@ -311,7 +311,7 @@ export default function SolutionsPage() {
       </section>
 
       {/* ── Solutions Grid ───────────────────────────────────────────── */}
-      <section className="py-24 bg-white">
+      <section className="py-24">
         <div className="max-w-[1100px] mx-auto px-6 md:px-10">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -413,7 +413,7 @@ export default function SolutionsPage() {
       </section>
 
       {/* ── Workflow Section ─────────────────────────────────────────── */}
-      <section className="py-24 bg-[#FAFAF8]">
+      <section className="py-24">
         <div className="max-w-[1100px] mx-auto px-6 md:px-10">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -465,7 +465,7 @@ export default function SolutionsPage() {
       </section>
 
       {/* ── CTA Section ─────────────────────────────────────────────── */}
-      <section className="py-24 bg-white">
+      <section className="py-24">
         <div className="max-w-[800px] mx-auto px-6 md:px-10 text-center">
           <motion.div
             initial={{ opacity: 0, y: 20 }}

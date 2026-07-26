@@ -29,7 +29,7 @@ export default function HorizontalCarousel({ slides, eyebrow, title }: Horizonta
   const slide = slides[current];
 
   return (
-    <section className="py-24 bg-white">
+    <section className="py-24">
       <div className="max-w-[1200px] mx-auto px-6 md:px-10">
         {eyebrow && (
           <p className="text-center text-[11.5px] font-[700] tracking-[0.08em] uppercase text-[#0F8A8A] mb-3">

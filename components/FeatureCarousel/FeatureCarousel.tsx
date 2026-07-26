@@ -29,7 +29,7 @@ export default function FeatureCarousel({ tabs, eyebrow, title, subtitle, dark }
   const current = tabs[activeTab];
 
   return (
-    <section className={`py-24 ${dark ? 'bg-[#191919]' : 'bg-[#F7F6F3]'}`}>
+    <section className={`py-24 ${dark ? 'bg-[#191919]' : ''}`}>
       <div className="max-w-[1200px] mx-auto px-6 md:px-10">
 
         {/* Header */}

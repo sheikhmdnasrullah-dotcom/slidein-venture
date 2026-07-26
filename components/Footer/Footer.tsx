@@ -43,7 +43,7 @@ const NotionLogoSm = () => (
 
 export default function Footer() {
   return (
-    <footer className="bg-[#FAFAF8] border-t border-[#E5E5E5] pt-16">
+    <footer className="pt-16">
       <div className="max-w-[1200px] mx-auto px-6 md:px-10">
 
         {/* Top grid */}
