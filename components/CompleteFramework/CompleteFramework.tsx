@@ -1,164 +1,81 @@
 'use client';
 
-import React, { useState, useCallback, useRef, useEffect } from 'react';
-import { motion, useInView, useReducedMotion, useScroll, useTransform } from 'framer-motion';
-import { Plus, Sparkles, CheckCircle2, ChevronDown, Globe } from 'lucide-react';
+import React, { useState, useCallback, useRef } from 'react';
+import { motion, useInView } from 'framer-motion';
+import { Plus, ChevronDown, Video, Target, Sparkles, Send } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { ENGINES, OUTPUTS } from './framework.data';
 import ServiceDetailModal from '@/components/ServiceDetailModal/ServiceDetailModal';
-import { ENGINES } from './framework.data';
 
 const RED = '#7A0A0E';
-const RED_WARM = '#C24B4B';
 const BLACK = '#0A0A0A';
-const STONE = '#6B6B6B';
-const FROST = '#E8E8E4';
-const SECTION_BG = '#FAFAF8';
-const NODE_BG = '#FFFFFF';
+const WHITE = '#FFFFFF';
+const BG = '#FAFAF8';
 
-interface TrackItemData {
-  id: string;
-  label: string;
-  description: string;
-  icon?: React.ReactNode;
+interface Point {
+  x: number;
+  y: number;
 }
 
-// Data loaded from framework.data.ts
-
-/* ─── Orbital math ─────────────────────────────────────────────────────────── */
-
-function polarToCartesian(cx: number, cy: number, r: number, angleDeg: number) {
-  const rad = (angleDeg - 90) * (Math.PI / 180);
-  return { x: cx + r * Math.cos(rad), y: cy + r * Math.sin(rad) };
+function verticalBezier(p1: Point, p2: Point) {
+  const dy = Math.abs(p2.y - p1.y);
+  const offset = Math.max(dy * 0.4, 40);
+  return `M ${p1.x} ${p1.y} C ${p1.x} ${p1.y + offset}, ${p2.x} ${p2.y - offset}, ${p2.x} ${p2.y}`;
 }
 
-function describeArc(cx: number, cy: number, r: number, startAngle: number, endAngle: number) {
-  const start = polarToCartesian(cx, cy, r, startAngle);
-  const end = polarToCartesian(cx, cy, r, endAngle);
-  const largeArcFlag = endAngle - startAngle <= 180 ? '0' : '1';
-  return `M ${start.x} ${start.y} A ${r} ${r} 0 ${largeArcFlag} 1 ${end.x} ${end.y}`;
-}
-
-/* ─── Animated Orbital Ring ────────────────────────────────────────────────── */
-
-function OrbitalRing({
-  radius,
-  rotation,
-  duration,
-  color = RED,
-  opacity = 0.12,
-  dashArray = '4 8',
-  direction = 1,
-}: {
-  radius: number;
-  rotation: number;
-  duration: number;
-  color?: string;
-  opacity?: number;
-  dashArray?: string;
-  direction?: number;
-}) {
-  const path = describeArc(150, 150, radius, 0, 359.9);
-
+function Connection({ p1, p2, delay = 0 }: { p1: Point; p2: Point; delay?: number }) {
+  const path = verticalBezier(p1, p2);
   return (
-    <g transform={`rotate(${rotation * direction})`}>
-      <path
+    <g>
+      <path d={path} fill="none" stroke={RED} strokeWidth={1.5} opacity={0.3} />
+      <motion.path
         d={path}
         fill="none"
-        stroke={color}
-        strokeWidth="1"
-        opacity={opacity}
-        strokeDasharray={dashArray}
-        strokeLinecap="round"
-      >
-        <animateTransform
-          attributeName="transform"
-          type="rotate"
-          from={`0 150 150`}
-          to={`${360 * direction} 150 150`}
-          dur={`${duration}s`}
-          repeatCount="indefinite"
-        />
-      </path>
+        stroke={RED}
+        strokeWidth={1.5}
+        initial={{ pathLength: 0, opacity: 0 }}
+        whileInView={{ pathLength: 1, opacity: 1 }}
+        viewport={{ once: true, margin: "-50px" }}
+        transition={{ duration: 1.5, delay, ease: "easeOut" }}
+      />
     </g>
   );
 }
 
-/* ─── Glowing Node ────────────────────────────────────────────────────────── */
-
-function GlowNode({
-  x, y, label, subtitle, icon, color = RED, delay = 0, onClick, isExpanded,
-  isHub = false, isOutcome = false,
-}: {
-  x: number;
-  y: number;
-  label: string;
-  subtitle?: string;
-  icon?: React.ReactNode;
-  color?: string;
-  delay?: number;
-  onClick?: () => void;
-  isExpanded?: boolean;
-  isHub?: boolean;
-  isOutcome?: boolean;
+function PillNode({ 
+  x, y, label, icon: Icon, delay, onClick 
+}: { 
+  x: number; y: number; label: string; icon?: any; delay: number; onClick?: () => void;
 }) {
-  const glowSize = isHub ? 60 : isOutcome ? 40 : 32;
-  const nodeSize = isHub ? 56 : isOutcome ? 44 : 36;
-
   return (
-    <motion.g
-      initial={{ opacity: 0, scale: 0.5 }}
-      animate={{ opacity: 1, scale: 1 }}
-      transition={{ duration: 0.6, delay, ease: [0.16, 1, 0.3, 1] }}
-      style={{ cursor: onClick ? 'pointer' : 'default' }}
+    <motion.div
+      initial={{ opacity: 0, y: -10 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-50px" }}
+      transition={{ duration: 0.5, delay }}
+      className={cn(
+        "absolute -translate-x-1/2 -translate-y-1/2 flex items-center gap-3 px-4 py-2.5 rounded-full border bg-white shadow-sm transition-all duration-300",
+        onClick ? "cursor-pointer hover:shadow-md hover:scale-[1.02]" : ""
+      )}
+      style={{
+        left: x,
+        top: y,
+        borderColor: `${RED}30`,
+        borderLeft: `4px solid ${RED}`,
+      }}
       onClick={onClick}
     >
-      {/* Outer glow */}
-      <circle cx={x} cy={y} r={glowSize} fill={color} opacity={isHub ? 0.08 : 0.05}>
-        <animate attributeName="r" values={`${glowSize};${glowSize + 6};${glowSize}`} dur="4s" repeatCount="indefinite" />
-        <animate attributeName="opacity" values={isHub ? '0.08;0.04;0.08' : '0.05;0.02;0.05'} dur="4s" repeatCount="indefinite" />
-      </circle>
-
-      {/* Node body */}
-      <circle
-        cx={x} cy={y} r={nodeSize}
-        fill={NODE_BG}
-        stroke={color}
-        strokeWidth={isHub ? 2.5 : isOutcome ? 2 : 1.5}
-        opacity={0.95}
-        style={{ filter: `drop-shadow(0 4px 12px ${color}25)` }}
-      />
-
-      {/* Icon or text */}
-      {isHub ? (
-        <g>
-          <text x={x} y={y - 6} textAnchor="middle" fill={color} fontSize="18" fontWeight="700" fontFamily="system-ui">
-            {label.length > 12 ? label.slice(0, 11) + '…' : label}
-          </text>
-          <text x={x} y={y + 10} textAnchor="middle" fill={STONE} fontSize="9" fontFamily="system-ui">
-            {subtitle}
-          </text>
-        </g>
-      ) : isOutcome ? (
-        <text x={x} y={y + 4} textAnchor="middle" fill={BLACK} fontSize="9" fontWeight="600" fontFamily="system-ui">
-          {label.length > 18 ? label.slice(0, 17) + '…' : label}
-        </text>
-      ) : (
-        <text x={x} y={y + 3} textAnchor="middle" fill={BLACK} fontSize="8" fontWeight="500" fontFamily="system-ui">
-          {label.length > 10 ? label.slice(0, 9) + '…' : label}
-        </text>
+      {Icon && (
+        <div className="w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0" style={{ backgroundColor: `${RED}10`, color: RED }}>
+          <Icon size={12} strokeWidth={2.5} />
+        </div>
       )}
-
-      {/* Glow dot at center */}
-      <circle cx={x} cy={y} r={isHub ? 3 : 2} fill={color} opacity={0.6}>
-        <animate attributeName="opacity" values="0.6;1;0.6" dur="2s" repeatCount="indefinite" />
-      </circle>
-    </motion.g>
+      <span className="text-xs font-semibold whitespace-nowrap" style={{ color: BLACK }}>{label}</span>
+    </motion.div>
   );
 }
 
-/* ─── Track Item Detail Panel ─────────────────────────────────────────────── */
-
-function TrackItemPanel({ items, isOpen, color = RED, onOpenService }: { items: { id: string; label: string; description: string }[]; isOpen: boolean; color?: string; onOpenService?: (id: string) => void }) {
+function TrackItemPanel({ items, isOpen, onOpenService }: { items: { id: string; label: string; description: string }[]; isOpen: boolean; onOpenService?: (id: string) => void }) {
   if (!isOpen) return null;
 
   return (
@@ -169,23 +86,23 @@ function TrackItemPanel({ items, isOpen, color = RED, onOpenService }: { items: 
       transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
       className="overflow-hidden"
     >
-      <div className="mt-3 space-y-2">
+      <div className="mt-4 space-y-2">
         {items.map((item, i) => (
           <motion.button
             key={item.id}
             initial={{ opacity: 0, x: -10 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: i * 0.05 }}
-            className="flex items-start gap-3 p-3 rounded-xl border w-full text-left cursor-pointer transition-all duration-200 hover:shadow-md"
-            style={{ borderColor: `${color}18`, backgroundColor: `${color}06` }}
+            className="flex items-start gap-3 p-3 rounded-xl border w-full text-left cursor-pointer transition-all duration-200 hover:shadow-md bg-white"
+            style={{ borderColor: `${BLACK}10` }}
             onClick={() => onOpenService?.(item.id)}
           >
-            <div className="w-5 h-5 rounded-md flex items-center justify-center flex-shrink-0 mt-0.5" style={{ backgroundColor: `${color}18`, color }}>
+            <div className="w-5 h-5 rounded-md flex items-center justify-center flex-shrink-0 mt-0.5" style={{ border: `1px solid ${BLACK}20`, color: BLACK }}>
               <Plus size={12} strokeWidth={2.5} />
             </div>
             <div>
-              <p className="text-[13px] font-semibold" style={{ color: BLACK }}>{item.label}</p>
-              <p className="text-[11px] mt-0.5 leading-relaxed" style={{ color: STONE }}>{item.description.slice(0, 120)}...</p>
+              <p className="text-[13px] font-bold" style={{ color: BLACK }}>{item.label}</p>
+              <p className="text-[11px] mt-0.5 leading-relaxed" style={{ color: BLACK, opacity: 0.7 }}>{item.description.slice(0, 100)}...</p>
             </div>
           </motion.button>
         ))}
@@ -194,361 +111,234 @@ function TrackItemPanel({ items, isOpen, color = RED, onOpenService }: { items: 
   );
 }
 
-/* ─── Main Orbit Flowchart Component ──────────────────────────────────────── */
-
 export default function CompleteFramework() {
   const [openContent, setOpenContent] = useState(false);
   const [openOutreach, setOpenOutreach] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [modalServiceId, setModalServiceId] = useState<string | undefined>(undefined);
-  const prefersReducedMotion = useReducedMotion();
-  const shouldAnimate = !prefersReducedMotion;
+  
   const sectionRef = useRef<HTMLElement>(null);
   const isInView = useInView(sectionRef, { once: true, margin: '-80px' });
 
-  const { scrollY } = useScroll({ target: sectionRef, offset: ['start start', 'end start'] });
-  const orbitRotation = useTransform(scrollY, [0, 600], [0, 15]);
-  const orbitOpacity = useTransform(scrollY, [0, 300], [0.3, 0.15]);
-
-  const openService = useCallback((serviceId: string) => {
-    setModalServiceId(serviceId);
+  const openService = useCallback((id: string) => {
+    setModalServiceId(id);
     setModalOpen(true);
   }, []);
+  
   const closeModal = useCallback(() => {
     setModalOpen(false);
-    setModalServiceId(undefined);
+    setTimeout(() => setModalServiceId(undefined), 300);
   }, []);
 
+  // Vertical Flowchart Coordinates
+  const W = 1000; // SVG canvas width
+  const centerX = W / 2;
+  
+  const in1 = { x: centerX - 250, y: 100 };
+  const in2 = { x: centerX + 250, y: 100 };
+  
+  const centerHub = { x: centerX, y: 280 };
+  
+  const H = 850; // Flowchart container height
+
+  // Arranging 7 outputs in two columns below the center hub
+  const outputs = OUTPUTS.map((out, i) => {
+    // 0, 1, 2 go to the left. 3, 4, 5 go to the right. 6 goes to the middle bottom.
+    const isLeft = i % 2 === 0;
+    const isLast = i === 6;
+    
+    // Y position drops for every pair
+    const row = Math.floor(i / 2);
+    
+    const yPos = 400 + row * 80;
+    const xPos = isLast ? centerX : (isLeft ? centerX - 200 : centerX + 200);
+    
+    return { ...out, x: xPos, y: yPos };
+  });
+
   return (
-    <section
-      ref={sectionRef}
-      className="relative overflow-hidden"
-      style={{
-        backgroundColor: SECTION_BG,
-        paddingTop: 'clamp(5rem, 8vw, 8rem)',
-        paddingBottom: 'clamp(5rem, 8vw, 8rem)',
-      }}
-      aria-label="The Complete Framework — how SlideIn Venture works"
-    >
-      {/* ── Background grid ─────────────────────────────────────────── */}
-      <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
-        <div
-          className="absolute inset-0"
-          style={{
-            backgroundImage: `radial-gradient(circle at 1px 1px, ${RED}06 1px, transparent 0)`,
-            backgroundSize: '48px 48px',
-          }}
-        />
-        <motion.div
-          className="absolute inset-0"
-          style={{
-            background: `radial-gradient(ellipse at center, ${RED}08 0%, transparent 60%)`,
-            opacity: orbitOpacity,
-          }}
-        />
-      </div>
+    <section ref={sectionRef} className="relative overflow-hidden" style={{ backgroundColor: BG, paddingTop: '8rem', paddingBottom: '8rem' }}>
+      
+      {/* ── Section Header ─────────────────────────────────────────── */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+        transition={{ duration: 0.6 }}
+        className="text-center mb-16 relative z-20 px-6"
+      >
+        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border mb-6 bg-white" style={{ borderColor: `${RED}20` }}>
+          <div className="w-2 h-2 rounded-full" style={{ backgroundColor: RED }} />
+          <span className="text-[11px] font-bold uppercase tracking-[0.15em]" style={{ color: RED }}>Complete Framework</span>
+        </div>
+        <h2 className="text-4xl md:text-5xl font-bold tracking-tight text-black">Inside The Nerve Center</h2>
+      </motion.div>
 
-      <div className="relative max-w-[1200px] mx-auto px-6 md:px-10">
-        {/* ── Section Header ─────────────────────────────────────────── */}
-        <motion.div
-          initial={shouldAnimate ? { opacity: 0, y: 20 } : false}
-          animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-          transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-          className="text-center mb-12 md:mb-16"
-        >
-          <motion.div
-            initial={shouldAnimate ? { opacity: 0, scale: 0.9 } : false}
-            animate={isInView ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.9 }}
-            transition={{ duration: 0.5, delay: 0.1 }}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-full border mb-6"
-            style={{ borderColor: `${RED}25`, backgroundColor: `${RED}08` }}
-          >
-            <div className="w-2 h-2 rounded-full" style={{ backgroundColor: RED, boxShadow: `0 0 8px ${RED}80` }} />
-            <span className="text-[11px] font-[700] uppercase tracking-[0.12em]" style={{ color: RED }}>
-              Complete Framework
-            </span>
-          </motion.div>
-
-          <h2
-            className="font-bold leading-[1.04] tracking-[-0.04em]"
-            style={{
-              fontSize: 'clamp(2.5rem, 6vw, 4.5rem)',
-              color: BLACK,
-            }}
-          >
-            One system. Infinite output.
-          </h2>
-          <motion.p
-            initial={shouldAnimate ? { opacity: 0, y: 12 } : false}
-            animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 12 }}
-            transition={{ duration: 0.5, delay: 0.15 }}
-            className="text-[16px] mt-5 max-w-xl mx-auto"
-            style={{ color: STONE }}
-          >
-            Record once. Target precisely. Two parallel engines compound into a complete growth machine.
-          </motion.p>
-        </motion.div>
-
-        {/* ── Orbit Network Visualization ───────────────────────────── */}
-        <motion.div
-          initial={shouldAnimate ? { opacity: 0, scale: 0.95 } : false}
-          animate={isInView ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.95 }}
-          transition={{ duration: 0.8, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
-          className="relative mx-auto"
-          style={{ maxWidth: '600px', height: '600px' }}
-        >
-          {/* SVG Orbit Diagram */}
-          <svg
-            viewBox="0 0 300 300"
-            className="w-full h-full"
-            style={{ filter: 'drop-shadow(0 0 40px rgba(122,10,14,0.06))' }}
-          >
-            <defs>
-              <radialGradient id="hubGlow" cx="50%" cy="50%" r="50%">
-                <stop offset="0%" stopColor={RED} stopOpacity={0.15} />
-                <stop offset="100%" stopColor={RED} stopOpacity={0} />
-              </radialGradient>
-              <filter id="nodeShadow" x="-50%" y="-50%" width="200%" height="200%">
-                <feDropShadow dx="0" dy="2" stdDeviation="4" floodColor={RED} floodOpacity={0.15} />
-              </filter>
-            </defs>
-
-            {/* Outer orbital ring */}
-            <OrbitalRing radius={120} rotation={0} duration={60} color={RED} opacity={0.08} dashArray="2 12" direction={1} />
-            <OrbitalRing radius={120} rotation={60} duration={60} color={RED_WARM} opacity={0.05} dashArray="1 16" direction={-1} />
-
-            {/* Inner orbital ring */}
-            <OrbitalRing radius={75} rotation={30} duration={45} color={RED} opacity={0.12} dashArray="3 10" direction={-1} />
-            <OrbitalRing radius={75} rotation={90} duration={45} color={RED_WARM} opacity={0.06} dashArray="2 14" direction={1} />
-
-            {/* Connection lines from hub to branch nodes */}
-            <line x1="150" y1="150" x2="150" y2="75" stroke={RED} strokeWidth="1.5" opacity={0.2} strokeDasharray="4 4">
-              <animate attributeName="stroke-dashoffset" from="0" to="-8" dur="2s" repeatCount="indefinite" />
-            </line>
-            <line x1="150" y1="150" x2="150" y2="225" stroke={RED_WARM} strokeWidth="1.5" opacity={0.2} strokeDasharray="4 4">
-              <animate attributeName="stroke-dashoffset" from="0" to="-8" dur="2s" repeatCount="indefinite" begin="0.5s" />
-            </line>
-
-            {/* Connection lines from branch to outcome nodes */}
-            <line x1="150" y1="75" x2="60" y2="30" stroke={RED} strokeWidth="1" opacity={0.15} strokeDasharray="3 6">
-              <animate attributeName="stroke-dashoffset" from="0" to="-9" dur="2.5s" repeatCount="indefinite" />
-            </line>
-            <line x1="150" y1="75" x2="240" y2="30" stroke={RED} strokeWidth="1" opacity={0.15} strokeDasharray="3 6">
-              <animate attributeName="stroke-dashoffset" from="0" to="-9" dur="2.5s" repeatCount="indefinite" begin="0.3s" />
-            </line>
-            <line x1="150" y1="225" x2="60" y2="270" stroke={RED_WARM} strokeWidth="1" opacity={0.15} strokeDasharray="3 6">
-              <animate attributeName="stroke-dashoffset" from="0" to="-9" dur="2.5s" repeatCount="indefinite" begin="0.6s" />
-            </line>
-            <line x1="150" y1="225" x2="240" y2="270" stroke={RED_WARM} strokeWidth="1" opacity="0.15" strokeDasharray="3 6">
-              <animate attributeName="stroke-dashoffset" from="0" to="-9" dur="2.5s" repeatCount="indefinite" begin="0.9s" />
-            </line>
-
-            {/* Convergence lines to center bottom */}
-            <line x1="60" y1="270" x2="150" y2="255" stroke={RED} strokeWidth="1" opacity={0.12} strokeDasharray="2 8">
-              <animate attributeName="stroke-dashoffset" from="0" to="-10" dur="3s" repeatCount="indefinite" />
-            </line>
-            <line x1="240" y1="270" x2="150" y2="255" stroke={RED_WARM} strokeWidth="1" opacity={0.12} strokeDasharray="2 8">
-              <animate attributeName="stroke-dashoffset" from="0" to="-10" dur="3s" repeatCount="indefinite" begin="0.5s" />
-            </line>
-
-            {/* Central hub glow */}
-            <circle cx="150" cy="150" r="45" fill="url(#hubGlow)">
-              <animate attributeName="r" values="45;50;45" dur="4s" repeatCount="indefinite" />
-            </circle>
-
-            {/* ── NODES ─────────────────────────────────────────────── */}
-
-            {/* Central Hub */}
-            <g transform={`translate(${isInView ? 0 : -20}, ${isInView ? 0 : 20})`}>
-              <circle cx="150" cy="150" r="28" fill={NODE_BG} stroke={RED} strokeWidth="2.5" filter="url(#nodeShadow)" />
-              <text x="150" y="147" textAnchor="middle" fill={BLACK} fontSize="9" fontWeight="700" fontFamily="system-ui">
-                COMPLETE
-              </text>
-              <text x="150" y="158" textAnchor="middle" fill={RED} fontSize="9" fontWeight="700" fontFamily="system-ui">
-                FRAMEWORK
-              </text>
-              <circle cx="150" cy="150" r="3" fill={RED} opacity={0.7}>
-                <animate attributeName="opacity" values="0.7;1;0.7" dur="2s" repeatCount="indefinite" />
-              </circle>
-            </g>
-
-            {/* Track 1: Record Video Once */}
-            <motion.g
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={isInView ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.8 }}
-              transition={{ delay: 0.3, duration: 0.5 }}
-            >
-              <circle cx="150" cy="75" r="22" fill={NODE_BG} stroke={RED} strokeWidth="2" filter="url(#nodeShadow)" />
-              <text x="150" y="72" textAnchor="middle" fill={BLACK} fontSize="7" fontWeight="600" fontFamily="system-ui">
-                RECORD
-              </text>
-              <text x="150" y="81" textAnchor="middle" fill={RED} fontSize="6" fontWeight="600" fontFamily="system-ui">
-                VIDEO ONCE
-              </text>
-              <circle cx="150" cy="75" r="2.5" fill={RED} opacity={0.6} />
-            </motion.g>
-
-            {/* Track 2: You Tell Us Who to Reach */}
-            <motion.g
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={isInView ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.8 }}
-              transition={{ delay: 0.4, duration: 0.5 }}
-            >
-              <circle cx="150" cy="225" r="22" fill={NODE_BG} stroke={RED_WARM} strokeWidth="2" filter="url(#nodeShadow)" />
-              <text x="150" y="222" textAnchor="middle" fill={BLACK} fontSize="6.5" fontWeight="600" fontFamily="system-ui">
-                TELL US WHO
-              </text>
-              <text x="150" y="231" textAnchor="middle" fill={RED_WARM} fontSize="6.5" fontWeight="600" fontFamily="system-ui">
-                TO REACH
-              </text>
-              <circle cx="150" cy="225" r="2.5" fill={RED_WARM} opacity={0.6} />
-            </motion.g>
-
-            {/* Outcome nodes */}
-            {[
-              { x: 60, y: 30, label: 'Multi-Platform', sublabel: 'Presence', color: RED },
-              { x: 240, y: 30, label: 'Qualified', sublabel: 'Conversations', color: RED_WARM },
-              { x: 60, y: 270, label: 'More Clients', sublabel: 'Faster', color: BLACK },
-              { x: 240, y: 270, label: 'Revenue', sublabel: 'Growth', color: RED },
-            ].map((node, i) => (
-              <motion.g
-                key={i}
-                initial={{ opacity: 0, scale: 0.7 }}
-                animate={isInView ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.7 }}
-                transition={{ delay: 0.5 + i * 0.1, duration: 0.5 }}
-              >
-                <circle cx={node.x} cy={node.y} r="16" fill={NODE_BG} stroke={node.color} strokeWidth="1.5" opacity={0.9} />
-                <text x={node.x} y={node.y - 3} textAnchor="middle" fill={node.color} fontSize="6" fontWeight="600" fontFamily="system-ui">
-                  {node.label}
-                </text>
-                <text x={node.x} y={node.y + 6} textAnchor="middle" fill={STONE} fontSize="5.5" fontFamily="system-ui">
-                  {node.sublabel}
-                </text>
-                <circle cx={node.x} cy={node.y} r="1.5" fill={node.color} opacity={0.5} />
-              </motion.g>
-            ))}
-
-            {/* Animated particles along connections */}
-            {[
-              { x1: 150, y1: 150, x2: 150, y2: 75, delay: 0, color: RED },
-              { x1: 150, y1: 150, x2: 150, y2: 225, delay: 0.5, color: RED_WARM },
-              { x1: 150, y1: 75, x2: 60, y2: 30, delay: 1, color: RED },
-              { x1: 150, y1: 75, x2: 240, y2: 30, delay: 1.3, color: RED },
-              { x1: 150, y1: 225, x2: 60, y2: 270, delay: 1.6, color: RED_WARM },
-              { x1: 150, y1: 225, x2: 240, y2: 270, delay: 1.9, color: RED_WARM },
-            ].map((p, i) => (
-              <circle key={i} r="2" fill={p.color} opacity={0.7}>
-                <animateMotion
-                  path={`M ${p.x1} ${p.y1} L ${p.x2} ${p.y2}`}
-                  dur="3s"
-                  repeatCount="indefinite"
-                  begin={`${p.delay}s`}
-                />
-              </circle>
+      {/* ── Vertical Flowchart Visualization ───────────────────────────── */}
+      <div className="w-full overflow-x-auto pb-12 hide-scrollbar mask-edges relative z-10">
+        <div className="relative mx-auto" style={{ width: `${W}px`, height: `${H}px`, minWidth: `${W}px` }}>
+          
+          {/* SVG Connections */}
+          <svg className="absolute inset-0 w-full h-full pointer-events-none z-0 overflow-visible">
+            <Connection p1={{ x: in1.x, y: in1.y + 24 }} p2={{ x: centerHub.x, y: centerHub.y - 40 }} delay={0} />
+            <Connection p1={{ x: in2.x, y: in2.y + 24 }} p2={{ x: centerHub.x, y: centerHub.y - 40 }} delay={0.2} />
+            
+            {outputs.map((out, i) => (
+              <Connection key={out.id} p1={{ x: centerHub.x, y: centerHub.y + 40 }} p2={{ x: out.x, y: out.y - 24 }} delay={0.4 + i * 0.1} />
             ))}
           </svg>
-        </motion.div>
 
-        {/* ── Expandable Track Details ──────────────────────────────── */}
-        <motion.div
-          initial={shouldAnimate ? { opacity: 0, y: 20 } : false}
-          animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-          transition={{ delay: 0.6, duration: 0.5 }}
-          className="mt-12 max-w-3xl mx-auto space-y-4"
-        >
-          {/* Content Production Toggle */}
-          <div
-            className="p-6 rounded-2xl border cursor-pointer transition-all duration-200 hover:shadow-lg"
-            style={{ borderColor: `${RED}18`, backgroundColor: NODE_BG }}
-            onClick={() => setOpenContent(!openContent)}
-          >
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ backgroundColor: `${RED}12`, color: RED }}>
-                  <Sparkles size={20} strokeWidth={2} />
-                </div>
-                <div>
-                  <h3 className="text-[15px] font-semibold" style={{ color: BLACK }}>Content Production Track</h3>
-                  <p className="text-[11px] mt-0.5" style={{ color: STONE }}>{ENGINES[0].items.length} services — expand to view</p>
-                </div>
-              </div>
-              <motion.div
-                animate={{ rotate: openContent ? 180 : 0 }}
-                transition={{ duration: 0.2 }}
-                className="w-8 h-8 rounded-full flex items-center justify-center"
-                style={{ border: `1.5px solid ${RED}30`, color: RED }}
-              >
-                <ChevronDown size={16} strokeWidth={2.5} />
-              </motion.div>
+          {/* HTML Nodes */}
+          <div className="absolute inset-0 z-10 pointer-events-none">
+            
+            {/* Inputs */}
+            <div className="pointer-events-auto">
+              <PillNode x={in1.x} y={in1.y} label="You Record the Video" icon={Video} delay={0.1} />
+              <PillNode x={in2.x} y={in2.y} label="We Discuss Your ICP" icon={Target} delay={0.3} />
             </div>
-            <TrackItemPanel items={ENGINES[0].items} isOpen={openContent} color={RED} onOpenService={openService} />
-          </div>
 
-          {/* Manual Outreach Toggle */}
-          <div
-            className="p-6 rounded-2xl border cursor-pointer transition-all duration-200 hover:shadow-lg"
-            style={{ borderColor: `${RED_WARM}18`, backgroundColor: NODE_BG }}
-            onClick={() => setOpenOutreach(!openOutreach)}
-          >
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ backgroundColor: `${RED_WARM}12`, color: RED_WARM }}>
-                  <Globe size={20} strokeWidth={2} />
-                </div>
-                <div>
-                  <h3 className="text-[15px] font-semibold" style={{ color: BLACK }}>Manual Outreach Track</h3>
-                  <p className="text-[11px] mt-0.5" style={{ color: STONE }}>{ENGINES[1].items.length} services — expand to view</p>
-                </div>
+            {/* Central Nerve Center */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.8 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.5, duration: 0.6 }}
+              className="absolute -translate-x-1/2 -translate-y-1/2 flex flex-col items-center pointer-events-auto"
+              style={{ left: centerHub.x, top: centerHub.y }}
+            >
+              <div className="w-24 h-24 rounded-full flex flex-col items-center justify-center relative" style={{ backgroundColor: BLACK, boxShadow: `0 0 40px ${RED}30` }}>
+                <span className="text-xl font-bold text-white tracking-tight">SV</span>
+                <span className="text-[8px] uppercase tracking-widest text-white/70 mt-0.5">Venture</span>
+                
+                {/* Orbit dots matching old design */}
+                <svg className="absolute inset-[-20px] w-[calc(100%+40px)] h-[calc(100%+40px)] animate-spin-slow pointer-events-none" viewBox="0 0 100 100">
+                  <circle cx="50" cy="50" r="48" fill="none" stroke={RED} strokeWidth="0.5" strokeDasharray="2 6" opacity="0.5" />
+                  <circle cx="50" cy="2" r="2" fill={RED} />
+                  <circle cx="98" cy="50" r="1.5" fill={RED} opacity="0.6" />
+                  <circle cx="2" cy="50" r="1.5" fill={RED} opacity="0.6" />
+                </svg>
               </div>
-              <motion.div
-                animate={{ rotate: openOutreach ? 180 : 0 }}
-                transition={{ duration: 0.2 }}
-                className="w-8 h-8 rounded-full flex items-center justify-center"
-                style={{ border: `1.5px solid ${RED_WARM}30`, color: RED_WARM }}
-              >
-                <ChevronDown size={16} strokeWidth={2.5} />
-              </motion.div>
-            </div>
-            <TrackItemPanel items={ENGINES[1].items} isOpen={openOutreach} color={RED_WARM} onOpenService={openService} />
-          </div>
-        </motion.div>
+              
+              <div className="mt-8 flex items-center gap-1.5 bg-white/80 backdrop-blur-sm px-3 py-1 rounded-full">
+                <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: RED }} />
+                <span className="text-[10px] font-bold uppercase tracking-widest" style={{ color: RED }}>The Nerve Center</span>
+              </div>
+            </motion.div>
 
-        {/* ── Outcomes ─────────────────────────────────────────────── */}
+            {/* Outputs */}
+            <div className="pointer-events-auto">
+              {outputs.map((out, i) => (
+                <PillNode 
+                  key={out.id} 
+                  x={out.x} 
+                  y={out.y} 
+                  label={out.label} 
+                  icon={out.group === 'content' ? Sparkles : Send} 
+                  delay={0.6 + i * 0.1} 
+                />
+              ))}
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      {/* ── Accordion Lists ──────────────────────────────── */}
+      <div className="relative max-w-[1200px] mx-auto px-6 grid grid-cols-1 md:grid-cols-2 gap-8 relative z-20 -mt-12">
+        {/* Content Production */}
         <motion.div
-          initial={shouldAnimate ? { opacity: 0, y: 20 } : false}
+          initial={{ opacity: 0, y: 20 }}
           animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
           transition={{ delay: 0.8, duration: 0.5 }}
-          className="mt-16 flex flex-col items-center gap-6"
+          className="p-6 rounded-3xl border bg-white shadow-sm"
+          style={{ borderColor: `${BLACK}10` }}
         >
-          <div className="flex items-center gap-4">
-            <div className="text-center">
-              <p className="text-[14px] font-semibold" style={{ color: BLACK }}>Consistent Multi-Platform Presence</p>
-              <p className="text-[11px] italic mt-1" style={{ color: STONE }}>builds trust</p>
+          <div className="flex items-center justify-between cursor-pointer" onClick={() => setOpenContent(!openContent)}>
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ backgroundColor: `${RED}10`, color: RED }}>
+                <Sparkles size={20} strokeWidth={2} />
+              </div>
+              <div>
+                <div className="flex items-center gap-2">
+                  <h3 className="text-lg font-bold" style={{ color: BLACK }}>Content Production</h3>
+                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full" style={{ backgroundColor: `${RED}10`, color: RED }}>{ENGINES[0].items.length} steps</span>
+                </div>
+                <p className="text-[12px] mt-0.5 opacity-70" style={{ color: BLACK }}>One recording becomes everything you publish this month.</p>
+              </div>
             </div>
-            <div className="w-16 h-px" style={{ background: `linear-gradient(90deg, ${FROST}, ${RED}40)` }} />
-            <div className="text-center">
-              <p className="text-[14px] font-semibold" style={{ color: BLACK }}>Qualified Conversations</p>
-              <p className="text-[11px] italic mt-1" style={{ color: STONE }}>expands reach</p>
-            </div>
+            <motion.div animate={{ rotate: openContent ? 180 : 0 }} className="w-8 h-8 flex items-center justify-center opacity-50"><ChevronDown size={18} /></motion.div>
           </div>
-
-          <motion.div
-            initial={shouldAnimate ? { scale: 0.9, opacity: 0 } : false}
-            animate={isInView ? { scale: 1, opacity: 1 } : { scale: 0.9, opacity: 0 }}
-            transition={{ delay: 1, duration: 0.5 }}
-            className="flex items-center gap-3 px-8 py-4 rounded-2xl"
-            style={{
-              backgroundColor: BLACK,
-              boxShadow: `0 12px 40px ${RED}20, 0 4px 12px rgba(0,0,0,0.1)`,
-            }}
-          >
-            <span className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ backgroundColor: RED_WARM, boxShadow: `0 0 12px ${RED_WARM}80` }} />
-            <span className="text-[16px] font-bold text-white tracking-[-0.02em]">More Clients, Faster</span>
-          </motion.div>
+          <TrackItemPanel items={ENGINES[0].items} isOpen={openContent} onOpenService={openService} />
         </motion.div>
 
-        <ServiceDetailModal open={modalOpen} onClose={closeModal} serviceId={modalServiceId} />
+        {/* Manual Outreach */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+          transition={{ delay: 1, duration: 0.5 }}
+          className="p-6 rounded-3xl border bg-white shadow-sm"
+          style={{ borderColor: `${BLACK}10` }}
+        >
+          <div className="flex items-center justify-between cursor-pointer" onClick={() => setOpenOutreach(!openOutreach)}>
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ backgroundColor: `${RED}10`, color: RED }}>
+                <Send size={20} strokeWidth={2} />
+              </div>
+              <div>
+                <div className="flex items-center gap-2">
+                  <h3 className="text-lg font-bold" style={{ color: BLACK }}>Manual Outreach</h3>
+                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full" style={{ backgroundColor: `${RED}10`, color: RED }}>{ENGINES[1].items.length} steps</span>
+                </div>
+                <p className="text-[12px] mt-0.5 opacity-70" style={{ color: BLACK }}>Hand-built lists, human-written emails, replies sorted.</p>
+              </div>
+            </div>
+            <motion.div animate={{ rotate: openOutreach ? 180 : 0 }} className="w-8 h-8 flex items-center justify-center opacity-50"><ChevronDown size={18} /></motion.div>
+          </div>
+          <TrackItemPanel items={ENGINES[1].items} isOpen={openOutreach} onOpenService={openService} />
+        </motion.div>
       </div>
+
+      {/* ── Outcomes Node ──────────────────────────────── */}
+      <motion.div
+        initial={{ opacity: 0, y: 30 }}
+        animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
+        transition={{ delay: 1.2, duration: 0.6 }}
+        className="mt-24 max-w-3xl mx-auto flex flex-col items-center"
+      >
+        <div className="flex flex-col md:flex-row items-center gap-12 w-full justify-center">
+          <div className="flex items-center gap-3 px-6 py-4 bg-white rounded-xl border border-black/5 shadow-sm min-w-[280px]">
+            <div className="w-8 h-8 rounded-full bg-[#7A0A0E10] text-[#7A0A0E] flex items-center justify-center"><Sparkles size={14}/></div>
+            <div>
+              <p className="text-[13px] font-bold text-black">Consistent Multi-Platform</p>
+              <p className="text-[11px] italic text-black/50">builds trust</p>
+            </div>
+          </div>
+          
+          <div className="flex items-center gap-3 px-6 py-4 bg-white rounded-xl border border-black/5 shadow-sm min-w-[280px]">
+            <div className="w-8 h-8 rounded-full bg-[#7A0A0E10] text-[#7A0A0E] flex items-center justify-center"><Send size={14}/></div>
+            <div>
+              <p className="text-[13px] font-bold text-black">Qualified Conversations</p>
+              <p className="text-[11px] italic text-black/50">expands reach</p>
+            </div>
+          </div>
+        </div>
+
+        {/* SVG converging to final output */}
+        <div className="relative w-[300px] h-[100px] my-4 pointer-events-none">
+          <svg className="absolute inset-0 w-full h-full" viewBox="0 0 300 100">
+            <path d="M 50 0 C 50 50, 150 20, 150 100" fill="none" stroke={RED} strokeWidth="1.5" opacity="0.3" />
+            <path d="M 250 0 C 250 50, 150 20, 150 100" fill="none" stroke={RED} strokeWidth="1.5" opacity="0.3" />
+          </svg>
+        </div>
+
+        <div className="px-8 py-4 rounded-full flex items-center gap-3 shadow-xl z-10" style={{ backgroundColor: BLACK }}>
+          <div className="w-6 h-6 rounded-full flex items-center justify-center" style={{ backgroundColor: RED }}>
+            <Sparkles size={12} strokeWidth={3} color={WHITE} />
+          </div>
+          <span className="text-white font-bold tracking-wide">More Clients, Faster</span>
+        </div>
+      </motion.div>
+
+      <ServiceDetailModal open={modalOpen} onClose={closeModal} serviceId={modalServiceId} />
     </section>
   );
 }
