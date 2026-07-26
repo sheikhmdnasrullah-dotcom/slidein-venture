@@ -177,10 +177,11 @@ export default function CompleteFramework() {
   const final = { x: centerX, y: outY + 120 };
 
   return (
-    <section ref={sectionRef} className="relative overflow-hidden" style={{ backgroundColor: BG, paddingTop: '6rem', paddingBottom: '6rem' }}>
+    <section ref={sectionRef} className="relative overflow-hidden section-grid" style={{ backgroundColor: BG, paddingTop: '6rem', paddingBottom: '6rem' }}>
       
       {/* ── Background Grid ─────────────────────────────────────────── */}
       <div className="absolute inset-0 pointer-events-none" style={{ backgroundImage: `radial-gradient(circle at 1px 1px, ${RED}08 1px, transparent 0)`, backgroundSize: '40px 40px' }} />
+      <div className="absolute inset-0 pointer-events-none beam-sweep" />
       
       <div className="relative w-full max-w-[1200px] mx-auto px-6">
         
