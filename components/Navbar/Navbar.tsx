@@ -25,17 +25,8 @@ const productItems = [
   ]},
 ];
 
-const solutionsItems = [
-  { label: 'Docs', caption: 'Next-gen notes & docs', href: '/solutions', color: '#0F8A8A', bg: '#D3EAE8', icon: '📄' },
-  { label: 'Engineering', caption: 'Build better, faster', href: '/solutions/engineering', color: '#2383E2', bg: '#E8F3FC', icon: '⚙️' },
-  { label: 'Design', caption: 'Beautiful products', href: '/solutions/design', color: '#9065B0', bg: '#F4EEFC', icon: '🎨' },
-  { label: 'Marketing', caption: 'Launch & grow', href: '/solutions/marketing', color: '#CB912F', bg: '#FBF3DB', icon: '📣' },
-  { label: 'Operations', caption: 'Run the business', href: '/solutions/operations', color: '#D9730D', bg: '#FDEFD4', icon: '📊' },
-  { label: 'HR & People', caption: 'Build great teams', href: '/solutions/hr', color: '#B90B0F', bg: '#FFE8E8', icon: '👥' },
-];
-
 const navLinks = [
-  { label: 'Solutions', dropdown: 'solutions' },
+  { label: 'Solutions', href: '/solutions' },
   { label: 'Portfolio', href: '/portfolio' },
   { label: 'Pricing', href: '/pricing' },
 ];
@@ -69,34 +60,6 @@ function ProductDropdown() {
               </Link>
             ))}
           </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-// ─── Solutions Dropdown ───────────────────────────────────────────────────────
-function SolutionsDropdown() {
-  return (
-    <div className="p-4 min-w-[360px]">
-      <div className="grid grid-cols-2 gap-1">
-        {solutionsItems.map((item) => (
-          <Link
-            key={item.label}
-            href={item.href}
-            className="flex items-center gap-2.5 px-2 py-2 rounded-xl hover:bg-[#F7F6F3] transition-colors duration-150 group"
-          >
-            <span
-              className="w-8 h-8 rounded-[8px] flex items-center justify-center text-sm flex-shrink-0 transition-transform duration-200 group-hover:scale-110"
-              style={{ background: item.bg }}
-            >
-              {item.icon}
-            </span>
-            <span className="flex flex-col gap-px">
-              <span className="text-[13px] font-[560] text-[#191919] leading-tight">{item.label}</span>
-              <span className="text-[11px] text-[#9B9A97] leading-tight">{item.caption}</span>
-            </span>
-          </Link>
         ))}
       </div>
     </div>
@@ -187,58 +150,13 @@ export default function Navbar() {
           {/* ── Desktop Nav Links ─────────────────────────────────────── */}
           <div className="hidden lg:flex items-center gap-0.5 px-3">
             {navLinks.map((link) => (
-              <div
+              <Link
                 key={link.label}
-                className="relative"
-                onMouseEnter={() => link.dropdown && open(link.dropdown)}
-                onMouseLeave={() => link.dropdown && close()}
+                href={link.href}
+                className="px-4 py-2 text-[15px] font-[500] text-white/85 rounded-full hover:text-white hover:bg-white/10 transition-all duration-150 whitespace-nowrap inline-flex items-center"
               >
-                {link.href ? (
-                  <Link
-                    href={link.href}
-                    className="px-4 py-2 text-[15px] font-[500] text-white/85 rounded-full hover:text-white hover:bg-white/10 transition-all duration-150 whitespace-nowrap inline-flex items-center"
-                  >
-                    {link.label}
-                  </Link>
-                ) : (
-                  <button
-                    className={`px-4 py-2 text-[15px] font-[500] rounded-full transition-all duration-150 whitespace-nowrap inline-flex items-center gap-1 ${
-                      activeDropdown === link.dropdown
-                        ? 'text-white bg-white/10'
-                        : 'text-white/85 hover:text-white hover:bg-white/10'
-                    }`}
-                    aria-expanded={activeDropdown === link.dropdown}
-                  >
-                    {link.label}
-                    <svg
-                      className={`w-2.5 h-2.5 opacity-60 transition-transform duration-200 ${activeDropdown === link.dropdown ? 'rotate-180' : ''}`}
-                      viewBox="0 0 10 6" fill="none"
-                    >
-                      <path d="M1 1L5 5L9 1" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
-                    </svg>
-                  </button>
-                )}
-
-                {/* Dropdown */}
-                <AnimatePresence>
-                  {link.dropdown && activeDropdown === link.dropdown && (
-                    <motion.div
-                      className="absolute top-[calc(100%+12px)] left-1/2 -translate-x-1/2 bg-white rounded-2xl overflow-hidden"
-                      style={{
-                        boxShadow: '0 12px 48px rgba(0,0,0,0.14), 0 2px 8px rgba(0,0,0,0.06), 0 0 0 1px rgba(0,0,0,0.04)',
-                      }}
-                      initial={{ opacity: 0, y: -8, scale: 0.96 }}
-                      animate={{ opacity: 1, y: 0, scale: 1 }}
-                      exit={{ opacity: 0, y: -8, scale: 0.96 }}
-                      transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
-                      onMouseEnter={keep}
-                      onMouseLeave={close}
-                    >
-                      {link.dropdown === 'product' ? <ProductDropdown /> : <SolutionsDropdown />}
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
+                {link.label}
+              </Link>
             ))}
           </div>
 
@@ -288,42 +206,14 @@ export default function Navbar() {
             >
               <div className="px-4 py-4 flex flex-col gap-0.5 max-h-[calc(100vh-120px)] overflow-y-auto">
                 {navLinks.map((link) => (
-                  <div key={link.label}>
-                    {link.href ? (
-                      <Link
-                        href={link.href}
-                        className="block px-4 py-3 text-[15px] font-[500] text-white/85 rounded-2xl hover:text-white hover:bg-white/10 transition-colors"
-                        onClick={() => setMobileOpen(false)}
-                      >
-                        {link.label}
-                      </Link>
-                    ) : (
-                      <>
-                        <p className="text-[10px] font-[700] tracking-[0.12em] uppercase text-white/40 px-4 pt-4 pb-1">
-                          {link.label}
-                        </p>
-                        {(link.dropdown === 'product'
-                          ? productItems.flatMap(g => g.items)
-                          : solutionsItems
-                        ).map((item) => (
-                          <Link
-                            key={item.label}
-                            href={item.href}
-                            className="flex items-center gap-3 px-4 py-2.5 rounded-2xl hover:bg-white/10 transition-colors"
-                            onClick={() => setMobileOpen(false)}
-                          >
-                            <span
-                              className="w-7 h-7 rounded-lg flex items-center justify-center text-sm flex-shrink-0"
-                              style={{ background: 'rgba(255,255,255,0.15)' }}
-                            >
-                              {item.icon}
-                            </span>
-                            <span className="text-[14px] font-[450] text-white/90">{item.label}</span>
-                          </Link>
-                        ))}
-                      </>
-                    )}
-                  </div>
+                  <Link
+                    key={link.label}
+                    href={link.href}
+                    className="block px-4 py-3 text-[15px] font-[500] text-white/85 rounded-2xl hover:text-white hover:bg-white/10 transition-colors"
+                    onClick={() => setMobileOpen(false)}
+                  >
+                    {link.label}
+                  </Link>
                 ))}
 
                 {/* Mobile CTA */}
