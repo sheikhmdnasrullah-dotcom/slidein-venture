@@ -33,113 +33,243 @@ function useMedia(query: string) {
   return matches;
 }
 
-/* ── Hub ────────────────────────────────────────────────────────────────── */
+/* ── Nerve Center Hub ───────────────────────────────────────────────────── */
+
+/** Six evenly-spaced radial tick marks — drawn as SVG so they're crisp at any DPR */
+function CircuitTicks({ r, count = 6, color }: { r: number; count?: number; color: string }) {
+  return (
+    <>
+      {Array.from({ length: count }).map((_, i) => {
+        const angle = (i * 360) / count;
+        const rad = (angle * Math.PI) / 180;
+        const x1 = 90 + r * Math.cos(rad);
+        const y1 = 90 + r * Math.sin(rad);
+        const x2 = 90 + (r + 7) * Math.cos(rad);
+        const y2 = 90 + (r + 7) * Math.sin(rad);
+        return <line key={i} x1={x1} y1={y1} x2={x2} y2={y2} stroke={color} strokeWidth="1" strokeLinecap="round" />;
+      })}
+    </>
+  );
+}
 
 function Hub({ active }: { active: Group | null }) {
   const reduce = useReducedMotion();
+  const isActive = active !== null;
+
+  /* SVG circuit-trace coordinates (180×180 viewBox, centred at 90,90) */
+  const outerR  = 84;   // outer precision ring
+  const midR    = 68;   // mid ring
+  const innerR  = 50;   // inner ring
+  const coreR   = 32;   // hex core
+
+  /* Hexagon path centred at 90,90 with given radius */
+  const hex = (r: number) =>
+    Array.from({ length: 6 })
+      .map((_, i) => {
+        const a = (i * 60 - 30) * (Math.PI / 180);
+        return `${i === 0 ? 'M' : 'L'}${(90 + r * Math.cos(a)).toFixed(2)},${(90 + r * Math.sin(a)).toFixed(2)}`;
+      })
+      .join(' ') + ' Z';
 
   return (
-    <div className="relative flex flex-col items-center justify-center">
-      {/* Breathing halos */}
-      {!reduce &&
-        [0, 1, 2].map((i) => (
-          <motion.span
-            key={i}
-            aria-hidden="true"
-            className="absolute rounded-full"
-            style={{
-              width: 148,
-              height: 148,
-              border: `1px solid ${RED}`,
-            }}
-            initial={{ scale: 0.82, opacity: 0 }}
-            animate={{ scale: [0.82, 1.55], opacity: [0.28, 0] }}
-            transition={{
-              duration: 5,
-              delay: i * 1.6,
-              repeat: Infinity,
-              ease: 'easeOut',
-            }}
-          />
-        ))}
-
-      {/* Soft ambient wash */}
+    <div className="relative flex flex-col items-center">
+      {/* ── Ambient radial wash ── */}
       <span
         aria-hidden="true"
-        className="absolute rounded-full"
+        className="absolute rounded-full pointer-events-none"
         style={{
-          width: 210,
-          height: 210,
-          background: `radial-gradient(circle, ${RED}14 0%, ${RED}00 68%)`,
+          width: 260, height: 260,
+          top: '50%', left: '50%',
+          transform: 'translate(-50%, -50%)',
+          background: `radial-gradient(circle, ${RED}${isActive ? '22' : '0E'} 0%, transparent 70%)`,
+          transition: 'background 600ms ease',
         }}
       />
 
-      {/* Sweeping conic ring — one GPU transform, no layout work */}
-      <FlowNode id="hub" className="relative" style={{ width: 138, height: 138 }}>
+      {/* ── Pulse halos — 3 staggered rings ── */}
+      {!reduce && [0, 1, 2].map((i) => (
+        <motion.span
+          key={i}
+          aria-hidden="true"
+          className="absolute rounded-full pointer-events-none"
+          style={{ width: 180, height: 180, top: '50%', left: '50%', marginTop: -90, marginLeft: -90, border: `1px solid ${RED}` }}
+          initial={{ scale: 0.75, opacity: 0 }}
+          animate={{ scale: [0.75, 1.7], opacity: [0.35, 0] }}
+          transition={{ duration: 4.5, delay: i * 1.5, repeat: Infinity, ease: 'easeOut' }}
+        />
+      ))}
+
+      {/* ── SVG precision rings + circuit traces ── */}
+      <FlowNode id="hub" className="relative" style={{ width: 180, height: 180 }}>
+        <svg
+          aria-hidden="true"
+          className="absolute inset-0"
+          width="180" height="180" viewBox="0 0 180 180"
+          fill="none"
+        >
+          {/* Outer precision ring — dashed */}
+          <circle cx="90" cy="90" r={outerR} stroke={`${RED}22`} strokeWidth="1" strokeDasharray="3 5" />
+
+          {/* Tick marks at outer ring */}
+          <CircuitTicks r={outerR - 4} count={12} color={`${RED}30`} />
+
+          {/* Mid ring — solid, faint */}
+          <circle cx="90" cy="90" r={midR} stroke={`${RED}18`} strokeWidth="1" />
+
+          {/* Radial circuit traces — 4 cardinal lines from mid ring to inner */}
+          {[0, 90, 180, 270].map((angle, i) => {
+            const rad = (angle * Math.PI) / 180;
+            const x1 = 90 + midR * Math.cos(rad);
+            const y1 = 90 + midR * Math.sin(rad);
+            const x2 = 90 + innerR * Math.cos(rad);
+            const y2 = 90 + innerR * Math.sin(rad);
+            return <line key={i} x1={x1} y1={y1} x2={x2} y2={y2} stroke={`${RED}28`} strokeWidth="1" />;
+          })}
+
+          {/* Diagonal traces — 4 at 45° */}
+          {[45, 135, 225, 315].map((angle, i) => {
+            const rad = (angle * Math.PI) / 180;
+            const x1 = 90 + outerR * Math.cos(rad);
+            const y1 = 90 + outerR * Math.sin(rad);
+            const x2 = 90 + midR * Math.cos(rad);
+            const y2 = 90 + midR * Math.sin(rad);
+            return <line key={i} x1={x1} y1={y1} x2={x2} y2={y2} stroke={`${RED}18`} strokeWidth="0.75" strokeDasharray="2 3" />;
+          })}
+
+          {/* Inner ring */}
+          <circle cx="90" cy="90" r={innerR} stroke={`${RED}30`} strokeWidth="1" />
+
+          {/* Hex core outline */}
+          <path d={hex(coreR)} stroke={`${RED}55`} strokeWidth="1.2" />
+          <path d={hex(coreR - 6)} stroke={`${RED}22`} strokeWidth="0.75" />
+        </svg>
+
+        {/* Outer rotating ring with conic sweep */}
         <motion.span
           aria-hidden="true"
           className="absolute inset-0 rounded-full"
           style={{
-            background: `conic-gradient(from 0deg, ${RED}00 0deg, ${RED}00 180deg, ${ROSE}55 300deg, ${RED} 350deg, ${RED}00 360deg)`,
+            background: `conic-gradient(from 0deg, transparent 0deg, transparent 200deg, ${ROSE}44 310deg, ${RED}CC 355deg, transparent 360deg)`,
             willChange: 'transform',
           }}
           animate={reduce ? undefined : { rotate: 360 }}
-          transition={{ duration: 14, repeat: Infinity, ease: 'linear' }}
+          transition={{ duration: 18, repeat: Infinity, ease: 'linear' }}
         />
+
+        {/* Counter-rotating inner conic — creates depth */}
+        <motion.span
+          aria-hidden="true"
+          className="absolute rounded-full"
+          style={{
+            inset: 22,
+            background: `conic-gradient(from 180deg, transparent 0deg, transparent 230deg, ${RED}28 320deg, ${ROSE}88 358deg, transparent 360deg)`,
+            willChange: 'transform',
+          }}
+          animate={reduce ? undefined : { rotate: -360 }}
+          transition={{ duration: 26, repeat: Infinity, ease: 'linear' }}
+        />
+
+        {/* BG mask ring between outer and mid */}
         <span
           aria-hidden="true"
           className="absolute rounded-full"
-          style={{ inset: 1.5, backgroundColor: BG }}
+          style={{ inset: 1, backgroundColor: BG }}
+        />
+        {/* Restore mid-to-inner gap */}
+        <span
+          aria-hidden="true"
+          className="absolute rounded-full"
+          style={{ inset: 23, backgroundColor: BG }}
         />
 
-        {/* Core */}
-        <motion.div
-          className="absolute flex items-center justify-center rounded-full"
-          style={{
-            inset: 11,
-            backgroundColor: CARD,
-            border: `1px solid ${BORDER}`,
-            boxShadow: `0 18px 50px ${RED}1F, 0 4px 14px rgba(0,0,0,0.05)`,
-          }}
-          animate={reduce ? undefined : { scale: [1, 1.022, 1] }}
-          transition={{ duration: 4.5, repeat: Infinity, ease: 'easeInOut' }}
+        {/* Core hex fill */}
+        <svg
+          aria-hidden="true"
+          className="absolute inset-0"
+          width="180" height="180" viewBox="0 0 180 180"
+          fill="none"
         >
-          {BRAND.logo ? (
-            <Artwork logo={BRAND.logo} icon="layers" label={BRAND.name} size={46} />
-          ) : (
-            <span
-              className="flex items-center justify-center rounded-2xl"
-              style={{ width: 58, height: 58, backgroundColor: `${RED}0D`, color: RED }}
-            >
-              <FlowIcon name="layers" size={28} />
-            </span>
-          )}
+          <path d={hex(coreR)} fill={CARD} />
+          {/* Subtle hex facets inside the core */}
+          <path d={hex(coreR - 6)} stroke={`${RED}18`} strokeWidth="0.75" fill="none" />
+          {/* 3 axis lines through core centre */}
+          {[0, 60, 120].map((angle, i) => {
+            const rad = (angle * Math.PI) / 180;
+            return (
+              <line
+                key={i}
+                x1={90 - (coreR - 8) * Math.cos(rad)} y1={90 - (coreR - 8) * Math.sin(rad)}
+                x2={90 + (coreR - 8) * Math.cos(rad)} y2={90 + (coreR - 8) * Math.sin(rad)}
+                stroke={`${RED}14`} strokeWidth="0.75"
+              />
+            );
+          })}
+          {/* Centre dot */}
+          <circle cx="90" cy="90" r="3.5" fill={RED} opacity="0.7" />
+          <circle cx="90" cy="90" r="1.5" fill={RED} />
+        </svg>
+
+        {/* Breathing scale on the core */}
+        <motion.div
+          className="absolute inset-0 flex items-center justify-center"
+          animate={reduce ? undefined : { scale: [1, 1.015, 1] }}
+          transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut' }}
+        >
+          {/* Intentionally empty — the SVG hex IS the core */}
         </motion.div>
       </FlowNode>
 
-      <div className="mt-5 flex flex-col items-center gap-1.5">
-        <span
-          className="text-[10px] font-semibold uppercase"
-          style={{ color: RED, letterSpacing: '0.18em' }}
-        >
-          The Engine
-        </span>
-        <AnimatePresence mode="wait" initial={false}>
-          <motion.span
-            key={active ?? 'idle'}
-            initial={{ opacity: 0, y: 4 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -4 }}
-            transition={{ duration: 0.24, ease: EASE }}
-            className="text-[12px] text-center"
-            style={{ color: STONE }}
+      {/* ── Label + state pill ── */}
+      <div className="mt-4 flex flex-col items-center gap-2">
+        <div className="flex items-center gap-1.5">
+          {/* Live indicator dot */}
+          <span
+            className="relative flex h-[7px] w-[7px]"
           >
-            {active === 'content'
-              ? 'Producing your content'
-              : active === 'outreach'
-                ? 'Reaching your buyers'
-                : 'Two engines, one system'}
-          </motion.span>
+            {!reduce && (
+              <motion.span
+                className="absolute inline-flex h-full w-full rounded-full"
+                style={{ backgroundColor: RED }}
+                animate={{ scale: [1, 1.8], opacity: [0.6, 0] }}
+                transition={{ duration: 1.8, repeat: Infinity, ease: 'easeOut' }}
+              />
+            )}
+            <span
+              className="relative inline-flex rounded-full h-[7px] w-[7px]"
+              style={{ backgroundColor: RED }}
+            />
+          </span>
+          <span
+            className="text-[10px] font-bold uppercase tracking-widest"
+            style={{ color: RED, letterSpacing: '0.2em' }}
+          >
+            The Nerve Center
+          </span>
+        </div>
+
+        {/* State label — switches on hover */}
+        <AnimatePresence mode="wait" initial={false}>
+          <motion.div
+            key={active ?? 'idle'}
+            initial={{ opacity: 0, y: 5, filter: 'blur(3px)' }}
+            animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+            exit={{ opacity: 0, y: -5, filter: 'blur(3px)' }}
+            transition={{ duration: 0.22, ease: EASE }}
+            className="flex items-center gap-1.5 rounded-full px-3 py-1"
+            style={{
+              backgroundColor: isActive ? `${RED}0D` : 'transparent',
+              border: `1px solid ${isActive ? `${RED}22` : 'transparent'}`,
+              transition: 'background 300ms, border 300ms',
+            }}
+          >
+            <span className="text-[11.5px]" style={{ color: STONE }}>
+              {active === 'content'
+                ? 'Producing your content'
+                : active === 'outreach'
+                  ? 'Reaching your buyers'
+                  : 'Two tracks. One system.'}
+            </span>
+          </motion.div>
         </AnimatePresence>
       </div>
     </div>
@@ -167,45 +297,69 @@ function InputCard({
   dimmed: boolean;
   onHover: (g: Group | null) => void;
 }) {
+  const reduce = useReducedMotion();
   return (
     <motion.div
-      initial={{ opacity: 0, x: -18 }}
+      initial={{ opacity: 0, x: -20 }}
       whileInView={{ opacity: 1, x: 0 }}
       viewport={{ once: true, margin: '-10%' }}
-      transition={{ duration: 0.6, delay, ease: EASE }}
+      transition={{ duration: 0.55, delay, ease: EASE }}
       onMouseEnter={() => onHover(null)}
       onMouseLeave={() => onHover(null)}
-      style={{ opacity: dimmed ? 0.4 : 1, transition: 'opacity 420ms cubic-bezier(0.16,1,0.3,1)' }}
+      style={{ opacity: dimmed ? 0.35 : 1, transition: 'opacity 380ms cubic-bezier(0.16,1,0.3,1)' }}
     >
       <FlowNode id={id}>
-        <div
-          className="group flex items-center gap-3 rounded-2xl px-4 py-3.5 transition-shadow duration-300"
+        <motion.div
+          whileHover={reduce ? undefined : { y: -2, boxShadow: `0 12px 32px ${RED}18, 0 2px 8px rgba(0,0,0,0.06)` }}
+          transition={{ type: 'spring', stiffness: 300, damping: 24 }}
+          className="group relative flex items-center gap-3.5 rounded-2xl px-4 py-4 overflow-hidden"
           style={{
             backgroundColor: CARD,
             border: `1px solid ${BORDER}`,
-            boxShadow: '0 1px 2px rgba(0,0,0,0.04), 0 8px 24px rgba(0,0,0,0.035)',
+            boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 6px 20px rgba(0,0,0,0.04)',
           }}
         >
+          {/* Left accent bar */}
           <span
-            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl"
-            style={{ backgroundColor: `${RED}0D`, color: RED }}
+            aria-hidden="true"
+            className="absolute left-0 top-3 bottom-3 w-[2.5px] rounded-full"
+            style={{ backgroundColor: RED, opacity: 0.55 }}
+          />
+
+          {/* Icon badge */}
+          <span
+            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl relative"
+            style={{
+              background: `linear-gradient(135deg, ${RED}15 0%, ${RED}08 100%)`,
+              border: `1px solid ${RED}22`,
+              color: RED,
+            }}
           >
-            <Artwork logo={logo} icon={icon} label={label} size={18} />
+            <Artwork logo={logo} icon={icon} label={label} size={19} />
           </span>
-          <span className="flex min-w-0 flex-col">
+
+          {/* Text */}
+          <span className="flex min-w-0 flex-col gap-0.5">
             <span
-              className="truncate text-[13.5px] font-semibold"
-              style={{ color: INK, letterSpacing: '-0.01em' }}
+              className="truncate text-[13.5px] font-semibold leading-tight"
+              style={{ color: INK, letterSpacing: '-0.015em' }}
             >
               {label}
             </span>
             {caption && (
-              <span className="truncate text-[11.5px]" style={{ color: PEBBLE }}>
+              <span className="truncate text-[11px] font-medium" style={{ color: PEBBLE }}>
                 {caption}
               </span>
             )}
           </span>
-        </div>
+
+          {/* Flow arrow — signals direction toward hub */}
+          <span className="ml-auto flex-shrink-0" style={{ color: `${RED}50` }}>
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+              <path d="M3 7h8M8 4l3 3-3 3" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </span>
+        </motion.div>
       </FlowNode>
     </motion.div>
   );
@@ -220,6 +374,7 @@ function OutputChip({
   logo,
   delay,
   dimmed,
+  index,
 }: {
   id: string;
   label: string;
@@ -227,36 +382,52 @@ function OutputChip({
   logo?: string;
   delay: number;
   dimmed: boolean;
+  index: number;
 }) {
+  const reduce = useReducedMotion();
   return (
     <motion.div
-      initial={{ opacity: 0, x: 18 }}
+      initial={{ opacity: 0, x: 20 }}
       whileInView={{ opacity: 1, x: 0 }}
       viewport={{ once: true, margin: '-10%' }}
-      transition={{ duration: 0.55, delay, ease: EASE }}
+      transition={{ duration: 0.5, delay, ease: EASE }}
       className="flex items-center gap-3"
-      style={{ opacity: dimmed ? 0.32 : 1, transition: 'opacity 420ms cubic-bezier(0.16,1,0.3,1)' }}
+      style={{ opacity: dimmed ? 0.28 : 1, transition: 'opacity 380ms cubic-bezier(0.16,1,0.3,1)' }}
     >
       <FlowNode id={id}>
         <motion.div
-          whileHover={{ scale: 1.06 }}
+          whileHover={reduce ? undefined : { scale: 1.08, boxShadow: `0 8px 24px ${RED}18` }}
           transition={{ type: 'spring', stiffness: 340, damping: 22 }}
-          className="flex items-center justify-center rounded-full"
+          className="relative flex items-center justify-center"
           style={{
-            width: 52,
-            height: 52,
+            width: 48,
+            height: 48,
             backgroundColor: CARD,
             border: `1px solid ${BORDER}`,
-            boxShadow: '0 2px 6px rgba(0,0,0,0.05), 0 10px 30px rgba(0,0,0,0.04)',
+            borderRadius: 14,
+            boxShadow: '0 1px 4px rgba(0,0,0,0.05), 0 6px 20px rgba(0,0,0,0.05)',
             color: INK,
           }}
         >
-          <Artwork logo={logo} icon={icon} label={label} size={22} />
+          <Artwork logo={logo} icon={icon} label={label} size={20} />
+          {/* Sequence number badge */}
+          <span
+            aria-hidden="true"
+            className="absolute -top-[5px] -right-[5px] flex h-[15px] min-w-[15px] items-center justify-center rounded-full px-[3px] text-[8.5px] font-bold"
+            style={{
+              backgroundColor: RED,
+              color: '#fff',
+              fontVariantNumeric: 'tabular-nums',
+              lineHeight: 1,
+            }}
+          >
+            {String(index + 1).padStart(2, '0')}
+          </span>
         </motion.div>
       </FlowNode>
       <span
-        className="text-[12.5px] leading-tight"
-        style={{ color: STONE, letterSpacing: '-0.005em' }}
+        className="text-[12.5px] font-medium leading-tight"
+        style={{ color: STONE, letterSpacing: '-0.01em' }}
       >
         {label}
       </span>
@@ -756,6 +927,7 @@ export default function CompleteFramework() {
                     logo={output.logo}
                     delay={0.28 + i * 0.06}
                     dimmed={!!hovered && output.group !== hovered}
+                    index={i}
                   />
                 ))}
               </div>
@@ -770,7 +942,7 @@ export default function CompleteFramework() {
               className="text-[10.5px] font-semibold uppercase"
               style={{ color: PEBBLE, letterSpacing: '0.16em' }}
             >
-              Inside the engines
+              Inside the nerve center
             </span>
             <p className="text-[13.5px]" style={{ color: STONE }}>
               Hover a column to trace it through the diagram. Tap any line for detail.
