@@ -28,52 +28,36 @@ function VerifiedBadge({ size = 18 }: { size?: number }) {
   );
 }
 
-/* ─── Email row (replicates ElementsEmailHover) ─────────────────────────── */
-function EmailRow({ email }: { email: string }) {
-  const [copied, setCopied] = useState(false);
-
-  const copy = () => {
-    navigator.clipboard.writeText(email).catch(() => {});
-    setCopied(true);
-    setTimeout(() => setCopied(false), 1800);
-  };
-
+/* ─── Email row ─────────────────────────── */
+function EmailRow({ email, label }: { email: string, label?: string }) {
   return (
-    <div className="flex items-center justify-between w-full gap-3 mt-3 pt-3" style={{ borderTop: '1px solid #EBEBEB' }}>
+    <Link 
+      href={`mailto:${email}`}
+      className="flex items-center justify-between w-full gap-3 mt-3 pt-3 group transition-opacity" 
+      style={{ borderTop: '1px solid #EBEBEB' }}
+    >
       <div className="flex flex-col gap-0.5">
         <span className="text-[10px] font-medium uppercase tracking-wider" style={{ color: '#B0B0B0' }}>
-          Email
+          {label || "Email"}
         </span>
         <span className="text-[13px] font-semibold" style={{ color: '#111', letterSpacing: '-0.01em' }}>
           {email}
         </span>
       </div>
-      <button
-        onClick={copy}
-        className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-semibold transition-all duration-200"
+      <div
+        className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-semibold transition-all duration-200 group-hover:bg-[#111] group-hover:text-white"
         style={{
-          background: copied ? '#111' : '#F2F2F2',
-          color: copied ? '#fff' : '#111',
+          background: '#F2F2F2',
+          color: '#111',
         }}
       >
-        {copied ? (
-          <>
-            <svg width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true">
-              <path d="M1.5 5L4 7.5l4.5-5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
-            Copied
-          </>
-        ) : (
-          <>
-            <svg width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true">
-              <rect x="1" y="3" width="6" height="6" rx="1" stroke="currentColor" strokeWidth="1.2"/>
-              <path d="M3 3V2a1 1 0 011-1h4a1 1 0 011 1v5a1 1 0 01-1 1H7" stroke="currentColor" strokeWidth="1.2"/>
-            </svg>
-            Copy
-          </>
-        )}
-      </button>
-    </div>
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+          <polyline points="22,6 12,13 2,6"></polyline>
+        </svg>
+        Send
+      </div>
+    </Link>
   );
 }
 
@@ -111,13 +95,8 @@ function ContactCard() {
             className="w-[72px] h-[72px] rounded-2xl overflow-hidden"
             style={{ border: '1.5px solid rgba(0,0,0,0.08)' }}
           >
-            {/* Placeholder avatar — replace src with real photo */}
-            <div
-              className="w-full h-full flex items-center justify-center text-[28px] font-bold"
-              style={{ background: `linear-gradient(135deg, ${RED}22 0%, ${RED}0A 100%)`, color: RED }}
-            >
-              N
-            </div>
+            {/* Real photo avatar */}
+            <img src="/profile.png" alt="Nasrullah Tanim" className="w-full h-full object-cover" />
           </div>
           {/* Verified badge */}
           <div className="absolute -bottom-1.5 -right-1.5">
@@ -180,13 +159,14 @@ function ContactCard() {
         </motion.div>
       </div>
 
-      {/* ── Email row ── */}
+      {/* ── Email rows ── */}
       <motion.div
         initial={{ opacity: 0, y: 6 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ ...SPRING_FAST, delay: 0.22 }}
       >
-        <EmailRow email="nasrullahthq@gmail.com" />
+        <EmailRow label="Direct Email" email="nasrullahtanim@gmail.com" />
+        <EmailRow label="Social Email" email="hello@tanim.social" />
       </motion.div>
     </motion.div>
   );
