@@ -81,49 +81,49 @@ export const ENGINES: Engine[] = [
         id: 'c-audio',
         label: 'Audio & Video Editing',
         description:
-          'We take your raw recording and produce a polished, publish-ready episode — cleaned audio, colour-corrected video, branded intro and outro, all handled.',
+          'You send the raw file, I send back a finished episode. The stumbles, the dead air, all of that gets trimmed. The audio gets balanced and cleaned. Then the video gets edited properly. Cuts, visuals, references, captions, whatever the moment calls for to keep the audience engaged.',
       },
       {
         id: 'c-notes',
         label: 'Show Notes',
         description:
-          'SEO-optimised episode summaries with chapter timestamps, guest bios, and resource links — written to drive organic discovery.',
+          'Show notes pulled straight from the episode, broken down by topic with timestamps. Makes it easy to jump to the exact part you want in a long episode. Works for YouTube, podcast apps, and your website.',
       },
       {
         id: 'c-transcripts',
         label: 'Transcripts',
         description:
-          'Speaker-labeled transcripts in multiple formats, opening your content to search engines and unlocking repurposing workflows.',
+          'Clean, timestamped transcript of the finished episode, every speaker labeled, every name spelled right. Easy to read, easy to search, and ready to pull articles and posts from later.',
       },
       {
         id: 'c-clips',
         label: 'Short Form Clips',
         description:
-          'Up to 10 vertical clips per episode, hook-first edited with auto-captions — sized and styled for TikTok, Reels, and Shorts.',
+          'The best 30 to 60 second clips from every episode, captioned so they play fine with the sound off. B-roll, text overlays, whatever it takes to stop the scroll. Sized right for LinkedIn, YouTube Shorts, and Instagram Reels.',
       },
       {
         id: 'c-thumbnails',
         label: 'Thumbnails & Cover Art',
         description:
-          'Custom-designed episode artwork matching your brand system, with A/B test variants included for every episode.',
+          "Custom thumbnail designed for every episode according to your brand's tone. If you don't have a visual style yet, I build one and keep it consistent going forward.",
       },
       {
         id: 'c-blog',
         label: 'Blog Articles',
         description:
-          'Each episode becomes a 1,500+ word SEO article with keyword targeting, internal linking, and embedded calls-to-action.',
+          'The conversations throughout the whole video turned into written articles that perfectly imitate and reflect your voice, with proper research, real structure, and real opinions in them. Perfect for dropping into blogs or newsletters.',
       },
       {
         id: 'c-social',
         label: 'LinkedIn & Social Posts',
         description:
-          'Three to five native posts per episode — carousels, text hooks, and conversation starters written for each platform.',
+          'Every episode becomes several LinkedIn posts, pulled from what you actually said, in the way you actually talk.',
       },
       {
         id: 'c-publish',
         label: 'Publishing & Scheduling',
         description:
-          'We handle distribution across all podcast platforms and schedule your social content. Nothing publishes without your approval.',
+          'Everything goes out on a real schedule after getting your final approval. Titles, descriptions, and tags get filled in properly without your continuous supervision.',
       },
     ],
     outcome: {
@@ -139,46 +139,40 @@ export const ENGINES: Engine[] = [
     icon: 'send',
     items: [
       {
-        id: 'o-research',
-        label: 'Ideal Client Research',
-        description:
-          'Deep-dive ICP profiling with industry mapping, role filtering, and pain-point validation so every message hits the right person.',
-      },
-      {
         id: 'o-lists',
         label: 'Hand-Built Prospect Lists',
         description:
-          'Manually curated lists of verified decision-makers — 500 to 2,000 contacts per month, triple-verified for accuracy.',
+          "Before a single email goes out, we sit down and define exactly who's worth reaching out to. We build a real filter based on industry, company size, role, and whether they actually have the budget and the need. Everything after this step is judged against it.",
+      },
+      {
+        id: 'o-build',
+        label: 'Manual List Building',
+        description:
+          "Every person on your list is found and verified by hand using LinkedIn, YouTube, and their own website. We avoid relying on generic lead databases, then read what they've actually said publicly first, so every email copy gets a real context for personalization.",
       },
       {
         id: 'o-verify',
         label: 'Email Verification',
         description:
-          'Every address validated with real-time SMTP checks before sending. Bounce rates stay below 2%, always.',
+          "Every address gets checked before it's ever used to make sure it won't bounce, so dead or fake emails never hurt your sender reputation.",
       },
       {
         id: 'o-write',
         label: 'Email Writing',
         description:
-          'Human-written sequences that feel personal, not templated. Personalised first lines, A/B subject testing, single-action CTAs.',
+          "We'll make sure every email references something real about that person, or a problem they've talked about publicly, then naturally position your service/product as a solution without sounding like a marketing pitch or a generic sales email. The writing will follow a strict humanizer pass. Also, no two email topics will be the same.",
       },
       {
         id: 'o-send',
         label: 'Sending & Follow-Ups',
         description:
-          'Timezone-optimised sending with automated follow-up cadence. Volume limits respected, out-of-office replies handled automatically.',
+          'Emails will go out in a real sequence, spaced and timed the way a person would send them, aligned with each prospect\'s local working hours.',
       },
       {
         id: 'o-sort',
         label: 'Reply Sorting & Handoff',
         description:
-          'Every reply categorised within hours. Hot leads get same-day alerts with booking links ready to go.',
-      },
-      {
-        id: 'o-perf',
-        label: 'Performance Tracking',
-        description:
-          'Weekly reporting on open rates, reply rates, and pipeline. We adjust messaging, targeting, and timing based on real data.',
+          "You don't have to dig through your inbox looking for the ten people who actually said yes. Every reply gets read and sorted, and the ones worth your time land in front of you with the context already attached.",
       },
     ],
     outcome: {

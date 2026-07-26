@@ -4,7 +4,8 @@ import React, { useState, useCallback, useRef, useEffect } from 'react';
 import { motion, useInView, useReducedMotion, useScroll, useTransform } from 'framer-motion';
 import { Plus, Sparkles, CheckCircle2, ChevronDown, Globe } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import ServiceDetailModal, { type ServiceDetail } from '@/components/ServiceDetailModal/ServiceDetailModal';
+import ServiceDetailModal from '@/components/ServiceDetailModal/ServiceDetailModal';
+import { ENGINES } from './framework.data';
 
 const RED = '#7A0A0E';
 const RED_WARM = '#C24B4B';
@@ -21,165 +22,7 @@ interface TrackItemData {
   icon?: React.ReactNode;
 }
 
-const CONTENT_ITEMS: ServiceDetail[] = [
-  {
-    id: 'c-audio',
-    label: 'Audio & Video Editing',
-    slides: [
-      {
-        id: 'c-audio-1',
-        title: 'Audio & Video Editing',
-        body: `You send the raw file, I send back a finished episode.\n\nThe stumbles, the dead air, all of that gets trimmed. The audio gets balanced and cleaned. Then the video gets edited properly. Cuts, visuals, references, captions, whatever the moment calls for to keep the audience engaged.`,
-      },
-    ],
-  },
-  {
-    id: 'c-notes',
-    label: 'Show Notes',
-    slides: [
-      {
-        id: 'c-notes-1',
-        title: 'Show Notes',
-        body: `Show notes pulled straight from the episode, broken down by topic with timestamps. Makes it easy to jump to the exact part you want in a long episode. Works for YouTube, podcast apps, and your website.`,
-      },
-    ],
-  },
-  {
-    id: 'c-transcripts',
-    label: 'Transcripts',
-    slides: [
-      {
-        id: 'c-transcripts-1',
-        title: 'Transcripts',
-        body: `Clean, timestamped transcript of the finished episode, every speaker labeled, every name spelled right. Easy to read, easy to search, and ready to pull articles and posts from later.`,
-      },
-    ],
-  },
-  {
-    id: 'c-clips',
-    label: 'Short Form Clips',
-    slides: [
-      {
-        id: 'c-clips-1',
-        title: 'Short Form Clips',
-        body: `The best 30 to 60 second clips from every episode, captioned so they play fine with the sound off. B-roll, text overlays, whatever it takes to stop the scroll. Sized right for LinkedIn, YouTube Shorts, and Instagram Reels.`,
-      },
-    ],
-  },
-  {
-    id: 'c-thumbnails',
-    label: 'Thumbnails & Cover Art',
-    slides: [
-      {
-        id: 'c-thumbnails-1',
-        title: 'Thumbnails & Cover Art',
-        body: `Custom thumbnail designed for every episode according to your brand's tone. If you don't have a visual style yet, I build one and keep it consistent going forward.`,
-      },
-    ],
-  },
-  {
-    id: 'c-blog',
-    label: 'Blog Articles',
-    slides: [
-      {
-        id: 'c-blog-1',
-        title: 'Blog Articles',
-        body: `The conversations throughout the whole video turned into written articles that perfectly imitate and reflect your voice, with proper research, real structure, and real opinions in them. Perfect for dropping into blogs or newsletters.`,
-      },
-    ],
-  },
-  {
-    id: 'c-social',
-    label: 'LinkedIn & Social Posts',
-    slides: [
-      {
-        id: 'c-social-1',
-        title: 'LinkedIn & Social Posts',
-        body: `Every episode becomes several LinkedIn posts, pulled from what you actually said, in the way you actually talk.`,
-      },
-    ],
-  },
-  {
-    id: 'c-publish',
-    label: 'Publishing & Scheduling',
-    slides: [
-      {
-        id: 'c-publish-1',
-        title: 'Publishing & Scheduling',
-        body: `Everything goes out on a real schedule after getting your final approval. Titles, descriptions, and tags get filled in properly without your continuous supervision.`,
-      },
-    ],
-  },
-];
-
-const OUTREACH_ITEMS: ServiceDetail[] = [
-  {
-    id: 'o-research',
-    label: 'Ideal Client Research',
-    slides: [
-      {
-        id: 'o-research-1',
-        title: 'Ideal Client Research',
-        body: `Before a single email goes out, we sit down and define exactly who's worth reaching out to. We build a real filter based on industry, company size, role, and whether they actually have the budget and the need. Everything after this step is judged against it.`,
-      },
-    ],
-  },
-  {
-    id: 'o-lists',
-    label: 'Hand-Built Prospect Lists',
-    slides: [
-      {
-        id: 'o-lists-1',
-        title: 'Hand-Built Prospect Lists',
-        body: `Every person on your list is found and verified by hand using LinkedIn, YouTube, and their own website. We avoid relying on generic lead databases, then read what they've actually said publicly first, so every email copy gets a real context for personalization.`,
-      },
-    ],
-  },
-  {
-    id: 'o-verify',
-    label: 'Email Verification',
-    slides: [
-      {
-        id: 'o-verify-1',
-        title: 'Email Verification',
-        body: `Every address gets checked before it's ever used to make sure it won't bounce, so dead or fake emails never hurt your sender reputation.`,
-      },
-    ],
-  },
-  {
-    id: 'o-write',
-    label: 'Email Writing',
-    slides: [
-      {
-        id: 'o-write-1',
-        title: 'Email Writing',
-        body: `We'll make sure every email references something real about that person, or a problem they've talked about publicly, then naturally position your service/product as a solution without sounding like a marketing pitch or a generic sales email. The writing will follow a strict humanizer pass. Also, no two email topics will be the same.`,
-      },
-    ],
-  },
-  {
-    id: 'o-send',
-    label: 'Sending & Follow-Ups',
-    slides: [
-      {
-        id: 'o-send-1',
-        title: 'Sending & Follow-Ups',
-        body: `Emails will go out in a real sequence, spaced and timed the way a person would send them, aligned with each prospect's local working hours.`,
-      },
-    ],
-  },
-  {
-    id: 'o-sort',
-    label: 'Reply Sorting & Handoff',
-    slides: [
-      {
-        id: 'o-sort-1',
-        title: 'Reply Sorting & Handoff',
-        body: `You don't have to dig through your inbox looking for the ten people who actually said yes. Every reply gets read and sorted, and the ones worth your time land in front of you with the context already attached.`,
-      },
-    ],
-  },
-];
+// Data loaded from framework.data.ts
 
 /* ─── Orbital math ─────────────────────────────────────────────────────────── */
 
@@ -315,7 +158,7 @@ function GlowNode({
 
 /* ─── Track Item Detail Panel ─────────────────────────────────────────────── */
 
-function TrackItemPanel({ items, isOpen, color = RED, onOpenService }: { items: ServiceDetail[]; isOpen: boolean; color?: string; onOpenService?: (id: string) => void }) {
+function TrackItemPanel({ items, isOpen, color = RED, onOpenService }: { items: { id: string; label: string; description: string }[]; isOpen: boolean; color?: string; onOpenService?: (id: string) => void }) {
   if (!isOpen) return null;
 
   return (
@@ -342,7 +185,7 @@ function TrackItemPanel({ items, isOpen, color = RED, onOpenService }: { items: 
             </div>
             <div>
               <p className="text-[13px] font-semibold" style={{ color: BLACK }}>{item.label}</p>
-              <p className="text-[11px] mt-0.5 leading-relaxed" style={{ color: STONE }}>{item.slides[0]?.body.slice(0, 120)}...</p>
+              <p className="text-[11px] mt-0.5 leading-relaxed" style={{ color: STONE }}>{item.description.slice(0, 120)}...</p>
             </div>
           </motion.button>
         ))}
@@ -626,7 +469,7 @@ export default function CompleteFramework() {
                 </div>
                 <div>
                   <h3 className="text-[15px] font-semibold" style={{ color: BLACK }}>Content Production Track</h3>
-                  <p className="text-[11px] mt-0.5" style={{ color: STONE }}>{CONTENT_ITEMS.length} services — expand to view</p>
+                  <p className="text-[11px] mt-0.5" style={{ color: STONE }}>{ENGINES[0].items.length} services — expand to view</p>
                 </div>
               </div>
               <motion.div
@@ -638,7 +481,7 @@ export default function CompleteFramework() {
                 <ChevronDown size={16} strokeWidth={2.5} />
               </motion.div>
             </div>
-            <TrackItemPanel items={CONTENT_ITEMS} isOpen={openContent} color={RED} onOpenService={openService} />
+            <TrackItemPanel items={ENGINES[0].items} isOpen={openContent} color={RED} onOpenService={openService} />
           </div>
 
           {/* Manual Outreach Toggle */}
@@ -654,7 +497,7 @@ export default function CompleteFramework() {
                 </div>
                 <div>
                   <h3 className="text-[15px] font-semibold" style={{ color: BLACK }}>Manual Outreach Track</h3>
-                  <p className="text-[11px] mt-0.5" style={{ color: STONE }}>{OUTREACH_ITEMS.length} services — expand to view</p>
+                  <p className="text-[11px] mt-0.5" style={{ color: STONE }}>{ENGINES[1].items.length} services — expand to view</p>
                 </div>
               </div>
               <motion.div
@@ -666,7 +509,7 @@ export default function CompleteFramework() {
                 <ChevronDown size={16} strokeWidth={2.5} />
               </motion.div>
             </div>
-            <TrackItemPanel items={OUTREACH_ITEMS} isOpen={openOutreach} color={RED_WARM} onOpenService={openService} />
+            <TrackItemPanel items={ENGINES[1].items} isOpen={openOutreach} color={RED_WARM} onOpenService={openService} />
           </div>
         </motion.div>
 
