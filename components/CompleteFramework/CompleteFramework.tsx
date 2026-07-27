@@ -202,7 +202,6 @@ function ColumnContainer({
             className="group relative flex items-center gap-3 p-3.5 rounded-xl border w-full text-left cursor-pointer transition-all duration-200 bg-white hover:bg-red-50/60"
             style={{ borderColor: `${BLACK}10` }}
             onClick={() => onOpenService?.(item.id)}
-            title={item.description || item.label}
           >
             <div
               className="w-6 h-6 rounded-md flex items-center justify-center flex-shrink-0 transition-all duration-200 group-hover:bg-red-100/80"
@@ -215,15 +214,6 @@ function ColumnContainer({
                 {item.label}
               </p>
             </div>
-            {/* Tooltip on hover */}
-            {item.description && (
-              <div
-                className="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 px-3 py-2 rounded-lg text-[11px] leading-snug opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-20 shadow-lg whitespace-nowrap"
-                style={{ backgroundColor: BLACK, color: WHITE }}
-              >
-                {item.description.length > 80 ? item.description.slice(0, 80) + '…' : item.description}
-              </div>
-            )}
           </button>
         ))}
       </CardContent>
@@ -373,7 +363,7 @@ export default function CompleteFramework() {
 
       </div>
       
-      <ServiceDetailModal open={modalOpen} onClose={closeModal} serviceId={modalServiceId} />
+      <ServiceDetailModal open={modalOpen} onClose={closeModal} serviceId={modalServiceId} onChange={setModalServiceId} />
       </ScrollCtx.Provider>
     </section>
   );

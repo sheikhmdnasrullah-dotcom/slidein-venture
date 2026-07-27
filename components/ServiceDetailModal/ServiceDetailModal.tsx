@@ -1,30 +1,42 @@
 'use client';
 
 import { motion, AnimatePresence } from 'framer-motion';
-import { X } from 'lucide-react';
+import { X, ChevronLeft, ChevronRight } from 'lucide-react';
 import { ENGINES } from '@/components/CompleteFramework/framework.data';
 
 interface ServiceDetailModalProps {
   open: boolean;
   onClose: () => void;
   serviceId?: string;
+  onChange?: (id: string | undefined) => void;
 }
 
-export default function ServiceDetailModal({ open, onClose, serviceId }: ServiceDetailModalProps) {
-  let selectedItem = null;
-  for (const engine of ENGINES) {
-    const found = engine.items.find((item) => item.id === serviceId);
-    if (found) {
-      selectedItem = found;
-      break;
+export default function ServiceDetailModal({ open, onClose, serviceId, onChange }: ServiceDetailModalProps) {
+  const allItems = ENGINES.flatMap(e => e.items);
+  const currentIndex = allItems.findIndex(item => item.id === serviceId);
+  const selectedItem = currentIndex !== -1 ? allItems[currentIndex] : null;
+
+  const handleNext = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (onChange && selectedItem) {
+      const nextIndex = (currentIndex + 1) % allItems.length;
+      onChange(allItems[nextIndex].id);
     }
-  }
+  };
+
+  const handlePrev = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (onChange && selectedItem) {
+      const prevIndex = (currentIndex - 1 + allItems.length) % allItems.length;
+      onChange(allItems[prevIndex].id);
+    }
+  };
 
   return (
     <AnimatePresence>
       {open && selectedItem && (
         <motion.div
-          className="fixed inset-0 z-[70] flex items-center justify-center p-4 sm:p-6 lg:p-8"
+          className="fixed inset-0 z-[70] flex items-center justify-center p-4 sm:p-6 lg:p-12"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
@@ -32,59 +44,84 @@ export default function ServiceDetailModal({ open, onClose, serviceId }: Service
         >
           {/* Refined frosted backdrop */}
           <motion.div
-            className="absolute inset-0 bg-black/20 backdrop-blur-2xl"
+            className="absolute inset-0 bg-black/60 backdrop-blur-xl"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
           />
 
-          {/* Premium slide panel — balanced proportions, not oversized */}
+          {/* Navigation Controls (Outside Modal Frame for Desktop) */}
+          <button
+            onClick={handlePrev}
+            className="absolute left-4 sm:left-8 z-30 w-12 h-12 rounded-full bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/20 flex items-center justify-center text-white transition-all duration-300 hover:scale-110 hidden md:flex"
+            aria-label="Previous service"
+          >
+            <ChevronLeft size={24} strokeWidth={2} />
+          </button>
+          
+          <button
+            onClick={handleNext}
+            className="absolute right-4 sm:right-8 z-30 w-12 h-12 rounded-full bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/20 flex items-center justify-center text-white transition-all duration-300 hover:scale-110 hidden md:flex"
+            aria-label="Next service"
+          >
+            <ChevronRight size={24} strokeWidth={2} />
+          </button>
+
+          {/* Premium slide panel — 16:9 Aspect Ratio */}
           <motion.div
-            className="relative w-full max-w-[980px] rounded-3xl overflow-hidden border border-black/[0.06] bg-white/95 shadow-[0_24px_80px_rgba(0,0,0,0.12)]"
+            className="relative w-full max-w-[1100px] aspect-video rounded-[2rem] overflow-hidden border border-white/20 bg-[#FAFAF9] shadow-2xl flex flex-col justify-center"
             initial={{ opacity: 0, y: 30, scale: 0.98 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 24, scale: 0.98 }}
             transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
           >
-            {/* Subtle top accent line — restrained, not flashy */}
-            <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#7A0A0E]/40 to-transparent" />
-
+            {/* Ambient Background Gradient (Elite Presentation Feel) */}
+            <div 
+              className="absolute inset-0 opacity-50 pointer-events-none" 
+              style={{ background: 'radial-gradient(circle at 100% 0%, rgba(139,0,0,0.06) 0%, transparent 60%)' }} 
+            />
+            
             {/* Close button */}
             <button
               onClick={onClose}
-              className="absolute top-5 right-5 z-20 w-10 h-10 rounded-full bg-black/[0.04] hover:bg-black/[0.08] flex items-center justify-center text-black/50 hover:text-black transition-all duration-300"
+              className="absolute top-6 right-6 z-20 w-10 h-10 rounded-full bg-black/5 hover:bg-black/10 flex items-center justify-center text-black/50 hover:text-black transition-all duration-300"
               aria-label="Close"
             >
               <X size={16} strokeWidth={2} />
             </button>
 
-            {/* Content — generous but intentional whitespace */}
-            <div className="px-8 sm:px-12 md:px-16 pt-10 pb-10 md:pt-14 md:pb-14 max-w-2xl">
-              <motion.div
-                key={selectedItem.id}
-                initial={{ opacity: 0, y: 16 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 0.05, ease: [0.16, 1, 0.3, 1] }}
-              >
-                {/* Restrained label — no pulsing dot */}
-                <span className="text-[10px] font-semibold tracking-[0.12em] uppercase text-[#7A0A0E] mb-4 block">
-                  Service
-                </span>
+            {/* Mobile Navigation Controls (Inside Modal Frame) */}
+            <div className="absolute bottom-6 right-6 z-20 flex gap-2 md:hidden">
+              <button onClick={handlePrev} className="w-10 h-10 rounded-full bg-black/5 flex items-center justify-center text-black/70"><ChevronLeft size={16} /></button>
+              <button onClick={handleNext} className="w-10 h-10 rounded-full bg-black/5 flex items-center justify-center text-black/70"><ChevronRight size={16} /></button>
+            </div>
 
-                {/* Crisp typography — refined scale, not oversized */}
-                <h3 className="text-[clamp(1.75rem,3vw,2.5rem)] font-semibold tracking-[-0.02em] text-[#0A0A0A] mb-5 leading-[1.15]">
-                  {selectedItem.label}
-                </h3>
+            {/* Slide Content */}
+            <div className="px-8 sm:px-16 md:px-24 flex flex-col justify-center w-full max-w-4xl relative z-10">
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={selectedItem.id}
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -20 }}
+                  transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+                >
+                  <span className="text-[11px] md:text-sm font-bold tracking-[0.2em] uppercase text-[#8B0000] mb-6 block">
+                    Step {currentIndex + 1} of {allItems.length}
+                  </span>
 
-                {/* Subtle divider */}
-                <div className="w-8 h-px bg-black/10 mb-6" />
+                  <h3 className="text-3xl md:text-5xl font-extrabold tracking-tight text-[#0A0A0A] mb-8 leading-[1.1]">
+                    {selectedItem.label}
+                  </h3>
 
-                {/* Body copy with tight, readable measure */}
-                <p className="text-[15px] sm:text-base text-[#404040] leading-[1.7] font-normal">
-                  {selectedItem.description}
-                </p>
-              </motion.div>
+                  <div className="w-16 h-1 bg-[#8B0000] mb-8 rounded-full" />
+
+                  <p className="text-lg md:text-[22px] text-[#4A4A4A] leading-relaxed font-normal">
+                    {selectedItem.description}
+                  </p>
+                </motion.div>
+              </AnimatePresence>
             </div>
           </motion.div>
         </motion.div>
