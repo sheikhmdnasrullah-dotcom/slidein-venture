@@ -477,10 +477,10 @@ export default function SolutionsPage() {
               <Rocket size={28} strokeWidth={2} />
             </div>
 
-            <h2 className="text-[clamp(2rem,4vw,3rem)] font-[700] leading-[1.1] tracking-[-0.025em] text-[#0A0A0A] mb-4">
-              Ready to get started?
-            </h2>
-            <p className="text-[16px] text-[#6B6B6B] leading-[1.65] max-w-[500px] mx-auto mb-10">
+          <h2 className="section-headline text-xl font-[700] text-[#0A0A0A] mb-4">
+            Ready to get started?
+          </h2>
+          <p className="body-copy text-sm text-[#6B6B6B] max-w-[500px] mx-auto mb-10">
               Join hundreds of founders who are already using SlideIn Venture to grow their business.
             </p>
 

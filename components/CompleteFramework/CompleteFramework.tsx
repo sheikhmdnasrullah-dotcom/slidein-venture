@@ -93,16 +93,7 @@ function AnimatedConnector({ p1, p2, scrollVisible, delay = 0 }: {
   );
 }
 
-function MobileConnector({ height = 24, delay = 0 }: { height?: number; delay?: number }) {
-  const scrollVisible = useContext(ScrollCtx);
-  return (
-    <div className="flex justify-center w-full" style={{ height }}>
-      <svg width="10" height={height} className="overflow-visible">
-        <AnimatedConnector p1={{ x: 5, y: 0 }} p2={{ x: 5, y: height }} scrollVisible={scrollVisible} delay={delay} />
-      </svg>
-    </div>
-  );
-}
+
 
 function PillNode({
   x, y, label, icon: Icon, onClick, bg = WHITE, color = BLACK
@@ -201,53 +192,7 @@ function ColumnContainer({
 }
 
 /* ── Mobile Accordion Item ─────────────────────────────────────────────── */
-function AccordionItem({
-  item, index, onOpenService
-}: {
-  item: any; index: number; onOpenService: (id: string) => void;
-}) {
-  const [open, setOpen] = useState(false);
-  return (
-    <div className="rounded-xl border overflow-hidden transition-all" style={{ borderColor: `${RED}20`, background: WHITE }}>
-      <button
-        onClick={() => setOpen(!open)}
-        className="group flex items-center gap-3 w-full p-4 text-left transition-all duration-200"
-        style={{ backgroundColor: open ? `${RED}04` : 'transparent' }}
-      >
-        <div className="w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 transition-colors duration-200 group-hover:bg-red-100/60" style={{ backgroundColor: `${RED}10`, color: RED }}>
-          <span className="text-[11px] font-bold">{index + 1}</span>
-        </div>
-        <span className="text-[14px] font-semibold flex-1 group-hover:text-red-800 transition-colors duration-200" style={{ color: BLACK }}>{item.label}</span>
-        <ChevronDown
-          size={16}
-          strokeWidth={2.5}
-          className="transition-transform duration-200"
-          style={{ color: RED, transform: open ? 'rotate(180deg)' : 'rotate(0deg)' }}
-        />
-      </button>
-      <div
-        className="overflow-hidden transition-all duration-300"
-        style={{
-          maxHeight: open ? '300px' : '0px',
-          opacity: open ? 1 : 0,
-        }}
-      >
-        <div className="px-4 pb-4 pt-1">
-          <p className="text-[12px] leading-relaxed mb-3" style={{ color: `${BLACK}99` }}>
-            {item.description || 'Click to learn more about this step.'}
-          </p>
-          <button
-            onClick={() => onOpenService(item.id)}
-            className="text-[11px] font-semibold px-3 py-1.5 rounded-lg transition-colors hover:bg-red-200/60"
-            style={{ backgroundColor: `${RED}10`, color: RED }}
-          >
-            View details →
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-}
+
 
 export default function CompleteFramework() {
   const [modalOpen, setModalOpen] = useState(false);
@@ -300,7 +245,7 @@ export default function CompleteFramework() {
         </div>
 
         {/* ── DESKTOP Flowchart (≥768px) ──────────────────────────────── */}
-        <div className="hidden md:block w-full overflow-x-auto pb-12 hide-scrollbar mask-edges relative z-10">
+        <div className="w-full overflow-x-auto pb-12 hide-scrollbar mask-edges relative z-10">
           <div className="relative mx-auto" style={{ width: `${W}px`, height: `${H}px`, minWidth: `${W}px` }}>
             
             {/* SVG Connections Layer */}
@@ -364,130 +309,7 @@ export default function CompleteFramework() {
           </div>
         </div>
 
-        {/* ── MOBILE Layout (<768px) ─────────────────────────────────── */}
-        <div className="md:hidden w-full space-y-4 mt-8">
-          {/* Inputs */}
-          <div className="flex flex-col items-center gap-3">
-            <div
-              className="flex items-center gap-3 px-5 py-3 rounded-full border shadow-sm bg-white max-w-[320px]"
-              style={{ borderColor: `${RED}30`, color: BLACK }}
-            >
-              <div className="w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0" style={{ backgroundColor: `${RED}10`, color: RED }}>
-                <Video size={14} strokeWidth={2.5} />
-              </div>
-              <span className="text-sm font-bold">You Record Video Once</span>
-            </div>
-            <MobileConnector height={16} delay={100} />
-            <div
-              className="flex items-center gap-3 px-5 py-3 rounded-full border shadow-sm bg-white max-w-[320px]"
-              style={{ borderColor: `${RED}30`, color: BLACK }}
-            >
-              <div className="w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0" style={{ backgroundColor: `${RED}10`, color: RED }}>
-                <Target size={14} strokeWidth={2.5} />
-              </div>
-              <span className="text-sm font-bold">You Tell Us Who to Reach</span>
-            </div>
-          </div>
 
-          {/* Vertical connector */}
-          <MobileConnector height={24} delay={200} />
-
-          {/* Content Production Column (as accordion) */}
-          <Card style={{ borderColor: `${RED}20`, backgroundColor: WHITE }}>
-            <div className="flex items-center gap-3 px-5 pt-5 pb-3">
-              <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ backgroundColor: `${RED}10`, color: RED }}>
-                <Sparkles size={18} strokeWidth={2} />
-              </div>
-              <div className="flex-1">
-                <h3 className="text-base font-bold" style={{ color: BLACK }}>Content Production</h3>
-              </div>
-              <Badge variant="ghost" className="text-[9px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider" style={{ backgroundColor: `${RED}08`, color: RED, border: `1px solid ${RED}20` }}>
-                {ENGINES[0].items.length} steps
-              </Badge>
-            </div>
-            <CardContent className="space-y-0 px-5 pb-5 flex flex-col items-center">
-              {ENGINES[0].items.map((item, i) => (
-                <React.Fragment key={item.id}>
-                  <div className="w-full">
-                    <AccordionItem item={item} index={i} onOpenService={openService} />
-                  </div>
-                  {i < ENGINES[0].items.length - 1 && (
-                    <MobileConnector height={16} delay={300 + (i * 100)} />
-                  )}
-                </React.Fragment>
-              ))}
-            </CardContent>
-          </Card>
-
-          {/* Vertical connector */}
-          <MobileConnector height={24} delay={1100} />
-
-          {/* Outcome 1 */}
-          <div className="flex justify-center">
-            <div className="flex items-center gap-3 px-5 py-3 rounded-full border shadow-sm bg-white max-w-[340px]" style={{ borderColor: `${RED}30`, color: BLACK }}>
-              <div className="w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0" style={{ backgroundColor: `${RED}10`, color: RED }}>
-                <Sparkles size={14} strokeWidth={2.5} />
-              </div>
-              <span className="text-sm font-bold text-center">Consistent Multi-Platform Presence</span>
-            </div>
-          </div>
-
-          {/* Vertical connector */}
-          <MobileConnector height={24} delay={1200} />
-
-          {/* Manual Outreach Column (as accordion) */}
-          <Card style={{ borderColor: `${RED}20`, backgroundColor: WHITE }}>
-            <div className="flex items-center gap-3 px-5 pt-5 pb-3">
-              <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ backgroundColor: `${RED}10`, color: RED }}>
-                <Send size={18} strokeWidth={2} />
-              </div>
-              <div className="flex-1">
-                <h3 className="text-base font-bold" style={{ color: BLACK }}>Manual Outreach</h3>
-              </div>
-              <Badge variant="ghost" className="text-[9px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider" style={{ backgroundColor: `${RED}08`, color: RED, border: `1px solid ${RED}20` }}>
-                {ENGINES[1].items.length} steps
-              </Badge>
-            </div>
-            <CardContent className="space-y-0 px-5 pb-5 flex flex-col items-center">
-              {ENGINES[1].items.map((item, i) => (
-                <React.Fragment key={item.id}>
-                  <div className="w-full">
-                    <AccordionItem item={item} index={i} onOpenService={openService} />
-                  </div>
-                  {i < ENGINES[1].items.length - 1 && (
-                    <MobileConnector height={16} delay={1300 + (i * 100)} />
-                  )}
-                </React.Fragment>
-              ))}
-            </CardContent>
-          </Card>
-
-          {/* Vertical connector */}
-          <MobileConnector height={24} delay={2100} />
-
-          {/* Outcome 2 */}
-          <div className="flex justify-center">
-            <div className="flex items-center gap-3 px-5 py-3 rounded-full border shadow-sm bg-white max-w-[340px]" style={{ borderColor: `${RED}30`, color: BLACK }}>
-              <div className="w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0" style={{ backgroundColor: `${RED}10`, color: RED }}>
-                <Send size={14} strokeWidth={2.5} />
-              </div>
-              <span className="text-sm font-bold text-center">Qualified Conversations with the Right People</span>
-            </div>
-          </div>
-
-          {/* Vertical connector */}
-          <MobileConnector height={24} delay={2200} />
-
-          {/* Final */}
-          <div className="flex justify-center pb-4">
-            <div className="flex items-center gap-3 px-6 py-3.5 rounded-full border shadow-md" style={{ backgroundColor: BLACK, borderColor: `${BLACK}`, color: WHITE }}>
-              <div className="w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0" style={{ backgroundColor: `${WHITE}20`, color: WHITE }}>
-                <CheckCircle2 size={14} strokeWidth={2.5} />
-              </div>
-              <span className="text-sm font-bold">More Clients, Faster</span>
-            </div>
-          </div>
-        </div>
       </div>
       
       <ServiceDetailModal open={modalOpen} onClose={closeModal} serviceId={modalServiceId} />
