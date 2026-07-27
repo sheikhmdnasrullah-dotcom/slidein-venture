@@ -120,31 +120,28 @@ export default function Navbar() {
           {/* ── Logo Pill ──────────────────────────────────────────────── */}
           <Link
             href="/"
-            className="flex items-center gap-1 h-[44px] px-4 rounded-full flex-shrink-0 transition-transform duration-200 hover:scale-[1.02]"
+            className="flex items-center gap-1.5 h-[44px] px-5 rounded-full flex-shrink-0 transition-all duration-300 hover:scale-[1.02] hover:bg-white group"
             style={{
-              background: 'rgba(122, 10, 14, 0.06)',
-              border: '1px solid rgba(122, 10, 14, 0.12)',
-              boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
+              background: 'rgba(255, 255, 255, 0.85)',
+              border: '1px solid rgba(0, 0, 0, 0.06)',
+              boxShadow: '0 2px 12px rgba(0,0,0,0.03)',
             }}
             aria-label="SlideIn Venture"
           >
             <span
-              className="font-[800] text-[15px] leading-none select-none"
+              className="font-[800] text-[16px] leading-none select-none tracking-tight"
               style={{
-                color: '#7A0A0E',
-                fontFamily: "'Geist', system-ui, sans-serif",
-                letterSpacing: '-0.03em',
+                color: '#0A0A0A',
+                fontFamily: 'var(--font-playfair), "Playfair Display", serif',
               }}
             >
               SlideIn
             </span>
             <span
-              className="font-[600] text-[15px] leading-none select-none"
+              className="font-[500] text-[14px] leading-none select-none tracking-tight transition-colors duration-300"
               style={{
                 color: '#7A0A0E',
                 fontFamily: "'Geist', system-ui, sans-serif",
-                letterSpacing: '-0.03em',
-                opacity: 0.65,
               }}
             >
               Venture
@@ -224,27 +221,8 @@ export default function Navbar() {
                 ))}
 
                 {/* Mobile CTA */}
-                <div className="pt-3 mt-2" style={{ borderTop: '1px solid rgba(0,0,0,0.06)' }}>
-                  <Link
-                    href="/login"
-                    className="block text-center py-3 text-[15px] font-[500] text-[#0A0A0A]/80 rounded-2xl hover:bg-black/[0.04] transition-colors"
-                    onClick={() => setMobileOpen(false)}
-                  >
-                    Log in
-                  </Link>
-                  <Link
-                    href="https://calendar.notion.so/meet/nasrullah_tanim/schedule"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="block text-center mt-1 py-3 text-[15px] font-[650] rounded-full transition-all duration-200"
-                    style={{
-                      background: '#7A0A0E',
-                      color: 'white',
-                    }}
-                    onClick={() => setMobileOpen(false)}
-                  >
-                    Let&apos;s Talk
-                  </Link>
+                <div className="pt-3 mt-2 pb-4 flex justify-center" style={{ borderTop: '1px solid rgba(0,0,0,0.06)' }}>
+                  <LetsTalkButton isMobile={true} />
                 </div>
               </div>
             </motion.div>

@@ -168,6 +168,7 @@ function PriceSummary({
   const savings = Math.round(subtotal * discount);
   const total = subtotal - savings;
 
+  const RED_PRICING = '#7A0A0E';
   return (
     <AnimatePresence>
       {count > 0 && (
@@ -187,7 +188,7 @@ function PriceSummary({
             <div className="flex items-center gap-3 flex-1">
               <div
                 className="w-8 h-8 rounded-lg flex items-center justify-center text-[13px] font-[800]"
-                style={{ background: '#F59E0B', color: '#000' }}
+                style={{ background: RED_PRICING, color: '#FFFFFF' }}
               >
                 {count}
               </div>
@@ -196,7 +197,7 @@ function PriceSummary({
                   {count} service{count !== 1 ? 's' : ''} selected
                 </p>
                 {discount > 0 && (
-                  <p className="text-[11.5px] font-[500]" style={{ color: '#F59E0B' }}>
+                  <p className="text-[11.5px] font-[500]" style={{ color: RED_PRICING }}>
                     🎉 {Math.round(discount * 100)}% bundle discount applied — saving ${savings}
                   </p>
                 )}
@@ -228,7 +229,7 @@ function PriceSummary({
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full text-[14px] font-[700] transition-all duration-200 hover:-translate-y-px hover:shadow-lg"
-                style={{ background: '#F59E0B', color: '#000' }}
+                style={{ background: '#7A0A0E', color: '#FFFFFF' }}
               >
                 Book a Call
                 <svg className="w-3.5 h-3.5" viewBox="0 0 14 14" fill="none">
@@ -269,9 +270,9 @@ function ServiceCard({
       className="relative w-full text-left rounded-2xl p-5 transition-all duration-200 group focus:outline-none"
       style={{
         background: selected ? '#0A0A0A' : service.color,
-        border: selected ? '2px solid #F59E0B' : '2px solid transparent',
+        border: selected ? '2px solid #7A0A0E' : '2px solid transparent',
         boxShadow: selected
-          ? '0 0 0 3px rgba(245,158,11,0.15), 0 8px 32px rgba(0,0,0,0.12)'
+          ? '0 0 0 3px rgba(122,10,14,0.15), 0 8px 32px rgba(0,0,0,0.12)'
           : '0 1px 4px rgba(0,0,0,0.04)',
       }}
     >
@@ -279,8 +280,8 @@ function ServiceCard({
         <span
           className="absolute top-4 right-4 text-[10px] font-[700] tracking-[0.06em] uppercase px-2 py-0.5 rounded-full"
           style={{
-            background: selected ? '#F59E0B' : service.textColor,
-            color: selected ? '#000' : '#fff',
+            background: selected ? '#7A0A0E' : service.textColor,
+            color: selected ? '#fff' : '#fff',
           }}
         >
           {service.tag}
@@ -291,7 +292,7 @@ function ServiceCard({
 
       <p
         className="text-[13px] font-[600] tracking-[0.04em] uppercase mb-0.5"
-        style={{ color: selected ? '#F59E0B' : service.textColor, opacity: 0.7 }}
+        style={{ color: selected ? '#7A0A0E' : service.textColor, opacity: 0.7 }}
       >
         {service.subtitle}
       </p>
@@ -315,7 +316,7 @@ function ServiceCard({
         <div>
           <span
             className="text-[24px] font-[800] tracking-[-0.03em]"
-            style={{ color: selected ? '#F59E0B' : '#0A0A0A' }}
+            style={{ color: selected ? '#7A0A0E' : '#0A0A0A' }}
           >
             ${service.price}
           </span>
@@ -330,13 +331,13 @@ function ServiceCard({
         <div
           className="w-7 h-7 rounded-full flex items-center justify-center transition-all duration-200"
           style={{
-            background: selected ? '#F59E0B' : 'rgba(0,0,0,0.08)',
-            boxShadow: selected ? '0 2px 8px rgba(245,158,11,0.4)' : 'none',
+            background: selected ? '#7A0A0E' : 'rgba(0,0,0,0.08)',
+            boxShadow: selected ? '0 2px 8px rgba(122,10,14,0.4)' : 'none',
           }}
         >
           {selected ? (
             <svg className="w-3.5 h-3.5" viewBox="0 0 14 14" fill="none">
-              <path d="M2.5 7L5.5 10L11.5 4" stroke="#000" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              <path d="M2.5 7L5.5 10L11.5 4" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
             </svg>
           ) : (
             <svg className="w-3.5 h-3.5" viewBox="0 0 14 14" fill="none">
@@ -350,6 +351,7 @@ function ServiceCard({
 }
 
 function DiscountHint({ count }: { count: number }) {
+  const RED = '#7A0A0E';
   const tiers = [
     { min: 3, pct: '10%' },
     { min: 5, pct: '20%' },
@@ -360,11 +362,11 @@ function DiscountHint({ count }: { count: number }) {
   return (
     <div
       className="flex flex-col sm:flex-row items-start sm:items-center gap-3 px-5 py-3.5 rounded-xl mb-8"
-      style={{ background: '#FFFBEB', border: '1px solid #FDE68A' }}
+      style={{ background: '#F5E8E8', border: `1px solid ${RED}30` }}
     >
       <div className="flex items-center gap-2">
         <span className="text-xl">💡</span>
-        <span className="text-[13px] font-[600] text-[#78350F]">Bundle discounts:</span>
+        <span className="text-[13px] font-[600]" style={{ color: RED }}>Bundle discounts:</span>
       </div>
       <div className="flex flex-wrap gap-2">
         {tiers.map((t) => (
@@ -372,8 +374,8 @@ function DiscountHint({ count }: { count: number }) {
             key={t.min}
             className="text-[12px] font-[650] px-2.5 py-1 rounded-lg transition-all duration-200"
             style={{
-              background: count >= t.min ? '#F59E0B' : 'rgba(0,0,0,0.05)',
-              color: count >= t.min ? '#000' : '#78350F',
+              background: count >= t.min ? RED : 'rgba(0,0,0,0.05)',
+              color: count >= t.min ? '#FFFFFF' : '#4A4A4A',
             }}
           >
             {t.min}+ services → {t.pct} off
@@ -381,12 +383,12 @@ function DiscountHint({ count }: { count: number }) {
         ))}
       </div>
       {next && (
-        <span className="text-[12px] text-[#92400E] ml-auto hidden sm:block">
+        <span className="text-[12px] text-[#787774] ml-auto hidden sm:block">
           Pick {next.min - count} more for {next.pct} off
         </span>
       )}
       {!next && (
-        <span className="text-[12px] font-[600] text-[#15803D] ml-auto hidden sm:block">
+        <span className="text-[12px] font-[600] ml-auto hidden sm:block" style={{ color: RED }}>
           🎉 Max discount unlocked!
         </span>
       )}
@@ -395,6 +397,7 @@ function DiscountHint({ count }: { count: number }) {
 }
 
 export default function PricingPage() {
+  const RED = '#7A0A0E';
   const [selected, setSelected] = useState<Set<string>>(new Set());
 
   const toggle = (id: string) => {
@@ -415,17 +418,17 @@ export default function PricingPage() {
       <section className="relative pt-36 pb-16 overflow-hidden">
         <div className="absolute inset-0 pointer-events-none overflow-hidden">
           <div
-            className="absolute -top-40 left-1/2 -translate-x-1/2 w-[700px] h-[400px] rounded-full opacity-30 blur-[120px]"
-            style={{ background: 'radial-gradient(ellipse, #FDE68A 0%, transparent 70%)' }}
+            className="absolute -top-40 left-1/2 -translate-x-1/2 w-[700px] h-[400px] rounded-full opacity-20 blur-[120px]"
+            style={{ background: `radial-gradient(ellipse, ${RED} 0%, transparent 70%)` }}
           />
         </div>
 
         <div className="relative max-w-[760px] mx-auto px-6 md:px-10 text-center">
           <div
             className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-[11.5px] font-[700] tracking-[0.06em] uppercase mb-6"
-            style={{ background: '#FEF3C7', color: '#92400E', border: '1px solid #FDE68A' }}
+            style={{ background: '#F5E8E8', color: RED, border: '1px solid rgba(122,10,14,0.15)' }}
           >
-            <span className="w-1.5 h-1.5 rounded-full bg-[#F59E0B]" />
+            <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: RED }} />
             Build your own bundle
           </div>
 
@@ -435,13 +438,7 @@ export default function PricingPage() {
           >
             Pay only for what
             <br />
-            <span
-              style={{
-                background: 'linear-gradient(135deg, #F59E0B 0%, #EF4444 60%, #F97316 100%)',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-              }}
-            >
+            <span style={{ color: RED }}>
               you actually need.
             </span>
           </h1>
@@ -517,7 +514,7 @@ export default function PricingPage() {
                 target="_blank"
                 rel="noopener noreferrer"
                 className="font-[600] underline underline-offset-2 hover:text-[#0A0A0A] transition-colors"
-                style={{ color: '#F59E0B' }}
+                style={{ color: '#7A0A0E' }}
               >
                 Book a call for a custom quote →
               </Link>

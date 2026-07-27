@@ -9,9 +9,9 @@ import { Card } from '@/components/ui/card';
 import { ChevronRight, CheckCircle2, ArrowRight, Play, Sparkles, Zap, Globe, BarChart3, Shield, Rocket, Layers, Workflow } from 'lucide-react';
 
 const RED = '#7A0A0E';
-const RED_WARM = '#C24B4B';
 const BLACK = '#0A0A0A';
 const STONE = '#6B6B6B';
+const MIST = '#787774';
 const FROST = '#E8E8E4';
 
 const features = [
@@ -46,10 +46,10 @@ const features = [
     headline: 'Reach the right people, every time.',
     description: 'We build hand-curated prospect lists, write personalized sequences, and manage the entire outreach workflow — so you only talk to qualified leads.',
     badge: 'Outreach',
-    badgeColor: '#4A7D8C',
-    gradient: 'linear-gradient(135deg, #4A7D8C08 0%, #4A7D8C12 100%)',
-    borderColor: '#4A7D8C15',
-    icon: <Globe size={20} strokeWidth={2} style={{ color: '#4A7D8C' }} />,
+    badgeColor: RED,
+    gradient: `linear-gradient(135deg, ${RED}08 0%, ${RED}12 100%)`,
+    borderColor: `${RED}15`,
+    icon: <Globe size={20} strokeWidth={2} style={{ color: RED }} />,
     metrics: [
       { label: 'Prospect list size', value: '500-2,000/mo' },
       { label: 'Bounce rate', value: '< 2%' },
@@ -71,10 +71,10 @@ const features = [
     headline: 'Let AI handle the busywork.',
     description: 'Automate repetitive tasks with custom AI agents that work across your entire stack — from data entry to client follow-ups.',
     badge: 'Automation',
-    badgeColor: '#B8863D',
-    gradient: 'linear-gradient(135deg, #B8863D08 0%, #B8863D12 100%)',
-    borderColor: '#B8863D15',
-    icon: <Zap size={20} strokeWidth={2} style={{ color: '#B8863D' }} />,
+    badgeColor: RED,
+    gradient: `linear-gradient(135deg, ${RED}08 0%, ${RED}12 100%)`,
+    borderColor: `${RED}15`,
+    icon: <Zap size={20} strokeWidth={2} style={{ color: RED }} />,
     metrics: [
       { label: 'Time saved', value: '10+ hrs/wk' },
       { label: 'Automation coverage', value: '100+ apps' },
@@ -95,10 +95,10 @@ const features = [
     headline: 'Data-driven decisions, made simple.',
     description: 'Track performance across all your content and outreach with beautiful dashboards that surface the metrics that matter most.',
     badge: 'Analytics',
-    badgeColor: '#9065B0',
-    gradient: 'linear-gradient(135deg, #9065B008 0%, #9065B012 100%)',
-    borderColor: '#9065B015',
-    icon: <BarChart3 size={20} strokeWidth={2} style={{ color: '#9065B0' }} />,
+    badgeColor: RED,
+    gradient: `linear-gradient(135deg, ${RED}08 0%, ${RED}12 100%)`,
+    borderColor: `${RED}15`,
+    icon: <BarChart3 size={20} strokeWidth={2} style={{ color: RED }} />,
     metrics: [
       { label: 'Open rate', value: '45%+' },
       { label: 'Reply rate', value: '8%+' },
@@ -119,10 +119,10 @@ const features = [
     headline: 'Enterprise-grade security, built in.',
     description: 'Your data is protected with SOC 2 compliant infrastructure, end-to-end encryption, and role-based access controls.',
     badge: 'Security',
-    badgeColor: '#6B8F71',
-    gradient: 'linear-gradient(135deg, #6B8F7108 0%, #6B8F7112 100%)',
-    borderColor: '#6B8F7115',
-    icon: <Shield size={20} strokeWidth={2} style={{ color: '#6B8F71' }} />,
+    badgeColor: RED,
+    gradient: `linear-gradient(135deg, ${RED}08 0%, ${RED}12 100%)`,
+    borderColor: `${RED}15`,
+    icon: <Shield size={20} strokeWidth={2} style={{ color: RED }} />,
     metrics: [
       { label: 'Compliance', value: 'SOC 2' },
       { label: 'Encryption', value: 'E2E' },
@@ -143,10 +143,10 @@ const features = [
     headline: 'Connects with everything you use.',
     description: 'Native integrations with 100+ apps mean your data flows seamlessly between tools — no more copy-pasting or manual syncing.',
     badge: 'Integrations',
-    badgeColor: '#D9730D',
-    gradient: 'linear-gradient(135deg, #D9730D08 0%, #D9730D12 100%)',
-    borderColor: '#D9730D15',
-    icon: <Layers size={20} strokeWidth={2} style={{ color: '#D9730D' }} />,
+    badgeColor: RED,
+    gradient: `linear-gradient(135deg, ${RED}08 0%, ${RED}12 100%)`,
+    borderColor: `${RED}15`,
+    icon: <Layers size={20} strokeWidth={2} style={{ color: RED }} />,
     metrics: [
       { label: 'Integrations', value: '100+' },
       { label: 'Setup time', value: '< 5 min' },
@@ -174,19 +174,19 @@ const workflowSteps = [
     step: '02',
     title: 'Target',
     description: 'Tell us who you want to reach. We build a hand-curated list of decision-makers.',
-    icon: <Globe size={24} strokeWidth={2} style={{ color: '#4A7D8C' }} />,
+    icon: <Globe size={24} strokeWidth={2} style={{ color: RED }} />,
   },
   {
     step: '03',
     title: 'Create',
     description: 'We produce polished content, write personalized outreach, and schedule everything.',
-    icon: <Sparkles size={24} strokeWidth={2} style={{ color: '#B8863D' }} />,
+    icon: <Sparkles size={24} strokeWidth={2} style={{ color: RED }} />,
   },
   {
     step: '04',
     title: 'Convert',
     description: 'Sit back as qualified leads book calls, engage with your content, and become clients.',
-    icon: <Rocket size={24} strokeWidth={2} style={{ color: '#6B8F71' }} />,
+    icon: <Rocket size={24} strokeWidth={2} style={{ color: RED }} />,
   },
 ];
 

@@ -62,14 +62,16 @@ function EmailRow({ email, label }: { email: string, label?: string }) {
 }
 
 /* ─── The card that pops up on hover ───────────────────────────────────── */
-function ContactCard() {
+function ContactCard({ isMobile = false }: { isMobile?: boolean }) {
   return (
     <motion.div
       initial={{ opacity: 0, y: -10, scale: 0.95 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
       exit={{ opacity: 0, y: -8, scale: 0.96 }}
       transition={SPRING_CARD}
-      className="absolute top-[calc(100%+12px)] right-0 z-50 w-[310px] overflow-hidden"
+      className={`z-50 w-[310px] overflow-hidden ${
+        isMobile ? 'relative mt-3 mx-auto' : 'absolute top-[calc(100%+12px)] right-0'
+      }`}
       style={{
         background: 'rgba(255,255,255,0.96)',
         backdropFilter: 'blur(16px)',
@@ -173,28 +175,37 @@ function ContactCard() {
 }
 
 /* ─── The main exported button ──────────────────────────────────────────── */
-export default function LetsTalkButton() {
+export default function LetsTalkButton({ isMobile = false }: { isMobile?: boolean }) {
   const [isHovered, setIsHovered] = useState(false);
   const leaveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const handleEnter = () => {
+    if (isMobile) return;
     if (leaveTimer.current) clearTimeout(leaveTimer.current);
     setIsHovered(true);
   };
 
   const handleLeave = () => {
+    if (isMobile) return;
     // Small delay so user can move mouse into the card
     leaveTimer.current = setTimeout(() => setIsHovered(false), 140);
   };
 
+  const handleClick = () => {
+    if (isMobile) {
+      setIsHovered(!isHovered);
+    }
+  };
+
   return (
     <div
-      className="relative"
+      className={`relative ${isMobile ? 'flex flex-col items-center w-full' : ''}`}
       onMouseEnter={handleEnter}
       onMouseLeave={handleLeave}
     >
       {/* ── Button ── */}
       <motion.button
+        onClick={handleClick}
         animate={isHovered
           ? { background: '#111', color: '#fff', scale: 1.03 }
           : { background: '#fff', color: RED, scale: 1 }
@@ -230,8 +241,8 @@ export default function LetsTalkButton() {
       {/* ── Popup card ── */}
       <AnimatePresence>
         {isHovered && (
-          <div onMouseEnter={handleEnter} onMouseLeave={handleLeave}>
-            <ContactCard />
+          <div onMouseEnter={handleEnter} onMouseLeave={handleLeave} className={isMobile ? "w-full flex justify-center" : ""}>
+            <ContactCard isMobile={isMobile} />
           </div>
         )}
       </AnimatePresence>
