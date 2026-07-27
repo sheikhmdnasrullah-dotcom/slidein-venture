@@ -185,28 +185,21 @@ function ColumnContainer({
       }}
     >
       <div 
-        className="flex items-center gap-3 px-6 py-6 cursor-pointer hover:bg-black/5 transition-colors border-b" 
+        className="flex items-center gap-3 px-6 py-4 cursor-pointer hover:bg-black/5 transition-colors border-b" 
         style={{ borderColor: isOpen ? `${BLACK}10` : 'transparent' }}
         onClick={onToggle}
       >
         {imgSrc ? (
-          <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-transparent">
+          <div className="w-8 h-8 rounded-xl flex items-center justify-center bg-transparent">
             <img src={imgSrc} alt="" className="w-full h-full object-contain" />
           </div>
         ) : Icon ? (
-          <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ backgroundColor: `${RED}10`, color: RED }}>
-            <Icon size={20} strokeWidth={2} />
+          <div className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ backgroundColor: `${RED}10`, color: RED }}>
+            <Icon size={18} strokeWidth={2} />
           </div>
         ) : null}
-        <h3 className="text-xl font-bold tracking-tight" style={{ color: BLACK }}>{title}</h3>
-        <Badge
-          variant="ghost"
-          className="ml-auto text-[9px] font-bold px-2.5 py-0.5 rounded-full uppercase tracking-wider"
-          style={{ backgroundColor: `${RED}08`, color: RED, border: `1px solid ${RED}20` }}
-        >
-          {items.length} steps
-        </Badge>
-        <ChevronDown className={cn("transition-transform duration-300 ml-2", isOpen ? 'rotate-180' : '')} size={20} style={{ color: BLACK }} />
+        <h3 className="text-lg font-bold tracking-tight flex-1" style={{ color: BLACK }}>{title}</h3>
+        <ChevronDown className={cn("transition-transform duration-300", isOpen ? 'rotate-180' : '')} size={20} style={{ color: BLACK }} />
       </div>
 
       <AnimatePresence initial={false}>
@@ -221,7 +214,7 @@ function ColumnContainer({
         {items.map((item) => (
           <button
             key={item.id}
-            className="group relative flex items-center gap-3 p-3.5 rounded-xl border w-full text-left cursor-pointer transition-all duration-200 bg-white/40 backdrop-blur-sm hover:bg-white/80 hover:shadow-sm"
+            className="group relative flex items-center gap-3 p-2.5 rounded-xl border w-full text-left cursor-pointer transition-all duration-200 bg-white/40 backdrop-blur-sm hover:bg-white/80 hover:shadow-sm"
             style={{ borderColor: `${BLACK}10` }}
             onClick={() => onOpenService?.(item.id)}
           >
@@ -309,7 +302,7 @@ export default function CompleteFramework() {
   }, []);
 
   return (
-    <section ref={sectionRef} className="relative overflow-hidden pt-24 pb-24">
+    <section ref={sectionRef} className="relative overflow-hidden pt-8 pb-24">
       <ScrollCtx.Provider value={scrollVisible}>
       <div className="relative w-full max-w-[1200px] mx-auto px-6">
         
