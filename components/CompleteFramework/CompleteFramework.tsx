@@ -369,8 +369,8 @@ export default function CompleteFramework() {
               
               {/* Inputs */}
               <div className="pointer-events-auto">
-                <PillNode x={in1.x} y={in1.y} label="You record video once." icon={Video} />
-                <PillNode x={in2.x} y={in2.y} label="We discuss your ideal client once" icon={Target} />
+                <PillNode x={in1.x} y={in1.y} label="You Record Video Once." imgSrc="/logos/camera-red.png" />
+                <PillNode x={in2.x} y={in2.y} label="We Discuss Your Ideal Client Once." imgSrc="/logos/bubble-red.png" />
               </div>
 
               {/* Columns */}
