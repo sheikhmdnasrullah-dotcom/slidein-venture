@@ -27,13 +27,13 @@ export default function Hero() {
         {/* Watch This Button */}
         <motion.button
           onClick={() => setVideoOpen(true)}
-          className="relative inline-flex items-center justify-center gap-3 px-8 py-4 text-lg font-bold text-black rounded-full shadow-lg transition-all duration-300 hover:scale-105 bg-white/60 backdrop-blur-md border border-white/40 hover:bg-white/80"
+          className="relative inline-flex items-center justify-center gap-3 px-8 py-4 text-lg font-bold text-black rounded-full shadow-lg transition-all duration-300 hover:scale-105 bg-white/60 backdrop-blur-md border border-white/40 hover:bg-white/80 cursor-pointer"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.2 }}
         >
-          <div className="w-8 h-8 rounded-full bg-[#7A0A0E] flex items-center justify-center pl-0.5 shadow-md">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="white"><path d="M5 3l14 9-14 9V3z"/></svg>
+          <div className="w-6 h-6 flex items-center justify-center shrink-0">
+            <img src="/logos/play.png" alt="Play" className="w-full h-full object-contain" />
           </div>
           Watch This
         </motion.button>
