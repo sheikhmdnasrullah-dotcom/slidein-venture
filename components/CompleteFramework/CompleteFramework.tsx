@@ -103,20 +103,19 @@ function AnimatedConnector({ p1, p2, scrollVisible, delay = 0 }: {
 
 
 function PillNode({
-  x, y, label, icon: Icon, imgSrc, onClick, bg = WHITE, color = BLACK
+  x, y, label, icon: Icon, imgSrc, onClick, color = BLACK
 }: {
-  x: number; y: number; label: string; icon?: any; imgSrc?: string; onClick?: () => void; bg?: string; color?: string;
+  x: number; y: number; label: string; icon?: any; imgSrc?: string; onClick?: () => void; color?: string;
 }) {
   return (
     <div
       className={cn(
-        'absolute -translate-x-1/2 -translate-y-1/2 flex items-center gap-3 px-5 py-3 rounded-full border shadow-sm transition-all duration-300',
-        onClick ? 'cursor-pointer hover:shadow-md hover:scale-[1.02]' : ''
+        'absolute -translate-x-1/2 -translate-y-1/2 flex items-center gap-3 px-5 py-3 rounded-full border shadow-lg transition-all duration-300 bg-white/60 backdrop-blur-md',
+        onClick ? 'cursor-pointer hover:shadow-xl hover:scale-[1.02] hover:bg-white/80' : ''
       )}
       style={{
         left: x,
         top: y,
-        backgroundColor: bg,
         borderColor: color === WHITE ? `${WHITE}40` : `${RED}30`,
         color: color,
       }}
@@ -144,31 +143,24 @@ function FinalNode({ x, y, label }: { x: number; y: number; label: string }) {
     >
       {/* Ambient Glow */}
       <div 
-        className="absolute inset-0 rounded-full blur-xl opacity-40 transition-opacity duration-500 group-hover:opacity-70"
-        style={{ backgroundColor: RED, transform: 'scale(1.2)' }}
+        className="absolute inset-0 rounded-full blur-xl opacity-30 transition-opacity duration-500 group-hover:opacity-60"
+        style={{ backgroundColor: RED, transform: 'scale(1.1)' }}
       />
       
       {/* Main Pill */}
       <div 
-        className="relative flex items-center gap-4 px-8 py-4 rounded-full border shadow-2xl transition-transform duration-500 group-hover:scale-[1.03] overflow-hidden"
+        className="relative flex items-center gap-4 px-8 py-4 rounded-full border shadow-xl transition-transform duration-500 group-hover:scale-[1.03] overflow-hidden bg-white/60 backdrop-blur-md hover:bg-white/80"
         style={{ 
-          background: `linear-gradient(135deg, ${BLACK} 0%, #1a1a1a 100%)`,
           borderColor: `${RED}40`
         }}
       >
-        {/* Internal Gradient overlay */}
-        <div 
-          className="absolute inset-0 opacity-20 pointer-events-none"
-          style={{ background: `radial-gradient(circle at 50% 0%, ${RED} 0%, transparent 70%)` }}
-        />
-
         {/* Pulsing Icon */}
         <div className="relative w-10 h-10 rounded-full flex items-center justify-center shrink-0 border" style={{ backgroundColor: `${RED}10`, borderColor: `${RED}40` }}>
           <div className="absolute inset-0 rounded-full animate-ping opacity-20" style={{ backgroundColor: RED }} />
           <CheckCircle2 size={20} strokeWidth={2.5} style={{ color: RED }} />
         </div>
         
-        <span className="text-xl font-extrabold tracking-tight text-white whitespace-nowrap relative z-10">
+        <span className="text-xl font-extrabold tracking-tight text-black whitespace-nowrap relative z-10">
           {label}
         </span>
       </div>
@@ -229,7 +221,7 @@ function ColumnContainer({
         {items.map((item) => (
           <button
             key={item.id}
-            className="group relative flex items-center gap-3 p-3.5 rounded-xl border w-full text-left cursor-pointer transition-all duration-200 bg-white hover:bg-red-50/60"
+            className="group relative flex items-center gap-3 p-3.5 rounded-xl border w-full text-left cursor-pointer transition-all duration-200 bg-white/40 backdrop-blur-sm hover:bg-white/80 hover:shadow-sm"
             style={{ borderColor: `${BLACK}10` }}
             onClick={() => onOpenService?.(item.id)}
           >
