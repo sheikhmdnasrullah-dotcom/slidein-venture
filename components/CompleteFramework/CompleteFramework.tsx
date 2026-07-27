@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useCallback, useRef, useEffect, createContext, useContext } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Plus, Video, Target, Sparkles, Send, CheckCircle2, ChevronDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { ENGINES } from './framework.data';
