@@ -231,22 +231,43 @@ export default function CompleteFramework() {
 
   const final = { x: centerX, y: outY + 120 };
 
+  const [scale, setScale] = useState(1);
+  useEffect(() => {
+    function handleResize() {
+      if (window.innerWidth < 1150) {
+        setScale((window.innerWidth - 16) / 1100);
+      } else {
+        setScale(1);
+      }
+    }
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   return (
     <section ref={sectionRef} className="relative overflow-hidden pt-24 pb-24">
       <ScrollCtx.Provider value={scrollVisible}>
       <div className="relative w-full max-w-[1200px] mx-auto px-6">
         
         {/* ── Section Header ─────────────────────────────────────────── */}
-        <div className="text-center relative z-20 pb-4">
+        <div className="text-center relative z-20">
           <h2 className="display-headline text-4xl md:text-5xl" style={{ color: BLACK }}>The Complete Framework</h2>
-          <p className="mt-3 body-copy text-base text-[#787774] max-w-xl mx-auto">
-            From one recording to a full content &amp; outreach system — every step handled for you.
-          </p>
         </div>
 
-        {/* ── DESKTOP Flowchart (≥768px) ──────────────────────────────── */}
-        <div className="w-full overflow-x-auto pb-12 hide-scrollbar mask-edges relative z-10">
-          <div className="relative mx-auto" style={{ width: `${W}px`, height: `${H}px`, minWidth: `${W}px` }}>
+        {/* ── Flowchart (Scaled for Mobile) ──────────────────────────────── */}
+        <div className="w-full relative z-10 flex justify-center mt-2" style={{ overflow: 'hidden' }}>
+          <div 
+            className="relative" 
+            style={{ 
+              width: `${W}px`, 
+              height: `${H}px`, 
+              minWidth: `${W}px`,
+              transform: `scale(${scale})`,
+              transformOrigin: 'top center',
+              marginBottom: `-${H * (1 - scale)}px`
+            }}
+          >
             
             {/* SVG Connections Layer */}
             <svg className="absolute inset-0 w-full h-full pointer-events-none z-0 overflow-visible">

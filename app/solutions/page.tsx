@@ -216,13 +216,13 @@ export default function SolutionsPage() {
               Solutions
             </Badge>
 
-            <h1 className="text-[clamp(2.75rem,7vw,5.25rem)] font-[700] leading-[1.04] tracking-[-0.03em] text-[#0A0A0A] max-w-[900px] mx-auto mb-6">
+            <h1 className="display-headline text-[clamp(2.75rem,7vw,5.25rem)] text-[#0A0A0A] max-w-[900px] mx-auto mb-6">
               Everything you need to
               <br />
               <span style={{ color: RED }}>grow your business</span>
             </h1>
 
-            <p className="text-[clamp(1rem,2vw,1.1875rem)] leading-[1.7] text-[#6B6B6B] max-w-[600px] mx-auto">
+            <p className="body-copy text-base text-[#6B6B6B] max-w-[600px] mx-auto">
               From content production to manual outreach — one unified system that helps you reach more clients and close more deals.
             </p>
           </motion.div>
@@ -320,10 +320,10 @@ export default function SolutionsPage() {
             transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
             className="text-center mb-16"
           >
-            <h2 className="text-[clamp(2rem,4vw,3rem)] font-[700] leading-[1.1] tracking-[-0.025em] text-[#0A0A0A] mb-4">
+            <h2 className="section-headline text-[clamp(2rem,4vw,3rem)] text-[#0A0A0A] mb-4">
               Built for modern teams
             </h2>
-            <p className="text-[16px] text-[#6B6B6B] leading-[1.65] max-w-[500px] mx-auto">
+            <p className="body-copy text-base text-[#6B6B6B] max-w-[500px] mx-auto">
               Six powerful solutions that work together to help you create, reach, and convert — all in one place.
             </p>
           </motion.div>
@@ -422,10 +422,10 @@ export default function SolutionsPage() {
             transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
             className="text-center mb-16"
           >
-            <h2 className="text-[clamp(2rem,4vw,3rem)] font-[700] leading-[1.1] tracking-[-0.025em] text-[#0A0A0A] mb-4">
+            <h2 className="section-headline text-[clamp(2rem,4vw,3rem)] text-[#0A0A0A] mb-4">
               How it works
             </h2>
-            <p className="text-[16px] text-[#6B6B6B] leading-[1.65] max-w-[500px] mx-auto">
+            <p className="body-copy text-base text-[#6B6B6B] max-w-[500px] mx-auto">
               Four simple steps to transform your content and outreach workflow.
             </p>
           </motion.div>

@@ -433,7 +433,7 @@ export default function PricingPage() {
           </div>
 
           <h1
-            className="text-[clamp(2.5rem,5vw,4rem)] font-[900] leading-[1.0] tracking-[-0.04em] mb-5"
+            className="display-headline text-[clamp(2.5rem,5vw,4rem)] mb-5"
             style={{ color: '#0A0A0A' }}
           >
             Pay only for what
@@ -443,7 +443,7 @@ export default function PricingPage() {
             </span>
           </h1>
 
-          <p className="text-[17px] text-[#78716C] max-w-[520px] mx-auto leading-[1.7]">
+          <p className="body-copy text-base text-[#78716C] max-w-[520px] mx-auto">
             Select the services below. Your custom price is calculated instantly — and the more you pick, the more you save.
           </p>
 
