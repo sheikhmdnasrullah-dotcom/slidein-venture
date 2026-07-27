@@ -293,8 +293,8 @@ export default function CompleteFramework() {
         
         {/* ── Section Header ─────────────────────────────────────────── */}
         <div className="text-center relative z-20 pb-4">
-          <h2 className="text-4xl md:text-5xl font-bold tracking-tight" style={{ color: BLACK }}>The Complete Framework</h2>
-          <p className="mt-3 text-base text-[#787774] max-w-xl mx-auto">
+          <h2 className="display-headline text-4xl md:text-5xl" style={{ color: BLACK }}>The Complete Framework</h2>
+          <p className="mt-3 body-copy text-base text-[#787774] max-w-xl mx-auto">
             From one recording to a full content &amp; outreach system — every step handled for you.
           </p>
         </div>
