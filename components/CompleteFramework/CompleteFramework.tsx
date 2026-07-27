@@ -345,14 +345,14 @@ export default function CompleteFramework() {
               
               {/* Inputs */}
               <div className="pointer-events-auto">
-                <PillNode x={in1.x} y={in1.y} label="You Record Video Once" imgSrc="/logos/camera.png" />
-                <PillNode x={in2.x} y={in2.y} label="Manual Outreach" imgSrc="/logos/email.png" />
+                <PillNode x={in1.x} y={in1.y} label="You record video once." icon={Video} />
+                <PillNode x={in2.x} y={in2.y} label="We discuss your ideal client once" icon={Target} />
               </div>
 
               {/* Columns */}
               <div className="pointer-events-auto">
-                <ColumnContainer x={col1Top.x} y={col1Top.y} title="Content Production" items={ENGINES[0].items} icon={Sparkles} onOpenService={openService} />
-                <ColumnContainer x={col2Top.x} y={col2Top.y} title="Manual Outreach" items={ENGINES[1].items} icon={Send} onOpenService={openService} />
+                <ColumnContainer x={col1Top.x} y={col1Top.y} title="Content Production" items={ENGINES[0].items} icon={Sparkles} imgSrc="/logos/video.png" onOpenService={openService} />
+                <ColumnContainer x={col2Top.x} y={col2Top.y} title="Manual Outreach" items={ENGINES[1].items} icon={Send} imgSrc="/logos/email.png" onOpenService={openService} />
               </div>
 
               {/* Outcomes */}
