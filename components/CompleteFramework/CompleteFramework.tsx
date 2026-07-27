@@ -251,7 +251,7 @@ export default function CompleteFramework() {
   }, []);
 
   const W = 1100;
-  const H = 1080;
+  const H = 1200;
   const centerX = W / 2;
 
   const hub = { x: centerX, y: 0 };
