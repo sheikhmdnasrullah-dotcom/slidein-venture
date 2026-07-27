@@ -125,6 +125,46 @@ function PillNode({
   );
 }
 
+function FinalNode({ x, y, label }: { x: number; y: number; label: string }) {
+  return (
+    <div
+      className="absolute -translate-x-1/2 -translate-y-1/2 group"
+      style={{ left: x, top: y }}
+    >
+      {/* Ambient Glow */}
+      <div 
+        className="absolute inset-0 rounded-full blur-xl opacity-40 transition-opacity duration-500 group-hover:opacity-70"
+        style={{ backgroundColor: RED, transform: 'scale(1.2)' }}
+      />
+      
+      {/* Main Pill */}
+      <div 
+        className="relative flex items-center gap-4 px-8 py-4 rounded-full border shadow-2xl transition-transform duration-500 group-hover:scale-[1.03] overflow-hidden"
+        style={{ 
+          background: `linear-gradient(135deg, ${BLACK} 0%, #1a1a1a 100%)`,
+          borderColor: `${RED}40`
+        }}
+      >
+        {/* Internal Gradient overlay */}
+        <div 
+          className="absolute inset-0 opacity-20 pointer-events-none"
+          style={{ background: `radial-gradient(circle at 50% 0%, ${RED} 0%, transparent 70%)` }}
+        />
+
+        {/* Pulsing Icon */}
+        <div className="relative w-10 h-10 rounded-full flex items-center justify-center shrink-0 border" style={{ backgroundColor: `${RED}10`, borderColor: `${RED}40` }}>
+          <div className="absolute inset-0 rounded-full animate-ping opacity-20" style={{ backgroundColor: RED }} />
+          <CheckCircle2 size={20} strokeWidth={2.5} style={{ color: RED }} />
+        </div>
+        
+        <span className="text-xl font-extrabold tracking-tight text-white whitespace-nowrap relative z-10">
+          {label}
+        </span>
+      </div>
+    </div>
+  );
+}
+
 function ColumnContainer({
   x, y, title, items, icon: Icon, onOpenService
 }: {
@@ -323,7 +363,7 @@ export default function CompleteFramework() {
 
               {/* Final Node */}
               <div className="pointer-events-auto">
-                <PillNode x={final.x} y={final.y} label="More Clients, Faster" icon={CheckCircle2} bg={BLACK} color={WHITE} />
+                <FinalNode x={final.x} y={final.y} label="More Clients, Faster" />
               </div>
 
             </div>
