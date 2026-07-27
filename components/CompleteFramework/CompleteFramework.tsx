@@ -212,6 +212,7 @@ function ColumnContainer({
           style={{ backgroundColor: `${RED}08`, color: RED, border: `1px solid ${RED}20` }}
         >
           {items.length} steps
+        </Badge>
         <ChevronDown className={cn("transition-transform duration-300 ml-2", isOpen ? 'rotate-180' : '')} size={20} style={{ color: BLACK }} />
       </div>
 
