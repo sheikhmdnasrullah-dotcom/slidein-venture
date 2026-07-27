@@ -11,7 +11,6 @@ interface ServiceDetailModalProps {
 }
 
 export default function ServiceDetailModal({ open, onClose, serviceId }: ServiceDetailModalProps) {
-  // Find the requested item in the ENGINES data
   let selectedItem = null;
   for (const engine of ENGINES) {
     const found = engine.items.find((item) => item.id === serviceId);
@@ -25,63 +24,64 @@ export default function ServiceDetailModal({ open, onClose, serviceId }: Service
     <AnimatePresence>
       {open && selectedItem && (
         <motion.div
-          className="fixed inset-0 z-[70] flex items-center justify-center p-4 sm:p-6 lg:p-12"
+          className="fixed inset-0 z-[70] flex items-center justify-center p-4 sm:p-6 lg:p-8"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
         >
-          {/* Futuristic Frosted Backdrop */}
+          {/* Refined frosted backdrop */}
           <motion.div
-            className="absolute inset-0 bg-white/60 backdrop-blur-xl"
+            className="absolute inset-0 bg-black/20 backdrop-blur-2xl"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
           />
 
-          {/* 16:9 Futuristic White Professional Page Tag */}
+          {/* Premium slide panel — balanced proportions, not oversized */}
           <motion.div
-            className="relative bg-white w-full max-w-[1200px] aspect-video rounded-[2rem] overflow-hidden flex flex-col justify-center shadow-[0_20px_80px_rgba(0,0,0,0.08)] border border-black/[0.04]"
-            initial={{ opacity: 0, y: 40, scale: 0.95 }}
+            className="relative w-full max-w-[980px] rounded-3xl overflow-hidden border border-black/[0.06] bg-white/95 shadow-[0_24px_80px_rgba(0,0,0,0.12)]"
+            initial={{ opacity: 0, y: 30, scale: 0.98 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 30, scale: 0.98 }}
+            exit={{ opacity: 0, y: 24, scale: 0.98 }}
             transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
           >
-            {/* Subtle background glow/gradient to make it "futuristic white" */}
-            <div className="absolute inset-0 pointer-events-none" style={{
-              background: 'radial-gradient(circle at 50% 0%, rgba(122,10,14,0.05) 0%, transparent 60%)'
-            }} />
+            {/* Subtle top accent line — restrained, not flashy */}
+            <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#7A0A0E]/40 to-transparent" />
 
-            {/* Close Button */}
+            {/* Close button */}
             <button
               onClick={onClose}
-              className="absolute top-6 right-6 z-20 w-12 h-12 rounded-full bg-black/5 hover:bg-black/10 flex items-center justify-center text-black/60 hover:text-black transition-all duration-300 backdrop-blur-md"
+              className="absolute top-5 right-5 z-20 w-10 h-10 rounded-full bg-black/[0.04] hover:bg-black/[0.08] flex items-center justify-center text-black/50 hover:text-black transition-all duration-300"
               aria-label="Close"
             >
-              <X size={20} strokeWidth={2} />
+              <X size={16} strokeWidth={2} />
             </button>
 
-            {/* Content Container */}
-            <div className="relative z-10 px-8 sm:px-16 md:px-24 max-w-4xl">
+            {/* Content — generous but intentional whitespace */}
+            <div className="px-8 sm:px-12 md:px-16 pt-10 pb-10 md:pt-14 md:pb-14 max-w-2xl">
               <motion.div
                 key={selectedItem.id}
-                initial={{ opacity: 0, y: 20 }}
+                initial={{ opacity: 0, y: 16 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
+                transition={{ duration: 0.5, delay: 0.05, ease: [0.16, 1, 0.3, 1] }}
               >
-                <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-black/10 bg-black/5 mb-6">
-                  <div className="w-2 h-2 rounded-full bg-[#7A0A0E] animate-pulse" />
-                  <span className="text-xs font-bold tracking-widest uppercase text-black/70">
-                    SlideIn Venture
-                  </span>
-                </div>
-                
-                <h3 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-[#0A0A0A] mb-8 leading-tight">
+                {/* Restrained label — no pulsing dot */}
+                <span className="text-[10px] font-semibold tracking-[0.12em] uppercase text-[#7A0A0E] mb-4 block">
+                  Service
+                </span>
+
+                {/* Crisp typography — refined scale, not oversized */}
+                <h3 className="text-[clamp(1.75rem,3vw,2.5rem)] font-semibold tracking-[-0.02em] text-[#0A0A0A] mb-5 leading-[1.15]">
                   {selectedItem.label}
                 </h3>
-                
-                <p className="text-lg sm:text-xl text-[#404040] leading-relaxed font-medium">
+
+                {/* Subtle divider */}
+                <div className="w-8 h-px bg-black/10 mb-6" />
+
+                {/* Body copy with tight, readable measure */}
+                <p className="text-[15px] sm:text-base text-[#404040] leading-[1.7] font-normal">
                   {selectedItem.description}
                 </p>
               </motion.div>

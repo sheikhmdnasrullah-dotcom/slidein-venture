@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { X } from 'lucide-react';
 import WorkflowDetailModal from '@/components/WorkflowDetailModal/WorkflowDetailModal';
 
 interface SolutionSlide {
@@ -9,7 +10,6 @@ interface SolutionSlide {
   headline: string;
   description: string;
   eyebrow?: string;
-  bg?: string;
 }
 
 const slides: SolutionSlide[] = [
@@ -18,21 +18,18 @@ const slides: SolutionSlide[] = [
     headline: 'Create content at the speed of thought',
     description: 'Generate blog posts, social media content, and marketing copy in seconds. Let AI handle the first draft while you focus on strategy.',
     eyebrow: 'Content',
-    bg: 'linear-gradient(135deg, #0f1923 0%, #182842 50%, #1e3a5f 100%)',
   },
   {
     id: 'outreach',
     headline: 'Outreach that actually converts',
     description: 'Send personalized cold emails and follow-ups at scale. Track opens, replies, and conversions — all from one dashboard.',
     eyebrow: 'Outreach',
-    bg: 'linear-gradient(135deg, #1a0533 0%, #2d0b6e 50%, #3a0d8a 100%)',
   },
   {
     id: 'backend',
     headline: 'Automate the complex stuff',
     description: 'Automate data pipelines, API integrations, and backend workflows. Reduce manual work and eliminate errors.',
     eyebrow: 'Backend Tasks',
-    bg: 'linear-gradient(135deg, #0a1628 0%, #1a2e4a 50%, #243654 100%)',
   },
 ];
 
@@ -63,150 +60,108 @@ export default function SolutionsModal({ open, onClose }: SolutionsModalProps) {
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
           >
-            {/* Backdrop */}
+            {/* Refined frosted backdrop */}
             <motion.div
-              className="absolute inset-0 bg-black/40 backdrop-blur-sm"
+              className="absolute inset-0 bg-black/20 backdrop-blur-2xl"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={onClose}
             />
 
-            {/* Modal - fits within screen, no scroll */}
+            {/* Premium modal */}
             <motion.div
-              className="relative bg-[#F7F6F3] rounded-2xl shadow-[0_40px_80px_rgba(0,0,0,0.25)] max-w-[900px] w-full border border-[#E3E2E0]"
-              initial={{ opacity: 0, y: 24, scale: 0.97 }}
+              className="relative w-full max-w-[920px] rounded-3xl overflow-hidden border border-black/[0.06] bg-white/95 shadow-[0_24px_80px_rgba(0,0,0,0.12)]"
+              initial={{ opacity: 0, y: 24, scale: 0.98 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: 24, scale: 0.97 }}
+              exit={{ opacity: 0, y: 24, scale: 0.98 }}
               transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
             >
+              {/* Restrained top accent */}
+              <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-black/10 to-transparent" />
+
               {/* Close button */}
               <button
                 onClick={onClose}
-                className="absolute top-3 right-3 w-7 h-7 rounded-full bg-white border border-[#E3E2E0] flex items-center justify-center text-[#787774] hover:text-[#191919] hover:border-[#9B9A97] transition-all duration-150 z-10"
+                className="absolute top-5 right-5 z-20 w-10 h-10 rounded-full bg-black/[0.04] hover:bg-black/[0.08] flex items-center justify-center text-black/50 hover:text-black transition-all duration-300"
                 aria-label="Close"
               >
-                <svg width="12" height="12" viewBox="0 0 14 14" fill="none">
-                  <path d="M3 3L11 11M11 3L3 11" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"/>
-                </svg>
+                <X size={16} strokeWidth={2} />
               </button>
 
-              {/* Content - compact padding */}
-              <div className="p-5 md:p-6">
-                {/* Stage / Carousel */}
-                <div
-                  className="relative rounded-2xl overflow-hidden shadow-[0_24px_60px_rgba(0,0,0,0.14),0_8px_20px_rgba(0,0,0,0.08)]"
-                  style={{
-                    background: slide.bg || '#F1F1EF',
-                    aspectRatio: '16/9',
-                    maxHeight: 420,
-                  }}
-                >
+              <div className="p-8 sm:p-12 md:p-14">
+                {/* Carousel stage — clean layout, no generic gradients */}
+                <div className="relative rounded-2xl overflow-hidden border border-black/[0.04] bg-[#FAFAF8]">
                   <AnimatePresence mode="wait">
                     <motion.div
                       key={slide.id}
-                      className="absolute inset-0 flex items-center justify-center"
-                      initial={{ opacity: 0, y: 16 }}
+                      className="relative px-8 py-10 sm:px-12 sm:py-14"
+                      initial={{ opacity: 0, y: 12 }}
                       animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -16 }}
-                      transition={{ duration: 0.32, ease: [0.16, 1, 0.3, 1] }}
+                      exit={{ opacity: 0, y: -12 }}
+                      transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1 ]}}
                     >
-                      <div className="w-full h-full flex items-center justify-center p-8">
-                        <div className="bg-white/10 backdrop-blur-sm border border-white/15 rounded-2xl p-6 max-w-[480px] w-full">
-                          <div className="flex flex-col gap-2">
-                            {[80, 55, 0, 100, 88, 70, 48].map((w, i) =>
-                              w === 0 ? <div key={i} className="h-1.5" /> : (
-                                <div
-                                  key={i}
-                                  className="rounded-full"
-                                  style={{
-                                    height: i === 0 ? 14 : 8,
-                                    width: `${w}%`,
-                                    background: 'rgba(255,255,255,0.18)',
-                                  }}
-                                />
-                              )
-                            )}
-                          </div>
-                        </div>
-                      </div>
+                      <span className="text-[10px] font-semibold tracking-[0.12em] uppercase text-[#7A0A0E] mb-3 block">
+                        {slide.eyebrow}
+                      </span>
+                      <h3 className="text-[clamp(1.25rem,2vw,1.75rem)] font-semibold tracking-[-0.02em] text-[#0A0A0A] mb-3 leading-[1.2]">
+                        {slide.headline}
+                      </h3>
+                      <p className="text-[13.5px] sm:text-sm text-[#6B6B6B] leading-[1.7] max-w-[520px]">
+                        {slide.description}
+                      </p>
                     </motion.div>
                   </AnimatePresence>
-
-                  {/* Text overlay */}
-                  <div className="absolute bottom-0 left-0 right-0 p-5 md:p-6 bg-gradient-to-t from-black/75 via-black/30 to-transparent">
-                    <AnimatePresence mode="wait">
-                      <motion.div
-                        key={slide.id + '-txt'}
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -10 }}
-                        transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
-                      >
-                        {slide.eyebrow && (
-                          <span className="block text-[10px] font-[700] tracking-[0.08em] uppercase text-white/60 mb-1">
-                            {slide.eyebrow}
-                          </span>
-                        )}
-                        <h3 className="text-[clamp(0.875rem,1.8vw,1.25rem)] font-[700] leading-[1.2] tracking-[-0.02em] text-white mb-1">
-                          {slide.headline}
-                        </h3>
-                        <p className="text-[12px] md:text-[13px] text-white/75 leading-[1.5] max-w-[440px]">
-                          {slide.description}
-                        </p>
-                      </motion.div>
-                    </AnimatePresence>
-                  </div>
                 </div>
 
-                {/* Controls */}
-                <div className="flex items-center justify-center gap-4 mt-3 mb-3">
-                  <button
-                    onClick={prev}
-                    aria-label="Previous"
-                    className="w-8 h-8 rounded-full border border-[#E3E2E0] bg-white flex items-center justify-center text-[#37352F] hover:border-[#9B9A97] hover:shadow-[0_2px_8px_rgba(0,0,0,0.08)] transition-all duration-150 shadow-sm"
-                  >
-                    <svg width="12" height="12" viewBox="0 0 14 14" fill="none">
-                      <path d="M9 2.5L4.5 7L9 11.5" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"/>
-                    </svg>
-                  </button>
-
-                  <div className="flex items-center gap-1.5">
+                {/* Controls — minimal, intentional */}
+                <div className="flex items-center justify-between mt-5">
+                  <div className="flex items-center gap-2">
                     {slides.map((_, i) => (
                       <button
                         key={i}
                         onClick={() => setCurrent(i)}
                         aria-label={`Go to slide ${i + 1}`}
-                        className={`rounded-full transition-all duration-250 ${
+                        className={`rounded-full transition-all duration-300 ${
                           i === current
-                            ? 'w-4 h-[5px] bg-[#191919]'
-                            : 'w-[5px] h-[5px] bg-[#E3E2E0] hover:bg-[#9B9A97]'
+                            ? 'w-6 h-1 bg-black/80'
+                            : 'w-1 h-1 bg-black/20 hover:bg-black/40'
                         }`}
                       />
                     ))}
                   </div>
 
-                  <button
-                    onClick={next}
-                    aria-label="Next"
-                    className="w-8 h-8 rounded-full border border-[#E3E2E0] bg-white flex items-center justify-center text-[#37352F] hover:border-[#9B9A97] hover:shadow-[0_2px_8px_rgba(0,0,0,0.08)] transition-all duration-150 shadow-sm"
-                  >
-                    <svg width="12" height="12" viewBox="0 0 14 14" fill="none">
-                      <path d="M5 2.5L9.5 7L5 11.5" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"/>
-                    </svg>
-                  </button>
+                  <div className="flex items-center gap-1.5">
+                    <button
+                      onClick={prev}
+                      aria-label="Previous"
+                      className="w-8 h-8 rounded-full border border-black/[0.08] bg-white hover:bg-black/[0.03] flex items-center justify-center text-black/60 hover:text-black transition-all duration-200"
+                    >
+                      <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                        <path d="M9 2.5L4.5 7L9 11.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                      </svg>
+                    </button>
+                    <button
+                      onClick={next}
+                      aria-label="Next"
+                      className="w-8 h-8 rounded-full border border-black/[0.08] bg-white hover:bg-black/[0.03] flex items-center justify-center text-black/60 hover:text-black transition-all duration-200"
+                    >
+                      <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                        <path d="M5 2.5L9.5 7L5 11.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                      </svg>
+                    </button>
+                  </div>
                 </div>
 
-                {/* Orange CTA Button */}
-                <div className="flex justify-center">
+                {/* CTA — grounded, not floating */}
+                <div className="mt-6 pt-6 border-t border-black/[0.04]">
                   <button
                     onClick={() => setWorkflowOpen(true)}
-                    className="inline-flex items-center gap-2 px-6 py-2.5 text-[14px] font-[600] text-white rounded-[8px] transition-all duration-150 shadow-[0_4px_14px_rgba(255,165,0,0.35)] hover:shadow-[0_6px_20px_rgba(255,165,0,0.5)] hover:-translate-y-[1px] tracking-[-0.01em]"
-                    style={{ background: '#FFA500' }}
+                    className="inline-flex items-center gap-2 px-5 py-2.5 text-[13px] font-semibold text-white bg-[#0A0A0A] hover:bg-black/80 rounded-full transition-all duration-200 shadow-[0_1px_3px_rgba(0,0,0,0.08)] hover:shadow-[0_4px_12px_rgba(0,0,0,0.12)] hover:-translate-y-px"
                   >
                     See the full workflow
                     <svg width="13" height="13" viewBox="0 0 14 14" fill="none">
-                      <path d="M3 7H11M8 3.5L11.5 7L8 10.5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
+                      <path d="M3 7H11M8 3.5L11.5 7L8 10.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
                     </svg>
                   </button>
                 </div>
