@@ -54,16 +54,22 @@ function AnimatedConnector({ p1, p2, scrollVisible, delay = 0 }: {
     if (!scrollVisible || !pathRef.current) return;
     const length = pathRef.current.getTotalLength();
     pathRef.current.style.strokeDasharray = `${length}`;
-    pathRef.current.style.strokeDashoffset = `${length}`;
-    const timer = setTimeout(() => {
-      if (pathRef.current) {
-        pathRef.current.style.transition = `stroke-dashoffset 1.2s cubic-bezier(0.16, 1, 0.3, 1)`;
-        pathRef.current.style.strokeDashoffset = '0';
-      }
-      setTimeout(() => setDrawn(true), 1200);
-    }, delay);
-    return () => clearTimeout(timer);
-  }, [scrollVisible, delay]);
+    
+    if (!drawn) {
+      pathRef.current.style.strokeDashoffset = `${length}`;
+      const timer = setTimeout(() => {
+        if (pathRef.current) {
+          pathRef.current.style.transition = `stroke-dashoffset 1.2s cubic-bezier(0.16, 1, 0.3, 1)`;
+          pathRef.current.style.strokeDashoffset = '0';
+        }
+        setTimeout(() => setDrawn(true), 1200);
+      }, delay);
+      return () => clearTimeout(timer);
+    } else {
+      pathRef.current.style.transition = 'none';
+      pathRef.current.style.strokeDashoffset = '0';
+    }
+  }, [scrollVisible, delay, path, drawn]);
 
   return (
     <g>
@@ -170,9 +176,9 @@ function FinalNode({ x, y, label }: { x: number; y: number; label: string }) {
 }
 
 function ColumnContainer({
-  x, y, title, items, icon: Icon, imgSrc, onOpenService
+  x, y, title, items, icon: Icon, imgSrc, onOpenService, isOpen, onToggle
 }: {
-  x: number; y: number; title: string; items: any[]; icon?: any; imgSrc?: string; onOpenService: (id: string) => void;
+  x: number; y: number; title: string; items: any[]; icon?: any; imgSrc?: string; onOpenService: (id: string) => void; isOpen: boolean; onToggle: () => void;
 }) {
   return (
     <Card
@@ -185,7 +191,11 @@ function ColumnContainer({
         boxShadow: `0 20px 40px ${BLACK}05, inset 0 0 0 1px ${WHITE}`
       }}
     >
-      <div className="flex items-center gap-3 mb-6 pb-4 border-b px-6 pt-6" style={{ borderColor: `${BLACK}10` }}>
+      <div 
+        className="flex items-center gap-3 px-6 py-6 cursor-pointer hover:bg-black/5 transition-colors border-b" 
+        style={{ borderColor: isOpen ? `${BLACK}10` : 'transparent' }}
+        onClick={onToggle}
+      >
         {imgSrc ? (
           <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-transparent">
             <img src={imgSrc} alt="" className="w-full h-full object-contain" />
@@ -202,10 +212,18 @@ function ColumnContainer({
           style={{ backgroundColor: `${RED}08`, color: RED, border: `1px solid ${RED}20` }}
         >
           {items.length} steps
-        </Badge>
+        <ChevronDown className={cn("transition-transform duration-300 ml-2", isOpen ? 'rotate-180' : '')} size={20} style={{ color: BLACK }} />
       </div>
 
-      <CardContent className="space-y-2.5 px-6 pb-6">
+      <AnimatePresence initial={false}>
+        {isOpen && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+          >
+            <CardContent className="space-y-2.5 px-6 pb-6 pt-2">
         {items.map((item) => (
           <button
             key={item.id}
@@ -226,7 +244,10 @@ function ColumnContainer({
             </div>
           </button>
         ))}
-      </CardContent>
+            </CardContent>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </Card>
   );
 }
@@ -250,8 +271,11 @@ export default function CompleteFramework() {
     setTimeout(() => setModalServiceId(undefined), 300);
   }, []);
 
+  // Dropdown states (closed by default on mobile for easy viewing, but let's default to false generally for the slick animation)
+  const [col1Open, setCol1Open] = useState(false);
+  const [col2Open, setCol2Open] = useState(false);
+
   const W = 1100;
-  const H = 1200;
   const centerX = W / 2;
 
   const hub = { x: centerX, y: 0 };
@@ -262,14 +286,19 @@ export default function CompleteFramework() {
   const col1Top = { x: centerX - 250, y: colY };
   const col2Top = { x: centerX + 250, y: colY };
 
-  const col1Bottom = { x: centerX - 250, y: colY + 85 + (ENGINES[0].items.length * 60) + 20 };
-  const col2Bottom = { x: centerX + 250, y: colY + 85 + (ENGINES[1].items.length * 60) + 20 };
+  // Calculate dynamic heights based on whether they are open or closed
+  const col1Height = col1Open ? (ENGINES[0].items.length * 60 + 20) : 0;
+  const col2Height = col2Open ? (ENGINES[1].items.length * 60 + 20) : 0;
 
-  const outY = Math.max(col1Bottom.y, col2Bottom.y) + 160;
+  const col1Bottom = { x: centerX - 250, y: colY + 95 + col1Height };
+  const col2Bottom = { x: centerX + 250, y: colY + 95 + col2Height };
+
+  const outY = Math.max(col1Bottom.y, col2Bottom.y) + 140;
   const out1 = { x: centerX - 250, y: outY };
   const out2 = { x: centerX + 250, y: outY };
 
   const final = { x: centerX, y: outY + 120 };
+  const H = final.y + 100;
 
   const [scale, setScale] = useState(1);
   useEffect(() => {
@@ -296,17 +325,10 @@ export default function CompleteFramework() {
         </div>
 
         {/* ── Flowchart (Scaled for Mobile) ──────────────────────────────── */}
-        <div className="w-full relative z-10 flex justify-center mt-2" style={{ overflow: 'hidden' }}>
+        <div className="w-full relative z-10 flex justify-center mt-2 transition-all duration-500 ease-in-out overflow-hidden" style={{ height: H * scale }}>
           <div 
-            className="relative" 
-            style={{ 
-              width: `${W}px`, 
-              height: `${H}px`, 
-              minWidth: `${W}px`,
-              transform: `scale(${scale})`,
-              transformOrigin: 'top center',
-              marginBottom: `-${H * (1 - scale)}px`
-            }}
+            className="absolute origin-top transition-all duration-500 ease-in-out" 
+            style={{ width: W, height: H, transform: `scale(${scale})` }}
           >
             
             {/* SVG Connections Layer */}
@@ -351,8 +373,8 @@ export default function CompleteFramework() {
 
               {/* Columns */}
               <div className="pointer-events-auto">
-                <ColumnContainer x={col1Top.x} y={col1Top.y} title="Content Production" items={ENGINES[0].items} icon={Sparkles} imgSrc="/logos/video.png" onOpenService={openService} />
-                <ColumnContainer x={col2Top.x} y={col2Top.y} title="Manual Outreach" items={ENGINES[1].items} icon={Send} imgSrc="/logos/email.png" onOpenService={openService} />
+                <ColumnContainer x={col1Top.x} y={col1Top.y} title="Content Production" items={ENGINES[0].items} icon={Sparkles} imgSrc="/logos/video.png" onOpenService={openService} isOpen={col1Open} onToggle={() => setCol1Open(!col1Open)} />
+                <ColumnContainer x={col2Top.x} y={col2Top.y} title="Manual Outreach" items={ENGINES[1].items} icon={Send} imgSrc="/logos/email.png" onOpenService={openService} isOpen={col2Open} onToggle={() => setCol2Open(!col2Open)} />
               </div>
 
               {/* Outcomes */}
