@@ -96,9 +96,9 @@ function AnimatedConnector({ p1, p2, scrollVisible, delay = 0 }: {
 
 
 function PillNode({
-  x, y, label, icon: Icon, onClick, bg = WHITE, color = BLACK
+  x, y, label, icon: Icon, imgSrc, onClick, bg = WHITE, color = BLACK
 }: {
-  x: number; y: number; label: string; icon?: any; onClick?: () => void; bg?: string; color?: string;
+  x: number; y: number; label: string; icon?: any; imgSrc?: string; onClick?: () => void; bg?: string; color?: string;
 }) {
   return (
     <div
@@ -115,11 +115,15 @@ function PillNode({
       }}
       onClick={onClick}
     >
-      {Icon && (
+      {imgSrc ? (
+        <div className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 bg-transparent">
+          <img src={imgSrc} alt="" className="w-full h-full object-contain" />
+        </div>
+      ) : Icon ? (
         <div className="w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0" style={{ backgroundColor: color === WHITE ? `${WHITE}20` : `${RED}10`, color: color === WHITE ? WHITE : RED }}>
           <Icon size={14} strokeWidth={2.5} />
         </div>
-      )}
+      ) : null}
       <span className="text-sm font-bold whitespace-nowrap">{label}</span>
     </div>
   );
@@ -166,9 +170,9 @@ function FinalNode({ x, y, label }: { x: number; y: number; label: string }) {
 }
 
 function ColumnContainer({
-  x, y, title, items, icon: Icon, onOpenService
+  x, y, title, items, icon: Icon, imgSrc, onOpenService
 }: {
-  x: number; y: number; title: string; items: any[]; icon: any; onOpenService: (id: string) => void;
+  x: number; y: number; title: string; items: any[]; icon?: any; imgSrc?: string; onOpenService: (id: string) => void;
 }) {
   return (
     <Card
@@ -182,9 +186,15 @@ function ColumnContainer({
       }}
     >
       <div className="flex items-center gap-3 mb-6 pb-4 border-b px-6 pt-6" style={{ borderColor: `${BLACK}10` }}>
-        <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ backgroundColor: `${RED}10`, color: RED }}>
-          <Icon size={20} strokeWidth={2} />
-        </div>
+        {imgSrc ? (
+          <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-transparent">
+            <img src={imgSrc} alt="" className="w-full h-full object-contain" />
+          </div>
+        ) : Icon ? (
+          <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ backgroundColor: `${RED}10`, color: RED }}>
+            <Icon size={20} strokeWidth={2} />
+          </div>
+        ) : null}
         <h3 className="text-xl font-bold tracking-tight" style={{ color: BLACK }}>{title}</h3>
         <Badge
           variant="ghost"
@@ -335,8 +345,8 @@ export default function CompleteFramework() {
               
               {/* Inputs */}
               <div className="pointer-events-auto">
-                <PillNode x={in1.x} y={in1.y} label="You Record Video Once" icon={Video} />
-                <PillNode x={in2.x} y={in2.y} label="You Tell Us Who to Reach" icon={Target} />
+                <PillNode x={in1.x} y={in1.y} label="You Record Video Once" imgSrc="/logos/camera.png" />
+                <PillNode x={in2.x} y={in2.y} label="Manual Outreach" imgSrc="/logos/email.png" />
               </div>
 
               {/* Columns */}
