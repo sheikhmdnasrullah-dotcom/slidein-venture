@@ -7,7 +7,20 @@
 /* ─── Tailwind v4 Theme ───────────────────────────────────────────────────── */
 @theme {
   --font-sans: var(--font-inter), system-ui, -apple-system, sans-serif;
+  --font-serif: 'Georgia', 'Times New Roman', serif;
   --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+
+  /* Type Scale — 5 sizes across the system */
+  --text-xs:  0.75rem;    /* 12px — labels, meta */
+  --text-sm:  0.875rem;   /* 14px — body small, nav */
+  --text-base: 1rem;      /* 16px — body copy */
+  --text-lg:  1.125rem;   /* 18px — large body */
+  --text-xl:  1.25rem;    /* 20px — lead paragraphs */
+  --text-2xl: 1.5rem;     /* 24px — section subheads */
+  --text-3xl: 1.875rem;   /* 30px — small headlines */
+  --text-4xl: 2.25rem;    /* 36px — section headlines */
+  --text-5xl: 3rem;       /* 48px — hero display */
+  --text-6xl: 3.75rem;    /* 60px — max hero */
 
   /* Brand Colors — black, white, dark red */
   --color-background:   #FAFAF9;
@@ -326,5 +339,27 @@ body::after {
   }
   html {
     @apply font-sans;
+  }
+
+  /* Display headlines (hero, section titles) use serif for contrast */
+  .display-headline {
+    font-family: var(--font-serif);
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    line-height: 1.04;
+  }
+
+  /* Section headings use serif as well */
+  .section-headline {
+    font-family: var(--font-serif);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.15;
+  }
+
+  /* Body copy stays sans-serif (Inter) */
+  .body-copy {
+    font-family: var(--font-sans);
+    line-height: 1.65;
   }
 }
