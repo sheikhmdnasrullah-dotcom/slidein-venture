@@ -2,8 +2,7 @@
 
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X } from 'lucide-react';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { Cancel01Icon as X, ArrowLeft01Icon as ChevronLeft, ArrowRight01Icon as ChevronRight } from 'hugeicons-react';
 
 interface WorkflowSlide {
   id: string;

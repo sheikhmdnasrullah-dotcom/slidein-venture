@@ -1,7 +1,7 @@
 'use client';
 
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Cancel01Icon as X, ArrowLeft01Icon as ChevronLeft, ArrowRight01Icon as ChevronRight } from 'hugeicons-react';
 import { ENGINES } from '@/components/CompleteFramework/framework.data';
 
 interface ServiceDetailModalProps {

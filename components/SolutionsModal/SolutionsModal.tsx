@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X } from 'lucide-react';
+import { Cancel01Icon as X } from 'hugeicons-react';
 import WorkflowDetailModal from '@/components/WorkflowDetailModal/WorkflowDetailModal';
 
 interface SolutionSlide {

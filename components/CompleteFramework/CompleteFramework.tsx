@@ -2,7 +2,7 @@
 
 import React, { useState, useCallback, useRef, useEffect, createContext, useContext } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Plus, Video, Target, Sparkles, Send, CheckCircle2, ChevronDown } from 'lucide-react';
+import { PlusSignIcon as Plus, Camera01Icon as Video, Target01Icon as Target, SparklesIcon as Sparkles, SentIcon as Send, CheckmarkCircle01Icon as CheckCircle2, ArrowDown01Icon as ChevronDown } from 'hugeicons-react';
 import { cn } from '@/lib/utils';
 import { ENGINES } from './framework.data';
 import ServiceDetailModal from '@/components/ServiceDetailModal/ServiceDetailModal';

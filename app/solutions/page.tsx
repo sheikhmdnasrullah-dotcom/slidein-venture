@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { Badge } from '@/components/ui/badge';
 import { buttonVariants } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { ChevronRight, CheckCircle2, ArrowRight, Play, Sparkles, Zap, Globe, BarChart3, Shield, Rocket, Layers, Workflow } from 'lucide-react';
+import { ArrowRight01Icon as ChevronRight, CheckmarkCircle01Icon as CheckCircle2, ArrowRight02Icon as ArrowRight, PlayIcon as Play, SparklesIcon as Sparkles, FlashIcon as Zap, GlobeIcon as Globe, Chart01Icon as BarChart3, Shield01Icon as Shield, RocketIcon as Rocket, GroupLayersIcon as Layers, Flowchart01Icon as Workflow } from 'hugeicons-react';
 
 const RED = '#7A0A0E';
 const BLACK = '#0A0A0A';
