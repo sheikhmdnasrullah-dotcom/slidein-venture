@@ -9,7 +9,7 @@ import ServiceDetailModal from '@/components/ServiceDetailModal/ServiceDetailMod
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 
-const RED = '#7A0A0E';
+const RED = '#FF6200'; // now bright orange
 const BLACK = '#0A0A0A';
 const WHITE = '#FFFFFF';
 const CREAM = '#FDFCFB';
@@ -219,13 +219,13 @@ function ColumnContainer({
             onClick={() => onOpenService?.(item.id)}
           >
             <div
-              className="w-6 h-6 rounded-md flex items-center justify-center flex-shrink-0 transition-all duration-200 group-hover:bg-red-100/80"
+              className="w-6 h-6 rounded-md flex items-center justify-center flex-shrink-0 transition-all duration-200 group-hover:bg-orange-100/80"
               style={{ border: `1px solid ${RED}30`, color: RED, backgroundColor: 'transparent' }}
             >
               <Plus size={14} strokeWidth={2.5} className="transition-all duration-200 group-hover:scale-110" />
             </div>
             <div className="flex-1">
-              <p className="text-[13px] font-bold transition-colors duration-200 group-hover:text-red-800" style={{ color: BLACK }}>
+              <p className="text-[13px] font-bold transition-colors duration-200 group-hover:text-orange-800" style={{ color: BLACK }}>
                 {item.label}
               </p>
             </div>
@@ -354,8 +354,8 @@ export default function CompleteFramework() {
               
               {/* Inputs */}
               <div className="pointer-events-auto">
-                <PillNode x={in1.x} y={in1.y} label="You Record Video Once." imgSrc="/logos/camera-red.png" />
-                <PillNode x={in2.x} y={in2.y} label="We Discuss Your Ideal Client Once." imgSrc="/logos/bubble-red.png" />
+                <PillNode x={in1.x} y={in1.y} label="You Record Video Once." icon={Video} />
+                <PillNode x={in2.x} y={in2.y} label="We Discuss Your Ideal Client Once." icon={Target} />
               </div>
 
               {/* Columns */}

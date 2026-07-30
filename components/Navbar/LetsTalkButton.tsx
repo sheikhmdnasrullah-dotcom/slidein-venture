@@ -10,7 +10,7 @@ const SPRING_CARD   = { type: 'spring', bounce: 0.15, duration: 0.7 } as const;
 const SPRING_AVATAR = { type: 'spring', bounce: 0.2, duration: 0.8 } as const;
 
 /* ─── Brand colours ─────────────────────────────────────────────────────── */
-const RED  = '#7A0A0E';
+const RED  = '#FF6200';
 
 /* ─── Verified badge SVG (blue checkmark, same path as the Framer source) ─ */
 function VerifiedBadge({ size = 18 }: { size?: number }) {

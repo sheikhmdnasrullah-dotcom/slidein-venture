@@ -107,7 +107,7 @@ export default function ServiceDetailModal({ open, onClose, serviceId, onChange 
                   exit={{ opacity: 0, x: -20 }}
                   transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
                 >
-                  <span className="text-[11px] md:text-sm font-bold tracking-[0.2em] uppercase text-[#8B0000] mb-6 block">
+                  <span className="text-[11px] md:text-sm font-bold tracking-[0.2em] uppercase text-[#FF6200] mb-6 block">
                     Step {currentIndex + 1} of {allItems.length}
                   </span>
 
@@ -115,7 +115,7 @@ export default function ServiceDetailModal({ open, onClose, serviceId, onChange 
                     {selectedItem.label}
                   </h3>
 
-                  <div className="w-16 h-1 bg-[#8B0000] mb-8 rounded-full" />
+                  <div className="w-16 h-1 bg-[#FF6200] mb-8 rounded-full" />
 
                   <p className="text-lg md:text-[22px] text-[#4A4A4A] leading-relaxed font-normal">
                     {selectedItem.description}

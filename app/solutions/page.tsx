@@ -8,7 +8,7 @@ import { buttonVariants } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { ArrowRight01Icon as ChevronRight, CheckmarkCircle01Icon as CheckCircle2, ArrowRight02Icon as ArrowRight, PlayIcon as Play, SparklesIcon as Sparkles, FlashIcon as Zap, GlobeIcon as Globe, Chart01Icon as BarChart3, Shield01Icon as Shield, RocketIcon as Rocket, GroupLayersIcon as Layers, Flowchart01Icon as Workflow } from 'hugeicons-react';
 
-const RED = '#7A0A0E';
+const RED = '#FF6200';
 const BLACK = '#0A0A0A';
 const STONE = '#6B6B6B';
 const MIST = '#787774';
@@ -22,7 +22,7 @@ const features = [
     description: 'Turn a single video recording into a full content ecosystem — podcasts, clips, blogs, and social posts — all polished and ready to publish.',
     badge: 'Content',
     badgeColor: RED,
-    gradient: 'linear-gradient(135deg, #7A0A0E08 0%, #C24B4B08 100%)',
+    gradient: 'linear-gradient(135deg, #FF620008 0%, #FFA77008 100%)',
     borderColor: `${RED}15`,
     icon: <Sparkles size={20} strokeWidth={2} style={{ color: RED }} />,
     metrics: [
@@ -211,8 +211,8 @@ export default function SolutionsPage() {
             transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
             className="text-center mb-16"
           >
-            <Badge className="mb-6 bg-[#7A0A0E]/[0.06] text-[#7A0A0E] border-[#7A0A0E]/[0.15] hover:bg-[#7A0A0E]/[0.08] font-[600] tracking-[0.02em] rounded-full px-4 py-1.5">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#7A0A0E] mr-2 inline-block" />
+            <Badge className="mb-6 bg-[#FF6200]/[0.06] text-[#FF6200] border-[#FF6200]/[0.15] hover:bg-[#FF6200]/[0.08] font-[600] tracking-[0.02em] rounded-full px-4 py-1.5">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#FF6200] mr-2 inline-block" />
               Solutions
             </Badge>
 
@@ -264,7 +264,7 @@ export default function SolutionsPage() {
                 </div>
 
                 <div className="grid grid-cols-2 gap-6">
-                  <div className="bg-[#7A0A0E]/[0.03] rounded-2xl p-6 border border-[#7A0A0E]/[0.08]">
+                  <div className="bg-[#FF6200]/[0.03] rounded-2xl p-6 border border-[#FF6200]/[0.08]">
                     <div className="flex items-center gap-3 mb-4">
                       <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ backgroundColor: `${RED}12`, color: RED }}>
                         <Sparkles size={20} strokeWidth={2} />
@@ -489,7 +489,7 @@ export default function SolutionsPage() {
                 href="/signup"
                 className={buttonVariants({
                   size: "lg",
-                  className: "bg-[#7A0A0E] hover:bg-[#8B0F13] text-white font-[600] tracking-[-0.01em] shadow-[0_4px_14px_rgba(122,10,14,0.25)] hover:shadow-[0_6px_20px_rgba(122,10,14,0.35)] hover:-translate-y-px transition-all duration-150 rounded-[7px] h-12 px-8",
+                  className: "bg-[#FF6200] hover:bg-[#8B0F13] text-white font-[600] tracking-[-0.01em] shadow-[0_4px_14px_rgba(122,10,14,0.25)] hover:shadow-[0_6px_20px_rgba(122,10,14,0.35)] hover:-translate-y-px transition-all duration-150 rounded-[7px] h-12 px-8",
                 })}
               >
                 Start for free

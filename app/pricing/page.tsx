@@ -168,7 +168,7 @@ function PriceSummary({
   const savings = Math.round(subtotal * discount);
   const total = subtotal - savings;
 
-  const RED_PRICING = '#7A0A0E';
+  const RED_PRICING = '#FF6200';
   return (
     <AnimatePresence>
       {count > 0 && (
@@ -229,7 +229,7 @@ function PriceSummary({
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full text-[14px] font-[700] transition-all duration-200 hover:-translate-y-px hover:shadow-lg"
-                style={{ background: '#7A0A0E', color: '#FFFFFF' }}
+                style={{ background: '#FF6200', color: '#FFFFFF' }}
               >
                 Book a Call
                 <svg className="w-3.5 h-3.5" viewBox="0 0 14 14" fill="none">
@@ -270,7 +270,7 @@ function ServiceCard({
       className="relative w-full text-left rounded-2xl p-5 transition-all duration-200 group focus:outline-none"
       style={{
         background: selected ? '#0A0A0A' : service.color,
-        border: selected ? '2px solid #7A0A0E' : '2px solid transparent',
+        border: selected ? '2px solid #FF6200' : '2px solid transparent',
         boxShadow: selected
           ? '0 0 0 3px rgba(122,10,14,0.15), 0 8px 32px rgba(0,0,0,0.12)'
           : '0 1px 4px rgba(0,0,0,0.04)',
@@ -280,7 +280,7 @@ function ServiceCard({
         <span
           className="absolute top-4 right-4 text-[10px] font-[700] tracking-[0.06em] uppercase px-2 py-0.5 rounded-full"
           style={{
-            background: selected ? '#7A0A0E' : service.textColor,
+            background: selected ? '#FF6200' : service.textColor,
             color: selected ? '#fff' : '#fff',
           }}
         >
@@ -292,7 +292,7 @@ function ServiceCard({
 
       <p
         className="text-[13px] font-[600] tracking-[0.04em] uppercase mb-0.5"
-        style={{ color: selected ? '#7A0A0E' : service.textColor, opacity: 0.7 }}
+        style={{ color: selected ? '#FF6200' : service.textColor, opacity: 0.7 }}
       >
         {service.subtitle}
       </p>
@@ -316,7 +316,7 @@ function ServiceCard({
         <div>
           <span
             className="text-[24px] font-[800] tracking-[-0.03em]"
-            style={{ color: selected ? '#7A0A0E' : '#0A0A0A' }}
+            style={{ color: selected ? '#FF6200' : '#0A0A0A' }}
           >
             ${service.price}
           </span>
@@ -331,7 +331,7 @@ function ServiceCard({
         <div
           className="w-7 h-7 rounded-full flex items-center justify-center transition-all duration-200"
           style={{
-            background: selected ? '#7A0A0E' : 'rgba(0,0,0,0.08)',
+            background: selected ? '#FF6200' : 'rgba(0,0,0,0.08)',
             boxShadow: selected ? '0 2px 8px rgba(122,10,14,0.4)' : 'none',
           }}
         >
@@ -351,7 +351,7 @@ function ServiceCard({
 }
 
 function DiscountHint({ count }: { count: number }) {
-  const RED = '#7A0A0E';
+  const RED = '#FF6200';
   const tiers = [
     { min: 3, pct: '10%' },
     { min: 5, pct: '20%' },
@@ -397,7 +397,7 @@ function DiscountHint({ count }: { count: number }) {
 }
 
 export default function PricingPage() {
-  const RED = '#7A0A0E';
+  const RED = '#FF6200';
   const [selected, setSelected] = useState<Set<string>>(new Set());
 
   const toggle = (id: string) => {
@@ -514,7 +514,7 @@ export default function PricingPage() {
                 target="_blank"
                 rel="noopener noreferrer"
                 className="font-[600] underline underline-offset-2 hover:text-[#0A0A0A] transition-colors"
-                style={{ color: '#7A0A0E' }}
+                style={{ color: '#FF6200' }}
               >
                 Book a call for a custom quote →
               </Link>

@@ -96,7 +96,7 @@ export default function WorkflowDetailModal({ open, onClose }: WorkflowDetailMod
                     exit={{ opacity: 0, y: -12 }}
                     transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
                   >
-                    <span className="text-[10px] font-semibold tracking-[0.12em] uppercase text-[#7A0A0E] mb-3 block">
+                    <span className="text-[10px] font-semibold tracking-[0.12em] uppercase text-[#FF6200] mb-3 block">
                       {slide.eyebrow}
                     </span>
                     <h3 className="text-[clamp(1.25rem,2vw,1.75rem)] font-semibold tracking-[-0.02em] text-[#0A0A0A] mb-3 leading-[1.2]">

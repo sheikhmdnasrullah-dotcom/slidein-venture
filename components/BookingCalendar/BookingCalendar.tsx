@@ -5,7 +5,7 @@ import { motion } from 'framer-motion';
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 const NOTION_CALENDAR_URL = 'https://calendar.notion.so/meet/nasrullah_tanim/schedule';
-const RED = '#7A0A0E';
+const RED = '#FF6200';
 const RED_LIGHT = '#FFF0F0';
 
 const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];

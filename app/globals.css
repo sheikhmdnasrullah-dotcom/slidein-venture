@@ -22,23 +22,23 @@
   --text-5xl: 3rem;       /* 48px — hero display */
   --text-6xl: 3.75rem;    /* 60px — max hero */
 
-  /* Brand Colors — black, white, dark red */
-  --color-background:   #FAFAF9;
+  /* Brand Colors — black, white, bright orange */
+  --color-background:   #FFFFFF;
   --color-foreground:   #0A0A0A;
   --color-card:         #FFFFFF;
   --color-card-foreground: #0A0A0A;
-  --color-primary:      #8B0000;
+  --color-primary:      #FF6200;
   --color-primary-foreground: #FFFFFF;
   --color-secondary:    #F5F5F5;
   --color-secondary-foreground: #0A0A0A;
   --color-muted:        #F5F5F5;
   --color-muted-foreground: #787774;
-  --color-accent:       #8B0000;
+  --color-accent:       #FF6200;
   --color-accent-foreground: #FFFFFF;
-  --color-destructive:  #8B0000;
+  --color-destructive:  #FF6200;
   --color-border:       #E5E5E5;
   --color-input:        #E5E5E5;
-  --color-ring:         #8B0000;
+  --color-ring:         #FF6200;
 
   /* Brand Palette — minimal, sophisticated */
   --color-ink:          #0A0A0A;
@@ -46,8 +46,8 @@
   --color-mist:         #787774;
   --color-fog:          #C4C4C4;
   --color-frost:        #E8E8E4;
-  --color-rose:         #8B0000;
-  --color-rose-soft:    #F8EBEB;
+  --color-rose:         #FF6200;
+  --color-rose-soft:    #FFF0E6;
 
   /* Radius */
   --radius-sm: 4px;
@@ -93,7 +93,7 @@
   --chart-3: oklch(0.439 0 0);
   --chart-4: oklch(0.371 0 0);
   --chart-5: oklch(0.269 0 0);
-  --background: #FDFCFB;
+  --background: #FFFFFF;
   --foreground: oklch(0.145 0 0);
   --sidebar: oklch(0.985 0 0);
   --sidebar-foreground: oklch(0.145 0 0);
@@ -154,11 +154,6 @@ html {
 body {
   font-family: var(--font-sans);
   background-color: var(--color-background);
-  background-image: url('/bg.jpg');
-  background-size: cover;
-  background-position: center;
-  background-attachment: fixed;
-  background-repeat: no-repeat;
   color: var(--color-foreground);
   line-height: 1.6;
   overflow-x: hidden;
@@ -166,17 +161,7 @@ body {
 }
 
 /* Subtle grain overlay for the whole site */
-body::after {
-  content: "";
-  position: fixed;
-  inset: 0;
-  width: 100vw;
-  height: 100vh;
-  pointer-events: none;
-  z-index: 9999;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
-  opacity: 0.025; /* Very subtle premium grain */
-}
+/* Removed for cleaner minimalist look */
 
 /* ─── Background Overlay ──────────────────────────────────────────────────── */
 /* (All decorative background overlays removed to eliminate visual artifacts) */
@@ -186,7 +171,7 @@ body::after {
   background: rgba(255, 255, 255, 0.7);
   backdrop-filter: blur(24px) saturate(1.4);
   -webkit-backdrop-filter: blur(24px) saturate(1.4);
-  border: 1px solid rgba(122, 10, 14, 0.04);
+  border: 1px solid rgba(255, 98, 0, 0.04);
   box-shadow: 0 4px 30px rgba(0, 0, 0, 0.02), inset 0 0 0 1px rgba(255, 255, 255, 0.5);
 }
 
@@ -212,10 +197,10 @@ body::after {
 }
 
 /* ─── Selection ──────────────────────────────────────────────────────────── */
-::selection { background: rgba(122, 10, 14, 0.12); }
+::selection { background: rgba(255, 98, 0, 0.12); }
 
 /* ─── Focus ──────────────────────────────────────────────────────────────── */
-:focus-visible { outline: 2px solid #7A0A0E; outline-offset: 2px; border-radius: 2px; }
+:focus-visible { outline: 2px solid #FF6200; outline-offset: 2px; border-radius: 2px; }
 
 /* ─── Logo scroll animation ──────────────────────────────────────────────── */
 @keyframes logoScroll {
@@ -236,14 +221,14 @@ body::after {
 
 /* ─── Gradient text utility ──────────────────────────────────────────────── */
 .gradient-text {
-  background: linear-gradient(135deg, #0A0A0A 0%, #7A0A0E 100%);
+  background: linear-gradient(135deg, #0A0A0A 0%, #FF6200 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 
 .gradient-text-warm {
-  background: linear-gradient(135deg, #7A0A0E 0%, #C24B4B 50%, #0A0A0A 100%);
+  background: linear-gradient(135deg, #FF6200 0%, #FFA770 50%, #0A0A0A 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;

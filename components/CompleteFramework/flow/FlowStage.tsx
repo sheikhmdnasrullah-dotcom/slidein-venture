@@ -120,7 +120,7 @@ export function FlowStage({
   className,
   style,
   children,
-  color = '#7A0A0E',
+  color = '#FF6200',
   trackColor = '#E1DFDA',
   pulseDuration = 3.2,
   drawDuration = 1.05,

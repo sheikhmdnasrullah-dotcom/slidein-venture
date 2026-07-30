@@ -57,7 +57,7 @@ function AnimatedWordSwap() {
   }, [index, words.length]);
 
   return (
-    <span className="inline-block text-[#7A0A0E]">
+    <span className="inline-block text-[#FF6200]">
       <AnimatePresence mode="popLayout">
         <motion.span
           key={words[index]}

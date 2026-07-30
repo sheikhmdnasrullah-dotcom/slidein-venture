@@ -140,7 +140,7 @@ export default function Navbar() {
             <span
               className="font-[500] text-[14px] leading-none select-none tracking-tight transition-colors duration-300"
               style={{
-                color: '#7A0A0E',
+                color: '#FF6200',
                 fontFamily: "'Geist', system-ui, sans-serif",
               }}
             >
