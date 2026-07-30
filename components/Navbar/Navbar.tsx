@@ -94,7 +94,7 @@ export default function Navbar() {
   return (
     <>
       {/* Spacer to push content below the floating navbar area */}
-      <div className="h-[80px]" />
+      <div className="h-[88px]" />
 
       {/* ── Floating Pill Navbar ─────────────────────────────────────────── */}
       <nav
@@ -102,7 +102,7 @@ export default function Navbar() {
         style={{ width: 'auto' }}
       >
         <motion.div
-          className="flex items-center gap-1 pl-2 pr-2 py-2"
+          className="flex items-center gap-1 pl-3 pr-3 py-2.5"
           style={{
             background: 'rgba(255, 255, 255, 0.72)',
             backdropFilter: 'blur(24px) saturate(1.4)',
@@ -120,7 +120,7 @@ export default function Navbar() {
           {/* ── Logo Pill ──────────────────────────────────────────────── */}
           <Link
             href="/"
-            className="flex items-center gap-1.5 h-[44px] px-5 rounded-full flex-shrink-0 transition-all duration-300 hover:scale-[1.02] hover:bg-white group"
+            className="flex items-center gap-1.5 h-[48px] px-5 rounded-full flex-shrink-0 transition-all duration-300 hover:scale-[1.02] hover:bg-white group"
             style={{
               background: 'rgba(255, 255, 255, 0.85)',
               border: '1px solid rgba(0, 0, 0, 0.06)',
@@ -129,7 +129,7 @@ export default function Navbar() {
             aria-label="SlideIn Venture"
           >
             <span
-              className="font-[800] text-[16px] leading-none select-none tracking-tight"
+              className="font-[800] text-[18px] leading-none select-none tracking-tight"
               style={{
                 color: '#0A0A0A',
                 fontFamily: 'var(--font-playfair), "Playfair Display", serif',
@@ -138,7 +138,7 @@ export default function Navbar() {
               SlideIn
             </span>
             <span
-              className="font-[500] text-[14px] leading-none select-none tracking-tight transition-colors duration-300"
+              className="font-[500] text-[16px] leading-none select-none tracking-tight transition-colors duration-300"
               style={{
                 color: '#FF6200',
                 fontFamily: "'Geist', system-ui, sans-serif",
@@ -154,7 +154,7 @@ export default function Navbar() {
               <Link
                 key={link.label}
                 href={link.href}
-                className="px-4 py-2 text-[15px] font-[500] text-[#0A0A0A]/80 rounded-full hover:text-black hover:bg-black/[0.04] transition-all duration-150 whitespace-nowrap inline-flex items-center"
+                className="px-5 py-2.5 text-[16px] font-[500] text-[#0A0A0A]/80 rounded-full hover:text-black hover:bg-black/[0.04] transition-all duration-150 whitespace-nowrap inline-flex items-center"
               >
                 {link.label}
               </Link>

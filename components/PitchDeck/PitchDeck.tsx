@@ -33,6 +33,8 @@ import {
   Message01Icon as ConvoIcon,
   Mic01Icon as PodcastIcon,
   YoutubeIcon,
+  Maximize01Icon as FullscreenIcon,
+  Minimize01Icon as MinimizeIcon,
 } from 'hugeicons-react';
 import { cn } from '@/lib/utils';
 import ServiceDetailModal from '@/components/ServiceDetailModal/ServiceDetailModal';
@@ -143,7 +145,7 @@ function CardShell({
     <div
       className={cn(
         'w-full border border-black/10 bg-white/70 backdrop-blur-md rounded-3xl shadow-lg p-5 md:p-8',
-        wide ? 'max-w-4xl' : 'max-w-3xl'
+        wide ? 'max-w-5xl' : 'max-w-4xl'
       )}
     >
       <div className="flex items-center gap-3 pb-4 mb-5 border-b border-black/10">
@@ -826,7 +828,9 @@ export default function PitchDeck() {
   const [manualPaused, setManualPaused] = useState(false);
   const [hoverPaused, setHoverPaused] = useState(false);
   const [inView, setInView] = useState(false);
+  const [isFullscreen, setIsFullscreen] = useState(false);
   const sectionRef = useRef<HTMLElement>(null);
+  const deckRef = useRef<HTMLDivElement>(null);
   const paused = manualPaused || hoverPaused;
 
   const nextSlide = useCallback(() => {
@@ -906,6 +910,30 @@ export default function PitchDeck() {
     document.getElementById('framework')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }, []);
 
+  const toggleFullscreen = useCallback(async () => {
+    if (!deckRef.current) return;
+    try {
+      if (!document.fullscreenElement) {
+        await deckRef.current.requestFullscreen();
+        setIsFullscreen(true);
+      } else {
+        await document.exitFullscreen();
+        setIsFullscreen(false);
+      }
+    } catch {
+      // Fullscreen API not supported or denied
+    }
+  }, []);
+
+  // Listen for fullscreen change events (e.g., pressing Escape)
+  useEffect(() => {
+    const handler = () => {
+      setIsFullscreen(!!document.fullscreenElement);
+    };
+    document.addEventListener('fullscreenchange', handler);
+    return () => document.removeEventListener('fullscreenchange', handler);
+  }, []);
+
   const slides = useMemo(
     () => [
       <Slide1 key="s1" />,
@@ -922,15 +950,19 @@ export default function PitchDeck() {
   );
 
   return (
-    <section ref={sectionRef} className="relative py-8 md:py-14">
-      <div className="max-w-[1200px] mx-auto px-6 md:px-10">
+    <section ref={sectionRef} className={cn('relative py-8 md:py-14', isFullscreen && '!py-0')}>
+      <div className={cn('mx-auto px-6 md:px-10', isFullscreen ? 'max-w-full px-4' : 'max-w-[1400px]')}>
         <div
-          className="relative rounded-[28px] md:rounded-[32px] border border-black/[0.06] bg-white/80 backdrop-blur-xl shadow-[0_24px_70px_rgba(0,0,0,0.08)] overflow-hidden"
+          ref={deckRef}
+          className={cn(
+            'relative rounded-[28px] md:rounded-[32px] border border-black/[0.06] bg-white/80 backdrop-blur-xl shadow-[0_24px_70px_rgba(0,0,0,0.08)] overflow-hidden',
+            isFullscreen && '!rounded-none !border-0 !shadow-none min-h-screen flex flex-col'
+          )}
           onMouseEnter={() => setHoverPaused(true)}
           onMouseLeave={() => setHoverPaused(false)}
         >
           {/* Top bar */}
-          <div className="flex items-center justify-between gap-4 px-5 md:px-8 pt-5 pb-3">
+          <div className={cn('flex items-center justify-between gap-4 px-5 md:px-8 pt-5 pb-3', isFullscreen && 'px-6 pt-6 pb-4')}>
             <AnimatePresence mode="wait">
               <motion.span
                 key={SLIDE_META[index].kicker}
@@ -955,6 +987,15 @@ export default function PitchDeck() {
               <span className="text-[11px] md:text-xs font-bold text-black/40 tabular-nums">
                 0{index + 1} / 0{total}
               </span>
+              {/* Fullscreen toggle */}
+              <button
+                type="button"
+                onClick={toggleFullscreen}
+                aria-label={isFullscreen ? 'Exit fullscreen' : 'Enter fullscreen'}
+                className="w-7 h-7 rounded-full flex items-center justify-center text-black/40 hover:text-[#FF6200] hover:bg-[#FF6200]/10 transition-colors duration-200 cursor-pointer"
+              >
+                {isFullscreen ? <MinimizeIcon size={14} /> : <FullscreenIcon size={14} />}
+              </button>
             </div>
           </div>
 
@@ -989,7 +1030,10 @@ export default function PitchDeck() {
           {/* Stage */}
           <div
             data-deck-stage
-            className="relative w-full min-h-[600px] sm:min-h-[560px] md:min-h-[560px] lg:min-h-[580px] px-1"
+            className={cn(
+              'relative w-full px-1',
+              isFullscreen ? 'flex-1 flex items-center justify-center' : 'min-h-[680px] sm:min-h-[640px] md:min-h-[640px] lg:min-h-[660px]'
+            )}
             onPointerDown={onPointerDown}
             onPointerUp={onPointerUp}
           >
@@ -1002,7 +1046,10 @@ export default function PitchDeck() {
                 initial="enter"
                 animate="center"
                 exit="exit"
-                className="absolute inset-0 flex items-center justify-center p-5 sm:p-8 md:p-10 lg:p-12"
+                className={cn(
+                  'absolute inset-0 flex items-center justify-center',
+                  isFullscreen ? 'p-6 sm:p-10 md:p-14 lg:p-20' : 'p-4 sm:p-6 md:p-8 lg:p-10'
+                )}
               >
                 {slides[index]}
               </motion.div>
@@ -1013,17 +1060,23 @@ export default function PitchDeck() {
               type="button"
               onClick={prevSlide}
               aria-label="Previous slide"
-              className="absolute left-2 md:left-4 top-1/2 -translate-y-1/2 z-20 w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center bg-white/80 backdrop-blur-md border border-black/10 shadow-md hover:bg-white hover:scale-105 hover:shadow-lg active:scale-95 transition-all duration-200 cursor-pointer"
+              className={cn(
+                'absolute left-2 md:left-4 top-1/2 -translate-y-1/2 z-20 w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center bg-white/80 backdrop-blur-md border border-black/10 shadow-md hover:bg-white hover:scale-105 hover:shadow-lg active:scale-95 transition-all duration-200 cursor-pointer',
+                isFullscreen && 'md:w-14 md:h-14'
+              )}
             >
-              <ChevronLeft size={20} className="text-[#0A0A0A]" />
+              <ChevronLeft size={isFullscreen ? 24 : 20} className="text-[#0A0A0A]" />
             </button>
             <button
               type="button"
               onClick={nextSlide}
               aria-label="Next slide"
-              className="absolute right-2 md:right-4 top-1/2 -translate-y-1/2 z-20 w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center bg-white/80 backdrop-blur-md border border-black/10 shadow-md hover:bg-white hover:scale-105 hover:shadow-lg active:scale-95 transition-all duration-200 cursor-pointer"
+              className={cn(
+                'absolute right-2 md:right-4 top-1/2 -translate-y-1/2 z-20 w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center bg-white/80 backdrop-blur-md border border-black/10 shadow-md hover:bg-white hover:scale-105 hover:shadow-lg active:scale-95 transition-all duration-200 cursor-pointer',
+                isFullscreen && 'md:w-14 md:h-14'
+              )}
             >
-              <ChevronRight size={20} className="text-[#0A0A0A]" />
+              <ChevronRight size={isFullscreen ? 24 : 20} className="text-[#0A0A0A]" />
             </button>
           </div>
         </div>
