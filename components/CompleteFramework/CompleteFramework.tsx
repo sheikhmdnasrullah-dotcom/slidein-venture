@@ -302,7 +302,7 @@ export default function CompleteFramework() {
   }, []);
 
   return (
-    <section ref={sectionRef} className="relative overflow-hidden pt-8 pb-24">
+    <section id="framework" ref={sectionRef} className="relative overflow-hidden pt-8 pb-24">
       <ScrollCtx.Provider value={scrollVisible}>
       <div className="relative w-full max-w-[1200px] mx-auto px-6">
         

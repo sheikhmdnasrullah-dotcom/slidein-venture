@@ -280,6 +280,12 @@ body {
   transform-origin: left;
 }
 
+/* ─── Pitch deck autoplay progress segment ──────────────────────────────── */
+@keyframes deck-progress {
+  from { width: 0%; }
+  to { width: 100%; }
+}
+
 @theme inline {
   --font-heading: var(--font-sans);
   --font-sans: var(--font-sans);
