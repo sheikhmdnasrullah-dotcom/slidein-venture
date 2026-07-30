@@ -8,14 +8,14 @@ export default function Hero() {
   const [videoOpen, setVideoOpen] = useState(false);
 
   return (
-    <section className="pt-16 pb-8 overflow-hidden relative">
+    <section className="pt-16 pb-0 overflow-hidden relative">
       <div className="max-w-[1200px] mx-auto px-6 md:px-10 flex flex-col items-center text-center relative z-10">
 
         <VideoModal open={videoOpen} onClose={() => setVideoOpen(false)} />
 
         {/* Headline */}
         <motion.h1
-          className="text-[clamp(2rem,5.5vw,4rem)] font-[700] leading-[1.04] tracking-[-0.03em] text-[#1A1A1A] max-w-[820px] mb-12 drop-shadow-md"
+          className="text-[clamp(2rem,5.5vw,4rem)] font-[700] leading-[1.04] tracking-[-0.03em] text-[#1A1A1A] max-w-[820px] drop-shadow-md"
           initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.55, delay: 0.08, ease: [0.16, 1, 0.3, 1] }}
@@ -23,20 +23,6 @@ export default function Hero() {
           Helping Founders with{' '}
           <AnimatedWordSwap />
         </motion.h1>
-
-        {/* Watch This Button */}
-        <motion.button
-          onClick={() => setVideoOpen(true)}
-          className="relative inline-flex items-center justify-center gap-3 px-8 py-4 text-lg font-bold text-black rounded-full shadow-lg transition-all duration-300 hover:scale-105 bg-white/60 backdrop-blur-md border border-white/40 hover:bg-white/80 cursor-pointer"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.2 }}
-        >
-          <div className="w-6 h-6 flex items-center justify-center shrink-0">
-            <img src="/logos/play.png" alt="Play" className="w-full h-full object-contain" />
-          </div>
-          Watch This
-        </motion.button>
 
       </div>
     </section>

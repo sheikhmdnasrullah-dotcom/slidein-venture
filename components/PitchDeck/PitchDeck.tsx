@@ -38,6 +38,7 @@ import {
 } from 'hugeicons-react';
 import { cn } from '@/lib/utils';
 import ServiceDetailModal from '@/components/ServiceDetailModal/ServiceDetailModal';
+import VideoModal from '@/components/VideoModal/VideoModal';
 
 const ORANGE = '#FF6200';
 const EASE = [0.16, 1, 0.3, 1] as const;
@@ -825,6 +826,7 @@ export default function PitchDeck() {
   const [direction, setDirection] = useState(1);
   const [modalOpen, setModalOpen] = useState(false);
   const [modalServiceId, setModalServiceId] = useState<string | undefined>(undefined);
+  const [videoOpen, setVideoOpen] = useState(false);
   const [manualPaused, setManualPaused] = useState(false);
   const [hoverPaused, setHoverPaused] = useState(false);
   const [inView, setInView] = useState(false);
@@ -1084,9 +1086,26 @@ export default function PitchDeck() {
         <p className="text-center text-[11px] md:text-xs text-black/30 font-medium mt-4">
           Use the arrows, swipe, or the ← → keys to move through the story
         </p>
+
+        {/* Watch This Video Button — below slides */}
+        <div className="flex justify-center mt-8">
+          <motion.button
+            onClick={() => setVideoOpen(true)}
+            className="relative inline-flex items-center justify-center gap-3 px-8 py-4 text-lg font-bold text-black rounded-full shadow-lg transition-all duration-300 hover:scale-105 bg-white/60 backdrop-blur-md border border-white/40 hover:bg-white/80 cursor-pointer"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+          >
+            <div className="w-6 h-6 flex items-center justify-center shrink-0">
+              <img src="/logos/play.png" alt="Play" className="w-full h-full object-contain" />
+            </div>
+            Watch This
+          </motion.button>
+        </div>
       </div>
 
       <ServiceDetailModal open={modalOpen} onClose={closeModal} serviceId={modalServiceId} onChange={setModalServiceId} />
+      <VideoModal open={videoOpen} onClose={() => setVideoOpen(false)} />
     </section>
   );
 }
