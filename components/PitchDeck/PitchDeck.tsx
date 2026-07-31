@@ -12,13 +12,9 @@ import {
   ArrowUpRight01Icon as GrowthIcon,
   UserGroupIcon as AgencyIcon,
   Film01Icon as EpisodeIcon,
-  TextAlignLeftIcon as TranscriptIcon,
-  Note01Icon as ShowNotesIcon,
   PlaySquareIcon as ClipIcon,
-  Image02Icon as ThumbnailIcon,
   Doc02Icon as ArticleIcon,
   Linkedin01Icon as LinkedInIcon,
-  SparklesIcon as PublishIcon,
   Target01Icon as TargetIcon,
   SentIcon as SendIcon,
   SecurityCheckIcon as TrustIcon,
@@ -32,9 +28,13 @@ import {
   Minimize01Icon as MinimizeIcon,
 } from 'hugeicons-react';
 import { cn } from '@/lib/utils';
-import ServiceDetailModal from '@/components/ServiceDetailModal/ServiceDetailModal';
 import VideoModal from '@/components/VideoModal/VideoModal';
+import ServiceDetailModal from '@/components/ServiceDetailModal/ServiceDetailModal';
 import FrameworkFlowSlide from '@/components/PitchDeck/FrameworkFlowSlide';
+import OrbitSlide from '@/components/PitchDeck/OrbitSlide';
+import OutreachOSSlide from '@/components/PitchDeck/OutreachOSSlide';
+import GrowthLoopSlide from '@/components/PitchDeck/GrowthLoopSlide';
+import DistributionSlide from '@/components/PitchDeck/DistributionSlide';
 
 const ORANGE = '#FF6200';
 const EASE = [0.16, 1, 0.3, 1] as const;
@@ -159,24 +159,6 @@ function CardShell({
       </div>
       {children}
     </div>
-  );
-}
-
-function GridTile({ icon: Icon, label, onClick }: { icon: IconType; label: string; onClick?: () => void }) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className="group relative flex flex-col items-center gap-2 md:gap-2.5 p-2.5 md:p-4 rounded-2xl border border-black/8 bg-white/50 hover:bg-white hover:border-[#FF6200]/40 hover:shadow-md hover:-translate-y-1 transition-all duration-300 text-center cursor-pointer"
-    >
-      <span className="w-10 h-10 md:w-12 md:h-12 rounded-full border-2 border-[#FF6200] flex items-center justify-center bg-white group-hover:bg-[#FF6200] transition-colors duration-300">
-        <Icon size={17} strokeWidth={2} className="text-[#0A0A0A] group-hover:text-white transition-colors duration-300" />
-      </span>
-      <span className="text-[10.5px] md:text-xs font-bold text-[#0A0A0A] leading-tight">{label}</span>
-      <span className="absolute top-1 right-1 w-4 h-4 rounded-full bg-[#FF6200] text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200 text-[10px] font-black leading-none">
-        +
-      </span>
-    </button>
   );
 }
 
@@ -442,111 +424,49 @@ function Slide2() {
   );
 }
 
-/* ── Slide 4 — The Content System ─────────────────────────────────────── */
-const CONTENT_OUTPUTS: { id: string; label: string; icon: IconType }[] = [
-  { id: 'c-audio', label: 'Edited Episode', icon: EpisodeIcon },
-  { id: 'c-transcripts', label: 'Transcript', icon: TranscriptIcon },
-  { id: 'c-notes', label: 'Show Notes', icon: ShowNotesIcon },
-  { id: 'c-clips', label: 'Short Clips', icon: ClipIcon },
-  { id: 'c-thumbnails', label: 'Thumbnails', icon: ThumbnailIcon },
-  { id: 'c-blog', label: 'Full Articles', icon: ArticleIcon },
-  { id: 'c-social', label: 'LinkedIn Posts', icon: LinkedInIcon },
-];
-
+/* ── Slide 4 — The Content System (orbit diagram) ─────────────────────── */
 function Slide4({ onOpenService }: { onOpenService: (id: string) => void }) {
   return (
     <motion.div
       variants={containerVariants}
       initial="hidden"
       animate="visible"
-      className="w-full h-full flex flex-col items-center justify-center gap-0.5"
+      className="w-full h-full flex flex-col items-center justify-center gap-2"
     >
-      <motion.div variants={itemVariants}>
-        <Eyebrow>The Content System</Eyebrow>
-      </motion.div>
-      <motion.div variants={itemVariants} className="w-full flex justify-center">
-        <Pill icon={RecordIcon}>You Record, Once a Week</Pill>
-      </motion.div>
-      <Connector />
-      <motion.div variants={itemVariants} className="w-full flex justify-center">
-        <CardShell icon={EpisodeIcon} title="Content System" wide>
-          <div className="grid grid-cols-3 sm:grid-cols-4 gap-2.5 md:gap-5">
-            {CONTENT_OUTPUTS.map((o) => (
-              <GridTile key={o.id} icon={o.icon} label={o.label} onClick={() => onOpenService(o.id)} />
-            ))}
-          </div>
-          <p className="text-center text-[10.5px] md:text-[11px] text-black/40 font-semibold mt-4">Tap any output for the full breakdown</p>
-        </CardShell>
-      </motion.div>
-      <Connector />
-      <motion.div variants={itemVariants} className="w-full flex justify-center">
-        <Pill icon={PublishIcon} tone="accent">
-          Published Everywhere, Every Week
-        </Pill>
+      <motion.div variants={itemVariants} className="w-full">
+        <OrbitSlide onOpenService={onOpenService} />
       </motion.div>
     </motion.div>
   );
 }
 
-/* ── Slide 5 — The Outreach System ────────────────────────────────────── */
-const OUTREACH_STEPS: { num: string; icon: IconType; title: string; sub: string }[] = [
-  { num: '01', icon: TrustIcon, title: 'Trusted Setup', sub: 'Every message sent from a setup that lands in the inbox, not the spam folder' },
-  { num: '02', icon: ResearchIcon, title: 'Real Research', sub: 'The right people found and verified by hand, never a purchased list' },
-  { num: '03', icon: WriteIcon, title: 'Written Like a Person', sub: 'Messages built from something real about them, never a mail merge' },
-  { num: '04', icon: SortIcon, title: 'Sorted for You', sub: 'Sent carefully, watched closely, only real conversations reach you' },
-];
-
-function Slide5() {
-  const [active, setActive] = useState<number | null>(null);
-  const [autoActive, setAutoActive] = useState(0);
-  const interacted = useRef(false);
-
-  useEffect(() => {
-    const id = setInterval(() => {
-      if (!interacted.current) setAutoActive((i) => (i + 1) % OUTREACH_STEPS.length);
-    }, 2200);
-    return () => clearInterval(id);
-  }, []);
-
-  const activeIndex = active ?? autoActive;
-
+/* ── Slide 4 — Content Distribution ──────────────────────────────────── */
+function Slide4b() {
   return (
     <motion.div
       variants={containerVariants}
       initial="hidden"
       animate="visible"
-      className="w-full h-full flex flex-col items-center justify-center gap-0.5"
+      className="w-full h-full flex flex-col items-center justify-center"
     >
-      <motion.div variants={itemVariants}>
-        <Eyebrow>The Outreach System</Eyebrow>
+      <motion.div variants={itemVariants} className="w-full">
+        <DistributionSlide />
       </motion.div>
-      <motion.div variants={itemVariants} className="w-full flex justify-center">
-        <Pill icon={TargetIcon}>We Learn Your Ideal Client, Once</Pill>
-      </motion.div>
-      <Connector />
-      <motion.div variants={itemVariants} className="w-full flex justify-center">
-        <CardShell icon={SendIcon} title="Outreach System" wide>
-          <div className="flex flex-col md:flex-row items-stretch gap-2 md:gap-1">
-            {OUTREACH_STEPS.flatMap((s, i) => [
-              <StepItem
-                key={`step-${s.num}`}
-                {...s}
-                active={activeIndex === i}
-                onClick={() => {
-                  interacted.current = true;
-                  setActive(i);
-                }}
-              />,
-              i < OUTREACH_STEPS.length - 1 ? <StepArrow key={`arrow-${i}`} /> : null,
-            ])}
-          </div>
-        </CardShell>
-      </motion.div>
-      <Connector />
-      <motion.div variants={itemVariants} className="w-full flex justify-center">
-        <Pill icon={ConvoIcon} tone="accent">
-          Qualified Conversations with the Right People
-        </Pill>
+    </motion.div>
+  );
+}
+
+/* ── Slide 5 — The Outreach System (interactive OS) ───────────────────── */
+function Slide5() {
+  return (
+    <motion.div
+      variants={containerVariants}
+      initial="hidden"
+      animate="visible"
+      className="w-full h-full flex flex-col items-center justify-center"
+    >
+      <motion.div variants={itemVariants} className="w-full">
+        <OutreachOSSlide />
       </motion.div>
     </motion.div>
   );
@@ -554,40 +474,15 @@ function Slide5() {
 
 /* ── Slide 6 — Why It's One System ────────────────────────────────────── */
 function Slide6() {
-  const [hoverSide, setHoverSide] = useState<'content' | 'outreach' | null>(null);
   return (
     <motion.div
       variants={containerVariants}
       initial="hidden"
       animate="visible"
-      className="w-full h-full flex flex-col items-center justify-center gap-8 md:gap-10 text-center"
+      className="w-full h-full flex flex-col items-center justify-center"
     >
-      <motion.div variants={itemVariants}>
-        <Eyebrow>Why It&apos;s One System</Eyebrow>
-        <h2 className="display-headline text-[clamp(1.4rem,2.8vw,2.1rem)] text-[#0A0A0A]">Neither half works as well alone.</h2>
-      </motion.div>
-      <motion.div variants={itemVariants} className="flex items-center justify-center gap-1 md:gap-4">
-        <LoopCircle label="Content" tone="ink" active={hoverSide === 'content'} onMouseEnter={() => setHoverSide('content')} onMouseLeave={() => setHoverSide(null)} />
-        <LoopArt />
-        <LoopCircle label="Outreach" tone="accent" active={hoverSide === 'outreach'} onMouseEnter={() => setHoverSide('outreach')} onMouseLeave={() => setHoverSide(null)} />
-      </motion.div>
-      <motion.div variants={itemVariants} className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-6 max-w-2xl">
-        <p
-          className={cn(
-            'text-sm md:text-base leading-relaxed transition-all duration-300 rounded-2xl p-3',
-            hoverSide === 'content' ? 'text-[#0A0A0A] font-bold bg-black/5' : 'text-black/50'
-          )}
-        >
-          Makes outreach credible the moment they check your profile
-        </p>
-        <p
-          className={cn(
-            'text-sm md:text-base leading-relaxed transition-all duration-300 rounded-2xl p-3',
-            hoverSide === 'outreach' ? 'text-[#0A0A0A] font-bold bg-[#FF6200]/10' : 'text-black/50'
-          )}
-        >
-          Puts your content in front of exactly the right person, faster
-        </p>
+      <motion.div variants={itemVariants} className="w-full">
+        <GrowthLoopSlide />
       </motion.div>
     </motion.div>
   );
@@ -722,6 +617,7 @@ const SLIDE_META = [
   { kicker: 'The Promise' },
   { kicker: 'The Complete Framework' },
   { kicker: 'The Content System' },
+  { kicker: 'Content Distribution' },
   { kicker: 'The Outreach System' },
   { kicker: "Why It's One System" },
   { kicker: 'What This Replaces' },
@@ -846,6 +742,7 @@ export default function PitchDeck() {
       <Slide1 key="s1" />,
       <Slide2 key="s2" />,
       <Slide4 key="s4" onOpenService={openService} />,
+      <Slide4b key="s4b" />,
       <Slide5 key="s5" />,
       <Slide6 key="s6" />,
       <Slide7 key="s7" />,
@@ -972,7 +869,7 @@ export default function PitchDeck() {
               onClick={prevSlide}
               aria-label="Previous slide"
               className={cn(
-                'absolute left-2 md:left-4 top-1/2 -translate-y-1/2 z-20 w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center bg-white/60 backdrop-blur-md border border-black/[0.04] shadow-sm hover:bg-white hover:border-black/10 hover:scale-105 hover:shadow-lg active:scale-95 transition-all duration-200 cursor-pointer',
+                'absolute left-3 md:left-6 top-1/2 -translate-y-1/2 z-20 w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center bg-white/60 backdrop-blur-md border border-black/[0.04] shadow-sm hover:bg-white hover:border-black/10 hover:scale-105 hover:shadow-lg active:scale-95 transition-all duration-200 cursor-pointer',
                 isFullscreen && 'md:w-14 md:h-14'
               )}
             >
@@ -983,7 +880,7 @@ export default function PitchDeck() {
               onClick={nextSlide}
               aria-label="Next slide"
               className={cn(
-                'absolute right-2 md:right-4 top-1/2 -translate-y-1/2 z-20 w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center bg-white/60 backdrop-blur-md border border-black/[0.04] shadow-sm hover:bg-white hover:border-black/10 hover:scale-105 hover:shadow-lg active:scale-95 transition-all duration-200 cursor-pointer',
+                'absolute right-3 md:right-6 top-1/2 -translate-y-1/2 z-20 w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center bg-white/60 backdrop-blur-md border border-black/[0.04] shadow-sm hover:bg-white hover:border-black/10 hover:scale-105 hover:shadow-lg active:scale-95 transition-all duration-200 cursor-pointer',
                 isFullscreen && 'md:w-14 md:h-14'
               )}
             >
@@ -993,9 +890,6 @@ export default function PitchDeck() {
         </div>
         </div>
 
-        <p className="text-center text-[11px] md:text-xs text-black/30 font-medium mt-4">
-          Use the arrows, swipe, or the ← → keys to move through the story
-        </p>
 
         {/* Watch This Video Button — below slides */}
         <div className="flex justify-center mt-8">

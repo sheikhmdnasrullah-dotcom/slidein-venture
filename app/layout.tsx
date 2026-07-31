@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter, Geist } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/Navbar/Navbar";
+import AmbientEnvironment from "@/components/AmbientEnvironment/AmbientEnvironment";
 
 import { cn } from "@/lib/utils";
 
@@ -27,6 +28,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={cn("font-sans", geist.variable)}>
       <body className={`${inter.className} antialiased`}>
+        <AmbientEnvironment />
         <Navbar />
         <main>{children}</main>
 

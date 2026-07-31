@@ -1,366 +1,379 @@
 'use client';
 
-import { useEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
-import {
-  ReactFlow,
-  ReactFlowProvider,
-  Background,
-  BackgroundVariant,
-  Handle,
-  Position,
-  getSmoothStepPath,
-  type Node,
-  type Edge,
-  type NodeProps,
-  type EdgeProps,
-} from '@xyflow/react';
-import { CheckmarkCircle01Icon as CheckIcon } from 'hugeicons-react';
-import { cn } from '@/lib/utils';
-import { Artwork } from '@/components/CompleteFramework/FlowIcon';
-import { ENGINES, type Engine, type IconKey } from '@/components/CompleteFramework/framework.data';
+/**
+ * THE COMPLETE FRAMEWORK — SlideIn Venture
+ * -----------------------------------------
+ * A premium system map, read left to right:
+ *
+ *   SYS-01 CONTENT    You Record Once → Content Production → Multi-Platform Presence
+ *   SYS-02 OUTREACH   Learn Your Client Once → Manual Outreach → Qualified Conversations
+ *
+ * Both pipelines converge through a glowing junction into one elevated
+ * outcome module. White canvas, blueprint geometry, Bézier routing,
+ * flowing particles. Orange only guides attention.
+ */
+
+import { motion } from 'framer-motion';
 
 const ORANGE = '#FF6200';
+const INK = '#0A0A0A';
+const EASE = [0.22, 1, 0.36, 1] as const;
 
-// Explicit, pixel-anchored handle styles — position/top/left/right/transform are set
-// directly rather than left to the stylesheet, so anchoring can't drift regardless of
-// cascade order. Visually hidden (opacity 0) but functionally exact.
-const HANDLE_BASE: CSSProperties = {
-  position: 'absolute',
-  top: '50%',
-  width: 1,
-  height: 1,
-  minWidth: 1,
-  minHeight: 1,
-  border: 'none',
-  background: 'transparent',
-  opacity: 0,
-  pointerEvents: 'none',
+/* ------------------------------- geometry -------------------------------- */
+
+const VB = { w: 1240, h: 620 };
+
+const NODE_W = 236;
+const NODE_H = 78;
+const COLS = [60, 372, 684]; // x of each pipeline column
+const ROW_TOP = 112; // card top, content system
+const ROW_BOT = 430; // card top, outreach system
+const TOP_CY = ROW_TOP + NODE_H / 2; // 151
+const BOT_CY = ROW_BOT + NODE_H / 2; // 469
+
+const HERO = { x: 992, y: 244, w: 212, h: 132 };
+const HERO_CY = HERO.y + HERO.h / 2; // 310
+const JUNCTION = { x: 962, y: HERO_CY };
+
+type NodeDef = {
+  id: string;
+  title: string;
+  desc: string;
+  icon: 'video' | 'layers' | 'broadcast' | 'target' | 'send' | 'inbox';
 };
-const HANDLE_LEFT: CSSProperties = { ...HANDLE_BASE, left: 0, transform: 'translate(-50%, -50%)' };
-const HANDLE_RIGHT: CSSProperties = { ...HANDLE_BASE, right: 0, transform: 'translate(50%, -50%)' };
 
-// Handle ids — every edge references these explicitly via sourceHandle/targetHandle so
-// React Flow never falls back to nearest-point auto-connection.
-const LEFT_TARGET = 'left-target';
-const RIGHT_SOURCE = 'right-source';
-
-// One card language for every node type — same radius, same border, same shadow scale,
-// same hover response. Nothing in this diagram is shaped differently from anything else.
-const CARD_SHELL =
-  'rounded-2xl border border-black/[0.08] bg-white shadow-[0_1px_2px_rgba(0,0,0,0.04),0_10px_28px_rgba(0,0,0,0.05)] transition-all duration-300 group-hover:border-[#FF6200]/35 group-hover:shadow-[0_1px_2px_rgba(0,0,0,0.04),0_14px_34px_rgba(255,98,0,0.14)] group-hover:-translate-y-0.5';
-
-const ICON_SHELL =
-  'rounded-xl bg-gradient-to-br from-[#FF6200]/12 to-[#FF6200]/5 flex items-center justify-center text-[#FF6200] flex-shrink-0 ring-1 ring-[#FF6200]/10';
-
-/* ── Fixed 8px grid — every constant below is a multiple of GRID, and every node
-   position is derived from these, never eyeballed. Same column → identical x.
-   Same row → identical y. ─────────────────────────────────────────────────── */
-const GRID = 8;
-const GAP = GRID * 7; // 56
-// One size, every node. Pill, engine, final — all identical.
-const NODE_W = GRID * 34; // 272
-const NODE_H = GRID * 11; // 88
-
-const COL_1 = 0;
-const COL_2 = COL_1 + NODE_W + GAP;
-const COL_3 = COL_2 + NODE_W + GAP;
-const COL_4 = COL_3 + NODE_W + GAP;
-
-const ROW_TOP = GRID * 10; // 80
-const ROW_BOTTOM = GRID * 55; // 440
-const ROW_CENTER = (ROW_TOP + ROW_BOTTOM) / 2;
-
-// Single shared corner radius for every connector — never set per-edge.
-const EDGE_CORNER_RADIUS = 20;
-
-/* ── Nodes — static and clean; hover only gives a subtle lift, no popovers ─ */
-
-function TreePill({ data }: NodeProps) {
-  const { icon, label, hasTarget = true } = data as unknown as { icon: IconKey; label: string; hasTarget?: boolean };
-  return (
-    <div className="group relative" style={{ width: NODE_W, height: NODE_H }}>
-      {hasTarget && <Handle type="target" position={Position.Left} id={LEFT_TARGET} isConnectable={false} style={HANDLE_LEFT} />}
-      <div className={cn('flex items-center gap-3.5 px-5 h-full', CARD_SHELL)}>
-        <span className={cn('w-11 h-11', ICON_SHELL)}>
-          <Artwork icon={icon} label={label} size={19} />
-        </span>
-        <span className="text-[14px] font-semibold text-[#0A0A0A] tracking-tight leading-snug">{label}</span>
-      </div>
-      <Handle type="source" position={Position.Right} id={RIGHT_SOURCE} isConnectable={false} style={HANDLE_RIGHT} />
-    </div>
-  );
-}
-
-function EngineCard({ data }: NodeProps) {
-  const { engine } = data as unknown as { engine: Engine };
-  return (
-    <div className="group relative" style={{ width: NODE_W, height: NODE_H }}>
-      <Handle type="target" position={Position.Left} id={LEFT_TARGET} isConnectable={false} style={HANDLE_LEFT} />
-      <div className={cn('flex items-center gap-3.5 px-5 h-full', CARD_SHELL)}>
-        <span className={cn('w-11 h-11', ICON_SHELL)}>
-          <Artwork icon={engine.icon} label={engine.label} size={19} />
-        </span>
-        <p className="text-[15px] font-bold text-[#0A0A0A] tracking-tight leading-snug">{engine.label}</p>
-      </div>
-      <Handle type="source" position={Position.Right} id={RIGHT_SOURCE} isConnectable={false} style={HANDLE_RIGHT} />
-    </div>
-  );
-}
-
-function FinalFlowNode({ data }: NodeProps) {
-  const { label } = data as unknown as { label: string };
-  return (
-    <div className="group relative" style={{ width: NODE_W, height: NODE_H }}>
-      <Handle type="target" position={Position.Left} id={LEFT_TARGET} isConnectable={false} style={HANDLE_LEFT} />
-      <div
-        className="absolute inset-0 rounded-2xl blur-xl opacity-25 scale-105 transition-opacity duration-300 group-hover:opacity-45"
-        style={{ backgroundColor: ORANGE }}
-      />
-      <div
-        className={cn('relative flex items-center gap-3.5 px-5 h-full border bg-white shadow-lg transition-transform duration-300 group-hover:scale-[1.02]', CARD_SHELL)}
-        style={{ borderColor: `${ORANGE}45` }}
-      >
-        <span
-          className="relative w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0 border"
-          style={{ backgroundColor: `${ORANGE}10`, borderColor: `${ORANGE}30`, color: ORANGE }}
-        >
-          <span className="absolute inset-0 rounded-xl animate-ping opacity-20" style={{ backgroundColor: ORANGE }} />
-          <CheckIcon size={18} strokeWidth={2.5} className="relative" />
-        </span>
-        <span className="text-[16px] font-bold text-[#0A0A0A] tracking-tight">{label}</span>
-      </div>
-    </div>
-  );
-}
-
-// One shared timeline for every edge — a single journey, not independent per-edge loops.
-// 3 sequential stages (hop 1, hop 2, hop 3), each stage's pair of parallel edges draws in
-// together, holds lit, then the whole diagram resets. Nothing fires out of order.
-const TOTAL_CYCLE = 6;
-const STAGE_WINDOWS = [
-  { start: 0, end: 0.17 },
-  { start: 0.21, end: 0.38 },
-  { start: 0.42, end: 0.59 },
+const TOP_NODES: NodeDef[] = [
+  { id: 'record', title: 'You Record, Once', desc: '45 minutes, once a week', icon: 'video' },
+  { id: 'production', title: 'Content Production', desc: 'Edited, clipped, written for you', icon: 'layers' },
+  { id: 'presence', title: 'Multi-Platform Presence', desc: 'Published everywhere, weekly', icon: 'broadcast' },
 ];
 
-/* ── Edge: clean orthogonal routing + a sequential "draw-in" progress line ─
-   Base line is a static, faint connector, always visible end to end. The lit
-   orange line only ever advances — it draws in from source to target during
-   its assigned stage window, then stays lit (already-completed leg of the
-   journey) until the whole diagram resets. Every edge in a stage shares the
-   exact same window, so the highlight always moves start → finish in order,
-   never skipping a step or lighting two unrelated stages at once. */
-function LightFlowEdge({ id, sourceX, sourceY, targetX, targetY, sourcePosition, targetPosition, style, data }: EdgeProps) {
-  const [path] = getSmoothStepPath({
-    sourceX,
-    sourceY,
-    sourcePosition,
-    targetX,
-    targetY,
-    targetPosition,
-    borderRadius: EDGE_CORNER_RADIUS,
-  });
-  const pathRef = useRef<SVGPathElement>(null);
-  const [length, setLength] = useState(0);
+const BOT_NODES: NodeDef[] = [
+  { id: 'client', title: 'We Learn Your Client, Once', desc: 'Your ideal buyer, mapped', icon: 'target' },
+  { id: 'outreach', title: 'Manual Outreach', desc: 'Researched and written by hand', icon: 'send' },
+  { id: 'convos', title: 'Qualified Conversations', desc: 'Real replies, sorted for you', icon: 'inbox' },
+];
 
-  useEffect(() => {
-    if (pathRef.current) setLength(pathRef.current.getTotalLength());
-  }, [path]);
+const SECTIONS = [
+  { label: '01 — Input', x: COLS[0] },
+  { label: '02 — System', x: COLS[1] },
+  { label: '03 — Output', x: COLS[2] },
+  { label: '04 — Outcome', x: HERO.x },
+];
 
-  const stage = (data as { stage?: number } | undefined)?.stage ?? 0;
-  const { start, end } = STAGE_WINDOWS[stage];
-  const stroke = (style?.stroke as string | undefined) ?? ORANGE;
-  const coreWidth = (style?.strokeWidth as number | undefined) ?? 2.5;
-  const glowWidth = coreWidth * 2.4;
-  const filterId = `edge-glow-${id}`;
-  const keyTimes = `0;${start};${end};1`;
-  const values = `${length};${length};0;0`;
+/* connector paths */
+const link = (col: number, cy: number) =>
+  `M ${COLS[col] + NODE_W} ${cy} C ${COLS[col] + NODE_W + 38} ${cy}, ${COLS[col + 1] - 38} ${cy}, ${COLS[col + 1]} ${cy}`;
 
+const MERGE_TOP = `M ${COLS[2] + NODE_W} ${TOP_CY} C ${COLS[2] + NODE_W + 52} ${TOP_CY}, ${JUNCTION.x} ${TOP_CY + 60}, ${JUNCTION.x} ${HERO_CY - 34} L ${JUNCTION.x} ${HERO_CY}`;
+const MERGE_BOT = `M ${COLS[2] + NODE_W} ${BOT_CY} C ${COLS[2] + NODE_W + 52} ${BOT_CY}, ${JUNCTION.x} ${BOT_CY - 60}, ${JUNCTION.x} ${HERO_CY + 34} L ${JUNCTION.x} ${HERO_CY}`;
+
+/* ------------------------------- icon set -------------------------------- */
+
+function Glyph({ kind }: { kind: NodeDef['icon'] | 'check' }) {
+  const s = { fill: 'none', stroke: 'currentColor', strokeWidth: 1.8, strokeLinecap: 'round', strokeLinejoin: 'round' } as const;
+  switch (kind) {
+    case 'video':
+      return (
+        <g {...s}>
+          <rect x={2.5} y={6} width={13.5} height={12} rx={2.5} />
+          <path d="m16 10.5 5.5-3v9l-5.5-3" />
+        </g>
+      );
+    case 'layers':
+      return (
+        <g {...s}>
+          <path d="m12 3 9 5-9 5-9-5z" />
+          <path d="m3 13 9 5 9-5" />
+          <path d="m3 17.5 9 5 9-5" opacity={0.45} />
+        </g>
+      );
+    case 'broadcast':
+      return (
+        <g {...s}>
+          <circle cx={12} cy={12} r={2.2} />
+          <path d="M7.5 7.5a6.4 6.4 0 0 0 0 9M16.5 7.5a6.4 6.4 0 0 1 0 9" />
+          <path d="M4.6 4.6a10.5 10.5 0 0 0 0 14.8M19.4 4.6a10.5 10.5 0 0 1 0 14.8" opacity={0.45} />
+        </g>
+      );
+    case 'target':
+      return (
+        <g {...s}>
+          <circle cx={12} cy={12} r={9} />
+          <circle cx={12} cy={12} r={5} />
+          <circle cx={12} cy={12} r={1.2} fill="currentColor" stroke="none" />
+        </g>
+      );
+    case 'send':
+      return (
+        <g {...s}>
+          <path d="M21 3 10.5 13.5" />
+          <path d="M21 3 14.2 21l-3.7-7.5L3 9.8z" />
+        </g>
+      );
+    case 'inbox':
+      return (
+        <g {...s}>
+          <path d="M3 13.5V18a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-4.5" />
+          <path d="M3 13.5h5l1.6 2.5h4.8l1.6-2.5h5" />
+          <path d="M6.5 13.5 8 5.5h8l1.5 8" opacity={0.6} />
+        </g>
+      );
+    case 'check':
+      return (
+        <g {...s} strokeWidth={2}>
+          <circle cx={12} cy={12} r={9.5} />
+          <path d="m8 12.2 2.8 2.8L16.2 9.4" />
+        </g>
+      );
+  }
+}
+
+/* --------------------------- blueprint chrome ----------------------------- */
+
+function Chrome() {
   return (
-    <g>
-      <path ref={pathRef} d={path} fill="none" stroke="none" />
-      <path d={path} fill="none" stroke="#0A0A0A" strokeOpacity={0.08} strokeWidth={1.5} />
-      {length > 0 && (
-        <>
-          <defs>
-            <filter id={filterId} x="-150%" y="-150%" width="400%" height="400%">
-              <feGaussianBlur stdDeviation="4" />
-            </filter>
-          </defs>
-          <path
-            d={path}
-            fill="none"
-            stroke={stroke}
-            strokeWidth={glowWidth}
-            strokeLinecap="round"
-            opacity={0.45}
-            filter={`url(#${filterId})`}
-            strokeDasharray={length}
-          >
-            <animate attributeName="stroke-dashoffset" keyTimes={keyTimes} values={values} dur={`${TOTAL_CYCLE}s`} begin="0s" repeatCount="indefinite" />
-          </path>
-          <path d={path} fill="none" stroke={stroke} strokeWidth={coreWidth} strokeLinecap="round" strokeDasharray={length}>
-            <animate attributeName="stroke-dashoffset" keyTimes={keyTimes} values={values} dur={`${TOTAL_CYCLE}s`} begin="0s" repeatCount="indefinite" />
-          </path>
-        </>
-      )}
+    <g aria-hidden>
+      {Array.from({ length: 30 }, (_, i) => 60 + i * 40).map((x) => (
+        <line key={x} x1={x} y1={12} x2={x} y2={x % 200 === 60 % 200 ? 20 : 16} stroke={INK} strokeOpacity={0.08} strokeWidth={1} />
+      ))}
+      {[340, 652, 962].map((x) => (
+        <line key={x} x1={x} y1={30} x2={x} y2={596} stroke={INK} strokeOpacity={0.04} strokeWidth={1} strokeDasharray="1 7" />
+      ))}
+      {/* system baselines */}
+      <line x1={44} y1={TOP_CY} x2={COLS[0] - 8} y2={TOP_CY} stroke={INK} strokeOpacity={0.14} strokeWidth={1} />
+      <line x1={44} y1={BOT_CY} x2={COLS[0] - 8} y2={BOT_CY} stroke={INK} strokeOpacity={0.14} strokeWidth={1} />
+      {/* construction circles behind hero */}
+      <circle cx={HERO.x + HERO.w / 2} cy={HERO_CY} r={140} fill="none" stroke={ORANGE} strokeOpacity={0.06} strokeWidth={1} strokeDasharray="2 6" />
+      <circle cx={HERO.x + HERO.w / 2} cy={HERO_CY} r={182} fill="none" stroke={INK} strokeOpacity={0.04} strokeWidth={1} />
+      {/* corner crosshairs */}
+      {[[44, 40], [1196, 40], [44, 584], [1196, 584]].map(([x, y]) => (
+        <g key={`${x}-${y}`} stroke={INK} strokeOpacity={0.14} strokeWidth={1}>
+          <line x1={x - 5} y1={y} x2={x + 5} y2={y} />
+          <line x1={x} y1={y - 5} x2={x} y2={y + 5} />
+        </g>
+      ))}
+      {/* section labels */}
+      {SECTIONS.map((sec) => (
+        <g key={sec.label}>
+          <line x1={sec.x + 1} y1={34} x2={sec.x + 1} y2={42} stroke={ORANGE} strokeOpacity={0.8} strokeWidth={2} strokeLinecap="round" />
+          <text x={sec.x + 9} y={41} className="fw-section">{sec.label.toUpperCase()}</text>
+        </g>
+      ))}
+      {/* system identifiers */}
+      <text x={COLS[0]} y={96} className="fw-sys">SYS-01 · CONTENT</text>
+      <text x={COLS[0]} y={414} className="fw-sys">SYS-02 · OUTREACH</text>
     </g>
   );
 }
 
-const nodeTypes = { pill: TreePill, engine: EngineCard, final: FinalFlowNode };
-const edgeTypes = { light: LightFlowEdge };
+/* ------------------------------- connectors ------------------------------- */
 
-// Shared across every edge via defaultEdgeOptions — type, stroke, and width are set once
-// here instead of per-edge, so nothing can drift out of sync between connectors.
-const DEFAULT_EDGE_OPTIONS = {
-  type: 'light',
-  style: { stroke: ORANGE, strokeWidth: 2.5 },
-} as const;
-
-// elementsSelectable={false} makes RF mark nodes inert (pointer-events: none) by default, which
-// would swallow even the CSS :hover lift — force it back on for every node.
-const INTERACTIVE_STYLE: CSSProperties = { pointerEvents: 'auto' };
-
-/* ── The diagram ───────────────────────────────────────────────────────── */
-export default function FrameworkFlowSlide() {
-  const nodes = useMemo<Node[]>(
-    () => [
-      {
-        id: 'in-record',
-        type: 'pill',
-        position: { x: COL_1, y: ROW_TOP - NODE_H / 2 },
-        draggable: false,
-        selectable: false,
-        style: INTERACTIVE_STYLE,
-        data: { icon: 'video', label: 'You Record, Once', hasTarget: false },
-      },
-      {
-        id: 'in-icp',
-        type: 'pill',
-        position: { x: COL_1, y: ROW_BOTTOM - NODE_H / 2 },
-        draggable: false,
-        selectable: false,
-        style: INTERACTIVE_STYLE,
-        data: { icon: 'target', label: 'We Learn Your Client, Once', hasTarget: false },
-      },
-      {
-        id: 'content',
-        type: 'engine',
-        position: { x: COL_2, y: ROW_TOP - NODE_H / 2 },
-        draggable: false,
-        selectable: false,
-        zIndex: 20,
-        style: INTERACTIVE_STYLE,
-        data: { engine: ENGINES[0] },
-      },
-      {
-        id: 'outreach',
-        type: 'engine',
-        position: { x: COL_2, y: ROW_BOTTOM - NODE_H / 2 },
-        draggable: false,
-        selectable: false,
-        zIndex: 20,
-        style: INTERACTIVE_STYLE,
-        data: { engine: ENGINES[1] },
-      },
-      {
-        id: 'outcome-content',
-        type: 'pill',
-        position: { x: COL_3, y: ROW_TOP - NODE_H / 2 },
-        draggable: false,
-        selectable: false,
-        style: INTERACTIVE_STYLE,
-        data: { icon: ENGINES[0].outcome.icon, label: ENGINES[0].outcome.label },
-      },
-      {
-        id: 'outcome-outreach',
-        type: 'pill',
-        position: { x: COL_3, y: ROW_BOTTOM - NODE_H / 2 },
-        draggable: false,
-        selectable: false,
-        style: INTERACTIVE_STYLE,
-        data: { icon: ENGINES[1].outcome.icon, label: ENGINES[1].outcome.label },
-      },
-      {
-        id: 'final',
-        type: 'final',
-        position: { x: COL_4, y: ROW_CENTER - NODE_H / 2 },
-        draggable: false,
-        selectable: false,
-        style: INTERACTIVE_STYLE,
-        data: { label: 'More Clients, Faster' },
-      },
-    ],
-    []
-  );
-
-  const edges = useMemo<Edge[]>(
-    () => [
-      { id: 'e-record-content', source: 'in-record', target: 'content', sourceHandle: RIGHT_SOURCE, targetHandle: LEFT_TARGET, data: { stage: 0 } },
-      { id: 'e-icp-outreach', source: 'in-icp', target: 'outreach', sourceHandle: RIGHT_SOURCE, targetHandle: LEFT_TARGET, data: { stage: 0 } },
-      {
-        id: 'e-content-outcome',
-        source: 'content',
-        target: 'outcome-content',
-        sourceHandle: RIGHT_SOURCE,
-        targetHandle: LEFT_TARGET,
-        data: { stage: 1 },
-      },
-      {
-        id: 'e-outreach-outcome',
-        source: 'outreach',
-        target: 'outcome-outreach',
-        sourceHandle: RIGHT_SOURCE,
-        targetHandle: LEFT_TARGET,
-        data: { stage: 1 },
-      },
-      {
-        id: 'e-outcome-final-1',
-        source: 'outcome-content',
-        target: 'final',
-        sourceHandle: RIGHT_SOURCE,
-        targetHandle: LEFT_TARGET,
-        data: { stage: 2 },
-      },
-      {
-        id: 'e-outcome-final-2',
-        source: 'outcome-outreach',
-        target: 'final',
-        sourceHandle: RIGHT_SOURCE,
-        targetHandle: LEFT_TARGET,
-        data: { stage: 2 },
-      },
-    ],
-    []
-  );
-
+function Connectors() {
+  const draws: { d: string; delay: number; hot?: boolean; w?: number }[] = [
+    { d: link(0, TOP_CY), delay: 0.7 },
+    { d: link(1, TOP_CY), delay: 0.95 },
+    { d: link(0, BOT_CY), delay: 0.8 },
+    { d: link(1, BOT_CY), delay: 1.05 },
+    { d: MERGE_TOP, delay: 1.3, hot: true, w: 1.6 },
+    { d: MERGE_BOT, delay: 1.4, hot: true, w: 1.6 },
+    { d: `M ${JUNCTION.x} ${HERO_CY} L ${HERO.x} ${HERO_CY}`, delay: 1.65, hot: true, w: 1.8 },
+  ];
   return (
-    <div className="w-full" style={{ height: 560 }}>
-      <ReactFlowProvider>
-        <ReactFlow
-          nodes={nodes}
-          edges={edges}
-          nodeTypes={nodeTypes}
-          edgeTypes={edgeTypes}
-          defaultEdgeOptions={DEFAULT_EDGE_OPTIONS}
-          proOptions={{ hideAttribution: true }}
-          fitView
-          fitViewOptions={{ padding: 0.05 }}
-          minZoom={0.4}
-          maxZoom={1.3}
-          nodesDraggable={false}
-          nodesConnectable={false}
-          elementsSelectable={false}
-          panOnDrag={false}
-          panOnScroll={false}
-          zoomOnScroll={false}
-          zoomOnPinch={false}
-          zoomOnDoubleClick={false}
-        >
-          <Background variant={BackgroundVariant.Dots} gap={20} size={1} color="rgba(0,0,0,0.08)" />
-        </ReactFlow>
-      </ReactFlowProvider>
+    <g aria-hidden>
+      {/* soft glow underlay on the merge */}
+      <path d={MERGE_TOP} fill="none" stroke={ORANGE} strokeOpacity={0.06} strokeWidth={6} />
+      <path d={MERGE_BOT} fill="none" stroke={ORANGE} strokeOpacity={0.06} strokeWidth={6} />
+      {draws.map((p, i) => (
+        <motion.path
+          key={i}
+          d={p.d} fill="none"
+          stroke={p.hot ? ORANGE : INK}
+          strokeOpacity={p.hot ? 0.4 : 0.16}
+          strokeWidth={p.w ?? 1.4}
+          initial={{ pathLength: 0 }} animate={{ pathLength: 1 }}
+          transition={{ duration: 0.55, ease: 'easeOut', delay: p.delay }}
+        />
+      ))}
+      {/* joints */}
+      <g fill="#FFFFFF" stroke={INK} strokeOpacity={0.28} strokeWidth={1}>
+        {[TOP_CY, BOT_CY].map((cy) =>
+          COLS.map((x, c) => (
+            <g key={`${cy}-${c}`}>
+              {c > 0 && <circle cx={x} cy={cy} r={2.4} />}
+              <circle cx={x + NODE_W} cy={cy} r={2.4} />
+            </g>
+          ))
+        )}
+      </g>
+      {/* glowing junction where the two systems merge */}
+      <motion.g
+        initial={{ opacity: 0, scale: 0.5 }} animate={{ opacity: 1, scale: 1 }}
+        style={{ transformBox: 'fill-box', transformOrigin: 'center' }}
+        transition={{ duration: 0.5, ease: EASE, delay: 1.6 }}
+      >
+        <circle cx={JUNCTION.x} cy={JUNCTION.y} r={13} fill="#FFF9F3" stroke={ORANGE} strokeOpacity={0.4} strokeWidth={1.2} strokeDasharray="3 4" className="fw-spin" />
+        <circle cx={JUNCTION.x} cy={JUNCTION.y} r={4.5} fill={ORANGE} className="fw-glow" />
+      </motion.g>
+      {/* flowing particles */}
+      <motion.g initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 2.1, duration: 0.8 }}>
+        {[
+          { d: link(0, TOP_CY), dur: 2.4, b: 0 },
+          { d: link(1, TOP_CY), dur: 2.4, b: 0.7 },
+          { d: link(0, BOT_CY), dur: 2.6, b: 0.4 },
+          { d: link(1, BOT_CY), dur: 2.6, b: 1.1 },
+          { d: MERGE_TOP, dur: 2.2, b: 0.2 },
+          { d: MERGE_BOT, dur: 2.2, b: 1.3 },
+        ].map((p, i) => (
+          <circle key={i} r={2.4} fill={ORANGE} className="fw-glow">
+            <animateMotion dur={`${p.dur}s`} begin={`${p.b}s`} repeatCount="indefinite" path={p.d} />
+          </circle>
+        ))}
+      </motion.g>
+    </g>
+  );
+}
+
+/* --------------------------------- nodes ---------------------------------- */
+
+function SystemNode({ n, col, row, delay }: { n: NodeDef; col: number; row: 'top' | 'bot'; delay: number }) {
+  const x = COLS[col];
+  const y = row === 'top' ? ROW_TOP : ROW_BOT;
+  return (
+    <motion.g
+      className="fw-node"
+      initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.6, ease: EASE, delay }}
+    >
+      <rect className="fw-node-bg" x={x} y={y} width={NODE_W} height={NODE_H} rx={16}
+        fill="#FFFFFF" stroke={INK} strokeOpacity={0.11} filter="url(#fwCard)" />
+      <rect x={x} y={y} width={NODE_W} height={NODE_H} rx={16} fill="url(#fwGloss)" pointerEvents="none" />
+      <rect className="fw-node-chip" x={x + 16} y={y + 19} width={40} height={40} rx={12} fill="rgba(10,10,10,0.035)" />
+      <g className="fw-node-icon" transform={`translate(${x + 16 + 8.5} ${y + 19 + 8.5}) scale(0.96)`}>
+        <Glyph kind={n.icon} />
+      </g>
+      <text x={x + 68} y={y + 36} className="fw-node-title">{n.title}</text>
+      <text x={x + 68} y={y + 53} className="fw-node-desc">{n.desc}</text>
+      <circle cx={x + NODE_W - 17} cy={y + 17} r={2.2} fill={ORANGE} className="fw-blink" style={{ animationDelay: `${delay}s` }} />
+    </motion.g>
+  );
+}
+
+/* ------------------------------ hero module -------------------------------- */
+
+function HeroModule() {
+  return (
+    <motion.g
+      initial={{ opacity: 0, scale: 0.7 }} animate={{ opacity: 1, scale: 1 }}
+      style={{ transformBox: 'fill-box', transformOrigin: 'center' }}
+      transition={{ duration: 0.8, ease: EASE, delay: 1.75 }}
+    >
+      {/* ambient light */}
+      <circle cx={HERO.x + HERO.w / 2} cy={HERO_CY} r={118} fill="url(#fwAmbient)" className="fw-halo" />
+      {/* layered stack */}
+      <rect x={HERO.x + 8} y={HERO.y + 10} width={HERO.w} height={HERO.h} rx={20} fill="#FFFFFF" stroke={INK} strokeOpacity={0.06} />
+      <rect x={HERO.x + 4} y={HERO.y + 5} width={HERO.w} height={HERO.h} rx={20} fill="#FFFFFF" stroke={INK} strokeOpacity={0.08} />
+      <rect x={HERO.x} y={HERO.y} width={HERO.w} height={HERO.h} rx={20} fill="#FFFFFF" stroke={ORANGE} strokeOpacity={0.45} strokeWidth={1.2} filter="url(#fwHero)" />
+      <rect x={HERO.x} y={HERO.y} width={HERO.w} height={HERO.h} rx={20} fill="url(#fwGloss)" pointerEvents="none" />
+      {/* success chip */}
+      <rect x={HERO.x + 20} y={HERO.y + 20} width={42} height={42} rx={13} fill={ORANGE} filter="url(#fwChip)" />
+      <g transform={`translate(${HERO.x + 20 + 9} ${HERO.y + 20 + 9})`} style={{ color: '#FFFFFF' }}>
+        <Glyph kind="check" />
+      </g>
+      <circle cx={HERO.x + HERO.w - 21} cy={HERO.y + 22} r={2.6} fill="#16A34A" className="fw-blink" />
+      <text x={HERO.x + HERO.w - 30} y={HERO.y + 26} textAnchor="end" className="fw-hero-live">LIVE</text>
+      <text x={HERO.x + 20} y={HERO.y + 88} className="fw-hero-title">More Clients,</text>
+      <text x={HERO.x + 20} y={HERO.y + 108} className="fw-hero-title">Faster</text>
+      <text x={HERO.x + 20} y={HERO.y + HERO.h - 10} className="fw-hero-meta">TWO SYSTEMS · ONE OUTCOME</text>
+    </motion.g>
+  );
+}
+
+/* --------------------------------- slide ----------------------------------- */
+
+export default function FrameworkFlowSlide() {
+  return (
+    <div className="relative w-full max-w-[1100px] mx-auto">
+      <svg
+        viewBox={`0 0 ${VB.w} ${VB.h}`}
+        className="block h-auto w-full"
+        role="img"
+        aria-label="The complete framework: a content system (record once, content production, multi-platform presence) and an outreach system (learn your client once, manual outreach, qualified conversations) converge into one outcome — more clients, faster."
+      >
+        <defs>
+          <pattern id="fwDots" width="26" height="26" patternUnits="userSpaceOnUse">
+            <circle cx="1" cy="1" r="1" fill="rgba(10,10,10,0.05)" />
+          </pattern>
+          <linearGradient id="fwGloss" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="#FFFFFF" stopOpacity="0.7" />
+            <stop offset="45%" stopColor="#FFFFFF" stopOpacity="0" />
+          </linearGradient>
+          <radialGradient id="fwAmbient" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stopColor={ORANGE} stopOpacity="0.13" />
+            <stop offset="60%" stopColor={ORANGE} stopOpacity="0.05" />
+            <stop offset="100%" stopColor={ORANGE} stopOpacity="0" />
+          </radialGradient>
+          <filter id="fwCard" x="-30%" y="-30%" width="160%" height="160%">
+            <feDropShadow dx="0" dy="4" stdDeviation="6" floodColor={INK} floodOpacity="0.07" />
+          </filter>
+          <filter id="fwHero" x="-40%" y="-40%" width="180%" height="180%">
+            <feDropShadow dx="0" dy="14" stdDeviation="18" floodColor="#C2410C" floodOpacity="0.18" />
+          </filter>
+          <filter id="fwChip" x="-60%" y="-60%" width="220%" height="220%">
+            <feDropShadow dx="0" dy="5" stdDeviation="7" floodColor="#E65700" floodOpacity="0.4" />
+          </filter>
+        </defs>
+
+        <rect width={VB.w} height={VB.h} fill="url(#fwDots)" opacity={0.7} />
+        <Chrome />
+        <Connectors />
+
+        {TOP_NODES.map((n, i) => (
+          <SystemNode key={n.id} n={n} col={i} row="top" delay={0.15 + i * 0.18} />
+        ))}
+        {BOT_NODES.map((n, i) => (
+          <SystemNode key={n.id} n={n} col={i} row="bot" delay={0.3 + i * 0.18} />
+        ))}
+        <HeroModule />
+
+        {/* annotations */}
+        <motion.g initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.9, delay: 2.5 }} aria-hidden>
+          <text x={COLS[2] + 148} y={TOP_CY + 74} className="fw-annot">Two systems. One outcome.</text>
+          <path d={`M ${COLS[2] + 216} ${TOP_CY + 82} Q ${COLS[2] + 244} ${TOP_CY + 96} ${JUNCTION.x - 8} ${HERO_CY - 44}`} fill="none" stroke={INK} strokeOpacity={0.18} strokeWidth={1} />
+          <text x={COLS[0] + 4} y={TOP_CY + 130} className="fw-annot">Builds trust before you ever reach out.</text>
+          <text x={COLS[0] + 4} y={BOT_CY - 116} className="fw-annot">Starts conversations while content compounds.</text>
+        </motion.g>
+      </svg>
+
+      <style>{`
+        .fw-section { font-size: 9.5px; letter-spacing: .22em; fill: rgba(10,10,10,0.38); font-weight: 700; }
+        .fw-sys { font-size: 9px; letter-spacing: .24em; fill: rgba(10,10,10,0.3); font-weight: 800; }
+        .fw-annot { font-size: 12px; fill: rgba(10,10,10,0.38); font-style: italic; font-family: ui-serif, Georgia, serif; }
+
+        .fw-node-bg, .fw-node-chip, .fw-node-icon { transition: all .3s cubic-bezier(.22,1,.36,1); }
+        .fw-node-icon { color: rgba(10,10,10,0.68); }
+        .fw-node:hover .fw-node-bg { stroke: ${ORANGE}; stroke-opacity: .5; }
+        .fw-node:hover .fw-node-chip { fill: rgba(255,98,0,0.09); }
+        .fw-node:hover .fw-node-icon { color: ${ORANGE}; }
+        .fw-node-title { font-size: 12.5px; font-weight: 800; fill: ${INK}; letter-spacing: -0.01em; }
+        .fw-node-desc { font-size: 9.5px; fill: rgba(10,10,10,0.45); font-weight: 500; }
+
+        .fw-hero-title { font-size: 18px; font-weight: 800; fill: ${INK}; letter-spacing: -0.015em; }
+        .fw-hero-meta { font-size: 7.5px; letter-spacing: .18em; fill: rgba(10,10,10,0.38); font-weight: 700; }
+        .fw-hero-live { font-size: 8px; letter-spacing: .2em; fill: rgba(10,10,10,0.35); font-weight: 700; }
+
+        .fw-glow { filter: drop-shadow(0 0 3px rgba(255,98,0,0.55)); }
+        .fw-blink { animation: fwBlink 2.2s ease-in-out infinite; }
+        @keyframes fwBlink { 0%,100% { opacity: 1; } 50% { opacity: .25; } }
+        .fw-halo { transform-box: fill-box; transform-origin: center; animation: fwHalo 4.4s ease-in-out infinite; }
+        @keyframes fwHalo { 0%,100% { transform: scale(1); opacity: .85; } 50% { transform: scale(1.07); opacity: 1; } }
+        .fw-spin { transform-box: fill-box; transform-origin: center; animation: fwSpin 14s linear infinite; }
+        @keyframes fwSpin { to { transform: rotate(360deg); } }
+
+        @media (prefers-reduced-motion: reduce) {
+          .fw-blink, .fw-halo, .fw-spin { animation: none; }
+        }
+      `}</style>
     </div>
   );
 }

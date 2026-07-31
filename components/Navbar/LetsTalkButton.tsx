@@ -211,7 +211,7 @@ export default function LetsTalkButton({ isMobile = false }: { isMobile?: boolea
           : { background: '#fff', color: RED, scale: 1 }
         }
         transition={SPRING_FAST}
-        className="relative inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-[14px] font-[600] whitespace-nowrap outline-none cursor-pointer overflow-hidden"
+        className="btn-premium relative inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-[14px] font-[600] whitespace-nowrap outline-none cursor-pointer overflow-hidden"
         style={{
           background: '#fff',
           color: RED,

@@ -1,22 +1,20 @@
-# Implementation Plan
+# Redesign Orbit - Progress Tracker
 
-## ✅ Step 1: PitchDeck - Add Full-Screen Feature
-- [x] Import full-screen related icons (MaximizeIcon, MinimizeIcon)
-- [x] Add `isFullscreen` state and full-screen toggle logic
-- [x] Add full-screen button in top-right area (next to pause button)
-- [x] Add exit full-screen button when in full-screen mode
-- [x] Style buttons to match design theme
+## Steps
 
-## ✅ Step 2: PitchDeck - Make Slide Content Bigger
-- [x] Increase container width: `max-w-[1200px]` → `max-w-[1400px]`
-- [x] Increase slide stage height: `min-h-[600px]` → `min-h-[680px]` (and responsive variants)
-- [x] Reduce content padding: `p-5 sm:p-8 md:p-10 lg:p-12` → `p-4 sm:p-6 md:p-8 lg:p-10`
-- [x] Increase card shell widths: `max-w-3xl` → `max-w-4xl`, `max-w-4xl` → `max-w-5xl`
+- [x] Step 0: Analyze codebase and create plan (done)
+- [x] Step 1: Rewrite `OrbitSlide.tsx` — New workflow-based orbit layout
+  - [x] New node positions based on production sequence
+  - [x] Orange animated path connecting nodes in order
+  - [x] LinkedIn Posts pointing toward next slide
+  - [x] Export constants for Distribution slide
+- [x] Step 2: Create `DistributionSlide.tsx` — New Content Distribution slide
+  - [x] Same visual language as orbit
+  - [x] Platform nodes: YouTube, Spotify, Apple Podcasts, Instagram, TikTok, LinkedIn, X, Newsletter, Website
+  - [x] Animated flow from center to platforms
+- [x] Step 3: Update `PitchDeck.tsx` — Add distribution slide, update indices
+  - [x] Add DistributionSlide after Orbit slide
+  - [x] Update SLIDE_META
+  - [x] Update slide indices
+- [x] Step 4: Test build (compiled successfully)
 
-## ✅ Step 3: Navbar - Resize
-- [x] Increase logo pill height: `h-[44px]` → `h-[48px]`
-- [x] Increase logo text sizes: `text-[16px]` → `text-[18px]`, `text-[14px]` → `text-[16px]`
-- [x] Increase nav link padding: `px-4 py-2` → `px-5 py-2.5`
-- [x] Increase nav link text: `text-[15px]` → `text-[16px]`
-- [x] Adjust spacer height: `h-[80px]` → `h-[88px]`
-- [x] Adjust overall navbar padding: `pl-2 pr-2 py-2` → `pl-3 pr-3 py-2.5`

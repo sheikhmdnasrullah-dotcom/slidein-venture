@@ -71,6 +71,7 @@ export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [hoveredLink, setHoveredLink] = useState<string | null>(null);
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
@@ -114,7 +115,7 @@ export default function Navbar() {
               : '0 4px 24px rgba(0,0,0,0.06), 0 1px 4px rgba(0,0,0,0.03)',
           }}
           initial={{ y: -20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
+          animate={{ y: 0, opacity: 1, scale: scrolled ? 0.955 : 1 }}
           transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
         >
           {/* ── Logo Pill ──────────────────────────────────────────────── */}
@@ -149,14 +150,22 @@ export default function Navbar() {
           </Link>
 
           {/* ── Desktop Nav Links ─────────────────────────────────────── */}
-          <div className="hidden lg:flex items-center gap-0.5 px-3">
+          <div className="hidden lg:flex items-center gap-0.5 px-3" onMouseLeave={() => setHoveredLink(null)}>
             {navLinks.map((link) => (
               <Link
                 key={link.label}
                 href={link.href}
-                className="px-5 py-2.5 text-[16px] font-[500] text-[#0A0A0A]/80 rounded-full hover:text-black hover:bg-black/[0.04] transition-all duration-150 whitespace-nowrap inline-flex items-center"
+                onMouseEnter={() => setHoveredLink(link.label)}
+                className="relative px-5 py-2.5 text-[16px] font-[500] text-[#0A0A0A]/80 rounded-full hover:text-black transition-colors duration-150 whitespace-nowrap inline-flex items-center"
               >
-                {link.label}
+                {hoveredLink === link.label && (
+                  <motion.span
+                    layoutId="nav-liquid-pill"
+                    className="absolute inset-0 rounded-full bg-black/[0.05]"
+                    transition={{ type: 'spring', stiffness: 400, damping: 32 }}
+                  />
+                )}
+                <span className="relative">{link.label}</span>
               </Link>
             ))}
           </div>
