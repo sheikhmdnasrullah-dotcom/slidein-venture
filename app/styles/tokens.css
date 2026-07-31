@@ -180,10 +180,14 @@
   --opsz-display-md: 72;
   --opsz-display-sm: 36;
 
-  /* Fraunces axis defaults. Overridden per-element by the .wonk utility in
-     app/styles/type.css — one word per page, never more. */
-  --soft-display: 0;
-  --wonk-display: 0;
+  /* Live Fraunces axis values. The display roles in app/styles/type.css set
+     these; .wonk overrides only --axis-wonk and inherits the rest, so an
+     accent word keeps the optical cut of the line it sits in. Defaults match
+     the face's own defaults, so a stray .wonk outside a display role degrades
+     to plain text rather than a 144pt poster cut. */
+  --axis-opsz: 14;
+  --axis-soft: 0;
+  --axis-wonk: 0;
 }
 
 /* ── Focus ring (Rule 5) — one visible treatment, everywhere ───────────── */

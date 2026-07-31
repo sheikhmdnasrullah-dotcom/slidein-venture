@@ -22,25 +22,51 @@
    Fraunces at display size wants LOW soft, ZERO wonk: crisp and serious.
    SOFT climbs as the size drops so thin strokes survive at small optical
    sizes. font-variation-settings has to restate opsz because it overrides
-   font-optical-sizing wholesale — omitting it silently resets opsz to 14. */
+   font-optical-sizing wholesale — omitting it silently resets opsz to 14.
+
+   Why .wonk shares this selector list: font-variation-settings is an
+   inherited property, and a child inherits the RESOLVED value. Setting
+   --wonk on a nested span would change nothing, because the parent's
+   settings string was already resolved to 'WONK' 0 before it was inherited.
+   The child has to carry its own declaration for the override to land. */
+.font-display-xl,
+.font-display-md,
+.font-display-sm,
+.display-headline .wonk,
+.section-headline .wonk,
+.wonk {
+  font-variation-settings:
+    'opsz' var(--axis-opsz),
+    'SOFT' var(--axis-soft),
+    'WONK' var(--axis-wonk);
+}
+
 .font-display-xl {
   font-family: var(--font-display);
-  font-variation-settings:
-    'opsz' var(--opsz-display-xl),
-    'SOFT' var(--soft-display),
-    'WONK' var(--wonk-display);
+  /* opsz is a POINT size, not a px size. Holding 144 at a 39px mobile
+     headline gives the hairlines drawn for a poster and they disappear;
+     the compact instance is the same face cut for the size it is actually
+     set at. The 768px switch is stated here, in the type layer, so no
+     component needs a breakpoint of its own. */
+  --axis-opsz: var(--opsz-display-md);
+  --axis-soft: 0;
   font-weight: var(--font-weight-display-xl);
   letter-spacing: var(--tracking-display-xl);
   line-height: var(--leading-display-xl);
   text-wrap: balance;
 }
 
+@media (width >= 768px) {
+  .font-display-xl {
+    --axis-opsz: var(--opsz-display-xl);
+  }
+}
+
 .font-display-md {
   font-family: var(--font-display);
-  font-variation-settings:
-    'opsz' var(--opsz-display-md),
-    'SOFT' 8,
-    'WONK' var(--wonk-display);
+
+  --axis-opsz: var(--opsz-display-md);
+  --axis-soft: 8;
   font-weight: var(--font-weight-display-md);
   letter-spacing: var(--tracking-display-md);
   line-height: var(--leading-display-md);
@@ -49,10 +75,9 @@
 
 .font-display-sm {
   font-family: var(--font-display);
-  font-variation-settings:
-    'opsz' var(--opsz-display-sm),
-    'SOFT' 22,
-    'WONK' var(--wonk-display);
+
+  --axis-opsz: var(--opsz-display-sm);
+  --axis-soft: 22;
   font-weight: var(--font-weight-display-sm);
   letter-spacing: var(--tracking-display-sm);
   line-height: var(--leading-display-sm);
@@ -60,9 +85,11 @@
 }
 
 /* The wonk axis swaps in the quirkier single-storey g and angled terminals.
-   Scoped to one accent word per page. Two is a pattern; three is noise. */
+   Scoped to one word or phrase per page. Two is a pattern; three is noise.
+   --axis-opsz and --axis-soft are inherited from the display role above, so
+   the accent word keeps the same optical cut as the line it sits in. */
 .wonk {
-  --wonk-display: 1;
+  --axis-wonk: 1;
 }
 
 /* ── 2 · BODY ─────────────────────────────────────────────────────────────
@@ -147,8 +174,9 @@ p {
 
 /* ── 7 · THE HAIRLINE UNDERLINE ───────────────────────────────────────────
    Draws under the accent word. A hand-drawn stroke, not a highlighter block —
-   the block is the giveaway. vector-effect keeps the stroke 0.6px regardless
-   of how far the viewBox is stretched. */
+   the block is the giveaway. The SVG is stretched to the word's measure, so
+   the path carries pathLength="100" and the stroke is left to scale; see the
+   note on AccentRule in components/Hero/Hero.tsx. */
 .accent-underline {
   position: absolute;
   left: 0;
@@ -159,9 +187,11 @@ p {
   pointer-events: none;
 }
 
+/* Paired with pathLength="100" on the path, so one dash always spans exactly
+   one word regardless of how wide that word sets. */
 .underline-draw {
-  stroke-dasharray: 120;
-  stroke-dashoffset: 120;
+  stroke-dasharray: 100;
+  stroke-dashoffset: 100;
   /* Short delay, not a long one: the rule remounts with every rotating phrase,
      so anything slower than --dur-base leaves the word bare for half its turn. */
   animation: underline-draw var(--dur-reveal) var(--ease-expo) var(--dur-base) forwards;

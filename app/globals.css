@@ -347,10 +347,13 @@ body {
      both are present on an element. */
   .display-headline {
     font-family: var(--font-display);
+
+    --axis-opsz: var(--opsz-display-md);
+    --axis-soft: 8;
     font-variation-settings:
-      'opsz' var(--opsz-display-md),
-      'SOFT' 8,
-      'WONK' var(--wonk-display);
+      'opsz' var(--axis-opsz),
+      'SOFT' var(--axis-soft),
+      'WONK' var(--axis-wonk);
     font-weight: var(--font-weight-display-md);
     letter-spacing: var(--tracking-display-md);
     line-height: var(--leading-display-md);
@@ -359,10 +362,13 @@ body {
 
   .section-headline {
     font-family: var(--font-display);
+
+    --axis-opsz: var(--opsz-display-sm);
+    --axis-soft: 22;
     font-variation-settings:
-      'opsz' var(--opsz-display-sm),
-      'SOFT' 22,
-      'WONK' var(--wonk-display);
+      'opsz' var(--axis-opsz),
+      'SOFT' var(--axis-soft),
+      'WONK' var(--axis-wonk);
     font-weight: var(--font-weight-display-sm);
     letter-spacing: var(--tracking-display-sm);
     line-height: var(--leading-display-sm);

@@ -24,7 +24,7 @@ import localFont from 'next/font/local';
 /* ── Display ──────────────────────────────────────────────────────────────
    axes are opt-in: without this array next/font ships wght only and
    font-variation-settings for opsz/SOFT/WONK silently do nothing. */
-export const display = Fraunces({
+export const displayFace = Fraunces({
   subsets: ['latin'],
   display: 'swap',
   variable: '--font-face-display',
@@ -44,7 +44,7 @@ export const display = Fraunces({
    overrides) for the fallback, which is what actually holds CLS at 0.00
    during the swap window. `false` disables that machinery and reintroduces
    the jump the brief is trying to remove. */
-export const body = localFont({
+export const bodyFace = localFont({
   src: [
     {
       path: './fonts/Switzer-Variable-subset.woff2',
@@ -65,7 +65,7 @@ export const body = localFont({
 
 /* ── Mono ─────────────────────────────────────────────────────────────────
    400/500 only. Anything heavier stops reading as system metadata. */
-export const mono = JetBrains_Mono({
+export const monoFace = JetBrains_Mono({
   subsets: ['latin'],
   display: 'swap',
   variable: '--font-face-mono',

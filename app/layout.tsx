@@ -4,7 +4,7 @@ import Navbar from "@/components/Navbar/Navbar";
 import AmbientEnvironment from "@/components/AmbientEnvironment/AmbientEnvironment";
 import Footer from "@/components/Footer/Footer";
 
-import { display, body, mono } from "./fonts";
+import { displayFace, bodyFace, monoFace } from "./fonts";
 import { cn } from "@/lib/utils";
 
 export const metadata: Metadata = {
@@ -22,9 +22,9 @@ export default function RootLayout({
       lang="en"
       className={cn(
         "font-sans",
-        display.variable,
-        body.variable,
-        mono.variable
+        displayFace.variable,
+        bodyFace.variable,
+        monoFace.variable
       )}
     >
       {/* Roles come from the CSS layer (body { font-family: var(--font-sans) }),

@@ -100,23 +100,28 @@ function Magnetic({
 /* ─── Hand-drawn hairline under the accent word ──────────────────────────────
    A stroked path, never a highlighter block — the block is the tell. The
    quadratic wobble is the point: it does not sit flat on the baseline.
-   vector-effect holds the stroke weight while preserveAspectRatio="none"
-   stretches the viewBox to whatever the word measures. */
+
+   pathLength="100" normalises the geometry so the draw-on dash in type.css is
+   one length for every word, however wide. No vector-effect here: with
+   non-scaling-stroke the dash pattern is measured in device pixels while the
+   viewBox is stretched to the word's measure, which shatters the line into
+   evenly spaced fragments. Letting the stroke scale keeps it whole — the path
+   is near-horizontal, so only the small vertical scale reaches its weight. */
 function AccentRule() {
   return (
     <svg
-      className="accent-underline text-[var(--color-brand)]"
+      className="accent-underline text-brand"
       viewBox="0 0 100 6"
       preserveAspectRatio="none"
       aria-hidden
     >
       <path
         d="M0,3 Q25,1 50,3 T100,3"
+        pathLength="100"
         fill="none"
         stroke="currentColor"
-        strokeWidth="0.6"
+        strokeWidth="0.7"
         strokeLinecap="round"
-        vectorEffect="non-scaling-stroke"
         className="underline-draw"
       />
     </svg>
