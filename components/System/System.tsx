@@ -22,12 +22,9 @@ export function MonoLabel({
   className?: string;
 }) {
   return (
-    <span
-      className={cn(
-        'font-mono text-[10px] uppercase tracking-[0.2em] text-black/40',
-        className
-      )}
-    >
+    /* Size, case and tracking come from the .font-label role in
+       app/styles/type.css — never restate them here. */
+    <span className={cn('font-label font-label-wide text-slate-500', className)}>
       {children}
     </span>
   );
@@ -47,7 +44,7 @@ export function SectionRule({
 }) {
   return (
     <div className={cn('flex items-center gap-4', className)}>
-      <MonoLabel className="text-black/45">
+      <MonoLabel className="text-slate-600">
         {index} — {label}
       </MonoLabel>
       <span className="h-px flex-1 bg-black/[0.07]" aria-hidden />

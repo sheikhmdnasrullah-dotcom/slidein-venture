@@ -1,0 +1,184 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   SLIDEIN VENTURE — TYPE LAYER
+   ---------------------------------------------------------------------------
+   Roles, not sizes. A component picks `.font-display-xl`, never a family plus
+   a tracking value. Every number here resolves to a token in tokens.css.
+
+   The five things below are what separates print typography from web
+   typography, and almost every site skips all five:
+
+     1. optical sizing dialled per role (Fraunces `opsz`)
+     2. inverse tracking — negative at display, positive at text
+     3. text-wrap balance on headings, pretty on paragraphs
+     4. tabular figures anywhere a number can change
+     5. optical margin alignment on pulled quotes
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+:root {
+  font-optical-sizing: auto;
+}
+
+/* ── 1 · DISPLAY ──────────────────────────────────────────────────────────
+   Fraunces at display size wants LOW soft, ZERO wonk: crisp and serious.
+   SOFT climbs as the size drops so thin strokes survive at small optical
+   sizes. font-variation-settings has to restate opsz because it overrides
+   font-optical-sizing wholesale — omitting it silently resets opsz to 14. */
+.font-display-xl {
+  font-family: var(--font-display);
+  font-variation-settings:
+    'opsz' var(--opsz-display-xl),
+    'SOFT' var(--soft-display),
+    'WONK' var(--wonk-display);
+  font-weight: var(--font-weight-display-xl);
+  letter-spacing: var(--tracking-display-xl);
+  line-height: var(--leading-display-xl);
+  text-wrap: balance;
+}
+
+.font-display-md {
+  font-family: var(--font-display);
+  font-variation-settings:
+    'opsz' var(--opsz-display-md),
+    'SOFT' 8,
+    'WONK' var(--wonk-display);
+  font-weight: var(--font-weight-display-md);
+  letter-spacing: var(--tracking-display-md);
+  line-height: var(--leading-display-md);
+  text-wrap: balance;
+}
+
+.font-display-sm {
+  font-family: var(--font-display);
+  font-variation-settings:
+    'opsz' var(--opsz-display-sm),
+    'SOFT' 22,
+    'WONK' var(--wonk-display);
+  font-weight: var(--font-weight-display-sm);
+  letter-spacing: var(--tracking-display-sm);
+  line-height: var(--leading-display-sm);
+  text-wrap: balance;
+}
+
+/* The wonk axis swaps in the quirkier single-storey g and angled terminals.
+   Scoped to one accent word per page. Two is a pattern; three is noise. */
+.wonk {
+  --wonk-display: 1;
+}
+
+/* ── 2 · BODY ─────────────────────────────────────────────────────────────
+   Positive tracking at small sizes — the exact opposite of display, and the
+   reason both look right instead of one looking right.
+   Switzer carries kern (GPOS), liga, frac and locl. It has no calt/ss01, so
+   requesting them here would be cargo cult. */
+.font-body {
+  font-family: var(--font-sans);
+  font-weight: var(--font-weight-body);
+  letter-spacing: var(--tracking-body);
+  line-height: var(--leading-body);
+  text-wrap: pretty;
+  font-feature-settings: 'kern' 1, 'liga' 1;
+}
+
+.font-body-lead {
+  font-family: var(--font-sans);
+  font-weight: var(--font-weight-body);
+  letter-spacing: 0;
+  line-height: var(--leading-tight);
+  text-wrap: pretty;
+  font-feature-settings: 'kern' 1, 'liga' 1;
+}
+
+/* ── 3 · LABEL ────────────────────────────────────────────────────────────
+   Mono, uppercase, small, widely tracked. This is the ONE place wide
+   tracking belongs on the site. */
+.font-label {
+  font-family: var(--font-mono);
+  font-size: var(--text-micro);
+  font-weight: var(--font-weight-label);
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+  line-height: var(--leading-tight);
+  font-feature-settings: 'tnum' 1, 'zero' 1;   /* slashed zero */
+}
+
+.font-label-wide {
+  letter-spacing: var(--tracking-label-wide);
+}
+
+/* ── 4 · FIGURES ──────────────────────────────────────────────────────────
+   Any number that can change: prices, counters, stats, timers. Without this
+   the digits jitter in width and the whole panel reads unpolished.
+   Switzer's digits are drawn on a single 576/1000 advance, so this is belt
+   and braces there — it earns its keep on the fallback stack and on Fraunces. */
+.tnum {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: 'tnum' 1;
+}
+
+/* ── 5 · OPTICAL DETAIL ───────────────────────────────────────────────────
+   hanging-punctuation is Safari-only; the negative indent does the same job
+   everywhere else. Applied to pull quotes, not to body paragraphs. */
+.optical-quote {
+  hanging-punctuation: first last;
+  text-indent: -0.42em;
+}
+
+/* Switzer ships no smcp/c2sc table, so all-small-caps would be synthesised —
+   squashed caps, the thing real small caps exist to avoid. Fraunces has no
+   smcp either. Until a face with a real table lands, this is petite caps done
+   honestly: caps at a reduced size with compensating tracking. */
+.smallcaps {
+  text-transform: uppercase;
+  font-size: 0.82em;
+  letter-spacing: var(--tracking-smallcaps);
+  font-weight: var(--font-weight-body-md);
+}
+
+/* ── 6 · WIDOWS AND ORPHANS ───────────────────────────────────────────── */
+h1,
+h2,
+h3 {
+  text-wrap: balance;
+}
+
+p {
+  text-wrap: pretty;
+}
+
+/* ── 7 · THE HAIRLINE UNDERLINE ───────────────────────────────────────────
+   Draws under the accent word. A hand-drawn stroke, not a highlighter block —
+   the block is the giveaway. vector-effect keeps the stroke 0.6px regardless
+   of how far the viewBox is stretched. */
+.accent-underline {
+  position: absolute;
+  left: 0;
+  bottom: -0.1em;
+  width: 100%;
+  height: 0.1em;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.underline-draw {
+  stroke-dasharray: 120;
+  stroke-dashoffset: 120;
+  /* Short delay, not a long one: the rule remounts with every rotating phrase,
+     so anything slower than --dur-base leaves the word bare for half its turn. */
+  animation: underline-draw var(--dur-reveal) var(--ease-expo) var(--dur-base) forwards;
+}
+
+@keyframes underline-draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* The global backstop collapses duration to 1ms, which would leave the
+     stroke drawn — correct end state, no motion. Stated explicitly so it
+     survives anyone rewriting the backstop. */
+  .underline-draw {
+    stroke-dashoffset: 0;
+    animation: none;
+  }
+}

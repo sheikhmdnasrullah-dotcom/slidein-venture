@@ -1,6 +1,9 @@
 /* Token layer is the single source of truth and pulls in Tailwind itself.
    Do not re-import "tailwindcss" here. See app/styles/tokens.css. */
 @import "./styles/tokens.css";
+/* Type roles. Unlayered on purpose: a role class must beat a stray Tailwind
+   utility, otherwise `text-[10px]` on a call site quietly defeats the system. */
+@import "./styles/type.css";
 @import "tw-animate-css";
 /* layer() keeps xyflow in the base cascade. Wrapping an @import inside
    `@layer base { ... }` is an invalid at-rule position in CSS. */
@@ -15,10 +18,12 @@
    that untouched markup still references — each one resolves to a token rather
    than reintroducing a literal. */
 @theme {
-  --font-sans: var(--font-inter), system-ui, -apple-system, sans-serif;
-  --font-serif: var(--font-instrument), georgia, serif;
-  --font-mono: var(--font-jetbrains), ui-monospace, monospace;
-  --font-display: var(--font-instrument), georgia, serif;
+  /* Semantic roles → faces. Faces are declared in app/fonts.ts and injected
+     as --font-face-* on <html>. Components use the roles, never the faces. */
+  --font-sans: var(--font-face-body), system-ui, -apple-system, sans-serif;
+  --font-serif: var(--font-face-display), georgia, serif;
+  --font-mono: var(--font-face-mono), ui-monospace, monospace;
+  --font-display: var(--font-face-display), georgia, serif;
 
   /* Legacy semantic aliases → token layer. Migrate call sites, then delete. */
   --color-background:   var(--color-paper-50);
@@ -135,15 +140,20 @@ html {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   scroll-behavior: smooth;
-  font-feature-settings: "cv11", "ss01";
-  font-variation-settings: "opsz" 32;
+  /* The old `cv11` / `ss01` / `opsz 32` block here was Inter's alternate set,
+     inherited by every element. Switzer has no cv11 or ss01, and a global
+     opsz override defeats the per-role optical sizing in styles/type.css. */
 }
 
 body {
   font-family: var(--font-sans);
   background-color: var(--color-background);
   color: var(--color-foreground);
-  line-height: 1.6;
+  font-weight: var(--font-weight-body);
+  letter-spacing: var(--tracking-body);
+  line-height: var(--leading-body);
+  text-wrap: pretty;
+  font-feature-settings: "kern" 1, "liga" 1;
   overflow-x: hidden;
   position: relative;
 }
@@ -276,8 +286,12 @@ body {
 }
 
 @theme inline {
-  --font-heading: var(--font-sans);
-  --font-sans: var(--font-sans);
+  /* `--font-sans: var(--font-sans)` used to sit here. A custom property that
+     references itself is invalid at computed-value time, so --font-sans
+     resolved to nothing and `body { font-family: var(--font-sans) }` fell all
+     the way back to Times. It went unnoticed only because the old layout put
+     Inter's className directly on <body> and masked it. */
+  --font-heading: var(--font-display);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -324,26 +338,43 @@ body {
     @apply font-sans;
   }
 
-  /* Display headlines use the editorial face. Instrument Serif ships weight 400
-     only — never raise this or the browser synthesises faux bold. */
+  /* Legacy role names still used across pages and deck slides. They now
+     forward to the Stage 2 roles in styles/type.css instead of carrying their
+     own literals. Migrate call sites to .font-display-* / .font-body, then
+     delete this block.
+
+     These live in @layer base so the real role classes (unlayered) win when
+     both are present on an element. */
   .display-headline {
     font-family: var(--font-display);
-    font-weight: 400;
-    letter-spacing: -0.02em;
-    line-height: 1.04;
+    font-variation-settings:
+      'opsz' var(--opsz-display-md),
+      'SOFT' 8,
+      'WONK' var(--wonk-display);
+    font-weight: var(--font-weight-display-md);
+    letter-spacing: var(--tracking-display-md);
+    line-height: var(--leading-display-md);
+    text-wrap: balance;
   }
 
   .section-headline {
     font-family: var(--font-display);
-    font-weight: 400;
-    letter-spacing: -0.015em;
-    line-height: 1.15;
+    font-variation-settings:
+      'opsz' var(--opsz-display-sm),
+      'SOFT' 22,
+      'WONK' var(--wonk-display);
+    font-weight: var(--font-weight-display-sm);
+    letter-spacing: var(--tracking-display-sm);
+    line-height: var(--leading-display-sm);
+    text-wrap: balance;
   }
 
-  /* Body copy stays sans-serif (Inter) */
   .body-copy {
     font-family: var(--font-sans);
-    line-height: 1.65;
+    font-weight: var(--font-weight-body);
+    letter-spacing: var(--tracking-body);
+    line-height: var(--leading-body);
+    text-wrap: pretty;
   }
 }
 

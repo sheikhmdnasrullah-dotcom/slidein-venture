@@ -97,6 +97,32 @@ function Magnetic({
   );
 }
 
+/* ─── Hand-drawn hairline under the accent word ──────────────────────────────
+   A stroked path, never a highlighter block — the block is the tell. The
+   quadratic wobble is the point: it does not sit flat on the baseline.
+   vector-effect holds the stroke weight while preserveAspectRatio="none"
+   stretches the viewBox to whatever the word measures. */
+function AccentRule() {
+  return (
+    <svg
+      className="accent-underline text-[var(--color-brand)]"
+      viewBox="0 0 100 6"
+      preserveAspectRatio="none"
+      aria-hidden
+    >
+      <path
+        d="M0,3 Q25,1 50,3 T100,3"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="0.6"
+        strokeLinecap="round"
+        vectorEffect="non-scaling-stroke"
+        className="underline-draw"
+      />
+    </svg>
+  );
+}
+
 /* ─── Rotating phrase — zero layout shift ─────────────────────────────────── */
 function RotatingPhrase({ still }: { still: boolean }) {
   const [i, setI] = useState(0);
@@ -108,7 +134,9 @@ function RotatingPhrase({ still }: { still: boolean }) {
   }, [still]);
 
   return (
-    <span className="relative inline-grid align-top text-left">
+    /* `wonk` dials Fraunces' WONK axis to 1 on this phrase and nowhere else on
+       the page: single-storey g, angled terminals. One word, one decision. */
+    <span className="wonk relative inline-grid align-top text-left">
       {/* Invisible reservers: the cell sizes to the widest / tallest phrase, so
           swapping never reflows the headline. */}
       {PHRASES.map((p) => (
@@ -119,12 +147,15 @@ function RotatingPhrase({ still }: { still: boolean }) {
 
       <span className="col-start-1 row-start-1" style={{ color: ORANGE }} aria-hidden>
         {still ? (
-          PHRASES[0]
+          <span className="relative inline-block">
+            {PHRASES[0]}
+            <AccentRule />
+          </span>
         ) : (
           <AnimatePresence mode="wait" initial={false}>
             <motion.span
               key={PHRASES[i]}
-              className="block"
+              className="relative inline-block"
               initial={{ opacity: 0, y: '38%', filter: 'blur(6px)' }}
               animate={{ opacity: 1, y: '0%', filter: 'blur(0px)' }}
               exit={{
@@ -136,6 +167,9 @@ function RotatingPhrase({ still }: { still: boolean }) {
               transition={{ duration: 0.72, ease: EASE }}
             >
               {PHRASES[i]}
+              {/* Remounts with the phrase, so the rule redraws to the new word's
+                  measure instead of hanging over a shorter one. */}
+              <AccentRule />
             </motion.span>
           </AnimatePresence>
         )}
@@ -165,11 +199,11 @@ export default function Hero() {
       <div className="relative z-10 mx-auto flex w-full max-w-[1200px] flex-1 flex-col px-6 md:px-10">
         {/* ── Architectural header rule ───────────────────────────────── */}
         <motion.div className="flex items-center gap-4 pt-2 pb-10 md:pb-14" {...fade(0.05)}>
-          <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-black/35">
+          <span className="font-label font-label-wide text-slate-500">
             01 — Index
           </span>
           <span className="h-px flex-1 bg-black/[0.07]" />
-          <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-black/35">
+          <span className="font-label font-label-wide text-slate-500">
             SIV · Studio
           </span>
         </motion.div>
@@ -179,7 +213,7 @@ export default function Hero() {
           <motion.div {...fade(0.12)}>
             <span className="inline-flex items-center gap-2.5 rounded-full border border-black/[0.08] bg-white/60 px-4 py-1.5 backdrop-blur-md">
               <span className="pulse-dot h-1.5 w-1.5 rounded-full" style={{ background: ORANGE }} />
-              <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-black/55">
+              <span className="font-label text-slate-600">
                 Now booking · Q3
               </span>
             </span>
@@ -187,11 +221,10 @@ export default function Hero() {
 
           {/* ── Headline ──────────────────────────────────────────────── */}
           <h1
-            /* min of the clamp is tuned so the longest phrase stays on ONE line
-               at 390px — otherwise the reserver grid holds two lines of height
-               and opens a dead gap under the headline. */
-            className="mt-8 max-w-[16ch] text-[clamp(2.15rem,7.2vw,5.75rem)] leading-[1.02] tracking-[-0.02em] text-[var(--color-ink)] md:max-w-[18ch]"
-            style={{ fontFamily: 'var(--font-display)', fontWeight: 400 }}
+            /* Two registers in one headline: Fraunces at opsz 144 / WONK 0 for
+               the statement, the same face at WONK 1 in brand orange for the
+               rotating phrase. Size floor is --text-hero, measured at 390px. */
+            className="font-display-xl mt-8 max-w-[16ch] text-[length:var(--text-hero)] text-ink md:max-w-[18ch]"
           >
             <Line delay={0.2} still={still}>
               Helping founders with
@@ -254,7 +287,7 @@ export default function Hero() {
             >
               <button
                 onClick={() => setVideoOpen(true)}
-                className="group flex w-full cursor-pointer items-center justify-center gap-3 rounded-2xl border border-black/[0.1] bg-white/70 px-6 py-4 text-[15px] font-medium text-[var(--color-ink)] backdrop-blur-md transition-[border-color,background-color,box-shadow] duration-500 hover:border-black/20 hover:bg-white hover:shadow-[0_10px_30px_rgba(10,10,10,0.06)] sm:inline-flex sm:w-auto"
+                className="group flex w-full cursor-pointer items-center justify-center gap-3 rounded-2xl border border-black/[0.1] bg-white/70 px-6 py-4 text-[15px] font-medium text-ink backdrop-blur-md transition-[border-color,background-color,box-shadow] duration-500 hover:border-black/20 hover:bg-white hover:shadow-[0_10px_30px_rgba(10,10,10,0.06)] sm:inline-flex sm:w-auto"
               >
                 <span
                   className="flex h-6 w-6 items-center justify-center rounded-full transition-transform duration-500 ease-out group-hover:scale-110"
@@ -277,7 +310,7 @@ export default function Hero() {
                 {/* divider hidden below sm so a wrapped label never starts a
                     line with a stray rule */}
                 {i > 0 && <span className="hidden h-3 w-px bg-black/[0.12] sm:block" aria-hidden />}
-                <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-black/40">
+                <span className="font-label font-label-wide text-slate-500">
                   {c}
                 </span>
               </span>

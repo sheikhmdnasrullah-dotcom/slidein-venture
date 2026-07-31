@@ -1,36 +1,11 @@
 import type { Metadata } from "next";
-import { Inter, Geist, Instrument_Serif, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/Navbar/Navbar";
 import AmbientEnvironment from "@/components/AmbientEnvironment/AmbientEnvironment";
 import Footer from "@/components/Footer/Footer";
 
+import { display, body, mono } from "./fonts";
 import { cn } from "@/lib/utils";
-
-const geist = Geist({subsets:['latin'],variable:'--font-sans'});
-
-/* Editorial display face — 400 only, drawn for large optical sizes. */
-const instrumentSerif = Instrument_Serif({
-  subsets: ["latin"],
-  variable: "--font-instrument",
-  display: "swap",
-  weight: "400",
-});
-
-/* Architectural micro-labels. globals.css already points --font-mono here. */
-const jetbrainsMono = JetBrains_Mono({
-  subsets: ["latin"],
-  variable: "--font-jetbrains",
-  display: "swap",
-  weight: ["400", "500"],
-});
-
-const inter = Inter({
-  subsets: ["latin"],
-  variable: "--font-inter",
-  display: "swap",
-  weight: ["300", "400", "500", "600", "700", "800", "900"],
-});
 
 export const metadata: Metadata = {
   title: "SlideIn Venture — The AI workspace that works for you",
@@ -45,9 +20,17 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={cn("font-sans", geist.variable, instrumentSerif.variable, jetbrainsMono.variable)}
+      className={cn(
+        "font-sans",
+        display.variable,
+        body.variable,
+        mono.variable
+      )}
     >
-      <body className={`${inter.className} antialiased`}>
+      {/* Roles come from the CSS layer (body { font-family: var(--font-sans) }),
+          not from a face className here — that is what keeps a single place
+          responsible for which face plays which part. */}
+      <body className="antialiased">
         <AmbientEnvironment />
         <Navbar />
         <main>{children}</main>

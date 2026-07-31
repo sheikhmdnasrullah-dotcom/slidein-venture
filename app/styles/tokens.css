@@ -82,11 +82,54 @@
   --text-2xl:           clamp(2rem, 1.72rem + 1.4vw, 3rem);
   --text-3xl:           clamp(2.5rem, 1.9rem + 3vw, 4.25rem);
   --text-display:       clamp(3rem, 1.6rem + 7vw, 6.75rem);
+  /* Hero only. The 2.15rem floor is measured, not chosen: it is the largest
+     size at which the longest rotating phrase still sets on one line at
+     390px. Above it the reserver grid holds two lines and opens a dead gap
+     under the headline. */
+  --text-hero:          clamp(2.15rem, 0.9rem + 6.4vw, 5.75rem);
   /* legacy aliases so untouched markup keeps compiling */
   --text-xs:            var(--text-micro);
   --text-4xl:           var(--text-3xl);
   --text-5xl:           var(--text-3xl);
   --text-6xl:           var(--text-display);
+
+  /* ── TRACKING ───────────────────────────────────────────────────────────
+     The inverse relationship is the whole game: display type is set TIGHT,
+     body slightly OPEN, mono labels wide. A system where everything is 0 is
+     a system where nobody made a decision. */
+  --tracking-display-xl:  -0.028em;   /* 48px+ — counters close up on their own */
+  --tracking-display-md:  -0.014em;   /* 28–48px */
+  --tracking-display-sm:  -0.008em;   /* 20–28px */
+  --tracking-body:         0.002em;   /* opens the small sizes back up */
+  --tracking-label:        0.14em;    /* uppercase mono only */
+  --tracking-label-wide:   0.2em;     /* isolated single-word labels */
+  --tracking-smallcaps:    0.06em;
+
+  /* ── LEADING ─────────────────────────────────────────────────────────── */
+  --leading-display-xl:    0.92;      /* sub-1 leading is what makes display read as display */
+  --leading-display-md:    1.04;
+  --leading-display-sm:    1.14;
+  --leading-body:          1.62;
+  --leading-tight:         1.2;
+
+  /* ── WEIGHT ──────────────────────────────────────────────────────────────
+     Fraunces is variable, so these are real interpolated instances, not the
+     nine-step ladder. 340 at display size looks like 400 at body size —
+     large type carries more apparent weight per unit of stroke. */
+  --font-weight-display-xl: 340;
+  --font-weight-display-md: 380;
+  --font-weight-display-sm: 420;
+  --font-weight-body:       400;
+  --font-weight-body-md:    500;
+  --font-weight-label:      500;
+
+  /* ── OPTICAL SIZE — Fraunces `opsz` axis, in points ─────────────────────
+     Fraunces defaults to opsz 14 (a text cut). Left there, headlines get the
+     thick joins and open apertures drawn for 14px, which is exactly why most
+     variable-serif headlines look soft. These are the deliberate instances. */
+  --opsz-display-xl:       144;
+  --opsz-display-md:       72;
+  --opsz-display-sm:       36;
 
   /* ── SPACING — 8pt base, 4pt half-steps ────────────────────────────── */
   --spacing-section-y:  clamp(5rem, 3rem + 10vw, 11rem);
@@ -131,6 +174,16 @@
   --dur-base: 260ms;
   --dur-slow: 520ms;
   --dur-reveal: 900ms;
+
+  /* Same trap: --opsz-* is not a Tailwind namespace either. */
+  --opsz-display-xl: 144;
+  --opsz-display-md: 72;
+  --opsz-display-sm: 36;
+
+  /* Fraunces axis defaults. Overridden per-element by the .wonk utility in
+     app/styles/type.css — one word per page, never more. */
+  --soft-display: 0;
+  --wonk-display: 0;
 }
 
 /* ── Focus ring (Rule 5) — one visible treatment, everywhere ───────────── */
