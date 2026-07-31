@@ -7,8 +7,6 @@ import {
   ArrowLeft01Icon as ChevronLeft,
   ArrowRight01Icon as ChevronRight,
   ArrowRight02Icon as ArrowIcon,
-  PlayIcon,
-  PauseIcon,
   Camera01Icon as RecordIcon,
   RepeatIcon as LoopIcon,
   ArrowUpRight01Icon as GrowthIcon,
@@ -42,7 +40,6 @@ import VideoModal from '@/components/VideoModal/VideoModal';
 
 const ORANGE = '#FF6200';
 const EASE = [0.16, 1, 0.3, 1] as const;
-const AUTOPLAY_MS = 7000;
 
 /* ── Shared entrance variants ─────────────────────────────────────────── */
 const containerVariants: Variants = {
@@ -408,11 +405,11 @@ function Slide1() {
     >
       <div className="flex-1 max-w-xl text-center lg:text-left">
         <motion.div variants={itemVariants}>
-          <Eyebrow>The Founder Momentum Playbook</Eyebrow>
+          <Eyebrow>THE CONTENT TO REVENUE PLAYBOOK</Eyebrow>
         </motion.div>
         <motion.h2 variants={itemVariants} className="display-headline text-[clamp(1.6rem,3.4vw,2.6rem)] text-[#0A0A0A]">
-          Record once a week. Get a week of content out, and{' '}
-          <span className="text-[#FF6200]">outreach that puts what you sell</span> in front of the right people.
+          Record once a week. Get content that builds your name, and{' '}
+          <span className="text-[#FF6200]">outreach that fills your pipeline</span>.
         </motion.h2>
       </div>
       <div className="flex-1 w-full max-w-sm flex flex-col items-center">
@@ -827,13 +824,10 @@ export default function PitchDeck() {
   const [modalOpen, setModalOpen] = useState(false);
   const [modalServiceId, setModalServiceId] = useState<string | undefined>(undefined);
   const [videoOpen, setVideoOpen] = useState(false);
-  const [manualPaused, setManualPaused] = useState(false);
-  const [hoverPaused, setHoverPaused] = useState(false);
   const [inView, setInView] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const sectionRef = useRef<HTMLElement>(null);
   const deckRef = useRef<HTMLDivElement>(null);
-  const paused = manualPaused || hoverPaused;
 
   const nextSlide = useCallback(() => {
     setDirection(1);
@@ -853,7 +847,7 @@ export default function PitchDeck() {
     [index]
   );
 
-  // Only steer keyboard/autoplay while the deck is substantially in view.
+  // Only steer keyboard while the deck is substantially in view.
   useEffect(() => {
     const el = sectionRef.current;
     if (!el) return;
@@ -879,12 +873,6 @@ export default function PitchDeck() {
     return () => window.removeEventListener('keydown', handler);
   }, [inView, nextSlide, prevSlide]);
 
-  useEffect(() => {
-    if (paused || !inView) return;
-    const id = setTimeout(nextSlide, AUTOPLAY_MS);
-    return () => clearTimeout(id);
-  }, [index, paused, inView, nextSlide]);
-
   const touchStartX = useRef<number | null>(null);
   const onPointerDown = (e: React.PointerEvent) => {
     touchStartX.current = e.clientX;
@@ -898,7 +886,6 @@ export default function PitchDeck() {
   };
 
   const openService = useCallback((id: string) => {
-    setManualPaused(true);
     setModalServiceId(id);
     setModalOpen(true);
   }, []);
@@ -960,8 +947,6 @@ export default function PitchDeck() {
             'relative rounded-[28px] md:rounded-[32px] border border-black/[0.06] bg-white/80 backdrop-blur-xl shadow-[0_24px_70px_rgba(0,0,0,0.08)] overflow-hidden',
             isFullscreen && '!rounded-none !border-0 !shadow-none min-h-screen flex flex-col'
           )}
-          onMouseEnter={() => setHoverPaused(true)}
-          onMouseLeave={() => setHoverPaused(false)}
         >
           {/* Top bar */}
           <div className={cn('flex items-center justify-between gap-4 px-5 md:px-8 pt-5 pb-3', isFullscreen && 'px-6 pt-6 pb-4')}>
@@ -978,14 +963,6 @@ export default function PitchDeck() {
               </motion.span>
             </AnimatePresence>
             <div className="flex items-center gap-3">
-              <button
-                type="button"
-                onClick={() => setManualPaused((p) => !p)}
-                aria-label={manualPaused ? 'Resume autoplay' : 'Pause autoplay'}
-                className="w-7 h-7 rounded-full flex items-center justify-center text-black/40 hover:text-black hover:bg-black/5 transition-colors duration-200 cursor-pointer"
-              >
-                {manualPaused ? <PlayIcon size={13} /> : <PauseIcon size={13} />}
-              </button>
               <span className="text-[11px] md:text-xs font-bold text-black/40 tabular-nums">
                 0{index + 1} / 0{total}
               </span>
@@ -1009,20 +986,20 @@ export default function PitchDeck() {
                 type="button"
                 onClick={() => goTo(i)}
                 aria-label={`Go to slide ${i + 1}`}
-                className="relative h-1 flex-1 rounded-full bg-black/8 overflow-hidden cursor-pointer"
+                className="relative h-1 flex-1 rounded-full overflow-hidden cursor-pointer"
+                style={{ backgroundColor: 'rgba(0,0,0,0.08)' }}
               >
-                {i < index && <span className="absolute inset-0 bg-[#FF6200]/70 rounded-full" />}
+                {i < index && (
+                  <span
+                    className="absolute inset-0 rounded-full"
+                    style={{ backgroundColor: '#FF6200', opacity: 0.7 }}
+                  />
+                )}
                 {i === index && (
                   <span
                     key={index}
-                    className="absolute inset-y-0 left-0 bg-[#FF6200] rounded-full"
-                    style={{
-                      animationName: 'deck-progress',
-                      animationDuration: `${AUTOPLAY_MS}ms`,
-                      animationTimingFunction: 'linear',
-                      animationFillMode: 'forwards',
-                      animationPlayState: paused ? 'paused' : 'running',
-                    }}
+                    className="absolute inset-y-0 left-0 rounded-full"
+                    style={{ backgroundColor: '#FF6200', width: '100%' }}
                   />
                 )}
               </button>

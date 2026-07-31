@@ -15,7 +15,7 @@ export default function Hero() {
 
         {/* Headline */}
         <motion.h1
-          className="text-[clamp(2rem,5.5vw,4rem)] font-[700] leading-[1.04] tracking-[-0.03em] text-[#1A1A1A] max-w-[820px] drop-shadow-md"
+          className="display-headline text-[clamp(2rem,5.5vw,4rem)] text-[#1A1A1A] max-w-[820px] drop-shadow-md"
           initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.55, delay: 0.08, ease: [0.16, 1, 0.3, 1] }}
