@@ -435,36 +435,104 @@ function Slide1() {
   );
 }
 
-/* ── Slide 2 — The Problem ─────────────────────────────────────────────── */
-function Slide2() {
-  const ref = useRef<HTMLDivElement>(null);
-  const [pos, setPos] = useState({ x: 50, y: 45 });
+/* ── Slide 2 — The Complete Framework ─────────────────────────────────── */
+type FrameworkStep = { num: string; icon: IconType; title: string; bullets: [string, string] };
 
-  const handleMove = (e: React.MouseEvent) => {
-    const rect = ref.current?.getBoundingClientRect();
-    if (!rect) return;
-    setPos({ x: ((e.clientX - rect.left) / rect.width) * 100, y: ((e.clientY - rect.top) / rect.height) * 100 });
-  };
+const FRAMEWORK_CONTENT_STEPS: FrameworkStep[] = [
+  { num: '01', icon: RecordIcon, title: 'Record', bullets: ['You show up, once a week', "One recording. That's your only job"] },
+  { num: '02', icon: EpisodeIcon, title: 'Produce', bullets: ['Edited into episode, clips, articles, posts', 'All written and cut in your voice'] },
+  { num: '03', icon: PublishIcon, title: 'Publish', bullets: ['Sent out everywhere, on schedule', 'Every platform, every single week'] },
+];
 
+const FRAMEWORK_OUTREACH_STEPS: FrameworkStep[] = [
+  { num: '04', icon: TargetIcon, title: 'Target', bullets: ['Prospects found to match your ICP', 'Verified by hand, never a purchased list'] },
+  { num: '05', icon: SendIcon, title: 'Reach', bullets: ['Personalized outreach sent daily', 'Written like a person, never a mail merge'] },
+  { num: '06', icon: ConvoIcon, title: 'Convert', bullets: ['Replies sorted, only real ones reach you', 'Booked calls, not cold leads'] },
+];
+
+function EngineLabel({ children }: { children: React.ReactNode }) {
   return (
-    <div ref={ref} onMouseMove={handleMove} className="relative w-full h-full flex items-center justify-center overflow-hidden">
-      <div
-        className="pointer-events-none absolute w-[380px] h-[380px] md:w-[460px] md:h-[460px] rounded-full blur-[90px] opacity-[0.16] transition-[left,top] duration-300 ease-out"
-        style={{ left: `${pos.x}%`, top: `${pos.y}%`, transform: 'translate(-50%,-50%)', background: `radial-gradient(circle, ${ORANGE}, transparent 70%)` }}
-        aria-hidden
-      />
-      <motion.div variants={containerVariants} initial="hidden" animate="visible" className="relative z-10 max-w-2xl text-center px-4">
-        <motion.div variants={itemVariants}>
-          <Eyebrow>The Problem</Eyebrow>
-        </motion.div>
-        <motion.h2 variants={itemVariants} className="display-headline text-[clamp(1.9rem,4.4vw,3.4rem)] text-[#0A0A0A] mb-5">
-          You&apos;re good at what you do.
-        </motion.h2>
-        <motion.p variants={itemVariants} className="text-base md:text-lg text-black/55 leading-relaxed max-w-md mx-auto">
-          Right now your next client depends on who happens to think of you this month.
-        </motion.p>
-      </motion.div>
+    <p className="text-center text-[10px] md:text-[11px] font-black tracking-[0.18em] uppercase text-[#FF6200] mb-2.5">
+      {children}
+    </p>
+  );
+}
+
+function FrameworkCard({ num, icon: Icon, title, bullets }: FrameworkStep) {
+  return (
+    <div className="w-full md:flex-1 rounded-2xl border border-black/10 bg-white/70 backdrop-blur-md shadow-sm p-4 md:p-5 transition-all duration-300 hover:shadow-md hover:-translate-y-1 hover:border-[#FF6200]/30">
+      <div className="flex items-center gap-2.5 mb-3">
+        <span className="w-6 h-6 md:w-7 md:h-7 rounded-full bg-[#FF6200]/10 border border-[#FF6200]/30 flex items-center justify-center text-[10px] font-black text-[#FF6200] flex-shrink-0">
+          {num}
+        </span>
+        <span className="flex-1 text-[13px] md:text-sm font-extrabold uppercase tracking-wide text-[#0A0A0A]">{title}</span>
+        <Icon size={16} strokeWidth={2} className="text-[#FF6200]/60 flex-shrink-0" />
+      </div>
+      <ul className="space-y-1.5">
+        {bullets.map((b) => (
+          <li key={b} className="flex items-start gap-2">
+            <span className="mt-[6px] w-1 h-1 rounded-full bg-[#FF6200] flex-shrink-0" />
+            <span className="text-[11px] md:text-[11.5px] leading-snug text-black/55">{b}</span>
+          </li>
+        ))}
+      </ul>
     </div>
+  );
+}
+
+function EngineDivider() {
+  return (
+    <div className="flex items-center gap-3 w-full max-w-xl mx-auto">
+      <span className="w-1.5 h-1.5 rounded-full bg-[#FF6200] flex-shrink-0" />
+      <span className="flex-1 h-px bg-black/10" />
+      <p className="text-[10.5px] md:text-[11.5px] font-semibold text-black/45 text-center px-1 leading-snug">
+        Content earns the trust <span className="text-black/25">—</span> outreach puts it in front of the right person.
+      </p>
+      <span className="flex-1 h-px bg-black/10" />
+      <span className="w-1.5 h-1.5 rounded-full bg-[#FF6200] flex-shrink-0" />
+    </div>
+  );
+}
+
+function Slide2() {
+  return (
+    <motion.div
+      variants={containerVariants}
+      initial="hidden"
+      animate="visible"
+      className="w-full h-full flex flex-col items-center justify-center gap-5 md:gap-6"
+    >
+      <motion.div variants={itemVariants} className="text-center">
+        <Eyebrow>The Complete Framework</Eyebrow>
+        <h2 className="display-headline text-[clamp(1.4rem,2.8vw,2.1rem)] text-[#0A0A0A] max-w-xl">
+          One recording. Six steps. <span className="text-[#FF6200]">One system, start to finish.</span>
+        </h2>
+      </motion.div>
+
+      <motion.div variants={itemVariants} className="w-full max-w-4xl">
+        <EngineLabel>Content Engine</EngineLabel>
+        <div className="flex flex-col md:flex-row items-stretch gap-2.5 md:gap-1">
+          {FRAMEWORK_CONTENT_STEPS.flatMap((s, i) => [
+            <FrameworkCard key={`c-${s.num}`} {...s} />,
+            i < FRAMEWORK_CONTENT_STEPS.length - 1 ? <StepArrow key={`c-arrow-${i}`} /> : null,
+          ])}
+        </div>
+      </motion.div>
+
+      <motion.div variants={itemVariants}>
+        <EngineDivider />
+      </motion.div>
+
+      <motion.div variants={itemVariants} className="w-full max-w-4xl">
+        <EngineLabel>Outreach Engine</EngineLabel>
+        <div className="flex flex-col md:flex-row items-stretch gap-2.5 md:gap-1">
+          {FRAMEWORK_OUTREACH_STEPS.flatMap((s, i) => [
+            <FrameworkCard key={`o-${s.num}`} {...s} />,
+            i < FRAMEWORK_OUTREACH_STEPS.length - 1 ? <StepArrow key={`o-arrow-${i}`} /> : null,
+          ])}
+        </div>
+      </motion.div>
+    </motion.div>
   );
 }
 
@@ -801,7 +869,7 @@ function Slide9({ onSeeFramework }: { onSeeFramework: () => void }) {
 
 const SLIDE_META = [
   { kicker: 'The Promise' },
-  { kicker: 'The Problem' },
+  { kicker: 'The Complete Framework' },
   { kicker: 'Why The Old Fixes Fail' },
   { kicker: 'The Content System' },
   { kicker: 'The Outreach System' },
