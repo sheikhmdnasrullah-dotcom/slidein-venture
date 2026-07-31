@@ -10,10 +10,7 @@ import {
   Camera01Icon as RecordIcon,
   RepeatIcon as LoopIcon,
   ArrowUpRight01Icon as GrowthIcon,
-  User02Icon as FreelancerIcon,
-  Wrench01Icon as ToolIcon,
   UserGroupIcon as AgencyIcon,
-  Cancel01Icon as BreakIcon,
   Film01Icon as EpisodeIcon,
   TextAlignLeftIcon as TranscriptIcon,
   Note01Icon as ShowNotesIcon,
@@ -64,7 +61,7 @@ function Connector() {
   return (
     <motion.div
       variants={connectorVariants}
-      className="relative w-px h-8 md:h-10 mx-auto"
+      className="relative w-px h-10 md:h-12 mx-auto"
       style={{ transformOrigin: 'top' }}
     >
       <span className="absolute inset-0 border-l-2 border-dashed border-black/15" />
@@ -77,11 +74,13 @@ function Pill({
   icon: Icon,
   tone = 'default',
   tooltip,
+  width,
   children,
 }: {
   icon?: IconType;
   tone?: 'default' | 'ink' | 'accent';
   tooltip?: string;
+  width?: number;
   children: React.ReactNode;
 }) {
   const [hover, setHover] = useState(false);
@@ -94,10 +93,15 @@ function Pill({
   const iconWrapClasses = tone === 'default' ? 'bg-[#FF6200]/10 text-[#FF6200]' : 'bg-white/15 text-white';
 
   return (
-    <div className="relative w-fit max-w-full" onMouseEnter={() => setHover(true)} onMouseLeave={() => setHover(false)}>
+    <div
+      className={cn('relative max-w-full', width ? 'mx-auto' : 'w-fit')}
+      style={width ? { width } : undefined}
+      onMouseEnter={() => setHover(true)}
+      onMouseLeave={() => setHover(false)}
+    >
       <div
         className={cn(
-          'flex items-center gap-3 px-5 py-3 rounded-full border shadow-sm backdrop-blur-md transition-transform duration-300 cursor-default',
+          'flex items-center gap-3 px-5 py-3 min-h-[52px] rounded-full border shadow-sm backdrop-blur-md transition-transform duration-300 cursor-default',
           toneClasses,
           hover && 'scale-[1.03] shadow-md'
         )}
@@ -107,7 +111,7 @@ function Pill({
             <Icon size={14} strokeWidth={2.5} />
           </span>
         )}
-        <span className="text-[13px] md:text-sm font-bold text-center leading-snug">{children}</span>
+        <span className="text-[13px] md:text-sm font-bold text-center leading-snug whitespace-nowrap">{children}</span>
       </div>
       {tooltip && (
         <AnimatePresence>
@@ -219,41 +223,6 @@ function StepArrow() {
   return (
     <div className="flex items-center justify-center py-1 md:py-0 md:px-1 flex-shrink-0">
       <ArrowIcon size={18} className="text-[#FF6200]/50 rotate-90 md:rotate-0" />
-    </div>
-  );
-}
-
-function FailCard({ icon: Icon, label, reason }: { icon: IconType; label: string; reason: React.ReactNode }) {
-  const [hover, setHover] = useState(false);
-  return (
-    <div
-      className="flex flex-col items-center gap-3"
-      onMouseEnter={() => setHover(true)}
-      onMouseLeave={() => setHover(false)}
-    >
-      <div
-        className={cn(
-          'flex items-center gap-2.5 px-4 py-2.5 rounded-full border bg-white/70 backdrop-blur-md transition-all duration-300',
-          hover ? '-translate-y-0.5 border-black/20 shadow-sm' : 'border-black/10'
-        )}
-      >
-        <span className="w-7 h-7 rounded-full bg-black/5 flex items-center justify-center text-black/50 flex-shrink-0">
-          <Icon size={14} strokeWidth={2} />
-        </span>
-        <span className="text-[13px] font-bold text-black/70">{label}</span>
-      </div>
-      <span className="w-px h-6 border-l-2 border-dashed border-black/15" />
-      <span
-        className={cn(
-          'w-8 h-8 rounded-full border-2 flex items-center justify-center transition-all duration-300',
-          hover ? 'border-[#FF6200] rotate-180 bg-[#FF6200]/10' : 'border-black/25'
-        )}
-      >
-        <BreakIcon size={14} strokeWidth={2.5} className={cn('transition-colors duration-300', hover ? 'text-[#FF6200]' : 'text-black/40')} />
-      </span>
-      <p className={cn('text-[13px] font-semibold text-center leading-snug transition-colors duration-300', hover ? 'text-black/80' : 'text-black/45')}>
-        {reason}
-      </p>
     </div>
   );
 }
@@ -395,6 +364,24 @@ function Eyebrow({ children }: { children: React.ReactNode }) {
   return <p className="text-[11px] md:text-xs font-bold tracking-[0.14em] uppercase text-[#FF6200] mb-3">{children}</p>;
 }
 
+/** Small L-bracket accent in the deck's corners — a designed detail, not extra chrome. */
+function CornerAccent({ position }: { position: 'top-left' | 'bottom-right' }) {
+  const isTL = position === 'top-left';
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      aria-hidden
+      className={cn(
+        'pointer-events-none absolute w-5 h-5 md:w-6 md:h-6 z-20',
+        isTL ? 'top-4 left-4 md:top-5 md:left-5' : 'bottom-4 right-4 md:bottom-5 md:right-5 rotate-180'
+      )}
+    >
+      <path d="M2 9V2H9" stroke="#FF6200" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" opacity="0.55" />
+    </svg>
+  );
+}
+
 /* ── Slide 1 — The Promise ─────────────────────────────────────────────── */
 function Slide1() {
   return (
@@ -415,19 +402,19 @@ function Slide1() {
       </div>
       <div className="flex-1 w-full max-w-sm flex flex-col items-center">
         <motion.div variants={itemVariants} className="w-full flex justify-center">
-          <Pill icon={RecordIcon} tooltip="One recording a week is all this needs from you.">
+          <Pill icon={RecordIcon} width={300} tooltip="One recording a week is all this needs from you.">
             You Record, Once a Week
           </Pill>
         </motion.div>
         <Connector />
         <motion.div variants={itemVariants} className="w-full flex justify-center">
-          <Pill icon={LoopIcon} tone="ink" tooltip="We turn that recording into a week of content and a week of outreach.">
+          <Pill icon={LoopIcon} tone="ink" width={300} tooltip="We turn that recording into a week of content and a week of outreach.">
             Content + Outreach, Handled
           </Pill>
         </motion.div>
         <Connector />
         <motion.div variants={itemVariants} className="w-full flex justify-center">
-          <Pill icon={GrowthIcon} tone="accent" tooltip="More eyes on your work, more replies in your inbox.">
+          <Pill icon={GrowthIcon} tone="accent" width={300} tooltip="More eyes on your work, more replies in your inbox.">
             More Clients, Faster
           </Pill>
         </motion.div>
@@ -451,61 +438,6 @@ function Slide2() {
       <motion.div variants={itemVariants} className="w-full">
         <FrameworkFlowSlide />
       </motion.div>
-    </motion.div>
-  );
-}
-
-/* ── Slide 3 — Why The Old Fixes Fail ─────────────────────────────────── */
-function Slide3() {
-  return (
-    <motion.div
-      variants={containerVariants}
-      initial="hidden"
-      animate="visible"
-      className="w-full h-full flex flex-col items-center justify-center text-center gap-8 md:gap-10"
-    >
-      <motion.div variants={itemVariants}>
-        <Eyebrow>Why The Old Fixes Fail</Eyebrow>
-        <h2 className="display-headline text-[clamp(1.4rem,2.8vw,2.1rem)] text-[#0A0A0A]">You&apos;ve probably tried this already.</h2>
-      </motion.div>
-      <motion.div variants={itemVariants} className="grid grid-cols-1 sm:grid-cols-3 gap-8 md:gap-10 w-full max-w-3xl">
-        <FailCard
-          icon={FreelancerIcon}
-          label="A Freelancer"
-          reason={
-            <>
-              Great work.
-              <br />
-              Nobody coordinating it.
-            </>
-          }
-        />
-        <FailCard
-          icon={ToolIcon}
-          label="A Tool"
-          reason={
-            <>
-              Still ran on
-              <br />
-              your own time.
-            </>
-          }
-        />
-        <FailCard
-          icon={AgencyIcon}
-          label="An Agency"
-          reason={
-            <>
-              One more vendor
-              <br />
-              to manage.
-            </>
-          }
-        />
-      </motion.div>
-      <motion.p variants={itemVariants} className="text-lg md:text-xl font-extrabold text-[#0A0A0A]">
-        None of them ever talked to <span className="text-[#FF6200]">each other.</span>
-      </motion.p>
     </motion.div>
   );
 }
@@ -789,7 +721,6 @@ function Slide9({ onSeeFramework }: { onSeeFramework: () => void }) {
 const SLIDE_META = [
   { kicker: 'The Promise' },
   { kicker: 'The Complete Framework' },
-  { kicker: 'Why The Old Fixes Fail' },
   { kicker: 'The Content System' },
   { kicker: 'The Outreach System' },
   { kicker: "Why It's One System" },
@@ -914,7 +845,6 @@ export default function PitchDeck() {
     () => [
       <Slide1 key="s1" />,
       <Slide2 key="s2" />,
-      <Slide3 key="s3" />,
       <Slide4 key="s4" onOpenService={openService} />,
       <Slide5 key="s5" />,
       <Slide6 key="s6" />,
@@ -931,22 +861,32 @@ export default function PitchDeck() {
         <div
           className={cn(
             'relative',
-            !isFullscreen && 'rounded-[29px] md:rounded-[33px] p-[1.5px] bg-gradient-to-br from-black/[0.08] via-[#FF6200]/30 to-black/[0.08]'
+            !isFullscreen && 'rounded-[21px] md:rounded-[23px] p-px bg-gradient-to-br from-[#FF6200]/45 via-black/[0.06] to-black/[0.06]'
           )}
         >
           {!isFullscreen && (
             <div
               aria-hidden
-              className="pointer-events-none absolute -inset-6 md:-inset-10 -z-10 rounded-[44px] bg-[#FF6200]/10 blur-3xl opacity-70"
+              className="pointer-events-none absolute -inset-6 md:-inset-10 -z-10 rounded-[36px] bg-[#FF6200]/10 blur-3xl"
             />
           )}
           <div
             ref={deckRef}
             className={cn(
-              'relative rounded-[28px] md:rounded-[32px] bg-white shadow-[inset_0_1px_0_rgba(255,255,255,0.7),0_24px_70px_rgba(0,0,0,0.10),0_8px_20px_rgba(255,98,0,0.06)] overflow-hidden',
+              'relative rounded-[20px] md:rounded-[22px] bg-white shadow-[inset_0_1px_0_rgba(255,255,255,0.7),0_24px_70px_rgba(0,0,0,0.10),0_8px_20px_rgba(255,98,0,0.06)] overflow-hidden',
               isFullscreen && '!rounded-none !border-0 !shadow-none min-h-screen flex flex-col'
             )}
           >
+            {!isFullscreen && <CornerAccent position="top-left" />}
+            {!isFullscreen && <CornerAccent position="bottom-right" />}
+            <div
+              aria-hidden
+              className="pointer-events-none absolute inset-0 z-30 opacity-[0.025]"
+              style={{
+                backgroundImage:
+                  "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E\")",
+              }}
+            />
           {/* Top bar */}
           <div className={cn('flex items-center justify-between gap-4 px-5 md:px-8 pt-5 pb-3', isFullscreen && 'px-6 pt-6 pb-4')}>
             <AnimatePresence mode="wait">
@@ -988,19 +928,12 @@ export default function PitchDeck() {
                 className="relative h-1 flex-1 rounded-full overflow-hidden cursor-pointer"
                 style={{ backgroundColor: 'rgba(0,0,0,0.08)' }}
               >
-                {i < index && (
-                  <span
-                    className="absolute inset-0 rounded-full"
-                    style={{ backgroundColor: '#FF6200', opacity: 0.7 }}
-                  />
-                )}
-                {i === index && (
-                  <span
-                    key={index}
-                    className="absolute inset-y-0 left-0 rounded-full"
-                    style={{ backgroundColor: '#FF6200', width: '100%' }}
-                  />
-                )}
+                <motion.span
+                  className="absolute inset-y-0 left-0 rounded-full"
+                  style={{ backgroundColor: '#FF6200' }}
+                  animate={{ width: i <= index ? '100%' : '0%', opacity: i < index ? 0.7 : 1 }}
+                  transition={{ duration: 0.3, ease: 'easeInOut' }}
+                />
               </button>
             ))}
           </div>
@@ -1009,7 +942,7 @@ export default function PitchDeck() {
           <div
             data-deck-stage
             className={cn(
-              'relative w-full px-1',
+              'relative w-full px-1 overflow-hidden',
               isFullscreen ? 'flex-1 flex items-center justify-center' : 'min-h-[680px] sm:min-h-[640px] md:min-h-[640px] lg:min-h-[660px]'
             )}
             onPointerDown={onPointerDown}
@@ -1025,7 +958,7 @@ export default function PitchDeck() {
                 animate="center"
                 exit="exit"
                 className={cn(
-                  'absolute inset-0 flex items-center justify-center',
+                  'absolute inset-0 flex items-center justify-center overflow-hidden',
                   isFullscreen ? 'p-6 sm:p-10 md:p-14 lg:p-20' : 'p-4 sm:p-6 md:p-8 lg:p-10'
                 )}
               >
@@ -1039,7 +972,7 @@ export default function PitchDeck() {
               onClick={prevSlide}
               aria-label="Previous slide"
               className={cn(
-                'absolute left-2 md:left-4 top-1/2 -translate-y-1/2 z-20 w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center bg-white/80 backdrop-blur-md border border-black/10 shadow-md hover:bg-white hover:scale-105 hover:shadow-lg active:scale-95 transition-all duration-200 cursor-pointer',
+                'absolute left-2 md:left-4 top-1/2 -translate-y-1/2 z-20 w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center bg-white/60 backdrop-blur-md border border-black/[0.04] shadow-sm hover:bg-white hover:border-black/10 hover:scale-105 hover:shadow-lg active:scale-95 transition-all duration-200 cursor-pointer',
                 isFullscreen && 'md:w-14 md:h-14'
               )}
             >
@@ -1050,7 +983,7 @@ export default function PitchDeck() {
               onClick={nextSlide}
               aria-label="Next slide"
               className={cn(
-                'absolute right-2 md:right-4 top-1/2 -translate-y-1/2 z-20 w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center bg-white/80 backdrop-blur-md border border-black/10 shadow-md hover:bg-white hover:scale-105 hover:shadow-lg active:scale-95 transition-all duration-200 cursor-pointer',
+                'absolute right-2 md:right-4 top-1/2 -translate-y-1/2 z-20 w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center bg-white/60 backdrop-blur-md border border-black/[0.04] shadow-sm hover:bg-white hover:border-black/10 hover:scale-105 hover:shadow-lg active:scale-95 transition-all duration-200 cursor-pointer',
                 isFullscreen && 'md:w-14 md:h-14'
               )}
             >
