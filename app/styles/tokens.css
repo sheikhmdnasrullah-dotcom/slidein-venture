@@ -1,0 +1,155 @@
+@import "tailwindcss";
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   SLIDEIN VENTURE — TOKEN LAYER · single source of truth
+   ---------------------------------------------------------------------------
+   Every value in a component must come from here. A raw hex, px or ms literal
+   in a .tsx file is a bug.
+
+   OKLCH throughout: hex/HSL ramps lighten unevenly (warm greys drift green
+   through the mid-tones). OKLCH is perceptually uniform, so a ramp reads as
+   one material under different light.
+
+   Contrast figures below are measured, not estimated — computed with culori
+   against WCAG 2 relative luminance. See scripts/verify-contrast.mjs.
+   ═════════════════════════════════════════════════════════════════════════ */
+
+@theme {
+  /* ── SURFACE RAMP ──────────────────────────────────────────────────────
+     Warm but pulled grey — newsprint and cold-press, not latte foam.
+     Never #FFFFFF (Rule 2): paper-25 is the lightest surface on the site. */
+  --color-paper-25:     oklch(0.978 0.004 85);   /* highest light, hero top */
+  --color-paper-50:     oklch(0.968 0.006 85);   /* base page fill */
+  --color-paper-100:    oklch(0.945 0.008 84);   /* raised panel */
+  --color-paper-200:    oklch(0.915 0.010 83);   /* inset well, code blocks */
+  --color-bone-300:     oklch(0.868 0.012 82);   /* hairlines, dividers */
+  --color-bone-400:     oklch(0.790 0.014 80);   /* disabled, placeholder */
+
+  /* ── INK RAMP ──────────────────────────────────────────────────────────
+     Never #000000 (Rule 2): ink-deep is the darkest value on the site. */
+  --color-slate-500:    oklch(0.545 0.016 75);   /* 4.52:1 on paper-50 — AA */
+  --color-slate-600:    oklch(0.470 0.018 74);   /* body on light panels */
+  --color-graphite-800: oklch(0.235 0.012 70);   /* dark panel tint */
+  --color-graphite-900: oklch(0.185 0.011 68);   /* dark section base */
+  --color-ink:          oklch(0.155 0.010 66);   /* 17.83:1 on paper-50 */
+  --color-ink-deep:     oklch(0.115 0.009 64);   /* darkest on the site */
+
+  /* ── BRAND ─────────────────────────────────────────────────────────────
+     --color-brand is #FF6200 converted exactly (culori). Hue 42.28 is the
+     brand's real hue and is held constant across every derived token, so
+     none of these is a "second orange" (Rule 1).
+
+       #FF6200 -> oklch(0.6908 0.2074 42.28)
+
+     MEASURED CONTRAST — this is where orange brands fail:
+       brand    on paper-50      2.73:1  ✗ fails at any text size
+       brand    on graphite-900  6.22:1  ✓
+       brand-hi on graphite-900  6.47:1  ✓
+       signal   on paper-50      4.50:1  ✓ AA at any size                  */
+  --color-brand:        oklch(0.691 0.207 42.28);  /* exact #FF6200 */
+  --color-brand-hi:     oklch(0.700 0.198 42.28);  /* orange on dark surfaces */
+  --color-signal:       oklch(0.563 0.168 42.28);  /* the only orange for small text */
+  --color-ember:        oklch(0.380 0.120 42.28);  /* deep orange — FILLS AND BORDERS ONLY,
+                                                      never text: 1.9:1 on graphite-900 */
+
+  /* ── STATUS ────────────────────────────────────────────────────────────
+     Not brand colour. Reserved for live/scheduled system indicators, which
+     must stay distinguishable from the orange. Desaturated to sit inside the
+     warm palette rather than shouting UI-kit green. */
+  --color-live:         oklch(0.530 0.148 149);   /* 4.50:1 on paper-50 */
+  --color-live-deep:    oklch(0.430 0.120 149);   /* on light chips */
+
+  /* ── RADII — three values. A fourth is a design failure (Rule 3). ────── */
+  --radius-sm:          6px;     /* inputs, tags, tiny chips */
+  --radius-md:          18px;    /* cards, panels, media */
+  --radius-pill:        999px;   /* buttons, nav, badges — brand signature */
+
+  /* Legacy aliases. Existing markup uses rounded-lg/xl/2xl/3xl; these collapse
+     onto the deliberate scale instead of inventing new values. Migrate call
+     sites to sm/md/pill, then delete this block. */
+  --radius-lg:          var(--radius-md);
+  --radius-xl:          var(--radius-md);
+  --radius-2xl:         var(--radius-md);
+  --radius-3xl:         var(--radius-md);
+  --radius-4xl:         var(--radius-md);
+
+  /* ── TYPE SCALE — modular, ratio 1.26, fluid so no breakpoint overrides ─ */
+  --text-micro:         clamp(0.625rem, 0.60rem + 0.12vw, 0.6875rem);
+  --text-sm:            clamp(0.8125rem, 0.79rem + 0.12vw, 0.875rem);
+  --text-base:          clamp(1rem, 0.96rem + 0.2vw, 1.125rem);
+  --text-lg:            clamp(1.1875rem, 1.12rem + 0.32vw, 1.375rem);
+  --text-xl:            clamp(1.5rem, 1.36rem + 0.7vw, 2rem);
+  --text-2xl:           clamp(2rem, 1.72rem + 1.4vw, 3rem);
+  --text-3xl:           clamp(2.5rem, 1.9rem + 3vw, 4.25rem);
+  --text-display:       clamp(3rem, 1.6rem + 7vw, 6.75rem);
+  /* legacy aliases so untouched markup keeps compiling */
+  --text-xs:            var(--text-micro);
+  --text-4xl:           var(--text-3xl);
+  --text-5xl:           var(--text-3xl);
+  --text-6xl:           var(--text-display);
+
+  /* ── SPACING — 8pt base, 4pt half-steps ────────────────────────────── */
+  --spacing-section-y:  clamp(5rem, 3rem + 10vw, 11rem);
+  --spacing-gutter:     clamp(1.25rem, 0.5rem + 3.2vw, 3.5rem);
+
+  /* ── MOTION — two easings, not five ────────────────────────────────── */
+  --ease-expo:          cubic-bezier(0.16, 1, 0.30, 1);
+  --ease-std:           cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-spring: linear(
+    0, 0.0057 1.2%, 0.0225 2.5%, 0.0888 5%, 0.199 7.6%,
+    0.6082 15.5%, 0.8602 21.1%, 1.0231 26.9%, 1.0684 31.2%,
+    1.0257 41.3%, 0.9903 50.5%, 1.0009 68.4%, 1
+  );
+  --dur-fast:           140ms;
+  --dur-base:           260ms;
+  --dur-slow:           520ms;
+  --dur-reveal:         900ms;
+
+  /* ── ELEVATION ─────────────────────────────────────────────────────────
+     Two-layer: tight contact shadow + wide ambient. Single-layer shadows
+     always read fake. Warm-tinted — grey shadows on warm paper look wrong. */
+  --shadow-contact:     0 1px 2px -1px oklch(0.155 0.010 66 / 10%);
+  --shadow-raised:
+    0 1px 2px -1px oklch(0.155 0.010 66 / 9%),
+    0 8px 20px -10px oklch(0.155 0.010 66 / 14%);
+  --shadow-float:
+    0 1px 2px -1px oklch(0.155 0.010 66 / 8%),
+    0 12px 28px -12px oklch(0.155 0.010 66 / 12%),
+    0 40px 72px -32px oklch(0.155 0.010 66 / 14%);
+  /* paper-25, not oklch(1 0 0) — pure white is forbidden even in a highlight */
+  --shadow-inset-top:   inset 0 1px 0 oklch(0.978 0.004 85 / 55%);
+}
+
+/* ── Non-namespaced tokens ───────────────────────────────────────────────
+   Tailwind v4's @theme only emits custom properties for namespaces it knows
+   (--color-*, --radius-*, --text-*, --shadow-*, --ease-*, --spacing-* …).
+   --dur-* is not one of them, so declaring durations in @theme alone silently
+   drops them and every var(--dur-base) resolves to nothing. Declare them on
+   :root as well so they are real CSS custom properties. */
+:root {
+  --dur-fast: 140ms;
+  --dur-base: 260ms;
+  --dur-slow: 520ms;
+  --dur-reveal: 900ms;
+}
+
+/* ── Focus ring (Rule 5) — one visible treatment, everywhere ───────────── */
+@layer base {
+  :focus-visible {
+    outline: 2px solid var(--color-signal);
+    outline-offset: 2px;
+    border-radius: var(--radius-sm);
+  }
+}
+
+/* ── Reduced motion (Rule 5) — global backstop ─────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 1ms !important;
+    scroll-behavior: auto !important;
+  }
+}

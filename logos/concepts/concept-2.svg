@@ -1,0 +1,23 @@
+<svg viewBox="0 0 1024 512" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="SlideIn Venture">
+  <!-- Direction: signal / pipeline. One recording (orange source) fans out into
+       many distributed outputs. The literal business model as a mark. -->
+  <g id="icon">
+    <g fill="none" stroke="#0A0A0A" stroke-width="12" stroke-linecap="round">
+      <path d="M118 256 C 162 256, 162 190, 208 190"/>
+      <path d="M118 256 L 208 256"/>
+      <path d="M118 256 C 162 256, 162 322, 208 322"/>
+    </g>
+    <circle cx="96" cy="256" r="22" fill="#FF6200"/>
+    <circle cx="226" cy="190" r="14" fill="#0A0A0A"/>
+    <circle cx="226" cy="256" r="14" fill="#0A0A0A"/>
+    <circle cx="226" cy="322" r="14" fill="#0A0A0A"/>
+  </g>
+
+  <g id="wordmark">
+    <text x="316" y="292"
+          font-family="Georgia, 'Times New Roman', serif"
+          font-size="96" letter-spacing="-3" fill="#0A0A0A">SlideIn<tspan
+          font-family="Helvetica, Arial, sans-serif"
+          font-size="80" letter-spacing="-1" fill="#FF6200" dx="20">Venture</tspan></text>
+  </g>
+</svg>

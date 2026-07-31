@@ -1,57 +1,85 @@
 ## Design System: SlideIn Venture
 
-### Pattern
-- **Name:** Storytelling + Feature-Rich
-- **CTA Placement:** Above fold
-- **Sections:** Hero > Features > CTA
+> This file previously specified pink `#EC4899` + Calistoga + "Kinetic Brutalism".
+> None of that was ever in the code. It has been rewritten to match what actually
+> ships. Treat this file as the source of truth for visual decisions.
 
-### Style
-- **Name:** Kinetic Brutalism (Mobile)
-- **Mode Support:** Light ✓ Dark Primary | Dark ◐ Dark only (inverted sections)
-- **Keywords:** kinetic, brutalism, motion, marquee, acid yellow, uppercase, oversized, aggressive typography, street, zine, high contrast, scroll-driven, haptic, reanimated
-- **Best For:** Immersive storytelling apps, brand flagship mobile, music/culture platforms, sports apps, underground zines, limited-edition product drops, performance dashboards
-- **Performance:** ⚡ Excellent (native driver required) | **Accessibility:** ⚠ WCAG AA (verify zinc body text on dark bg)
+### Feeling
 
-### Colors
-| Role | Hex | CSS Variable |
-|------|-----|--------------|
-| Primary | `#EC4899` | `--color-primary` |
-| On Primary | `#FFFFFF` | `--color-on-primary` |
-| Secondary | `#F472B6` | `--color-secondary` |
-| Accent/CTA | `#0891B2` | `--color-accent` |
-| Background | `#FDF2F8` | `--color-background` |
-| Foreground | `#831843` | `--color-foreground` |
-| Muted | `#F1EEF5` | `--color-muted` |
-| Border | `#FBCFE8` | `--color-border` |
-| Destructive | `#DC2626` | `--color-destructive` |
-| Ring | `#EC4899` | `--color-ring` |
+Minimal · premium · editorial · technical · architectural · systematic.
 
-*Notes: Bold pink + creative cyan [Accent adjusted from #06B6D4 for WCAG 3:1]*
+Reference points: Linear, Apple, Stripe, Raycast, Vercel, Attio, Arc.
+The site should read like a product blueprint, not a marketing page.
 
-### Typography
-- **Heading:** Calistoga
-- **Body:** Inter
-- **Mood:** saas, boutique, electric, warm, editorial, bold, premium, fintech, business, dual font, human warmth
-- **Best For:** B2B SaaS mobile, fintech apps, analytics dashboards, marketing tools, operations platforms
-- **Google Fonts:** https://fonts.googleapis.com/css2?family=Calistoga:ital@0;1&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap
-- **CSS Import:**
-```css
-@import url('https://fonts.googleapis.com/css2?family=Calistoga:ital@0;1&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
-```
+**Not:** startup template, generic SaaS, glassmorphism everywhere, neon,
+excessive gradients.
 
-### Key Effects
-Infinite marquee (Reanimated, Linear easing, 5s loop, hard clip), hero parallax (scale 1.0→1.3 + fade), sticky section header push, card flood inversion on press (bg→#DFE104, text→#000000), haptic Medium on every press, scroll-triggered interpolate transforms, 0px radius, 2px borders, 100ms color transitions
+### Color
 
-### Avoid (Anti-patterns)
-- Boring design
-- Hidden work
+Orange is the brand colour and appears **only where attention is needed** —
+roughly 1% of any given viewport. Never as a large surface.
 
-### Pre-Delivery Checklist
-- [ ] No emojis as icons (use SVG: Heroicons/Lucide)
-- [ ] cursor-pointer on all clickable elements
-- [ ] Hover states with smooth transitions (150-300ms)
-- [ ] Light mode: text contrast 4.5:1 minimum
-- [ ] Focus states visible for keyboard nav
-- [ ] prefers-reduced-motion respected
-- [ ] Responsive: 375px, 768px, 1024px, 1440px
+| Role | Hex | Use |
+|------|-----|-----|
+| Ink | `#0A0A0A` | Headlines, primary buttons |
+| Ink light | `#4A4A4A` | Secondary text |
+| Mist | `#787774` | Muted text |
+| Frost | `#E8E8E4` | Hairlines, dividers |
+| Paper | `#FFFFFF` | Base surface |
+| Orange | `#FF6200` | Interaction, accents, eye-guidance |
 
+**Never:** solid orange buttons, orange section backgrounds, orange blocks.
+The primary CTA is an ink slab with an orange arrow and an orange hover glow.
+
+### Typography — three levels
+
+| Level | Face | CSS | Use |
+|-------|------|-----|-----|
+| Editorial display | Instrument Serif (400 only) | `var(--font-display)` | Hero + section headlines |
+| UI / body | Inter | `var(--font-sans)` | Body copy, buttons, nav |
+| Technical metadata | JetBrains Mono | `var(--font-mono)` | Labels, coordinates, indexes |
+
+Instrument Serif ships **weight 400 only** — never apply a bold weight to it or
+the browser synthesises faux bold.
+
+Mono labels are always `10px`, `uppercase`, `tracking-[0.2em]`, `text-black/40`.
+
+### Background — layered, in `AmbientEnvironment.tsx`
+
+Seven layers, all nearly invisible: white base → paper grain → 28px engineering
+dot grid → drifting radial light → blueprint construction guides → floating
+particles → cursor-following ambient light. Noticed after 20 seconds, not
+immediately.
+
+### System primitives — `components/System/System.tsx`
+
+`MonoLabel` · `SectionRule` · `CornerBrackets` · `Ticks`.
+Compose sections from these rather than hand-rolling labels and rules.
+
+Section rules follow `NN — Label` on the left, hairline, coordinate on the right.
+
+### Motion
+
+Easing is always `cubic-bezier(0.16, 1, 0.3, 1)`. Slow, confident, never flashy.
+Nothing bounces. Nothing overshoots.
+
+- Headlines reveal **by line**, never by character
+- Durations 0.7–1.1s for reveals, 0.3–0.5s for hovers
+- Magnetic buttons track the cursor via spring, mouse pointers only
+- Every motion path must collapse under `prefers-reduced-motion`
+
+### Buttons
+
+`.btn-premium` in `globals.css` provides the light sweep, elevation and physical
+press. Primary = ink gradient slab. Secondary = white/70 with a hairline border.
+Radius `rounded-2xl` — rounded, never pill, never a plain rectangle.
+
+### Pre-delivery checklist
+
+- [ ] No emoji as icons — one icon family only (hugeicons is what ships today)
+- [ ] `cursor-pointer` on everything clickable
+- [ ] Orange stays ~1% of the viewport
+- [ ] Instrument Serif never bolded
+- [ ] `prefers-reduced-motion` respected
+- [ ] Responsive at 375 / 768 / 1024 / 1440
+- [ ] No link points at a route that does not exist (see `docs/site-architecture.md`)

@@ -1,0 +1,530 @@
+app/globals.css:32:  --color-background:   #FFFFFF;
+app/globals.css:33:  --color-foreground:   #0A0A0A;
+app/globals.css:34:  --color-card:         #FFFFFF;
+app/globals.css:35:  --color-card-foreground: #0A0A0A;
+app/globals.css:36:  --color-primary:      #FF6200;
+app/globals.css:37:  --color-primary-foreground: #FFFFFF;
+app/globals.css:38:  --color-secondary:    #F5F5F5;
+app/globals.css:39:  --color-secondary-foreground: #0A0A0A;
+app/globals.css:40:  --color-muted:        #F5F5F5;
+app/globals.css:41:  --color-muted-foreground: #787774;
+app/globals.css:42:  --color-accent:       #FF6200;
+app/globals.css:43:  --color-accent-foreground: #FFFFFF;
+app/globals.css:44:  --color-destructive:  #FF6200;
+app/globals.css:45:  --color-border:       #E5E5E5;
+app/globals.css:46:  --color-input:        #E5E5E5;
+app/globals.css:47:  --color-ring:         #FF6200;
+app/globals.css:50:  --color-ink:          #0A0A0A;
+app/globals.css:51:  --color-ink-light:    #4A4A4A;
+app/globals.css:52:  --color-mist:         #787774;
+app/globals.css:53:  --color-fog:          #C4C4C4;
+app/globals.css:54:  --color-frost:        #E8E8E4;
+app/globals.css:55:  --color-rose:         #FF6200;
+app/globals.css:56:  --color-rose-soft:    #FFF0E6;
+app/globals.css:102:  --background: #FFFFFF;
+app/globals.css:189:::-webkit-scrollbar-thumb { background: #D4D4D4; border-radius: 3px; }
+app/globals.css:190:::-webkit-scrollbar-thumb:hover { background: #A3A3A3; }
+app/globals.css:209::focus-visible { outline: 2px solid #FF6200; outline-offset: 2px; border-radius: 2px; }
+app/globals.css:230:  background: linear-gradient(135deg, #0A0A0A 0%, #FF6200 100%);
+app/globals.css:237:  background: linear-gradient(135deg, #FF6200 0%, #FFA770 50%, #0A0A0A 100%);
+app/globals.css:250:  background: linear-gradient(90deg, #F5F5F5 25%, #E8E8E4 50%, #F5F5F5 75%);
+app/page.module.css:2:  --background: #fafafa;
+app/page.module.css:3:  --foreground: #fff;
+app/page.module.css:5:  --text-primary: #000;
+app/page.module.css:6:  --text-secondary: #666;
+app/page.module.css:8:  --button-primary-hover: #383838;
+app/page.module.css:9:  --button-secondary-hover: #f2f2f2;
+app/page.module.css:10:  --button-secondary-border: #ebebeb;
+app/page.module.css:132:    --background: #000;
+app/page.module.css:133:    --foreground: #000;
+app/page.module.css:135:    --text-primary: #ededed;
+app/page.module.css:136:    --text-secondary: #999;
+app/page.module.css:138:    --button-primary-hover: #ccc;
+app/page.module.css:139:    --button-secondary-hover: #1a1a1a;
+app/page.module.css:140:    --button-secondary-border: #1a1a1a;
+app/solutions/page.module.css:3:  background: linear-gradient(180deg, #EBF9F7 0%, #F7F6F3 100%);
+app/solutions/page.module.css:31:  color: #0F8A8A;
+app/solutions/page.module.css:54:  color: #0F8A8A;
+app/solutions/page.module.css:82:  background: #fff;
+app/solutions/page.module.css:91:  background: #F7F6F3;
+app/solutions/page.module.css:108:  background: #fff;
+app/solutions/page.module.css:149:  background: #FBF3DB;
+app/solutions/page.module.css:157:.heroDocAI:hover { background: #F5E8C0; }
+app/pricing/page.tsx:29:    color: '#FFF3CD',
+app/pricing/page.tsx:30:    textColor: '#92400E',
+app/pricing/page.tsx:39:    color: '#FEF3C7',
+app/pricing/page.tsx:40:    textColor: '#78350F',
+app/pricing/page.tsx:49:    color: '#FFFBEB',
+app/pricing/page.tsx:50:    textColor: '#92400E',
+app/pricing/page.tsx:59:    color: '#FEF9C3',
+app/pricing/page.tsx:60:    textColor: '#713F12',
+app/pricing/page.tsx:69:    color: '#FFFDE7',
+app/pricing/page.tsx:70:    textColor: '#92400E',
+app/pricing/page.tsx:79:    color: '#FEF3C7',
+app/pricing/page.tsx:80:    textColor: '#78350F',
+app/pricing/page.tsx:89:    color: '#FFF3CD',
+app/pricing/page.tsx:90:    textColor: '#92400E',
+app/pricing/page.tsx:100:    color: '#FFFBEB',
+app/pricing/page.tsx:101:    textColor: '#78350F',
+app/pricing/page.tsx:110:    color: '#FEF9C3',
+app/pricing/page.tsx:111:    textColor: '#713F12',
+app/pricing/page.tsx:120:    color: '#FFFDE7',
+app/pricing/page.tsx:121:    textColor: '#92400E',
+app/pricing/page.tsx:130:    color: '#FEF3C7',
+app/pricing/page.tsx:131:    textColor: '#78350F',
+app/pricing/page.tsx:141:    color: '#FFF3CD',
+app/pricing/page.tsx:142:    textColor: '#92400E',
+app/pricing/page.tsx:171:  const RED_PRICING = '#FF6200';
+app/pricing/page.tsx:191:                style={{ background: RED_PRICING, color: '#FFFFFF' }}
+app/pricing/page.tsx:210:                  <p className="text-[11px] text-[#787774] uppercase tracking-[0.06em] font-[600]">Subtotal</p>
+app/pricing/page.tsx:211:                  <p className="text-[15px] font-[700] text-[#9B9A97] line-through">${subtotal.toLocaleString()}</p>
+app/pricing/page.tsx:215:                <p className="text-[11px] text-[#787774] uppercase tracking-[0.06em] font-[600]">Total / mo</p>
+app/pricing/page.tsx:223:                className="text-[13px] text-[#787774] hover:text-white transition-colors px-3 py-2"
+app/pricing/page.tsx:232:                style={{ background: '#FF6200', color: '#FFFFFF' }}
+app/pricing/page.tsx:243:            <span className="text-[12px] text-[#787774]">
+app/pricing/page.tsx:272:        background: selected ? '#0A0A0A' : service.color,
+app/pricing/page.tsx:273:        border: selected ? '2px solid #FF6200' : '2px solid transparent',
+app/pricing/page.tsx:283:            background: selected ? '#FF6200' : service.textColor,
+app/pricing/page.tsx:284:            color: selected ? '#fff' : '#fff',
+app/pricing/page.tsx:295:        style={{ color: selected ? '#FF6200' : service.textColor, opacity: 0.7 }}
+app/pricing/page.tsx:301:        style={{ color: selected ? '#FFFFFF' : '#0A0A0A' }}
+app/pricing/page.tsx:307:        style={{ color: selected ? 'rgba(255,255,255,0.6)' : '#78716C' }}
+app/pricing/page.tsx:319:            style={{ color: selected ? '#FF6200' : '#0A0A0A' }}
+app/pricing/page.tsx:325:            style={{ color: selected ? 'rgba(255,255,255,0.4)' : '#9B9A97' }}
+app/pricing/page.tsx:334:            background: selected ? '#FF6200' : 'rgba(0,0,0,0.08)',
+app/pricing/page.tsx:340:              <path d="M2.5 7L5.5 10L11.5 4" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+app/pricing/page.tsx:344:              <path d="M7 3v8M3 7h8" stroke="#9B9A97" strokeWidth="1.8" strokeLinecap="round"/>
+app/pricing/page.tsx:354:  const RED = '#FF6200';
+app/pricing/page.tsx:365:      style={{ background: '#F5E8E8', border: `1px solid ${RED}30` }}
+app/pricing/page.tsx:378:              color: count >= t.min ? '#FFFFFF' : '#4A4A4A',
+app/pricing/page.tsx:386:        <span className="text-[12px] text-[#787774] ml-auto hidden sm:block">
+app/pricing/page.tsx:400:  const RED = '#FF6200';
+app/pricing/page.tsx:429:            style={{ background: '#F5E8E8', color: RED, border: '1px solid rgba(122,10,14,0.15)' }}
+app/pricing/page.tsx:437:            style={{ color: '#0A0A0A' }}
+app/pricing/page.tsx:446:          <p className="body-copy text-base text-[#78716C] max-w-[520px] mx-auto">
+app/pricing/page.tsx:456:              <div key={item.label} className="flex items-center gap-1.5 text-[12.5px] text-[#9B9A97] font-[500]">
+app/pricing/page.tsx:471:            <h2 className="text-[13px] font-[700] tracking-[0.06em] uppercase text-[#9B9A97]">
+app/pricing/page.tsx:477:                className="text-[12.5px] font-[600] text-[#9B9A97] hover:text-[#0A0A0A] transition-colors"
+app/pricing/page.tsx:500:              style={{ background: '#F5F4F1', border: '1px dashed #D6D3CD' }}
+app/pricing/page.tsx:502:              <p className="text-[15px] font-[600] text-[#9B9A97] mb-1">
+app/pricing/page.tsx:505:              <p className="text-[13px] text-[#C4BDB6]">Select 3+ services for a bundle discount</p>
+app/pricing/page.tsx:510:            <p className="text-[13.5px] text-[#9B9A97]">
+app/pricing/page.tsx:516:                className="font-[600] underline underline-offset-2 hover:text-[#0A0A0A] transition-colors"
+app/pricing/page.tsx:517:                style={{ color: '#FF6200' }}
+app/solutions/page.tsx:11:const RED = '#FF6200'; // Bright Orange
+app/solutions/page.tsx:12:const BLACK = '#0A0A0A';
+app/solutions/page.tsx:13:const STONE = '#6B6B6B';
+app/solutions/page.tsx:14:const MIST = '#787774';
+app/solutions/page.tsx:15:const FROST = '#E8E8E4';
+app/solutions/page.tsx:25:    gradient: 'linear-gradient(135deg, #FF620008 0%, #FFA77008 100%)',
+app/solutions/page.tsx:203:          <div className="absolute top-40 right-20 w-96 h-96 rounded-full opacity-20" style={{ background: `radial-gradient(circle, #4A7D8C08 0%, transparent 70%)` }} />
+app/solutions/page.tsx:214:            <Badge className="mb-6 bg-[#FF6200]/[0.06] text-[#FF6200] border-[#FF6200]/[0.15] hover:bg-[#FF6200]/[0.08] font-[600] tracking-[0.02em] rounded-full px-4 py-1.5">
+app/solutions/page.tsx:215:              <span className="w-1.5 h-1.5 rounded-full bg-[#FF6200] mr-2 inline-block" />
+app/solutions/page.tsx:219:            <h1 className="display-headline text-[clamp(2.75rem,7vw,5.25rem)] text-[#0A0A0A] max-w-[900px] mx-auto mb-6">
+app/solutions/page.tsx:225:            <p className="body-copy text-base text-[#6B6B6B] max-w-[600px] mx-auto">
+app/solutions/page.tsx:239:              <div className="bg-[#F7F6F3] px-6 py-4 flex items-center gap-4 border-b border-[#E3E2E0]">
+app/solutions/page.tsx:241:                  {['#FF5F57','#FEBC2E','#28C840'].map(c => (
+app/solutions/page.tsx:245:                <div className="bg-white border border-[#E3E2E0] rounded-lg px-4 py-1.5 text-[12px] font-[500] text-[#9B9A97]">
+app/solutions/page.tsx:258:                    <div key={i} className="bg-[#FAFAF8] rounded-2xl p-5 border border-black/[0.04]">
+app/solutions/page.tsx:259:                      <p className="text-[11px] font-[600] uppercase tracking-[0.08em] text-[#9B9A97] mb-2">{stat.label}</p>
+app/solutions/page.tsx:260:                      <p className="text-[28px] font-[700] text-[#0A0A0A] tracking-[-0.02em]">{stat.value}</p>
+app/solutions/page.tsx:261:                      <p className="text-[12px] font-[600] text-[#6B8F71] mt-1">{stat.change} this month</p>
+app/solutions/page.tsx:267:                  <div className="bg-[#FF6200]/[0.03] rounded-2xl p-6 border border-[#FF6200]/[0.08]">
+app/solutions/page.tsx:273:                        <p className="text-[13px] font-[600] text-[#0A0A0A]">Content Engine</p>
+app/solutions/page.tsx:274:                        <p className="text-[11px] text-[#9B9A97]">8 services active</p>
+app/solutions/page.tsx:279:                        <div key={i} className="flex items-center gap-2 text-[12px] text-[#6B6B6B]">
+app/solutions/page.tsx:287:                  <div className="bg-[#4A7D8C]/[0.03] rounded-2xl p-6 border border-[#4A7D8C]/[0.08]">
+app/solutions/page.tsx:289:                      <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ backgroundColor: '#4A7D8C12', color: '#4A7D8C' }}>
+app/solutions/page.tsx:293:                        <p className="text-[13px] font-[600] text-[#0A0A0A]">Outreach Engine</p>
+app/solutions/page.tsx:294:                        <p className="text-[11px] text-[#9B9A97]">7 services active</p>
+app/solutions/page.tsx:299:                        <div key={i} className="flex items-center gap-2 text-[12px] text-[#6B6B6B]">
+app/solutions/page.tsx:300:                          <CheckCircle2 size={14} style={{ color: '#4A7D8C' }} />
+app/solutions/page.tsx:323:            <h2 className="section-headline text-[clamp(2rem,4vw,3rem)] text-[#0A0A0A] mb-4">
+app/solutions/page.tsx:326:            <p className="body-copy text-base text-[#6B6B6B] max-w-[500px] mx-auto">
+app/solutions/page.tsx:369:                    <h3 className="text-[22px] font-[700] tracking-[-0.02em] text-[#0A0A0A] mb-3">
+app/solutions/page.tsx:372:                    <p className="text-[14px] leading-[1.7] text-[#6B6B6B] mb-6">
+app/solutions/page.tsx:383:                          <p className="text-[10px] font-[600] uppercase tracking-[0.06em] text-[#9B9A97] mt-1">
+app/solutions/page.tsx:393:                        <div key={i} className="flex items-center gap-2.5 text-[13px] text-[#404040]">
+app/solutions/page.tsx:425:            <h2 className="section-headline text-[clamp(2rem,4vw,3rem)] text-[#0A0A0A] mb-4">
+app/solutions/page.tsx:428:            <p className="body-copy text-base text-[#6B6B6B] max-w-[500px] mx-auto">
+app/solutions/page.tsx:447:                  <div className="text-[11px] font-[700] uppercase tracking-[0.1em] text-[#9B9A97] mb-2">
+app/solutions/page.tsx:450:                  <h3 className="text-[20px] font-[700] tracking-[-0.015em] text-[#0A0A0A] mb-3">
+app/solutions/page.tsx:453:                  <p className="text-[13px] leading-[1.7] text-[#6B6B6B]">
+app/solutions/page.tsx:480:          <h2 className="section-headline text-xl font-[700] text-[#0A0A0A] mb-4">
+app/solutions/page.tsx:483:          <p className="body-copy text-sm text-[#6B6B6B] max-w-[500px] mx-auto mb-10">
+app/solutions/page.tsx:492:                  className: "bg-[#FF6200] hover:bg-[#8B0F13] text-white font-[600] tracking-[-0.01em] shadow-[0_4px_14px_rgba(122,10,14,0.25)] hover:shadow-[0_6px_20px_rgba(122,10,14,0.35)] hover:-translate-y-px transition-all duration-150 rounded-[7px] h-12 px-8",
+app/solutions/page.tsx:503:                  className: "font-[500] tracking-[-0.01em] rounded-[7px] h-12 px-8 border-[#E3E2E0] hover:bg-[#F7F6F3] hover:border-[#D4D4D4]",
+components/Navbar/Navbar.tsx:66:                color: '#0A0A0A',
+components/Navbar/Navbar.tsx:75:                color: '#FF6200',
+components/Navbar/Navbar.tsx:90:                className="relative px-5 py-2.5 text-[16px] font-[500] text-[#0A0A0A]/80 rounded-full hover:text-black transition-colors duration-150 whitespace-nowrap inline-flex items-center"
+components/Navbar/Navbar.tsx:118:                  className="block h-[2px] bg-[#0A0A0A] rounded-full origin-center transition-transform duration-200"
+components/Navbar/Navbar.tsx:122:                  className="block h-[2px] bg-[#0A0A0A] rounded-full transition-opacity duration-200"
+components/Navbar/Navbar.tsx:126:                  className="block h-[2px] bg-[#0A0A0A] rounded-full origin-center transition-transform duration-200"
+components/Navbar/Navbar.tsx:156:                    className="block px-4 py-3 text-[15px] font-[500] text-[#0A0A0A]/80 rounded-2xl hover:text-black hover:bg-black/[0.04] transition-colors"
+components/SolutionsModal/SolutionsModal.tsx:94:                <div className="relative rounded-2xl overflow-hidden border border-black/[0.04] bg-[#FAFAF8]">
+components/SolutionsModal/SolutionsModal.tsx:104:                      <span className="text-[10px] font-semibold tracking-[0.12em] uppercase text-[#FF6200] mb-3 block">
+components/SolutionsModal/SolutionsModal.tsx:107:                      <h3 className="text-[clamp(1.25rem,2vw,1.75rem)] font-semibold tracking-[-0.02em] text-[#0A0A0A] mb-3 leading-[1.2]">
+components/SolutionsModal/SolutionsModal.tsx:110:                      <p className="text-[13.5px] sm:text-sm text-[#6B6B6B] leading-[1.7] max-w-[520px]">
+components/SolutionsModal/SolutionsModal.tsx:160:                    className="inline-flex items-center gap-2 px-5 py-2.5 text-[13px] font-semibold text-white bg-[#0A0A0A] hover:bg-black/80 rounded-full transition-all duration-200 shadow-[0_1px_3px_rgba(0,0,0,0.08)] hover:shadow-[0_4px_12px_rgba(0,0,0,0.12)] hover:-translate-y-px"
+components/magicui/animated-beam.tsx:22:  color = '#FF6200',
+components/magicui/animated-beam.tsx:118:        filter="url(#beam-glow)"
+components/magicui/animated-beam.tsx:154:  color = '#FF6200',
+components/Navbar/LetsTalkButton.tsx:13:const RED  = '#FF6200';
+components/Navbar/LetsTalkButton.tsx:21:        fill="#42A5F5"
+components/Navbar/LetsTalkButton.tsx:25:        fill="#fff"
+components/Navbar/LetsTalkButton.tsx:37:      style={{ borderTop: '1px solid #EBEBEB' }}
+components/Navbar/LetsTalkButton.tsx:40:        <span className="text-[10px] font-medium uppercase tracking-wider" style={{ color: '#B0B0B0' }}>
+components/Navbar/LetsTalkButton.tsx:43:        <span className="text-[13px] font-semibold" style={{ color: '#111', letterSpacing: '-0.01em' }}>
+components/Navbar/LetsTalkButton.tsx:48:        className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-semibold transition-all duration-200 group-hover:bg-[#111] group-hover:text-white"
+components/Navbar/LetsTalkButton.tsx:50:          background: '#F2F2F2',
+components/Navbar/LetsTalkButton.tsx:51:          color: '#111',
+components/Navbar/LetsTalkButton.tsx:122:                style={{ backgroundColor: '#7AFC62', opacity: 0.7 }}
+components/Navbar/LetsTalkButton.tsx:124:              <span className="relative inline-flex rounded-full h-[8px] w-[8px]" style={{ backgroundColor: '#7AFC62' }} />
+components/Navbar/LetsTalkButton.tsx:126:            <span className="text-[16px] font-bold leading-tight" style={{ color: '#111', letterSpacing: '-0.025em' }}>
+components/Navbar/LetsTalkButton.tsx:132:          <span className="text-[12.5px] leading-snug" style={{ color: '#B0B0B0', letterSpacing: '-0.01em' }}>
+components/Navbar/LetsTalkButton.tsx:149:                color: '#fff',
+components/Navbar/LetsTalkButton.tsx:210:          ? { background: '#111', color: '#fff', scale: 1.03 }
+components/Navbar/LetsTalkButton.tsx:211:          : { background: '#fff', color: RED, scale: 1 }
+components/Navbar/LetsTalkButton.tsx:216:          background: '#fff',
+components/Footer/Footer.tsx:28:                className="text-[22px] leading-none tracking-[-0.01em] text-[#0A0A0A]"
+components/Footer/Footer.tsx:33:              <span className="text-[18px] font-medium leading-none tracking-tight text-[#FF6200]">
+components/Footer/Footer.tsx:52:                    className="group inline-flex items-center gap-2.5 text-[15px] text-black/60 transition-colors duration-300 hover:text-[#0A0A0A]"
+components/Footer/Footer.tsx:56:                      className="h-px w-0 bg-[#FF6200] transition-all duration-500 ease-out group-hover:w-4"
+components/Footer/Footer.tsx:75:                style={{ background: '#FF6200' }}
+components/PitchDeck/OrbitSlide.tsx:22:const ORANGE = '#FF6200';
+components/PitchDeck/OrbitSlide.tsx:23:const INK = '#0A0A0A';
+components/PitchDeck/OrbitSlide.tsx:100:      { name: 'YouTube', brand: '#FF0000', logo: LOGOS.youtube },
+components/PitchDeck/OrbitSlide.tsx:101:      { name: 'Spotify', brand: '#1ED760', logo: LOGOS.spotify },
+components/PitchDeck/OrbitSlide.tsx:102:      { name: 'Podcasts', brand: '#9933CC', logo: LOGOS.applepodcasts },
+components/PitchDeck/OrbitSlide.tsx:112:      { name: 'Instagram', brand: '#E4405F', logo: LOGOS.instagram },
+components/PitchDeck/OrbitSlide.tsx:113:      { name: 'LinkedIn', brand: '#0A66C2', logo: LOGOS.linkedin },
+components/PitchDeck/OrbitSlide.tsx:114:      { name: 'TikTok', brand: '#010101', logo: LOGOS.tiktok },
+components/PitchDeck/OrbitSlide.tsx:115:      { name: 'X', brand: '#111111', logo: LOGOS.x },
+components/PitchDeck/OrbitSlide.tsx:306:      <g fill="#FFFFFF" stroke={INK} strokeOpacity={0.28} strokeWidth={1}>
+components/PitchDeck/OrbitSlide.tsx:387:      <rect x={ORIGIN.x} y={ORIGIN.y} width={ORIGIN.w} height={ORIGIN.h} rx={20} fill="none" stroke="#FFFFFF" strokeOpacity={0.22} strokeWidth={1} />
+components/PitchDeck/OrbitSlide.tsx:390:      <g fill="none" stroke="#FFFFFF" strokeWidth={1.9} strokeLinecap="round" strokeLinejoin="round"
+components/PitchDeck/OrbitSlide.tsx:396:      <circle cx={ORIGIN.x + ORIGIN.w - 26} cy={ORIGIN.y + 26} r={4} fill="#FFFFFF" className="bp-rec" />
+components/PitchDeck/OrbitSlide.tsx:416:      <rect x={ENGINE.x + 10} y={ENGINE.y + 12} width={ENGINE.w} height={ENGINE.h} rx={18} fill="#FFFFFF" stroke={INK} strokeOpacity={0.06} />
+components/PitchDeck/OrbitSlide.tsx:417:      <rect x={ENGINE.x + 5} y={ENGINE.y + 6} width={ENGINE.w} height={ENGINE.h} rx={18} fill="#FFFFFF" stroke={INK} strokeOpacity={0.08} />
+components/PitchDeck/OrbitSlide.tsx:418:      <rect x={ENGINE.x} y={ENGINE.y} width={ENGINE.w} height={ENGINE.h} rx={18} fill="#FFFFFF" stroke={INK} strokeOpacity={0.13} filter="url(#bpCard)" />
+components/PitchDeck/OrbitSlide.tsx:446:      <circle cx={ENGINE.x + 24} cy={ENGINE.y + ENGINE.h - 13} r={2.6} fill="#16A34A" className="bp-blink" />
+components/PitchDeck/OrbitSlide.tsx:471:        fill="#FFFFFF" stroke={INK} strokeOpacity={0.11} filter="url(#bpCard)" />
+components/PitchDeck/OrbitSlide.tsx:512:            <circle cx={cx} cy={chipCY} r={17} fill="#FFFFFF" stroke={INK} strokeOpacity={0.12} filter="url(#bpCard)" />
+components/PitchDeck/OrbitSlide.tsx:535:        <p className="text-[11px] md:text-xs font-bold tracking-[0.14em] uppercase text-[#FF6200]">The Content System</p>
+components/PitchDeck/OrbitSlide.tsx:536:        <h2 className="mt-1.5 display-headline text-[clamp(1.3rem,2.6vw,1.9rem)] text-[#0A0A0A]">
+components/PitchDeck/OrbitSlide.tsx:537:          One recording becomes an <span className="text-[#FF6200]">entire content ecosystem</span>.
+components/PitchDeck/OrbitSlide.tsx:554:              <stop offset="0%" stopColor="#FF7A26" />
+components/PitchDeck/OrbitSlide.tsx:556:              <stop offset="100%" stopColor="#E65700" />
+components/PitchDeck/OrbitSlide.tsx:559:              <feDropShadow dx="0" dy="12" stdDeviation="16" floodColor="#E65700" floodOpacity="0.3" />
+components/PitchDeck/OrbitSlide.tsx:589:        .bp-origin-t1 { font-size: 19px; font-weight: 800; fill: #FFFFFF; letter-spacing: -0.01em; }
+components/PitchDeck/OrbitSlide.tsx:590:        .bp-origin-t2 { font-size: 8.5px; font-weight: 600; fill: #FFFFFF; letter-spacing: .18em; }
+components/PitchDeck/FrameworkFlowSlide.tsx:18:const ORANGE = '#FF6200';
+components/PitchDeck/FrameworkFlowSlide.tsx:19:const INK = '#0A0A0A';
+components/PitchDeck/FrameworkFlowSlide.tsx:199:      <g fill="#FFFFFF" stroke={INK} strokeOpacity={0.28} strokeWidth={1}>
+components/PitchDeck/FrameworkFlowSlide.tsx:215:        <circle cx={JUNCTION.x} cy={JUNCTION.y} r={13} fill="#FFF9F3" stroke={ORANGE} strokeOpacity={0.4} strokeWidth={1.2} strokeDasharray="3 4" className="fw-spin" />
+components/PitchDeck/FrameworkFlowSlide.tsx:249:        fill="#FFFFFF" stroke={INK} strokeOpacity={0.11} filter="url(#fwCard)" />
+components/PitchDeck/FrameworkFlowSlide.tsx:274:      <rect x={HERO.x + 8} y={HERO.y + 10} width={HERO.w} height={HERO.h} rx={20} fill="#FFFFFF" stroke={INK} strokeOpacity={0.06} />
+components/PitchDeck/FrameworkFlowSlide.tsx:275:      <rect x={HERO.x + 4} y={HERO.y + 5} width={HERO.w} height={HERO.h} rx={20} fill="#FFFFFF" stroke={INK} strokeOpacity={0.08} />
+components/PitchDeck/FrameworkFlowSlide.tsx:276:      <rect x={HERO.x} y={HERO.y} width={HERO.w} height={HERO.h} rx={20} fill="#FFFFFF" stroke={ORANGE} strokeOpacity={0.45} strokeWidth={1.2} filter="url(#fwHero)" />
+components/PitchDeck/FrameworkFlowSlide.tsx:280:      <g transform={`translate(${HERO.x + 20 + 9} ${HERO.y + 20 + 9})`} style={{ color: '#FFFFFF' }}>
+components/PitchDeck/FrameworkFlowSlide.tsx:283:      <circle cx={HERO.x + HERO.w - 21} cy={HERO.y + 22} r={2.6} fill="#16A34A" className="fw-blink" />
+components/PitchDeck/FrameworkFlowSlide.tsx:308:            <stop offset="0%" stopColor="#FFFFFF" stopOpacity="0.7" />
+components/PitchDeck/FrameworkFlowSlide.tsx:309:            <stop offset="45%" stopColor="#FFFFFF" stopOpacity="0" />
+components/PitchDeck/FrameworkFlowSlide.tsx:320:            <feDropShadow dx="0" dy="14" stdDeviation="18" floodColor="#C2410C" floodOpacity="0.18" />
+components/PitchDeck/FrameworkFlowSlide.tsx:323:            <feDropShadow dx="0" dy="5" stdDeviation="7" floodColor="#E65700" floodOpacity="0.4" />
+components/CTABanner/CTABanner.tsx:61:              className="inline-flex items-center gap-2 px-6 py-3 text-[15px] font-[600] text-white bg-[#FF6200] rounded-[7px] hover:bg-[#8B0F13] transition-all duration-150 shadow-[0_1px_3px_rgba(0,0,0,0.12)] hover:shadow-[0_4px_16px_rgba(0,0,0,0.18)] hover:-translate-y-px tracking-[-0.01em]"
+components/PitchDeck/WeeklyCalendarSlide.tsx:49:  scheduled: { label: 'Scheduled', dot: '#16A34A', chip: 'bg-[#16A34A]/[0.08] text-[#15803D]' },
+components/PitchDeck/WeeklyCalendarSlide.tsx:50:  editing: { label: 'Editing', dot: '#FF6200', chip: 'bg-[#FF6200]/[0.09] text-[#C2410C]' },
+components/PitchDeck/WeeklyCalendarSlide.tsx:51:  ready: { label: 'Ready', dot: '#2563EB', chip: 'bg-[#2563EB]/[0.08] text-[#1D4ED8]' },
+components/PitchDeck/WeeklyCalendarSlide.tsx:52:  published: { label: 'Published', dot: '#9CA3AF', chip: 'bg-black/[0.05] text-black/50' },
+components/PitchDeck/WeeklyCalendarSlide.tsx:108:      className="rounded-lg border border-black/[0.07] bg-white px-2 py-1.5 shadow-[0_1px_3px_rgba(10,10,10,0.04)] hover:-translate-y-0.5 hover:shadow-[0_6px_14px_rgba(10,10,10,0.08)] hover:border-[#FF6200]/40 transition-all duration-300 cursor-default"
+components/PitchDeck/WeeklyCalendarSlide.tsx:115:      <p className="mt-1 text-[8.5px] font-bold text-[#0A0A0A] leading-[1.25]">{b.title}</p>
+components/PitchDeck/WeeklyCalendarSlide.tsx:118:        <span className="ml-auto w-3 h-3 rounded-full bg-gradient-to-br from-[#FFB27A] to-[#FF6200] ring-1 ring-white" />
+components/PitchDeck/WeeklyCalendarSlide.tsx:135:        <p className="text-[11px] md:text-xs font-bold tracking-[0.14em] uppercase text-[#FF6200]">The Weekly Output</p>
+components/PitchDeck/WeeklyCalendarSlide.tsx:136:        <h2 className="mt-1.5 display-headline text-[clamp(1.3rem,2.5vw,1.85rem)] text-[#0A0A0A]">
+components/PitchDeck/WeeklyCalendarSlide.tsx:137:          This is what your <span className="text-[#FF6200]">content calendar</span> looks like.
+components/PitchDeck/WeeklyCalendarSlide.tsx:172:          <span className="text-[10.5px] font-extrabold text-[#0A0A0A]">SlideIn Content Calendar</span>
+components/PitchDeck/WeeklyCalendarSlide.tsx:173:          <span className="hidden md:flex items-center gap-1 rounded-full bg-[#FF6200]/[0.07] border border-[#FF6200]/25 px-2 py-0.5">
+components/PitchDeck/WeeklyCalendarSlide.tsx:174:            <span className="w-1.5 h-1.5 rounded-full bg-[#FF6200] wc-blink" />
+components/PitchDeck/WeeklyCalendarSlide.tsx:175:            <span className="text-[7px] font-bold tracking-[0.12em] text-[#C2410C] uppercase">Built automatically after each recording</span>
+components/PitchDeck/WeeklyCalendarSlide.tsx:186:                s.active ? 'bg-[#FF6200]/[0.08] text-[#C2410C]' : 'text-black/40'
+components/PitchDeck/WeeklyCalendarSlide.tsx:199:              <div key={d.day} className={cn('flex flex-col min-w-0', d.today && 'bg-[#FF6200]/[0.025]')}>
+components/PitchDeck/WeeklyCalendarSlide.tsx:200:                <div className={cn('flex items-center justify-center gap-1 py-1.5 border-b border-black/[0.06]', d.today && 'border-b-[#FF6200]/30')}>
+components/PitchDeck/WeeklyCalendarSlide.tsx:201:                  <span className={cn('text-[7.5px] font-black tracking-[0.14em]', d.today ? 'text-[#FF6200]' : 'text-black/35')}>{d.day}</span>
+components/PitchDeck/WeeklyCalendarSlide.tsx:204:                    d.today ? 'bg-[#FF6200] text-white' : 'text-black/50'
+components/PitchDeck/WeeklyCalendarSlide.tsx:221:                <div className="flex items-center gap-1 text-black/55"><I k="li" s={9} /><span className="text-[8px] font-bold text-[#0A0A0A]">Thought Leadership</span></div>
+components/PitchDeck/WeeklyCalendarSlide.tsx:228:                <motion.div className="h-full rounded-full bg-[#FF6200]"
+components/PitchDeck/WeeklyCalendarSlide.tsx:236:              <p className="text-[16px] font-extrabold text-[#0A0A0A] leading-tight mt-0.5">9 <span className="text-[8px] font-bold text-black/40">pieces</span></p>
+components/PitchDeck/WeeklyCalendarSlide.tsx:239:            <div className="mt-auto rounded-lg bg-[#0A0A0A] p-2">
+components/PitchDeck/WeeklyCalendarSlide.tsx:240:              <div className="flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-[#16A34A] wc-blink" /><span className="text-[7px] font-bold text-white tracking-wide">SYSTEM ACTIVE</span></div>
+components/PitchDeck/DistributionSlide.tsx:70:      { name: 'YouTube', brand: '#FF0000', logo: LOGOS.youtube },
+components/PitchDeck/DistributionSlide.tsx:71:      { name: 'Spotify', brand: '#1ED760', logo: LOGOS.spotify },
+components/PitchDeck/DistributionSlide.tsx:72:      { name: 'Apple Podcasts', brand: '#9933CC', logo: LOGOS.applepodcasts },
+components/PitchDeck/DistributionSlide.tsx:82:      { name: 'Instagram', brand: '#E4405F', logo: LOGOS.instagram },
+components/PitchDeck/DistributionSlide.tsx:83:      { name: 'TikTok', brand: '#010101', logo: LOGOS.tiktok },
+components/PitchDeck/DistributionSlide.tsx:84:      { name: 'LinkedIn', brand: '#0A66C2', logo: LOGOS.linkedin },
+components/PitchDeck/DistributionSlide.tsx:85:      { name: 'X', brand: '#111111', logo: LOGOS.x },
+components/PitchDeck/DistributionSlide.tsx:95:      { name: 'Website', brand: '#F4610A', strokeIcon: 'globe' },
+components/PitchDeck/DistributionSlide.tsx:96:      { name: 'Newsletter', brand: '#F4610A', strokeIcon: 'mail' },
+components/PitchDeck/DistributionSlide.tsx:135:      <circle cx={cx} cy={cy} r={r} fill="#FFFFFF" stroke="#EFE3D8" strokeWidth={1} filter="url(#cdSoft)" />
+components/PitchDeck/DistributionSlide.tsx:160:        fill="rgba(255,255,255,0.72)" stroke="#EEDFD2" strokeWidth={1} filter="url(#cdCard)" />
+components/PitchDeck/DistributionSlide.tsx:163:      <circle cx={c.x} cy={c.entryY} r={4} fill="#F4610A" filter="url(#cdGlow)" />
+components/PitchDeck/DistributionSlide.tsx:164:      <circle cx={c.x} cy={c.entryY} r={8} fill="none" stroke="#F4610A" strokeOpacity={0.3} strokeWidth={1} />
+components/PitchDeck/DistributionSlide.tsx:166:      <circle cx={c.x + 26} cy={c.y + 31} r={3.2} fill="#F4610A" />
+components/PitchDeck/DistributionSlide.tsx:169:      <line x1={c.x + 24} y1={c.y + 50} x2={c.x + c.w - 24} y2={c.y + 50} stroke="#F0E4D8" strokeWidth={1} />
+components/PitchDeck/DistributionSlide.tsx:181:    <section className="relative mx-auto w-full max-w-[920px] overflow-hidden rounded-[28px] bg-[#FBF4EC] font-sans antialiased shadow-[0_30px_80px_-40px_rgba(120,60,10,0.25)]">
+components/PitchDeck/DistributionSlide.tsx:183:      <span className="pointer-events-none absolute left-5 top-5 h-3 w-3 border-l-2 border-t-2 border-[#F4610A]/70" />
+components/PitchDeck/DistributionSlide.tsx:184:      <span className="pointer-events-none absolute bottom-5 right-5 h-3 w-3 border-b-2 border-r-2 border-[#F4610A]/70" />
+components/PitchDeck/DistributionSlide.tsx:193:          <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-[#F4610A]">
+components/PitchDeck/DistributionSlide.tsx:196:          <h2 className="mt-1.5 text-xl font-semibold tracking-tight text-[#191410] md:text-[26px] md:leading-[1.05]">
+components/PitchDeck/DistributionSlide.tsx:198:            <span className="bg-gradient-to-r from-[#F4610A] to-[#FF9A3D] bg-clip-text text-transparent">
+components/PitchDeck/DistributionSlide.tsx:207:          className="hidden items-center gap-2 rounded-full border border-[#EEDFD2] bg-white/70 px-4 py-2 backdrop-blur md:flex"
+components/PitchDeck/DistributionSlide.tsx:210:            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#F4610A] opacity-60" />
+components/PitchDeck/DistributionSlide.tsx:211:            <span className="relative inline-flex h-2 w-2 rounded-full bg-[#F4610A]" />
+components/PitchDeck/DistributionSlide.tsx:213:          <span className="text-[11px] font-medium uppercase tracking-[0.18em] text-[#8A7B6E]">
+components/PitchDeck/DistributionSlide.tsx:225:              <stop offset="0%" stopColor="#F4610A" stopOpacity="0.14" />
+components/PitchDeck/DistributionSlide.tsx:226:              <stop offset="55%" stopColor="#F4610A" stopOpacity="0.05" />
+components/PitchDeck/DistributionSlide.tsx:227:              <stop offset="100%" stopColor="#F4610A" stopOpacity="0" />
+components/PitchDeck/DistributionSlide.tsx:230:              <stop offset="0%" stopColor="#FFB27A" />
+components/PitchDeck/DistributionSlide.tsx:231:              <stop offset="45%" stopColor="#F97316" />
+components/PitchDeck/DistributionSlide.tsx:232:              <stop offset="100%" stopColor="#DE4A00" />
+components/PitchDeck/DistributionSlide.tsx:235:              <stop offset="0%" stopColor="#FF7A1A" stopOpacity="0.55" />
+components/PitchDeck/DistributionSlide.tsx:236:              <stop offset="100%" stopColor="#FF7A1A" stopOpacity="0" />
+components/PitchDeck/DistributionSlide.tsx:239:              <stop offset="0%" stopColor="#FFFFFF" stopOpacity="0.55" />
+components/PitchDeck/DistributionSlide.tsx:240:              <stop offset="100%" stopColor="#FFFFFF" stopOpacity="0" />
+components/PitchDeck/DistributionSlide.tsx:243:              <stop offset="0%" stopColor="#F4610A" stopOpacity="0.55" />
+components/PitchDeck/DistributionSlide.tsx:244:              <stop offset="100%" stopColor="#F4610A" stopOpacity="0.14" />
+components/PitchDeck/DistributionSlide.tsx:247:              <stop offset="0%" stopColor="#F4610A" stopOpacity="0.65" />
+components/PitchDeck/DistributionSlide.tsx:248:              <stop offset="100%" stopColor="#FFB27A" stopOpacity="0.1" />
+components/PitchDeck/DistributionSlide.tsx:251:              <circle cx="1.2" cy="1.2" r="1.2" fill="#D9C6B4" />
+components/PitchDeck/DistributionSlide.tsx:254:              <stop offset="0%" stopColor="#fff" stopOpacity="0.75" />
+components/PitchDeck/DistributionSlide.tsx:255:              <stop offset="70%" stopColor="#fff" stopOpacity="0.25" />
+components/PitchDeck/DistributionSlide.tsx:256:              <stop offset="100%" stopColor="#fff" stopOpacity="0" />
+components/PitchDeck/DistributionSlide.tsx:259:              <rect width="1440" height="810" fill="url(#cdDotFade)" />
+components/PitchDeck/DistributionSlide.tsx:262:              <feDropShadow dx="0" dy="3" stdDeviation="5" floodColor="#7A4A20" floodOpacity="0.16" />
+components/PitchDeck/DistributionSlide.tsx:265:              <feDropShadow dx="0" dy="14" stdDeviation="18" floodColor="#7A4A20" floodOpacity="0.10" />
+components/PitchDeck/DistributionSlide.tsx:272:              <feDropShadow dx="0" dy="18" stdDeviation="24" floodColor="#C2410C" floodOpacity="0.35" />
+components/PitchDeck/DistributionSlide.tsx:277:          <rect width="1440" height="810" fill="url(#cdDots)" mask="url(#cdDotMask)" opacity="0.55" />
+components/PitchDeck/DistributionSlide.tsx:278:          <circle cx={E.x} cy={E.y} r={430} fill="url(#cdAmbient)" />
+components/PitchDeck/DistributionSlide.tsx:279:          <circle cx={E.x} cy={E.y} r={262} fill="none" stroke="#E7D5C4" strokeOpacity="0.55" strokeWidth="1" />
+components/PitchDeck/DistributionSlide.tsx:280:          <circle cx={E.x} cy={E.y} r={430} fill="none" stroke="#E7D5C4" strokeOpacity="0.35" strokeWidth="1" />
+components/PitchDeck/DistributionSlide.tsx:281:          <line x1="60" y1={E.y} x2="1380" y2={E.y} stroke="#E7D5C4" strokeOpacity="0.35" strokeWidth="1" strokeDasharray="1 8" />
+components/PitchDeck/DistributionSlide.tsx:287:            fill="none" stroke="url(#cdCable)" strokeWidth={2}
+components/PitchDeck/DistributionSlide.tsx:294:            fill="none" stroke="url(#cdCable)" strokeWidth={2.5}
+components/PitchDeck/DistributionSlide.tsx:301:              <path d={c.branch} fill="none" stroke="#F4610A" strokeOpacity={0.07} strokeWidth={7} />
+components/PitchDeck/DistributionSlide.tsx:304:                fill="none" stroke="url(#cdCable)" strokeWidth={1.8}
+components/PitchDeck/DistributionSlide.tsx:309:              <path className="cd-flow" d={c.branch} fill="none" stroke="#F4610A" strokeOpacity={0.5} strokeWidth={1.8} />
+components/PitchDeck/DistributionSlide.tsx:312:          <path className="cd-flow" d="M 196 415 C 300 415, 356 415, 424 415" fill="none" stroke="#F4610A" strokeOpacity={0.45} strokeWidth={2} />
+components/PitchDeck/DistributionSlide.tsx:313:          <path className="cd-flow" d="M 612 415 C 690 415, 748 415, 816 415" fill="none" stroke="#F4610A" strokeOpacity={0.55} strokeWidth={2.2} />
+components/PitchDeck/DistributionSlide.tsx:319:                <circle r={3.2} fill="#FF7A1A" filter="url(#cdGlow)">
+components/PitchDeck/DistributionSlide.tsx:322:                <circle r={2} fill="#FFB27A" filter="url(#cdGlow)">
+components/PitchDeck/DistributionSlide.tsx:327:            <circle r={3} fill="#FF7A1A" filter="url(#cdGlow)">
+components/PitchDeck/DistributionSlide.tsx:330:            <circle r={3.4} fill="#FF7A1A" filter="url(#cdGlow)">
+components/PitchDeck/DistributionSlide.tsx:340:            <circle cx={160} cy={415} r={34} fill="#FFFFFF" stroke="#EEDFD2" strokeWidth={1} filter="url(#cdSoft)" />
+components/PitchDeck/DistributionSlide.tsx:341:            <circle cx={160} cy={415} r={10} fill="#F4610A" className="cd-rec" />
+components/PitchDeck/DistributionSlide.tsx:342:            <circle cx={160} cy={415} r={17} fill="none" stroke="#F4610A" strokeOpacity={0.35} strokeWidth={1.5} className="cd-rec-ring" />
+components/PitchDeck/DistributionSlide.tsx:350:              stroke="#F4610A" strokeOpacity={0.28} strokeWidth={1.2} strokeDasharray="1 7" strokeLinecap="round" />
+components/PitchDeck/DistributionSlide.tsx:352:              stroke="url(#cdArc)" strokeWidth={2.4} strokeDasharray="72 46 148 64 96 104" strokeLinecap="round" />
+components/PitchDeck/DistributionSlide.tsx:354:            <circle r={3} fill="#F4610A" filter="url(#cdGlow)">
+components/PitchDeck/DistributionSlide.tsx:358:            <circle r={2.2} fill="#FFB27A" filter="url(#cdGlow)">
+components/PitchDeck/DistributionSlide.tsx:365:                <circle cx={n.x} cy={n.y} r={4} fill="#F4610A" filter="url(#cdGlow)" />
+components/PitchDeck/DistributionSlide.tsx:366:                <circle cx={n.x} cy={n.y} r={9} fill="none" stroke="#F4610A" strokeOpacity={0.3} strokeWidth={1} className="cd-rec-ring" />
+components/PitchDeck/DistributionSlide.tsx:380:            <circle cx={E.x} cy={E.y} r={88} fill="url(#cdCore)" filter="url(#cdEngineShadow)" />
+components/PitchDeck/DistributionSlide.tsx:381:            <circle cx={E.x} cy={E.y} r={88} fill="none" stroke="#FFFFFF" strokeOpacity={0.35} strokeWidth={1.2} />
+components/PitchDeck/DistributionSlide.tsx:382:            <circle cx={E.x} cy={E.y} r={72} fill="none" stroke="#FFFFFF" strokeOpacity={0.16} strokeWidth={1} strokeDasharray="2 5" />
+components/PitchDeck/DistributionSlide.tsx:383:            <ellipse cx={E.x - 26} cy={E.y - 38} rx={40} ry={22} fill="#FFFFFF" opacity={0.18} />
+components/PitchDeck/DistributionSlide.tsx:385:            <g fill="#FFFFFF">
+components/PitchDeck/DistributionSlide.tsx:399:            <circle cx={JUNCTION.x} cy={JUNCTION.y} r={15} fill="#FFF9F3" stroke="#F4610A" strokeOpacity={0.4}
+components/PitchDeck/DistributionSlide.tsx:401:            <circle cx={JUNCTION.x} cy={JUNCTION.y} r={5.5} fill="#F4610A" filter="url(#cdGlow)" />
+components/PitchDeck/DistributionSlide.tsx:416:        className="relative z-10 flex flex-wrap items-center justify-center gap-x-3 gap-y-2 px-8 pb-5 pt-0.5 text-[10.5px] font-medium uppercase tracking-[0.2em] text-[#9A8A7B]"
+components/PitchDeck/DistributionSlide.tsx:421:              <span className={i === arr.length - 1 ? 'text-[#F4610A]' : ''}>{s}</span>
+components/PitchDeck/DistributionSlide.tsx:422:              {i < arr.length - 1 && <span className="text-[#D8C6B4]">→</span>}
+components/PitchDeck/DistributionSlide.tsx:454:        .cd-glyph { color: #33291F; transition: color .3s ease; }
+components/PitchDeck/DistributionSlide.tsx:459:        .cd-item-label { font-size: 10px; letter-spacing: .04em; fill: #8A7B6E; font-weight: 500; }
+components/PitchDeck/DistributionSlide.tsx:460:        .cd-cluster-title { font-size: 10.5px; letter-spacing: .22em; fill: #6E6055; font-weight: 600; }
+components/PitchDeck/DistributionSlide.tsx:461:        .cd-cluster-count { font-size: 10.5px; letter-spacing: .18em; fill: #C9B7A5; font-weight: 600; }
+components/PitchDeck/DistributionSlide.tsx:462:        .cd-stage { font-size: 10px; letter-spacing: .24em; fill: #A08F7E; font-weight: 600; }
+components/PitchDeck/DistributionSlide.tsx:463:        .cd-substage { font-size: 10px; letter-spacing: .04em; fill: #BCAC9B; font-weight: 500; }
+components/PitchDeck/DistributionSlide.tsx:464:        .cd-micro { font-size: 8.5px; letter-spacing: .2em; fill: #B39B85; font-weight: 600; }
+components/PitchDeck/DistributionSlide.tsx:465:        .cd-engine-t1 { font-size: 13px; letter-spacing: .18em; fill: #FFFFFF; font-weight: 700; }
+components/FeatureCarousel/FeatureCarousel.tsx:32:    <section className={`py-24 ${dark ? 'bg-[#191919]' : ''}`}>
+components/FeatureCarousel/FeatureCarousel.tsx:39:              <p className="text-[11.5px] font-[700] tracking-[0.08em] uppercase text-[#0F8A8A] mb-3">
+components/FeatureCarousel/FeatureCarousel.tsx:44:              <h2 className={`text-[clamp(1.875rem,3.5vw,3rem)] font-[700] leading-[1.1] tracking-[-0.025em] mb-4 ${dark ? 'text-white' : 'text-[#191919]'}`}>
+components/FeatureCarousel/FeatureCarousel.tsx:49:              <p className={`text-[16.5px] max-w-[500px] mx-auto leading-[1.65] ${dark ? 'text-white/55' : 'text-[#787774]'}`}>
+components/FeatureCarousel/FeatureCarousel.tsx:75:                  <div className="w-[3px] rounded-full my-1 flex-shrink-0 overflow-hidden" style={{ background: dark ? 'rgba(255,255,255,0.10)' : '#E3E2E0' }}>
+components/FeatureCarousel/FeatureCarousel.tsx:79:                        style={{ background: '#0F8A8A', height: '100%' }}
+components/FeatureCarousel/FeatureCarousel.tsx:87:                    <span className={`block text-[14.5px] font-[600] leading-tight tracking-[-0.01em] ${dark ? 'text-white' : 'text-[#191919]'}`}>
+components/FeatureCarousel/FeatureCarousel.tsx:92:                        className={`text-[13px] leading-[1.6] mt-1.5 overflow-hidden ${dark ? 'text-white/55' : 'text-[#787774]'}`}
+components/FeatureCarousel/FeatureCarousel.tsx:113:                style={{ background: current.imageBg || '#F1F1EF' }}
+components/FeatureCarousel/FeatureCarousel.tsx:148:      <div className="bg-[#F7F6F3] px-4 py-3 flex items-center gap-3 border-b border-[#E3E2E0]">
+components/FeatureCarousel/FeatureCarousel.tsx:150:          {['#FF5F57','#FEBC2E','#28C840'].map(c => (
+components/FeatureCarousel/FeatureCarousel.tsx:154:        <span className="text-[12px] text-[#9B9A97] font-[500]">{tab.headline}</span>
+components/FeatureCarousel/FeatureCarousel.tsx:164:        <div className="mt-3 flex items-center gap-2 px-3 py-2 bg-[#FBF3DB] border border-[#F5E4B2] rounded-lg">
+components/FeatureCarousel/FeatureCarousel.tsx:166:          <span className="text-[12px] font-[500] text-[#64473A]">AI: Continue writing…</span>
+components/PitchDeck/GrowthLoopSlide.tsx:17:const ORANGE = '#FF6200';
+components/PitchDeck/GrowthLoopSlide.tsx:18:const INK = '#0A0A0A';
+components/PitchDeck/GrowthLoopSlide.tsx:67:      <rect x={p.x} y={p.y} width={p.w} height={p.h} rx={18} fill="#FFFFFF" stroke={INK} strokeOpacity={0.11} filter="url(#glCard)" />
+components/PitchDeck/GrowthLoopSlide.tsx:84:            <circle cx={p.x + 30} cy={y + 16} r={9} fill="#FFFFFF" stroke={INK} strokeOpacity={0.12} />
+components/PitchDeck/GrowthLoopSlide.tsx:89:            <circle cx={p.x + p.w - 30} cy={y + 16} r={2} fill="#16A34A" className="gl-blink" style={{ animationDelay: `${i * 0.3}s` }} />
+components/PitchDeck/GrowthLoopSlide.tsx:94:      <circle cx={align === 'l' ? p.x + p.w : p.x} cy={196} r={3.5} fill="#FFFFFF" stroke={ORANGE} strokeOpacity={0.7} strokeWidth={1.2} />
+components/PitchDeck/GrowthLoopSlide.tsx:95:      <circle cx={align === 'l' ? p.x + p.w : p.x} cy={324} r={3.5} fill="#FFFFFF" stroke={ORANGE} strokeOpacity={0.7} strokeWidth={1.2} />
+components/PitchDeck/GrowthLoopSlide.tsx:108:        <p className="text-[11px] md:text-xs font-bold tracking-[0.14em] uppercase text-[#FF6200]">Why It&apos;s One System</p>
+components/PitchDeck/GrowthLoopSlide.tsx:109:        <h2 className="mt-1.5 display-headline text-[clamp(1.3rem,2.6vw,1.9rem)] text-[#0A0A0A]">
+components/PitchDeck/GrowthLoopSlide.tsx:110:          Not two services. <span className="text-[#FF6200]">One growth engine.</span>
+components/PitchDeck/GrowthLoopSlide.tsx:125:            <stop offset="0%" stopColor="#FFFFFF" stopOpacity="0.7" />
+components/PitchDeck/GrowthLoopSlide.tsx:126:            <stop offset="45%" stopColor="#FFFFFF" stopOpacity="0" />
+components/PitchDeck/GrowthLoopSlide.tsx:145:            <feDropShadow dx="0" dy="12" stdDeviation="16" floodColor="#C2410C" floodOpacity="0.18" />
+components/PitchDeck/GrowthLoopSlide.tsx:224:          <rect x={OUT.x + 6} y={OUT.y + 8} width={OUT.w} height={OUT.h} rx={18} fill="#FFFFFF" stroke={INK} strokeOpacity={0.07} />
+components/PitchDeck/GrowthLoopSlide.tsx:225:          <rect x={OUT.x} y={OUT.y} width={OUT.w} height={OUT.h} rx={18} fill="#FFFFFF" stroke={ORANGE} strokeOpacity={0.5} strokeWidth={1.2} filter="url(#glHero)" />
+components/PitchDeck/GrowthLoopSlide.tsx:227:          <g transform={`translate(${OUT.x + 18 + 7} ${OUT.y + 18 + 7})`} stroke="#FFFFFF" strokeWidth={2} fill="none" strokeLinecap="round" strokeLinejoin="round">
+components/PitchDeck/GrowthLoopSlide.tsx:230:          <circle cx={OUT.x + OUT.w - 20} cy={OUT.y + 20} r={2.6} fill="#16A34A" className="gl-blink" />
+components/PitchDeck/OutreachOSSlide.tsx:138:          className="absolute -top-[2px] w-[5px] h-[5px] rounded-full bg-[#FF6200] shadow-[0_0_6px_rgba(255,98,0,0.6)]"
+components/PitchDeck/OutreachOSSlide.tsx:157:      <h3 className="mt-1.5 text-[13px] font-extrabold leading-snug text-[#0A0A0A]">
+components/PitchDeck/OutreachOSSlide.tsx:169:            <p className="text-[11px] font-bold text-[#0A0A0A] mt-0.5">{c.value}</p>
+components/PitchDeck/OutreachOSSlide.tsx:174:        <span className="w-1.5 h-1.5 rounded-full bg-[#FF6200] os-blink" />
+components/PitchDeck/OutreachOSSlide.tsx:197:        <span className="text-[11px] font-extrabold text-[#0A0A0A] tracking-tight">Manual Outreach Engine</span>
+components/PitchDeck/OutreachOSSlide.tsx:199:          <span className="w-1.5 h-1.5 rounded-full bg-[#16A34A] os-blink" />
+components/PitchDeck/OutreachOSSlide.tsx:212:            className="group text-left rounded-xl border border-black/[0.08] bg-white p-3 hover:border-[#FF6200]/50 hover:shadow-[0_8px_20px_rgba(255,98,0,0.1)] hover:-translate-y-0.5 transition-all duration-300 cursor-pointer"
+components/PitchDeck/OutreachOSSlide.tsx:215:              <span className="w-7 h-7 rounded-lg bg-black/[0.035] flex items-center justify-center text-black/65 group-hover:bg-[#FF6200]/10 group-hover:text-[#FF6200] transition-colors duration-300">
+components/PitchDeck/OutreachOSSlide.tsx:218:              <span className="text-[8px] font-black tracking-[0.14em] text-[#FF6200]">{m.num}</span>
+components/PitchDeck/OutreachOSSlide.tsx:220:                <span className="w-1.5 h-1.5 rounded-full bg-[#16A34A] os-blink" style={{ animationDelay: `${i * 0.35}s` }} />
+components/PitchDeck/OutreachOSSlide.tsx:221:                <svg width={10} height={10} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.4} strokeLinecap="round" strokeLinejoin="round" className="text-black/25 group-hover:text-[#FF6200] transition-colors" aria-hidden>
+components/PitchDeck/OutreachOSSlide.tsx:226:            <p className="mt-2 text-[11.5px] font-extrabold text-[#0A0A0A] leading-tight">{m.title}</p>
+components/PitchDeck/OutreachOSSlide.tsx:251:      <div aria-hidden className="pointer-events-none absolute -inset-5 rounded-[28px] bg-[#FF6200]/[0.07] blur-2xl os-halo" />
+components/PitchDeck/OutreachOSSlide.tsx:252:      <div className="relative rounded-2xl border border-[#FF6200]/35 bg-white shadow-[0_14px_36px_rgba(230,89,0,0.12)] p-4">
+components/PitchDeck/OutreachOSSlide.tsx:254:        <h3 className="mt-1.5 text-[13px] font-extrabold leading-snug text-[#0A0A0A]">Qualified Conversations</h3>
+components/PitchDeck/OutreachOSSlide.tsx:263:                r.ok ? 'border-[#FF6200]/35 bg-[#FF6200]/[0.05]' : 'border-black/[0.07] bg-black/[0.015]'
+components/PitchDeck/OutreachOSSlide.tsx:266:              <span className={cn('w-5 h-5 rounded-full flex items-center justify-center shrink-0', r.ok ? 'bg-[#FF6200]/12 text-[#FF6200]' : 'bg-black/[0.05] text-black/30')}>
+components/PitchDeck/OutreachOSSlide.tsx:269:              <span className={cn('text-[9px] font-bold leading-tight', r.ok ? 'text-[#0A0A0A]' : 'text-black/35 line-through')}>{r.name}</span>
+components/PitchDeck/OutreachOSSlide.tsx:279:        <div className="rounded-xl bg-[#0A0A0A] px-3 py-2.5 flex items-center gap-2.5">
+components/PitchDeck/OutreachOSSlide.tsx:280:          <span className="w-2 h-2 rounded-full bg-[#16A34A] os-blink shrink-0" />
+components/PitchDeck/OutreachOSSlide.tsx:300:        className="absolute inset-0 z-30 bg-[#0A0A0A]/[0.16] backdrop-blur-[2px] rounded-2xl cursor-pointer"
+components/PitchDeck/OutreachOSSlide.tsx:308:          <span className="w-8 h-8 rounded-lg bg-[#FF6200]/10 text-[#FF6200] flex items-center justify-center shrink-0">
+components/PitchDeck/OutreachOSSlide.tsx:312:            <p className="text-[8px] font-black tracking-[0.16em] text-[#FF6200]">MODULE {m.num}</p>
+components/PitchDeck/OutreachOSSlide.tsx:313:            <p className="text-[13px] font-extrabold text-[#0A0A0A] leading-tight truncate">{m.title}</p>
+components/PitchDeck/OutreachOSSlide.tsx:317:            className="ml-auto w-7 h-7 rounded-full flex items-center justify-center text-black/40 hover:text-[#0A0A0A] hover:bg-black/[0.05] transition-colors cursor-pointer"
+components/PitchDeck/OutreachOSSlide.tsx:327:          <div className="rounded-xl border-l-[3px] border-[#FF6200] bg-[#FF6200]/[0.05] px-3.5 py-3">
+components/PitchDeck/OutreachOSSlide.tsx:328:            <p className="text-[8px] font-black tracking-[0.16em] text-[#FF6200] uppercase">Why it matters</p>
+components/PitchDeck/OutreachOSSlide.tsx:329:            <p className="mt-1 text-[11px] leading-relaxed text-[#0A0A0A] font-medium">{m.why}</p>
+components/PitchDeck/OutreachOSSlide.tsx:338:                  <span className="mt-[3px] w-3.5 h-3.5 rounded-full bg-[#16A34A]/10 text-[#16A34A] flex items-center justify-center shrink-0">
+components/PitchDeck/OutreachOSSlide.tsx:356:                      ? 'border-[#FF6200]/40 bg-[#FF6200]/[0.07] text-[#FF6200]'
+components/PitchDeck/OutreachOSSlide.tsx:370:          <div className="rounded-xl bg-[#0A0A0A] px-4 py-3.5">
+components/PitchDeck/OutreachOSSlide.tsx:371:            <p className="text-[8px] font-black tracking-[0.16em] text-[#FF6200] uppercase">Outcome</p>
+components/PitchDeck/OutreachOSSlide.tsx:393:        <p className="text-[11px] md:text-xs font-bold tracking-[0.14em] uppercase text-[#FF6200]">The Outreach System</p>
+components/PitchDeck/OutreachOSSlide.tsx:394:        <h2 className="mt-1.5 display-headline text-[clamp(1.3rem,2.6vw,1.9rem)] text-[#0A0A0A]">
+components/PitchDeck/OutreachOSSlide.tsx:395:          You tell us once. <span className="text-[#FF6200]">The engine does the rest</span>.
+components/PitchDeck/OutreachOSSlide.tsx:412:              <span className="w-[2px] h-2.5 bg-[#FF6200]/80 rounded-full" />
+components/PitchDeck/PitchDeck.tsx:39:const ORANGE = '#FF6200';
+components/PitchDeck/PitchDeck.tsx:92:      ? 'bg-white/85 border-[#FF6200]/35 text-[#0A0A0A] shadow-[0_0_0_3px_rgba(255,98,0,0.06),0_10px_28px_rgba(255,98,0,0.12)]'
+components/PitchDeck/PitchDeck.tsx:94:      ? 'bg-[#0A0A0A] border-[#0A0A0A] text-white'
+components/PitchDeck/PitchDeck.tsx:95:      : 'bg-white/70 border-black/10 text-[#0A0A0A]';
+components/PitchDeck/PitchDeck.tsx:97:    tone === 'ink' ? 'bg-white/15 text-white' : 'bg-[#FF6200]/10 text-[#FF6200]';
+components/PitchDeck/PitchDeck.tsx:128:              className="absolute left-1/2 -translate-x-1/2 top-full mt-2 w-56 text-center text-[11px] leading-snug text-white bg-[#0A0A0A] px-3 py-2 rounded-xl shadow-lg z-30"
+components/PitchDeck/PitchDeck.tsx:131:              <span className="absolute -top-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-[#0A0A0A] rotate-45" />
+components/PitchDeck/PitchDeck.tsx:159:        <span className="w-9 h-9 rounded-xl bg-[#FF6200] text-white flex items-center justify-center flex-shrink-0">
+components/PitchDeck/PitchDeck.tsx:162:        <h3 className="text-[15px] md:text-lg font-extrabold tracking-tight text-[#0A0A0A]">{title}</h3>
+components/PitchDeck/PitchDeck.tsx:190:        active ? 'border-[#FF6200] bg-[#FF6200]/5 md:scale-[1.03] shadow-md' : 'border-transparent hover:bg-black/[0.03]'
+components/PitchDeck/PitchDeck.tsx:196:          active ? 'border-[#FF6200] bg-[#FF6200] text-white' : 'border-black/15 text-[#0A0A0A]'
+components/PitchDeck/PitchDeck.tsx:201:      <span className="text-[10px] font-black text-[#FF6200] tracking-wider">{num}</span>
+components/PitchDeck/PitchDeck.tsx:202:      <span className="text-[13px] md:text-sm font-extrabold text-[#0A0A0A]">{title}</span>
+components/PitchDeck/PitchDeck.tsx:211:      <ArrowIcon size={18} className="text-[#FF6200]/50 rotate-90 md:rotate-0" />
+components/PitchDeck/PitchDeck.tsx:246:            className="absolute -top-1.5 right-0 text-[8.5px] font-black uppercase tracking-wide text-white bg-[#FF6200] px-1.5 py-0.5 rounded-full shadow"
+components/PitchDeck/PitchDeck.tsx:275:        active ? 'border-[#FF6200] shadow-md -translate-y-1' : 'border-black/10 hover:-translate-y-0.5 hover:shadow-sm'
+components/PitchDeck/PitchDeck.tsx:281:          active ? 'bg-[#FF6200] text-white' : 'bg-[#0A0A0A] text-white'
+components/PitchDeck/PitchDeck.tsx:290:            active ? 'border-[#FF6200] bg-[#FF6200]/10' : 'border-black/15'
+components/PitchDeck/PitchDeck.tsx:293:          <Icon size={15} strokeWidth={2} className="text-[#0A0A0A]" />
+components/PitchDeck/PitchDeck.tsx:295:        <span className="text-[9px] md:text-[11px] font-bold text-center leading-tight text-[#0A0A0A]">{type}</span>
+components/PitchDeck/PitchDeck.tsx:320:        tone === 'accent' ? 'bg-[#FF6200] border-[#FF6200]' : 'bg-white border-[#0A0A0A]',
+components/PitchDeck/PitchDeck.tsx:324:      <span className={cn('text-sm md:text-xl font-extrabold tracking-tight', tone === 'accent' ? 'text-white' : 'text-[#0A0A0A]')}>{label}</span>
+components/PitchDeck/PitchDeck.tsx:332:      <path d="M4,44 C 60,10 140,10 196,44" stroke="#FF6200" strokeWidth="2.5" strokeLinecap="round" />
+components/PitchDeck/PitchDeck.tsx:333:      <path d="M186,36 L197,45 L185,52" stroke="#FF6200" strokeWidth="2.5" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+components/PitchDeck/PitchDeck.tsx:334:      <path d="M196,76 C 140,110 60,110 4,76" stroke="#0A0A0A" strokeWidth="2.5" strokeLinecap="round" />
+components/PitchDeck/PitchDeck.tsx:335:      <path d="M14,84 L3,75 L15,68" stroke="#0A0A0A" strokeWidth="2.5" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+components/PitchDeck/PitchDeck.tsx:343:      <path d="M30,200 A170,170 0 0 1 370,200" stroke="#FF6200" strokeWidth="14" strokeLinecap="round" />
+components/PitchDeck/PitchDeck.tsx:344:      <path d="M370,200 A170,170 0 0 1 30,200" stroke="#0A0A0A" strokeWidth="14" strokeLinecap="round" />
+components/PitchDeck/PitchDeck.tsx:350:  return <p className="text-[11px] md:text-xs font-bold tracking-[0.14em] uppercase text-[#FF6200] mb-3">{children}</p>;
+components/PitchDeck/PitchDeck.tsx:366:      <path d="M2 9V2H9" stroke="#FF6200" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" opacity="0.55" />
+components/PitchDeck/PitchDeck.tsx:384:        <motion.h2 variants={itemVariants} className="display-headline text-[clamp(1.6rem,3.4vw,2.6rem)] text-[#0A0A0A]">
+components/PitchDeck/PitchDeck.tsx:386:          <span className="text-[#FF6200]">outreach that fills your pipeline</span>.
+components/PitchDeck/PitchDeck.tsx:577:      <motion.p variants={itemVariants} className="text-[11px] md:text-xs font-bold tracking-[0.2em] uppercase text-[#FF6200]">
+components/PitchDeck/PitchDeck.tsx:580:      <motion.h2 variants={itemVariants} className="display-headline text-[clamp(1.7rem,3.8vw,2.9rem)] text-[#0A0A0A] max-w-2xl">
+components/PitchDeck/PitchDeck.tsx:581:        Record once. Let <span className="text-[#FF6200]">momentum</span> do the rest.
+components/PitchDeck/PitchDeck.tsx:590:          className="inline-flex items-center gap-2 px-6 py-3 text-sm font-bold text-white bg-[#FF6200] rounded-full hover:bg-[#0A0A0A] transition-all duration-300 shadow-md hover:shadow-lg hover:-translate-y-0.5 cursor-pointer"
+components/PitchDeck/PitchDeck.tsx:753:            !isFullscreen && 'rounded-[21px] md:rounded-[23px] p-px bg-gradient-to-br from-[#FF6200]/45 via-black/[0.06] to-black/[0.06]'
+components/PitchDeck/PitchDeck.tsx:759:              className="pointer-events-none absolute -inset-6 md:-inset-10 -z-10 rounded-[36px] bg-[#FF6200]/10 blur-3xl"
+components/PitchDeck/PitchDeck.tsx:802:                className="w-7 h-7 rounded-full flex items-center justify-center text-black/40 hover:text-[#FF6200] hover:bg-[#FF6200]/10 transition-colors duration-200 cursor-pointer"
+components/PitchDeck/PitchDeck.tsx:822:                  style={{ backgroundColor: '#FF6200' }}
+components/PitchDeck/PitchDeck.tsx:868:              <ChevronLeft size={isFullscreen ? 24 : 20} className="text-[#0A0A0A]" />
+components/PitchDeck/PitchDeck.tsx:879:              <ChevronRight size={isFullscreen ? 24 : 20} className="text-[#0A0A0A]" />
+components/CompleteFramework/CompleteFramework.tsx:12:const RED = '#FF6200'; // now bright orange
+components/CompleteFramework/CompleteFramework.tsx:13:const BLACK = '#0A0A0A';
+components/CompleteFramework/CompleteFramework.tsx:14:const WHITE = '#FFFFFF';
+components/CompleteFramework/CompleteFramework.tsx:15:const CREAM = '#FDFCFB';
+components/WorkflowDetailModal/WorkflowDetailModal.tsx:89:              <div className="relative rounded-2xl overflow-hidden border border-black/[0.04] bg-[#FAFAF8]">
+components/WorkflowDetailModal/WorkflowDetailModal.tsx:99:                    <span className="text-[10px] font-semibold tracking-[0.12em] uppercase text-[#FF6200] mb-3 block">
+components/WorkflowDetailModal/WorkflowDetailModal.tsx:102:                    <h3 className="text-[clamp(1.25rem,2vw,1.75rem)] font-semibold tracking-[-0.02em] text-[#0A0A0A] mb-3 leading-[1.2]">
+components/WorkflowDetailModal/WorkflowDetailModal.tsx:105:                    <p className="text-[13.5px] sm:text-sm text-[#6B6B6B] leading-[1.7] max-w-[520px]">
+components/VideoEmbed/VideoEmbed.tsx:99:      className="w-full bg-[#F1F1EF] border-2 border-dashed border-[#E3E2E0] rounded-2xl overflow-hidden flex items-center justify-center"
+components/VideoEmbed/VideoEmbed.tsx:103:        <div className="w-14 h-14 rounded-full bg-[#E3E2E0] flex items-center justify-center">
+components/VideoEmbed/VideoEmbed.tsx:105:            <circle cx="12" cy="12" r="10" stroke="#9B9A97" strokeWidth="1.5" opacity="0.5"/>
+components/VideoEmbed/VideoEmbed.tsx:106:            <path d="M9.5 8.5L16.5 12L9.5 15.5V8.5Z" fill="#9B9A97" opacity="0.6"/>
+components/VideoEmbed/VideoEmbed.tsx:109:        <p className="text-[14.5px] font-[600] text-[#787774]">{label}</p>
+components/VideoEmbed/VideoEmbed.tsx:110:        <code className="text-[11.5px] text-[#9B9A97] bg-[#E3E2E0] px-2.5 py-1 rounded-md font-mono">
+components/CompleteFramework/flow/FlowStage.tsx:123:  color = '#FF6200',
+components/CompleteFramework/flow/FlowStage.tsx:124:  trackColor = '#E1DFDA',
+components/HorizontalCarousel/HorizontalCarousel.tsx:35:          <p className="text-center text-[11.5px] font-[700] tracking-[0.08em] uppercase text-[#0F8A8A] mb-3">
+components/HorizontalCarousel/HorizontalCarousel.tsx:40:          <h2 className="text-center text-[clamp(1.875rem,3.5vw,3rem)] font-[700] leading-[1.1] tracking-[-0.025em] text-[#191919] mb-10">
+components/HorizontalCarousel/HorizontalCarousel.tsx:49:            background: slide.bg || '#F1F1EF',
+components/HorizontalCarousel/HorizontalCarousel.tsx:105:            className="w-9 h-9 rounded-full border border-[#E3E2E0] bg-white flex items-center justify-center text-[#37352F] hover:border-[#9B9A97] hover:shadow-[0_2px_8px_rgba(0,0,0,0.08)] transition-all duration-150 shadow-sm"
+components/HorizontalCarousel/HorizontalCarousel.tsx:120:                    ? 'w-5 h-[6px] bg-[#191919]'
+components/HorizontalCarousel/HorizontalCarousel.tsx:121:                    : 'w-[6px] h-[6px] bg-[#E3E2E0] hover:bg-[#9B9A97]'
+components/HorizontalCarousel/HorizontalCarousel.tsx:130:            className="w-9 h-9 rounded-full border border-[#E3E2E0] bg-white flex items-center justify-center text-[#37352F] hover:border-[#9B9A97] hover:shadow-[0_2px_8px_rgba(0,0,0,0.08)] transition-all duration-150 shadow-sm"
+components/AmbientEnvironment/AmbientEnvironment.tsx:91:          className="absolute rounded-full bg-[#FF6200]"
+components/BookingCalendar/BookingCalendar.tsx:8:const RED = '#FF6200';
+components/BookingCalendar/BookingCalendar.tsx:9:const RED_LIGHT = '#FFF0F0';
+components/BookingCalendar/BookingCalendar.tsx:141:        background: 'linear-gradient(180deg, #F7F6F3 0%, #FFFFFF 30%, #FFFFFF 70%, #F7F6F3 100%)',
+components/BookingCalendar/BookingCalendar.tsx:165:          <h2 className="text-[clamp(2rem,4vw,3.25rem)] font-[800] leading-[1.05] tracking-[-0.03em] text-[#191919] mb-4">
+components/BookingCalendar/BookingCalendar.tsx:168:          <p className="text-[17px] text-[#787774] max-w-[480px] mx-auto leading-[1.65]">
+components/BookingCalendar/BookingCalendar.tsx:203:                  <h3 className="text-[18px] font-[700] text-[#191919] tracking-[-0.02em]">
+components/BookingCalendar/BookingCalendar.tsx:209:                      className="w-8 h-8 rounded-lg flex items-center justify-center hover:bg-[#F1F1EF] transition-colors"
+components/BookingCalendar/BookingCalendar.tsx:212:                      <svg className="w-4 h-4 text-[#787774]" viewBox="0 0 16 16" fill="none">
+components/BookingCalendar/BookingCalendar.tsx:218:                      className="w-8 h-8 rounded-lg flex items-center justify-center hover:bg-[#F1F1EF] transition-colors"
+components/BookingCalendar/BookingCalendar.tsx:221:                      <svg className="w-4 h-4 text-[#787774]" viewBox="0 0 16 16" fill="none">
+components/BookingCalendar/BookingCalendar.tsx:231:                    <div key={d} className="text-center text-[11px] font-[600] text-[#9B9A97] tracking-[0.04em] uppercase py-2">
+components/BookingCalendar/BookingCalendar.tsx:255:                          ${!day.inMonth ? 'text-[#D3D1CB] cursor-default' : ''}
+components/BookingCalendar/BookingCalendar.tsx:256:                          ${day.inMonth && !disabled && !selected ? 'text-[#191919] hover:bg-[#F7F6F3] cursor-pointer' : ''}
+components/BookingCalendar/BookingCalendar.tsx:257:                          ${day.inMonth && disabled && !past ? 'text-[#D3D1CB] cursor-not-allowed' : ''}
+components/BookingCalendar/BookingCalendar.tsx:258:                          ${day.inMonth && past ? 'text-[#D3D1CB] cursor-not-allowed' : ''}
+components/BookingCalendar/BookingCalendar.tsx:276:                <div className="flex items-center gap-4 mt-4 pt-4 border-t border-[#F1F1EF]">
+components/BookingCalendar/BookingCalendar.tsx:279:                    <span className="text-[11px] text-[#9B9A97] font-[500]">Today</span>
+components/BookingCalendar/BookingCalendar.tsx:285:                    <span className="text-[11px] text-[#9B9A97] font-[500]">Selected</span>
+components/BookingCalendar/BookingCalendar.tsx:288:                    <span className="w-5 h-5 rounded-md text-[10px] flex items-center justify-center text-[#D3D1CB] bg-[#F7F6F3] font-[500]">
+components/BookingCalendar/BookingCalendar.tsx:291:                    <span className="text-[11px] text-[#9B9A97] font-[500]">Unavailable</span>
+components/BookingCalendar/BookingCalendar.tsx:299:                style={{ borderColor: '#F1F1EF', background: '#FCFBFA' }}
+components/BookingCalendar/BookingCalendar.tsx:306:                    <p className="text-[14px] font-[600] text-[#191919] mb-5 tracking-[-0.01em]">
+components/BookingCalendar/BookingCalendar.tsx:321:                              color: hoveredSlot === slot ? 'white' : '#191919',
+components/BookingCalendar/BookingCalendar.tsx:322:                              border: `1.5px solid ${hoveredSlot === slot ? RED : '#E3E2E0'}`,
+components/BookingCalendar/BookingCalendar.tsx:346:                        <p className="text-[14px] text-[#9B9A97]">
+components/BookingCalendar/BookingCalendar.tsx:352:                    <p className="text-[11px] text-[#9B9A97] mt-4 text-center">
+components/BookingCalendar/BookingCalendar.tsx:370:                    <p className="text-[15px] font-[600] text-[#191919] mb-1.5">
+components/BookingCalendar/BookingCalendar.tsx:373:                    <p className="text-[13px] text-[#9B9A97] max-w-[200px] leading-[1.5]">
+components/BookingCalendar/BookingCalendar.tsx:384:              style={{ borderTop: '1px solid #F1F1EF', background: '#FCFBFA' }}
+components/BookingCalendar/BookingCalendar.tsx:395:                  <p className="text-[13.5px] font-[600] text-[#191919] leading-tight">Nasrullah Tanim</p>
+components/BookingCalendar/BookingCalendar.tsx:396:                  <p className="text-[11.5px] text-[#9B9A97] leading-tight">SlideIn Venture · Founder</p>
+components/BookingCalendar/BookingCalendar.tsx:419:        <p className="text-center text-[12px] text-[#9B9A97] mt-6">
+components/ServiceDetailModal/ServiceDetailModal.tsx:73:            className="relative w-full max-w-[1100px] aspect-video rounded-[2rem] overflow-hidden border border-white/20 bg-[#FAFAF9] shadow-2xl flex flex-col justify-center"
+components/ServiceDetailModal/ServiceDetailModal.tsx:110:                  <span className="text-[11px] md:text-sm font-bold tracking-[0.2em] uppercase text-[#FF6200] mb-6 block">
+components/ServiceDetailModal/ServiceDetailModal.tsx:114:                  <h3 className="text-3xl md:text-5xl font-extrabold tracking-tight text-[#0A0A0A] mb-8 leading-[1.1]">
+components/ServiceDetailModal/ServiceDetailModal.tsx:118:                  <div className="w-16 h-1 bg-[#FF6200] mb-8 rounded-full" />
+components/ServiceDetailModal/ServiceDetailModal.tsx:120:                  <p className="text-lg md:text-[22px] text-[#4A4A4A] leading-relaxed font-normal">
+components/Hero/Hero.tsx:29:const ORANGE = '#FF6200';
+components/Hero/Hero.tsx:193:            className="mt-8 max-w-[16ch] text-[clamp(2.15rem,7.2vw,5.75rem)] leading-[1.02] tracking-[-0.02em] text-[#0A0A0A] md:max-w-[18ch]"
+components/Hero/Hero.tsx:225:                  background: 'linear-gradient(180deg,#1F1F1F 0%,#0A0A0A 100%)',
+components/Hero/Hero.tsx:257:                className="group flex w-full cursor-pointer items-center justify-center gap-3 rounded-2xl border border-black/[0.1] bg-white/70 px-6 py-4 text-[15px] font-medium text-[#0A0A0A] backdrop-blur-md transition-[border-color,background-color,box-shadow] duration-500 hover:border-black/20 hover:bg-white hover:shadow-[0_10px_30px_rgba(10,10,10,0.06)] sm:inline-flex sm:w-auto"
+components/Hero/WatchThisButton.tsx:97:          background: '#111',
+components/Hero/WatchThisButton.tsx:108:        <Eye springX={springX} springY={springY} eyeColor="#fff" pupilColor="#111" />
+components/Hero/WatchThisButton.tsx:109:        <Eye springX={springX} springY={springY} eyeColor="#fff" pupilColor="#111" />
+components/Hero/WatchThisButton.tsx:123:          background: '#F7F6F3',
+components/Hero/WatchThisButton.tsx:125:          border: '3px solid #111',
+components/Hero/WatchThisButton.tsx:130:          color: '#191919',
+components/Hero/WatchThisButton.tsx:149:            background: '#191919',

@@ -1,29 +1,10 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import LetsTalkButton from './LetsTalkButton';
-
-// ─── Dropdown Data ────────────────────────────────────────────────────────────
-const productItems = [
-  { group: 'AI', items: [
-    { label: 'Notion AI', caption: 'AI tools for work', href: '/product/ai', color: '#64473A', bg: '#EEE0DA', icon: '🤖' },
-    { label: 'Agents', caption: 'Automate busywork', href: '/product/agents', color: '#D9730D', bg: '#FDEFD4', icon: '⚡' },
-    { label: 'AI Meeting Notes', caption: 'Perfectly written by AI', href: '/product/ai-meeting-notes', color: '#B90B0F', bg: '#FFE8E8', icon: '🎙️' },
-    { label: 'Enterprise Search', caption: 'Find answers instantly', href: '/product/enterprise-search', color: '#9065B0', bg: '#F4EEFC', icon: '🔍' },
-  ]},
-  { group: 'Core', items: [
-    { label: 'Knowledge Base', caption: 'Centralize your knowledge', href: '/product/wikis', color: '#37352F', bg: '#F1F1EF', icon: '📚' },
-    { label: 'Docs', caption: 'Simple and powerful', href: '/solutions', color: '#0F8A8A', bg: '#D3EAE8', icon: '📄' },
-    { label: 'Projects', caption: 'Manage any project', href: '/product/projects', color: '#CB912F', bg: '#FBF3DB', icon: '🎯' },
-  ]},
-  { group: 'More', items: [
-    { label: 'Connections', caption: 'Connect your apps', href: '/connections', color: '#787774', bg: '#F1F1EF', icon: '🔗' },
-    { label: 'Security', caption: 'Safe and scalable', href: '/security', color: '#787774', bg: '#F1F1EF', icon: '🔒' },
-    { label: 'Calendar', caption: 'Manage your time', href: '/product/calendar', color: '#37352F', bg: '#F1F1EF', icon: '📅' },
-  ]},
-];
+import { LogoMark } from '@/components/Brand/Logo';
 
 const navLinks = [
   { label: 'Solutions', href: '/solutions' },
@@ -31,66 +12,17 @@ const navLinks = [
   { label: 'Pricing', href: '/pricing' },
 ];
 
-// ─── Product Mega-Dropdown ────────────────────────────────────────────────────
-function ProductDropdown() {
-  return (
-    <div className="p-4 min-w-[560px]">
-      <div className="grid grid-cols-3 gap-2">
-        {productItems.map((group) => (
-          <div key={group.group} className="flex flex-col">
-            <p className="text-[10px] font-[700] tracking-[0.1em] uppercase text-[#9B9A97] px-2 py-1 mb-1">
-              {group.group}
-            </p>
-            {group.items.map((item) => (
-              <Link
-                key={item.label}
-                href={item.href}
-                className="flex items-center gap-2.5 px-2 py-2 rounded-xl hover:bg-[#F7F6F3] transition-colors duration-150 group"
-              >
-                <span
-                  className="w-8 h-8 rounded-[8px] flex items-center justify-center text-sm flex-shrink-0 transition-transform duration-200 group-hover:scale-110"
-                  style={{ background: item.bg }}
-                >
-                  {item.icon}
-                </span>
-                <span className="flex flex-col gap-px">
-                  <span className="text-[13px] font-[560] text-[#191919] leading-tight">{item.label}</span>
-                  <span className="text-[11px] text-[#9B9A97] leading-tight">{item.caption}</span>
-                </span>
-              </Link>
-            ))}
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
 // ─── Main Navbar ──────────────────────────────────────────────────────────────
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
-  const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [hoveredLink, setHoveredLink] = useState<string | null>(null);
-  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 10);
     window.addEventListener('scroll', onScroll, { passive: true });
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
-
-  const open = (name: string) => {
-    if (timeoutRef.current) clearTimeout(timeoutRef.current);
-    setActiveDropdown(name);
-  };
-  const close = () => {
-    timeoutRef.current = setTimeout(() => setActiveDropdown(null), 120);
-  };
-  const keep = () => {
-    if (timeoutRef.current) clearTimeout(timeoutRef.current);
-  };
-
 
   return (
     <>
@@ -129,24 +61,17 @@ export default function Navbar() {
             }}
             aria-label="SlideIn Venture"
           >
+            <LogoMark className="h-[22px] w-[22px] transition-transform duration-500 ease-out group-hover:rotate-[-6deg]" />
             <span
-              className="font-[800] text-[18px] leading-none select-none tracking-tight"
-              style={{
-                color: '#0A0A0A',
-                fontFamily: 'var(--font-playfair), "Playfair Display", serif',
-              }}
+              className="font-normal text-[20px] leading-none select-none tracking-[-0.01em] text-[var(--color-ink)]"
+              style={{ fontFamily: 'var(--font-display)' }}
             >
               SlideIn
             </span>
-            <span
-              className="font-[500] text-[16px] leading-none select-none tracking-tight transition-colors duration-300"
-              style={{
-                color: '#FF6200',
-                fontFamily: "'Geist', system-ui, sans-serif",
-              }}
-            >
+            <span className="font-medium text-[16px] leading-none select-none tracking-tight text-[var(--color-brand)]">
               Venture
             </span>
+            <span className="sr-only">SlideIn Venture — home</span>
           </Link>
 
           {/* ── Desktop Nav Links ─────────────────────────────────────── */}
@@ -156,7 +81,7 @@ export default function Navbar() {
                 key={link.label}
                 href={link.href}
                 onMouseEnter={() => setHoveredLink(link.label)}
-                className="relative px-5 py-2.5 text-[16px] font-[500] text-[#0A0A0A]/80 rounded-full hover:text-black transition-colors duration-150 whitespace-nowrap inline-flex items-center"
+                className="relative px-5 py-2.5 text-[16px] font-[500] text-[var(--color-ink)]/80 rounded-full hover:text-black transition-colors duration-150 whitespace-nowrap inline-flex items-center"
               >
                 {hoveredLink === link.label && (
                   <motion.span
@@ -184,15 +109,15 @@ export default function Navbar() {
           >
             <div className="w-[18px] flex flex-col gap-[4px]">
                 <span
-                  className="block h-[2px] bg-[#0A0A0A] rounded-full origin-center transition-transform duration-200"
+                  className="block h-[2px] bg-[var(--color-ink)] rounded-full origin-center transition-transform duration-200"
                   style={{ transform: mobileOpen ? 'translateY(6px) rotate(45deg)' : 'none' }}
                 />
                 <span
-                  className="block h-[2px] bg-[#0A0A0A] rounded-full transition-opacity duration-200"
+                  className="block h-[2px] bg-[var(--color-ink)] rounded-full transition-opacity duration-200"
                   style={{ opacity: mobileOpen ? 0 : 1 }}
                 />
                 <span
-                  className="block h-[2px] bg-[#0A0A0A] rounded-full origin-center transition-transform duration-200"
+                  className="block h-[2px] bg-[var(--color-ink)] rounded-full origin-center transition-transform duration-200"
                   style={{ transform: mobileOpen ? 'translateY(-6px) rotate(-45deg)' : 'none' }}
                 />
             </div>
@@ -222,7 +147,7 @@ export default function Navbar() {
                   <Link
                     key={link.label}
                     href={link.href}
-                    className="block px-4 py-3 text-[15px] font-[500] text-[#0A0A0A]/80 rounded-2xl hover:text-black hover:bg-black/[0.04] transition-colors"
+                    className="block px-4 py-3 text-[15px] font-[500] text-[var(--color-ink)]/80 rounded-2xl hover:text-black hover:bg-black/[0.04] transition-colors"
                     onClick={() => setMobileOpen(false)}
                   >
                     {link.label}

@@ -1,0 +1,83 @@
+app/globals.css:346:  /* Display headlines use the editorial face. Instrument Serif ships weight 400
+app/layout.tsx:2:import { Inter, Geist, Instrument_Serif, JetBrains_Mono } from "next/font/google";
+app/layout.tsx:13:const instrumentSerif = Instrument_Serif({
+app/solutions/page.tsx:214:            <Badge className="mb-6 bg-[#FF6200]/[0.06] text-[#FF6200] border-[#FF6200]/[0.15] hover:bg-[#FF6200]/[0.08] font-[600] tracking-[0.02em] rounded-full px-4 py-1.5">
+app/solutions/page.tsx:245:                <div className="bg-white border border-[#E3E2E0] rounded-lg px-4 py-1.5 text-[12px] font-[500] text-[#9B9A97]">
+app/solutions/page.tsx:259:                      <p className="text-[11px] font-[600] uppercase tracking-[0.08em] text-[#9B9A97] mb-2">{stat.label}</p>
+app/solutions/page.tsx:260:                      <p className="text-[28px] font-[700] text-[#0A0A0A] tracking-[-0.02em]">{stat.value}</p>
+app/solutions/page.tsx:261:                      <p className="text-[12px] font-[600] text-[#6B8F71] mt-1">{stat.change} this month</p>
+app/solutions/page.tsx:273:                        <p className="text-[13px] font-[600] text-[#0A0A0A]">Content Engine</p>
+app/solutions/page.tsx:293:                        <p className="text-[13px] font-[600] text-[#0A0A0A]">Outreach Engine</p>
+app/solutions/page.tsx:358:                        className="font-[600] tracking-[0.02em] rounded-full px-3 py-1"
+app/solutions/page.tsx:369:                    <h3 className="text-[22px] font-[700] tracking-[-0.02em] text-[#0A0A0A] mb-3">
+app/solutions/page.tsx:380:                          <p className="text-[18px] font-[700] tracking-[-0.01em]" style={{ color: feature.badgeColor }}>
+app/solutions/page.tsx:383:                          <p className="text-[10px] font-[600] uppercase tracking-[0.06em] text-[#9B9A97] mt-1">
+app/solutions/page.tsx:447:                  <div className="text-[11px] font-[700] uppercase tracking-[0.1em] text-[#9B9A97] mb-2">
+app/solutions/page.tsx:450:                  <h3 className="text-[20px] font-[700] tracking-[-0.015em] text-[#0A0A0A] mb-3">
+app/solutions/page.tsx:480:          <h2 className="section-headline text-xl font-[700] text-[#0A0A0A] mb-4">
+app/solutions/page.tsx:492:                  className: "bg-[#FF6200] hover:bg-[#8B0F13] text-white font-[600] tracking-[-0.01em] shadow-[0_4px_14px_rgba(122,10,14,0.25)] hover:shadow-[0_6px_20px_rgba(122,10,14,0.35)] hover:-translate-y-px transition-all duration-150 rounded-[7px] h-12 px-8",
+app/solutions/page.tsx:503:                  className: "font-[500] tracking-[-0.01em] rounded-[7px] h-12 px-8 border-[#E3E2E0] hover:bg-[#F7F6F3] hover:border-[#D4D4D4]",
+components/Navbar/LetsTalkButton.tsx:214:        className="btn-premium relative inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-[14px] font-[600] whitespace-nowrap outline-none cursor-pointer overflow-hidden"
+components/Navbar/Navbar.tsx:67:                fontFamily: 'var(--font-display)',
+components/Navbar/Navbar.tsx:73:              className="font-[500] text-[16px] leading-none select-none tracking-tight transition-colors duration-300"
+components/Navbar/Navbar.tsx:76:                fontFamily: "'Geist', system-ui, sans-serif",
+components/Navbar/Navbar.tsx:90:                className="relative px-5 py-2.5 text-[16px] font-[500] text-[#0A0A0A]/80 rounded-full hover:text-black transition-colors duration-150 whitespace-nowrap inline-flex items-center"
+components/Navbar/Navbar.tsx:156:                    className="block px-4 py-3 text-[15px] font-[500] text-[#0A0A0A]/80 rounded-2xl hover:text-black hover:bg-black/[0.04] transition-colors"
+app/pricing/page.tsx:190:                className="w-8 h-8 rounded-lg flex items-center justify-center text-[13px] font-[800]"
+app/pricing/page.tsx:196:                <p className="text-[13px] font-[600] text-white leading-tight">
+app/pricing/page.tsx:200:                  <p className="text-[11.5px] font-[500]" style={{ color: RED_PRICING }}>
+app/pricing/page.tsx:210:                  <p className="text-[11px] text-[#787774] uppercase tracking-[0.06em] font-[600]">Subtotal</p>
+app/pricing/page.tsx:211:                  <p className="text-[15px] font-[700] text-[#9B9A97] line-through">${subtotal.toLocaleString()}</p>
+app/pricing/page.tsx:215:                <p className="text-[11px] text-[#787774] uppercase tracking-[0.06em] font-[600]">Total / mo</p>
+app/pricing/page.tsx:216:                <p className="text-[22px] font-[800] text-white">${total.toLocaleString()}</p>
+app/pricing/page.tsx:231:                className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full text-[14px] font-[700] transition-all duration-200 hover:-translate-y-px hover:shadow-lg"
+app/pricing/page.tsx:247:            <span className="text-[20px] font-[800] text-white">${total.toLocaleString()}</span>
+app/pricing/page.tsx:281:          className="absolute top-4 right-4 text-[10px] font-[700] tracking-[0.06em] uppercase px-2 py-0.5 rounded-full"
+app/pricing/page.tsx:294:        className="text-[13px] font-[600] tracking-[0.04em] uppercase mb-0.5"
+app/pricing/page.tsx:300:        className="text-[17px] font-[750] leading-tight tracking-[-0.02em] mb-2"
+app/pricing/page.tsx:318:            className="text-[24px] font-[800] tracking-[-0.03em]"
+app/pricing/page.tsx:324:            className="text-[12px] font-[500] ml-1"
+app/pricing/page.tsx:369:        <span className="text-[13px] font-[600]" style={{ color: RED }}>Bundle discounts:</span>
+app/pricing/page.tsx:375:            className="text-[12px] font-[650] px-2.5 py-1 rounded-lg transition-all duration-200"
+app/pricing/page.tsx:391:        <span className="text-[12px] font-[600] ml-auto hidden sm:block" style={{ color: RED }}>
+app/pricing/page.tsx:428:            className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-[11.5px] font-[700] tracking-[0.06em] uppercase mb-6"
+app/pricing/page.tsx:456:              <div key={item.label} className="flex items-center gap-1.5 text-[12.5px] text-[#9B9A97] font-[500]">
+app/pricing/page.tsx:471:            <h2 className="text-[13px] font-[700] tracking-[0.06em] uppercase text-[#9B9A97]">
+app/pricing/page.tsx:477:                className="text-[12.5px] font-[600] text-[#9B9A97] hover:text-[#0A0A0A] transition-colors"
+app/pricing/page.tsx:502:              <p className="text-[15px] font-[600] text-[#9B9A97] mb-1">
+app/pricing/page.tsx:516:                className="font-[600] underline underline-offset-2 hover:text-[#0A0A0A] transition-colors"
+components/Footer/Footer.tsx:29:                style={{ fontFamily: 'var(--font-display)' }}
+components/VideoEmbed/VideoEmbed.tsx:109:        <p className="text-[14.5px] font-[600] text-[#787774]">{label}</p>
+components/CTABanner/CTABanner.tsx:42:            <p className="text-[11.5px] font-[700] tracking-[0.08em] uppercase text-black/40 mb-4">
+components/CTABanner/CTABanner.tsx:47:          <h2 className="text-[clamp(2.25rem,5vw,4rem)] font-[700] leading-[1.06] tracking-[-0.03em] text-black mb-5">
+components/CTABanner/CTABanner.tsx:61:              className="inline-flex items-center gap-2 px-6 py-3 text-[15px] font-[600] text-white bg-[#FF6200] rounded-[7px] hover:bg-[#8B0F13] transition-all duration-150 shadow-[0_1px_3px_rgba(0,0,0,0.12)] hover:shadow-[0_4px_16px_rgba(0,0,0,0.18)] hover:-translate-y-px tracking-[-0.01em]"
+components/CTABanner/CTABanner.tsx:69:              className="inline-flex items-center gap-1.5 py-3 text-[15px] font-[500] text-black/60 hover:text-black/90 transition-colors duration-150 tracking-[-0.01em]"
+components/HorizontalCarousel/HorizontalCarousel.tsx:35:          <p className="text-center text-[11.5px] font-[700] tracking-[0.08em] uppercase text-[#0F8A8A] mb-3">
+components/HorizontalCarousel/HorizontalCarousel.tsx:40:          <h2 className="text-center text-[clamp(1.875rem,3.5vw,3rem)] font-[700] leading-[1.1] tracking-[-0.025em] text-[#191919] mb-10">
+components/HorizontalCarousel/HorizontalCarousel.tsx:85:                  <span className="block text-[11px] font-[700] tracking-[0.08em] uppercase text-white/60 mb-2">
+components/HorizontalCarousel/HorizontalCarousel.tsx:89:                <h3 className="text-[clamp(1.125rem,2.5vw,1.875rem)] font-[700] leading-[1.2] tracking-[-0.02em] text-white mb-2">
+components/BookingCalendar/BookingCalendar.tsx:161:            <span className="text-[11.5px] font-[700] tracking-[0.08em] uppercase" style={{ color: RED }}>
+components/BookingCalendar/BookingCalendar.tsx:165:          <h2 className="text-[clamp(2rem,4vw,3.25rem)] font-[800] leading-[1.05] tracking-[-0.03em] text-[#191919] mb-4">
+components/BookingCalendar/BookingCalendar.tsx:203:                  <h3 className="text-[18px] font-[700] text-[#191919] tracking-[-0.02em]">
+components/BookingCalendar/BookingCalendar.tsx:231:                    <div key={d} className="text-center text-[11px] font-[600] text-[#9B9A97] tracking-[0.04em] uppercase py-2">
+components/BookingCalendar/BookingCalendar.tsx:254:                          relative w-full aspect-square flex items-center justify-center rounded-xl text-[14px] font-[500] transition-all duration-150
+components/BookingCalendar/BookingCalendar.tsx:259:                          ${selected ? 'text-white font-[650]' : ''}
+components/BookingCalendar/BookingCalendar.tsx:279:                    <span className="text-[11px] text-[#9B9A97] font-[500]">Today</span>
+components/BookingCalendar/BookingCalendar.tsx:282:                    <span className="w-5 h-5 rounded-md text-[10px] flex items-center justify-center text-white font-[600]" style={{ background: RED }}>
+components/BookingCalendar/BookingCalendar.tsx:285:                    <span className="text-[11px] text-[#9B9A97] font-[500]">Selected</span>
+components/BookingCalendar/BookingCalendar.tsx:288:                    <span className="w-5 h-5 rounded-md text-[10px] flex items-center justify-center text-[#D3D1CB] bg-[#F7F6F3] font-[500]">
+components/BookingCalendar/BookingCalendar.tsx:291:                    <span className="text-[11px] text-[#9B9A97] font-[500]">Unavailable</span>
+components/BookingCalendar/BookingCalendar.tsx:303:                    <p className="text-[12px] font-[700] tracking-[0.06em] uppercase mb-1" style={{ color: RED }}>
+components/BookingCalendar/BookingCalendar.tsx:306:                    <p className="text-[14px] font-[600] text-[#191919] mb-5 tracking-[-0.01em]">
+components/BookingCalendar/BookingCalendar.tsx:318:                            className="relative w-full text-left px-4 py-3 rounded-xl text-[14px] font-[520] transition-all duration-150 overflow-hidden"
+components/BookingCalendar/BookingCalendar.tsx:370:                    <p className="text-[15px] font-[600] text-[#191919] mb-1.5">
+components/BookingCalendar/BookingCalendar.tsx:389:                  className="w-9 h-9 rounded-full flex items-center justify-center text-[13px] font-[700] text-white"
+components/BookingCalendar/BookingCalendar.tsx:395:                  <p className="text-[13.5px] font-[600] text-[#191919] leading-tight">Nasrullah Tanim</p>
+components/BookingCalendar/BookingCalendar.tsx:403:                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-[13.5px] font-[650] text-white transition-all duration-200 hover:-translate-y-px"
+components/FeatureCarousel/FeatureCarousel.tsx:39:              <p className="text-[11.5px] font-[700] tracking-[0.08em] uppercase text-[#0F8A8A] mb-3">
+components/FeatureCarousel/FeatureCarousel.tsx:44:              <h2 className={`text-[clamp(1.875rem,3.5vw,3rem)] font-[700] leading-[1.1] tracking-[-0.025em] mb-4 ${dark ? 'text-white' : 'text-[#191919]'}`}>
+components/FeatureCarousel/FeatureCarousel.tsx:87:                    <span className={`block text-[14.5px] font-[600] leading-tight tracking-[-0.01em] ${dark ? 'text-white' : 'text-[#191919]'}`}>
+components/FeatureCarousel/FeatureCarousel.tsx:121:                    className="absolute top-4 left-4 text-[10.5px] font-[700] tracking-[0.05em] uppercase px-2.5 py-1 rounded-full"
+components/FeatureCarousel/FeatureCarousel.tsx:154:        <span className="text-[12px] text-[#9B9A97] font-[500]">{tab.headline}</span>
+components/FeatureCarousel/FeatureCarousel.tsx:166:          <span className="text-[12px] font-[500] text-[#64473A]">AI: Continue writing…</span>
+components/Hero/Hero.tsx:194:            style={{ fontFamily: 'var(--font-display)', fontWeight: 400 }}

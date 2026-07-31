@@ -1,5 +1,12 @@
 import { withNextVideo } from "next-video/process";
+import bundleAnalyzer from "@next/bundle-analyzer";
 import type { NextConfig } from "next";
+
+/* Run `ANALYZE=true npm run build` to inspect bundle cost. Off by default so
+   normal builds are unaffected. */
+const withBundleAnalyzer = bundleAnalyzer({
+  enabled: process.env.ANALYZE === "true",
+});
 
 const nextConfig: NextConfig = {
   turbopack: {
@@ -7,4 +14,4 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default withNextVideo(nextConfig, { folder: 'videos' });
+export default withBundleAnalyzer(withNextVideo(nextConfig, { folder: 'videos' }));

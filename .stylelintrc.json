@@ -1,0 +1,58 @@
+{
+  "extends": [
+    "stylelint-config-standard"
+  ],
+  "rules": {
+    "color-no-hex": true,
+    "declaration-property-value-disallowed-list": {
+      "/^background/": [
+        "/#fff/i",
+        "/white/",
+        "/#000/i",
+        "/black/"
+      ],
+      "color": [
+        "/#fff/i",
+        "/white/",
+        "/#000/i",
+        "/black/"
+      ]
+    },
+    "at-rule-no-unknown": [
+      true,
+      {
+        "ignoreAtRules": [
+          "theme",
+          "custom-variant",
+          "apply",
+          "layer",
+          "variant",
+          "utility",
+          "source",
+          "plugin",
+          "config",
+          "reference"
+        ]
+      }
+    ],
+    "import-notation": null,
+    "custom-property-pattern": null,
+    "declaration-empty-line-before": null,
+    "comment-empty-line-before": null,
+    "no-descending-specificity": null,
+    "function-no-unknown": [
+      true,
+      {
+        "ignoreFunctions": [
+          "linear"
+        ]
+      }
+    ],
+    "lightness-notation": null,
+    "hue-degree-notation": null,
+    "declaration-block-single-line-max-declarations": null,
+    "property-no-vendor-prefix": null,
+    "keyframes-name-pattern": null,
+    "selector-class-pattern": null
+  }
+}

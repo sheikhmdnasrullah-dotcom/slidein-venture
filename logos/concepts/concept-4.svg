@@ -1,0 +1,26 @@
+<svg viewBox="0 0 1024 512" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="SlideIn Venture">
+  <!-- Direction: interface framing. Reuses the corner-bracket primitive already
+       in components/System/System.tsx, so the mark is literally built from the
+       site's own design language. Play triangle carries the orange. -->
+  <g id="icon">
+    <g fill="none" stroke="#0A0A0A" stroke-width="14" stroke-linecap="square">
+      <path d="M64 208 L64 156 L116 156"/>
+      <path d="M212 156 L264 156 L264 208"/>
+      <path d="M264 304 L264 356 L212 356"/>
+      <path d="M116 356 L64 356 L64 304"/>
+    </g>
+    <path d="M138 204 L138 308 L226 256 Z" fill="#FF6200"/>
+  </g>
+
+  <g id="wordmark">
+    <text x="316" y="278"
+          font-family="Georgia, 'Times New Roman', serif"
+          font-size="88" letter-spacing="-3" fill="#0A0A0A">SlideIn<tspan
+          font-family="Helvetica, Arial, sans-serif"
+          font-size="72" letter-spacing="-1" fill="#FF6200" dx="18">Venture</tspan></text>
+    <text x="318" y="330"
+          font-family="'JetBrains Mono', 'SF Mono', Menlo, monospace"
+          font-size="25" letter-spacing="7" fill="#0A0A0A"
+          opacity="0.45">PRODUCTION / OUTREACH</text>
+  </g>
+</svg>

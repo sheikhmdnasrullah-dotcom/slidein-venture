@@ -10,7 +10,7 @@ const SPRING_CARD   = { type: 'spring', bounce: 0.15, duration: 0.7 } as const;
 const SPRING_AVATAR = { type: 'spring', bounce: 0.2, duration: 0.8 } as const;
 
 /* ─── Brand colours ─────────────────────────────────────────────────────── */
-const RED  = '#FF6200';
+const RED  = 'var(--color-brand)';
 
 /* ─── Verified badge SVG (blue checkmark, same path as the Framer source) ─ */
 function VerifiedBadge({ size = 18 }: { size?: number }) {
@@ -22,7 +22,7 @@ function VerifiedBadge({ size = 18 }: { size?: number }) {
       />
       <path
         d="M12.7 19.994L8.22 15.512l1.464-1.463 3.045 3.038 6.601-6.401 1.443 1.484z"
-        fill="#fff"
+        fill="var(--color-paper-25)"
       />
     </svg>
   );
@@ -34,21 +34,21 @@ function EmailRow({ email, label }: { email: string, label?: string }) {
     <Link 
       href={`mailto:${email}`}
       className="flex items-center justify-between w-full gap-3 mt-3 pt-3 group transition-opacity" 
-      style={{ borderTop: '1px solid #EBEBEB' }}
+      style={{ borderTop: '1px solid var(--color-bone-300)' }}
     >
       <div className="flex flex-col gap-0.5">
-        <span className="text-[10px] font-medium uppercase tracking-wider" style={{ color: '#B0B0B0' }}>
+        <span className="text-[10px] font-medium uppercase tracking-wider" style={{ color: 'var(--color-bone-400)' }}>
           {label || "Email"}
         </span>
-        <span className="text-[13px] font-semibold" style={{ color: '#111', letterSpacing: '-0.01em' }}>
+        <span className="text-[13px] font-semibold" style={{ color: 'var(--color-ink)', letterSpacing: '-0.01em' }}>
           {email}
         </span>
       </div>
       <div
-        className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-semibold transition-all duration-200 group-hover:bg-[#111] group-hover:text-white"
+        className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-semibold transition-all duration-200 group-hover:bg-[var(--color-ink)] group-hover:text-white"
         style={{
-          background: '#F2F2F2',
-          color: '#111',
+          background: 'var(--color-paper-100)',
+          color: 'var(--color-ink)',
         }}
       >
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -119,17 +119,17 @@ function ContactCard({ isMobile = false }: { isMobile?: boolean }) {
             <span className="relative flex h-[8px] w-[8px]">
               <span
                 className="absolute inline-flex h-full w-full rounded-full animate-ping"
-                style={{ backgroundColor: '#7AFC62', opacity: 0.7 }}
+                style={{ backgroundColor: 'var(--color-live)', opacity: 0.7 }}
               />
-              <span className="relative inline-flex rounded-full h-[8px] w-[8px]" style={{ backgroundColor: '#7AFC62' }} />
+              <span className="relative inline-flex rounded-full h-[8px] w-[8px]" style={{ backgroundColor: 'var(--color-live)' }} />
             </span>
-            <span className="text-[16px] font-bold leading-tight" style={{ color: '#111', letterSpacing: '-0.025em' }}>
+            <span className="text-[16px] font-bold leading-tight" style={{ color: 'var(--color-ink)', letterSpacing: '-0.025em' }}>
               Nasrullah Tanim
             </span>
           </div>
 
           {/* Title */}
-          <span className="text-[12.5px] leading-snug" style={{ color: '#B0B0B0', letterSpacing: '-0.01em' }}>
+          <span className="text-[12.5px] leading-snug" style={{ color: 'var(--color-bone-400)', letterSpacing: '-0.01em' }}>
             Founder, SlideIn Venture
           </span>
 
@@ -146,7 +146,7 @@ function ContactCard({ isMobile = false }: { isMobile?: boolean }) {
               className="inline-flex items-center gap-1.5 mt-2 px-3.5 py-1.5 rounded-full text-[12px] font-semibold transition-all duration-200 hover:opacity-90"
               style={{
                 background: RED,
-                color: '#fff',
+                color: 'var(--color-paper-25)',
                 boxShadow: `0 4px 12px ${RED}40`,
               }}
             >
@@ -207,13 +207,13 @@ export default function LetsTalkButton({ isMobile = false }: { isMobile?: boolea
       <motion.button
         onClick={handleClick}
         animate={isHovered
-          ? { background: '#111', color: '#fff', scale: 1.03 }
-          : { background: '#fff', color: RED, scale: 1 }
+          ? { background: 'var(--color-ink)', color: 'var(--color-paper-25)', scale: 1.03 }
+          : { background: 'var(--color-paper-25)', color: RED, scale: 1 }
         }
         transition={SPRING_FAST}
         className="btn-premium relative inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-[14px] font-[600] whitespace-nowrap outline-none cursor-pointer overflow-hidden"
         style={{
-          background: '#fff',
+          background: 'var(--color-paper-25)',
           color: RED,
           boxShadow: isHovered
             ? '0 2px 12px rgba(0,0,0,0.18)'

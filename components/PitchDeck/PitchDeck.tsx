@@ -28,12 +28,12 @@ import {
   Minimize01Icon as MinimizeIcon,
 } from 'hugeicons-react';
 import { cn } from '@/lib/utils';
-import VideoModal from '@/components/VideoModal/VideoModal';
 import ServiceDetailModal from '@/components/ServiceDetailModal/ServiceDetailModal';
 import FrameworkFlowSlide from '@/components/PitchDeck/FrameworkFlowSlide';
 import OrbitSlide from '@/components/PitchDeck/OrbitSlide';
 import OutreachOSSlide from '@/components/PitchDeck/OutreachOSSlide';
 import GrowthLoopSlide from '@/components/PitchDeck/GrowthLoopSlide';
+import WeeklyCalendarSlide from '@/components/PitchDeck/WeeklyCalendarSlide';
 import DistributionSlide from '@/components/PitchDeck/DistributionSlide';
 
 const ORANGE = '#FF6200';
@@ -84,13 +84,17 @@ function Pill({
   children: React.ReactNode;
 }) {
   const [hover, setHover] = useState(false);
+  /* Accent no longer means "solid orange block". It means an ink-legible
+     surface carrying an orange hairline + orange icon + soft orange light —
+     attention without a saturated slab. */
   const toneClasses =
     tone === 'accent'
-      ? 'bg-[#FF6200] border-[#FF6200] text-white'
+      ? 'bg-white/85 border-[#FF6200]/35 text-[#0A0A0A] shadow-[0_0_0_3px_rgba(255,98,0,0.06),0_10px_28px_rgba(255,98,0,0.12)]'
       : tone === 'ink'
       ? 'bg-[#0A0A0A] border-[#0A0A0A] text-white'
       : 'bg-white/70 border-black/10 text-[#0A0A0A]';
-  const iconWrapClasses = tone === 'default' ? 'bg-[#FF6200]/10 text-[#FF6200]' : 'bg-white/15 text-white';
+  const iconWrapClasses =
+    tone === 'ink' ? 'bg-white/15 text-white' : 'bg-[#FF6200]/10 text-[#FF6200]';
 
   return (
     <div
@@ -544,27 +548,16 @@ const WEEK: { day: string; label: string; icon: IconType; type: string }[] = [
 ];
 
 function Slide8() {
-  const [activeDay, setActiveDay] = useState(0);
   return (
     <motion.div
       variants={containerVariants}
       initial="hidden"
       animate="visible"
-      className="w-full h-full flex flex-col items-center justify-center gap-6 md:gap-8"
+      className="w-full h-full flex flex-col items-center justify-center"
     >
-      <motion.div variants={itemVariants} className="text-center">
-        <Eyebrow>The Weekly Output</Eyebrow>
-        <h2 className="display-headline text-[clamp(1.25rem,2.4vw,1.9rem)] text-[#0A0A0A]">One recording, spread across your whole week.</h2>
+      <motion.div variants={itemVariants} className="w-full">
+        <WeeklyCalendarSlide />
       </motion.div>
-      <motion.div variants={itemVariants} className="grid grid-cols-4 sm:grid-cols-7 gap-2 md:gap-4 w-full max-w-4xl">
-        {WEEK.map((d, i) => (
-          <DayCell key={d.day} day={d.day} icon={d.icon} type={d.type} active={activeDay === i} onClick={() => setActiveDay(i)} />
-        ))}
-      </motion.div>
-      <motion.p variants={itemVariants} className="text-sm md:text-base font-extrabold text-[#0A0A0A] text-center">
-        Every {WEEK[activeDay].label}. <span className="text-[#FF6200]">Automatically.</span>
-        <span className="block text-[11px] font-semibold text-black/40 mt-1">Tap a day to pick your recording day</span>
-      </motion.p>
     </motion.div>
   );
 }
@@ -637,7 +630,6 @@ export default function PitchDeck() {
   const [direction, setDirection] = useState(1);
   const [modalOpen, setModalOpen] = useState(false);
   const [modalServiceId, setModalServiceId] = useState<string | undefined>(undefined);
-  const [videoOpen, setVideoOpen] = useState(false);
   const [inView, setInView] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const sectionRef = useRef<HTMLElement>(null);
@@ -753,7 +745,7 @@ export default function PitchDeck() {
   );
 
   return (
-    <section ref={sectionRef} className={cn('relative py-8 md:py-14', isFullscreen && '!py-0')}>
+    <section id="framework" ref={sectionRef} className={cn('relative py-8 md:py-14', isFullscreen && '!py-0')}>
       <div className={cn('mx-auto px-6 md:px-10', isFullscreen ? 'max-w-full px-4' : 'max-w-[1400px]')}>
         <div
           className={cn(
@@ -891,25 +883,9 @@ export default function PitchDeck() {
         </div>
 
 
-        {/* Watch This Video Button — below slides */}
-        <div className="flex justify-center mt-8">
-          <motion.button
-            onClick={() => setVideoOpen(true)}
-            className="relative inline-flex items-center justify-center gap-3 px-8 py-4 text-lg font-bold text-black rounded-full shadow-lg transition-all duration-300 hover:scale-105 bg-white/60 backdrop-blur-md border border-white/40 hover:bg-white/80 cursor-pointer"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-          >
-            <div className="w-6 h-6 flex items-center justify-center shrink-0">
-              <img src="/logos/play.png" alt="Play" className="w-full h-full object-contain" />
-            </div>
-            Watch This
-          </motion.button>
-        </div>
       </div>
 
       <ServiceDetailModal open={modalOpen} onClose={closeModal} serviceId={modalServiceId} onChange={setModalServiceId} />
-      <VideoModal open={videoOpen} onClose={() => setVideoOpen(false)} />
     </section>
   );
 }

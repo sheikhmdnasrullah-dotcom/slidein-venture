@@ -63,3 +63,12 @@ public/_next-video
 
 # Environment variables
 .env.local
+
+# visual regression — regenerated per stage, ~22MB. baseline-squint.png and the
+# audit-*.txt files are intentionally NOT ignored: they are the Stage 0 baseline
+# we diff every later stage against.
+/screenshots/
+/test-results/
+/playwright-report/
+/.playwright/
+.next/analyze/

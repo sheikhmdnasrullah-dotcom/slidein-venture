@@ -1,83 +1,66 @@
-@import "tailwindcss";
+/* Token layer is the single source of truth and pulls in Tailwind itself.
+   Do not re-import "tailwindcss" here. See app/styles/tokens.css. */
+@import "./styles/tokens.css";
 @import "tw-animate-css";
-
-@layer base {
-  @import "@xyflow/react/dist/style.css";
-}
-
+/* layer() keeps xyflow in the base cascade. Wrapping an @import inside
+   `@layer base { ... }` is an invalid at-rule position in CSS. */
+@import "@xyflow/react/dist/style.css" layer(base);
 @import "shadcn/tailwind.css";
 
 @custom-variant dark (&:is(.dark *));
 
 /* ─── Tailwind v4 Theme ───────────────────────────────────────────────────── */
+/* Colour, radius, type, shadow and motion tokens all live in
+   app/styles/tokens.css. What remains here is font wiring plus legacy aliases
+   that untouched markup still references — each one resolves to a token rather
+   than reintroducing a literal. */
 @theme {
   --font-sans: var(--font-inter), system-ui, -apple-system, sans-serif;
-  --font-serif: 'Georgia', 'Times New Roman', serif;
-  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+  --font-serif: var(--font-instrument), georgia, serif;
+  --font-mono: var(--font-jetbrains), ui-monospace, monospace;
+  --font-display: var(--font-instrument), georgia, serif;
 
-  /* Type Scale — 5 sizes across the system */
-  --text-xs:  0.75rem;    /* 12px — labels, meta */
-  --text-sm:  0.875rem;   /* 14px — body small, nav */
-  --text-base: 1rem;      /* 16px — body copy */
-  --text-lg:  1.125rem;   /* 18px — large body */
-  --text-xl:  1.25rem;    /* 20px — lead paragraphs */
-  --text-2xl: 1.5rem;     /* 24px — section subheads */
-  --text-3xl: 1.875rem;   /* 30px — small headlines */
-  --text-4xl: 2.25rem;    /* 36px — section headlines */
-  --text-5xl: 3rem;       /* 48px — hero display */
-  --text-6xl: 3.75rem;    /* 60px — max hero */
+  /* Legacy semantic aliases → token layer. Migrate call sites, then delete. */
+  --color-background:   var(--color-paper-50);
+  --color-foreground:   var(--color-ink);
+  --color-card:         var(--color-paper-25);
+  --color-card-foreground: var(--color-ink);
+  --color-primary-foreground: var(--color-paper-25);
+  --color-secondary:    var(--color-paper-100);
+  --color-secondary-foreground: var(--color-ink);
+  --color-muted:        var(--color-paper-100);
+  --color-muted-foreground: var(--color-slate-500);
+  --color-accent:       var(--color-brand);
+  --color-accent-foreground: var(--color-paper-25);
+  --color-destructive:  var(--color-signal);
+  --color-border:       var(--color-bone-300);
+  --color-input:        var(--color-bone-300);
+  --color-ring:         var(--color-signal);
+  --color-ink-light:    var(--color-slate-600);
+  --color-mist:         var(--color-slate-500);
+  --color-fog:          var(--color-bone-400);
+  --color-frost:        var(--color-bone-300);
+  --color-rose:         var(--color-brand);
+  --color-rose-soft:    var(--color-paper-100);
 
-  /* Brand Colors — black, white, bright orange */
-  --color-background:   #FFFFFF;
-  --color-foreground:   #0A0A0A;
-  --color-card:         #FFFFFF;
-  --color-card-foreground: #0A0A0A;
-  --color-primary:      #FF6200;
-  --color-primary-foreground: #FFFFFF;
-  --color-secondary:    #F5F5F5;
-  --color-secondary-foreground: #0A0A0A;
-  --color-muted:        #F5F5F5;
-  --color-muted-foreground: #787774;
-  --color-accent:       #FF6200;
-  --color-accent-foreground: #FFFFFF;
-  --color-destructive:  #FF6200;
-  --color-border:       #E5E5E5;
-  --color-input:        #E5E5E5;
-  --color-ring:         #FF6200;
+  /* Legacy shadow aliases → the two-layer elevation set. */
+  --shadow-sm:   var(--shadow-contact);
+  --shadow-md:   var(--shadow-raised);
+  --shadow-lg:   var(--shadow-float);
+  --shadow-xl:   var(--shadow-float);
+  --shadow-soft: var(--shadow-contact);
+  --shadow-warm: var(--shadow-raised);
 
-  /* Brand Palette — minimal, sophisticated */
-  --color-ink:          #0A0A0A;
-  --color-ink-light:    #4A4A4A;
-  --color-mist:         #787774;
-  --color-fog:          #C4C4C4;
-  --color-frost:        #E8E8E4;
-  --color-rose:         #FF6200;
-  --color-rose-soft:    #FFF0E6;
-
-  /* Radius */
-  --radius-sm: 4px;
-  --radius-md: 8px;
-  --radius-lg: 12px;
-  --radius-xl: 16px;
-
-  /* Shadows — softer, more natural */
-  --shadow-sm:  0 1px 3px rgba(0,0,0,.04), 0 1px 2px rgba(0,0,0,.02);
-  --shadow-md:  0 4px 12px rgba(0,0,0,.06), 0 2px 4px rgba(0,0,0,.03);
-  --shadow-lg:  0 12px 40px rgba(0,0,0,.08), 0 4px 8px rgba(0,0,0,.04);
-  --shadow-xl:  0 24px 60px rgba(0,0,0,.10), 0 8px 20px rgba(0,0,0,.05);
-  --shadow-soft: 0 2px 20px rgba(0,0,0,.04);
-  --shadow-warm: 0 4px 24px rgba(0,0,0,.06), 0 1px 4px rgba(0,0,0,.03);
-
-  /* Animation */
-  --ease-spring: cubic-bezier(0.16, 1, 0.3, 1);
-  --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+  /* Legacy easing aliases → the two deliberate easings. */
+  --ease-spring: var(--ease-expo);
+  --ease-smooth: var(--ease-std);
 }
 
 /* ─── shadcn/ui CSS Variables ─────────────────────────────────────────────── */
 :root {
-  --card: oklch(1 0 0);
+  --card: var(--color-paper-25);
   --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
+  --popover: var(--color-paper-25);
   --popover-foreground: oklch(0.145 0 0);
   --primary: oklch(0.205 0 0);
   --primary-foreground: oklch(0.985 0 0);
@@ -88,7 +71,7 @@
   --accent: oklch(0.97 0 0);
   --accent-foreground: oklch(0.205 0 0);
   --destructive: oklch(0.577 0.245 27.325);
-  --destructive-foreground: 0 0% 100%;
+  --destructive-foreground: var(--color-paper-25);
   --border: oklch(0.922 0 0);
   --input: oklch(0.922 0 0);
   --ring: oklch(0.708 0 0);
@@ -98,7 +81,7 @@
   --chart-3: oklch(0.439 0 0);
   --chart-4: oklch(0.371 0 0);
   --chart-5: oklch(0.269 0 0);
-  --background: #FFFFFF;
+  --background: var(--color-paper-50);
   --foreground: oklch(0.145 0 0);
   --sidebar: oklch(0.985 0 0);
   --sidebar-foreground: oklch(0.145 0 0);
@@ -126,9 +109,9 @@
   --accent: oklch(0.269 0 0);
   --accent-foreground: oklch(0.985 0 0);
   --destructive: oklch(0.704 0.191 22.216);
-  --destructive-foreground: 0 0% 98%;
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
+  --destructive-foreground: var(--color-paper-25);
+  --border: color-mix(in oklch, var(--color-paper-25) 10%, transparent);
+  --input: color-mix(in oklch, var(--color-paper-25) 15%, transparent);
   --ring: oklch(0.556 0 0);
   --chart-1: oklch(0.87 0 0);
   --chart-2: oklch(0.556 0 0);
@@ -141,7 +124,7 @@
   --sidebar-primary-foreground: oklch(0.985 0 0);
   --sidebar-accent: oklch(0.269 0 0);
   --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
+  --sidebar-border: color-mix(in oklch, var(--color-paper-25) 10%, transparent);
   --sidebar-ring: oklch(0.556 0 0);
 }
 
@@ -173,11 +156,11 @@ body {
 
 /* Glass card effect - ultra premium */
 .glass-card {
-  background: rgba(255, 255, 255, 0.7);
+  background: color-mix(in oklch, var(--color-paper-25) 70%, transparent);
   backdrop-filter: blur(24px) saturate(1.4);
   -webkit-backdrop-filter: blur(24px) saturate(1.4);
-  border: 1px solid rgba(255, 98, 0, 0.04);
-  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.02), inset 0 0 0 1px rgba(255, 255, 255, 0.5);
+  border: 1px solid color-mix(in oklch, var(--color-brand) 4%, transparent);
+  box-shadow: var(--shadow-contact), inset 0 0 0 1px color-mix(in oklch, var(--color-paper-25) 50%, transparent);
 }
 
 /* (Beam sweep and glow border effects removed - no decorative overlays) */
@@ -185,13 +168,14 @@ body {
 /* ─── Scrollbar ──────────────────────────────────────────────────────────── */
 ::-webkit-scrollbar { width: 6px; height: 6px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: #D4D4D4; border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: #A3A3A3; }
+::-webkit-scrollbar-thumb { background: var(--color-bone-400); border-radius: var(--radius-pill); }
+::-webkit-scrollbar-thumb:hover { background: var(--color-slate-500); }
 
 .hide-scrollbar {
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
+
 .hide-scrollbar::-webkit-scrollbar {
   display: none;
 }
@@ -202,10 +186,10 @@ body {
 }
 
 /* ─── Selection ──────────────────────────────────────────────────────────── */
-::selection { background: rgba(255, 98, 0, 0.12); }
+::selection { background: color-mix(in oklch, var(--color-brand) 18%, transparent); }
 
 /* ─── Focus ──────────────────────────────────────────────────────────────── */
-:focus-visible { outline: 2px solid #FF6200; outline-offset: 2px; border-radius: 2px; }
+/* focus ring is defined once in app/styles/tokens.css */
 
 /* ─── Logo scroll animation ──────────────────────────────────────────────── */
 @keyframes logoScroll {
@@ -226,14 +210,14 @@ body {
 
 /* ─── Gradient text utility ──────────────────────────────────────────────── */
 .gradient-text {
-  background: linear-gradient(135deg, #0A0A0A 0%, #FF6200 100%);
+  background: linear-gradient(135deg, var(--color-ink) 0%, var(--color-signal) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 
 .gradient-text-warm {
-  background: linear-gradient(135deg, #FF6200 0%, #FFA770 50%, #0A0A0A 100%);
+  background: linear-gradient(135deg, var(--color-signal) 0%, var(--color-brand) 50%, var(--color-ink) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -246,21 +230,21 @@ body {
 }
 
 .shimmer {
-  background: linear-gradient(90deg, #F5F5F5 25%, #E8E8E4 50%, #F5F5F5 75%);
+  background: linear-gradient(90deg, var(--color-paper-100) 25%, var(--color-bone-300) 50%, var(--color-paper-100) 75%);
   background-size: 200% 100%;
   animation: shimmer 2s infinite;
 }
 
 /* ─── Floating animation ─────────────────────────────────────────────────── */
 @keyframes float {
-  0%, 100% { transform: translateY(0px); }
+  0%, 100% { transform: translateY(0); }
   50% { transform: translateY(-6px); }
 }
 
 .float { animation: float 4s ease-in-out infinite; }
 
 @keyframes float-delayed {
-  0%, 100% { transform: translateY(0px); }
+  0%, 100% { transform: translateY(0); }
   50% { transform: translateY(-4px); }
 }
 
@@ -317,44 +301,42 @@ body {
   --color-muted: var(--muted);
   --color-secondary-foreground: var(--secondary-foreground);
   --color-secondary: var(--secondary);
-  --color-primary-foreground: var(--primary-foreground);
-  --color-primary: var(--primary);
+  /* --color-primary is deliberately NOT mapped to var(--primary) here.
+     shadcn's --primary is oklch(0.205 0 0), near-black; mapping it silently
+     turned every `text-primary` / `bg-primary` in the codebase black instead
+     of brand orange. Brand orange is --color-brand, from the token layer. */
   --color-popover-foreground: var(--popover-foreground);
   --color-popover: var(--popover);
   --color-card-foreground: var(--card-foreground);
   --color-card: var(--card);
   --color-foreground: var(--foreground);
   --color-background: var(--background);
-  --radius-sm: calc(var(--radius) * 0.6);
-  --radius-md: calc(var(--radius) * 0.8);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) * 1.4);
-  --radius-2xl: calc(var(--radius) * 1.8);
-  --radius-3xl: calc(var(--radius) * 2.2);
-  --radius-4xl: calc(var(--radius) * 2.6);
+  /* Radii are owned by the token layer (three deliberate values, Rule 3).
+     The old calc() ladder off --radius generated seven arbitrary sizes. */
 }
 
 @layer base {
   body {
     @apply bg-background text-foreground;
   }
+
   html {
     @apply font-sans;
   }
 
-  /* Display headlines (hero, section titles) use serif for contrast */
+  /* Display headlines use the editorial face. Instrument Serif ships weight 400
+     only — never raise this or the browser synthesises faux bold. */
   .display-headline {
-    font-family: var(--font-serif);
-    font-weight: 700;
-    letter-spacing: -0.03em;
+    font-family: var(--font-display);
+    font-weight: 400;
+    letter-spacing: -0.02em;
     line-height: 1.04;
   }
 
-  /* Section headings use serif as well */
   .section-headline {
-    font-family: var(--font-serif);
-    font-weight: 700;
-    letter-spacing: -0.02em;
+    font-family: var(--font-display);
+    font-weight: 400;
+    letter-spacing: -0.015em;
     line-height: 1.15;
   }
 
@@ -370,43 +352,45 @@ body {
   position: relative;
   overflow: hidden;
   transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.35s cubic-bezier(0.22, 1, 0.36, 1);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35), 0 1px 2px rgba(10, 10, 10, 0.06), 0 6px 16px rgba(10, 10, 10, 0.07);
+  box-shadow: var(--shadow-inset-top), var(--shadow-raised);
 }
+
 .btn-premium::after {
   content: '';
   position: absolute;
   inset: 0;
-  background: linear-gradient(115deg, transparent 30%, rgba(255, 255, 255, 0.45) 50%, transparent 70%);
+  background: linear-gradient(115deg, transparent 30%, color-mix(in oklch, var(--color-paper-25) 45%, transparent) 50%, transparent 70%);
   transform: translateX(-120%);
   transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
   pointer-events: none;
 }
+
 .btn-premium:hover {
   transform: translateY(-1.5px) scale(1.015);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35), 0 2px 4px rgba(10, 10, 10, 0.06), 0 12px 28px rgba(255, 98, 0, 0.14);
+  box-shadow: var(--shadow-inset-top), var(--shadow-float);
 }
 .btn-premium:hover::after { transform: translateX(120%); }
 .btn-premium:active { transform: translateY(0.5px) scale(0.985); transition-duration: 0.1s; }
 
 .card-premium {
   position: relative;
-  border: 1px solid rgba(10, 10, 10, 0.08);
+  border: 1px solid color-mix(in oklch, var(--color-ink) 8%, transparent);
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.75), rgba(255, 255, 255, 0) 45%),
-    rgba(255, 255, 255, 0.85);
+    linear-gradient(180deg, color-mix(in oklch, var(--color-paper-25) 75%, transparent), transparent 45%),
+    color-mix(in oklch, var(--color-paper-25) 85%, transparent);
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.9),
-    0 1px 2px rgba(10, 10, 10, 0.04),
-    0 14px 34px rgba(10, 10, 10, 0.07);
+    var(--shadow-inset-top),
+    var(--shadow-raised);
   transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.4s cubic-bezier(0.22, 1, 0.36, 1);
 }
+
 .card-premium:hover {
   transform: translateY(-3px);
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.9),
-    0 2px 4px rgba(10, 10, 10, 0.04),
-    0 22px 48px rgba(255, 98, 0, 0.1);
+    var(--shadow-inset-top),
+    var(--shadow-float);
 }
+
 @media (prefers-reduced-motion: reduce) {
   .btn-premium, .btn-premium::after, .card-premium { transition: none; }
 }

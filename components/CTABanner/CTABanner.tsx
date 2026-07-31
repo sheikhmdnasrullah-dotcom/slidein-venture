@@ -58,7 +58,7 @@ export default function CTABanner({
             {/* White filled button — shadcn-style */}
             <Link
               href={primaryHref}
-              className="inline-flex items-center gap-2 px-6 py-3 text-[15px] font-[600] text-white bg-[#FF6200] rounded-[7px] hover:bg-[#8B0F13] transition-all duration-150 shadow-[0_1px_3px_rgba(0,0,0,0.12)] hover:shadow-[0_4px_16px_rgba(0,0,0,0.18)] hover:-translate-y-px tracking-[-0.01em]"
+              className="inline-flex items-center gap-2 px-6 py-3 text-[15px] font-[600] text-white bg-[var(--color-brand)] rounded-[7px] hover:bg-[var(--color-ember)] transition-all duration-150 shadow-[0_1px_3px_rgba(0,0,0,0.12)] hover:shadow-[0_4px_16px_rgba(0,0,0,0.18)] hover:-translate-y-px tracking-[-0.01em]"
             >
               {primaryLabel}
             </Link>

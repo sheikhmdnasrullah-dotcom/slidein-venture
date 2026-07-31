@@ -88,7 +88,7 @@ export default function AmbientEnvironment() {
       {PARTICLES.map((p, i) => (
         <motion.span
           key={i}
-          className="absolute rounded-full bg-[#FF6200]"
+          className="absolute rounded-full bg-[var(--color-brand)]"
           style={{ left: p.l, top: p.t, width: p.s, height: p.s }}
           animate={{ y: [0, -p.dr, 0], opacity: [0, p.o, 0] }}
           transition={{ duration: 14 + i * 2, repeat: Infinity, ease: 'easeInOut', delay: p.d }}
