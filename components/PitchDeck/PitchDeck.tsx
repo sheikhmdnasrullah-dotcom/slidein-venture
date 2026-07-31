@@ -943,7 +943,7 @@ export default function PitchDeck() {
           <div
             ref={deckRef}
             className={cn(
-              'relative rounded-[28px] md:rounded-[32px] bg-white/80 backdrop-blur-xl shadow-[inset_0_1px_0_rgba(255,255,255,0.7),0_24px_70px_rgba(0,0,0,0.10),0_8px_20px_rgba(255,98,0,0.06)] overflow-hidden',
+              'relative rounded-[28px] md:rounded-[32px] bg-white shadow-[inset_0_1px_0_rgba(255,255,255,0.7),0_24px_70px_rgba(0,0,0,0.10),0_8px_20px_rgba(255,98,0,0.06)] overflow-hidden',
               isFullscreen && '!rounded-none !border-0 !shadow-none min-h-screen flex flex-col'
             )}
           >
