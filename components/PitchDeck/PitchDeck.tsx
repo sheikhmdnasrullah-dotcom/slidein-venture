@@ -37,6 +37,7 @@ import {
 import { cn } from '@/lib/utils';
 import ServiceDetailModal from '@/components/ServiceDetailModal/ServiceDetailModal';
 import VideoModal from '@/components/VideoModal/VideoModal';
+import FrameworkFlowSlide from '@/components/PitchDeck/FrameworkFlowSlide';
 
 const ORANGE = '#FF6200';
 const EASE = [0.16, 1, 0.3, 1] as const;
@@ -435,102 +436,20 @@ function Slide1() {
   );
 }
 
-/* ── Slide 2 — The Complete Framework ─────────────────────────────────── */
-type FrameworkStep = { num: string; icon: IconType; title: string; bullets: [string, string] };
-
-const FRAMEWORK_CONTENT_STEPS: FrameworkStep[] = [
-  { num: '01', icon: RecordIcon, title: 'Record', bullets: ['You show up, once a week', "One recording. That's your only job"] },
-  { num: '02', icon: EpisodeIcon, title: 'Produce', bullets: ['Edited into episode, clips, articles, posts', 'All written and cut in your voice'] },
-  { num: '03', icon: PublishIcon, title: 'Publish', bullets: ['Sent out everywhere, on schedule', 'Every platform, every single week'] },
-];
-
-const FRAMEWORK_OUTREACH_STEPS: FrameworkStep[] = [
-  { num: '04', icon: TargetIcon, title: 'Target', bullets: ['Prospects found to match your ICP', 'Verified by hand, never a purchased list'] },
-  { num: '05', icon: SendIcon, title: 'Reach', bullets: ['Personalized outreach sent daily', 'Written like a person, never a mail merge'] },
-  { num: '06', icon: ConvoIcon, title: 'Convert', bullets: ['Replies sorted, only real ones reach you', 'Booked calls, not cold leads'] },
-];
-
-function EngineLabel({ children }: { children: React.ReactNode }) {
-  return (
-    <p className="text-center text-[10px] md:text-[11px] font-black tracking-[0.18em] uppercase text-[#FF6200] mb-2.5">
-      {children}
-    </p>
-  );
-}
-
-function FrameworkCard({ num, icon: Icon, title, bullets }: FrameworkStep) {
-  return (
-    <div className="w-full md:flex-1 rounded-2xl border border-black/10 bg-white/70 backdrop-blur-md shadow-sm p-4 md:p-5 transition-all duration-300 hover:shadow-md hover:-translate-y-1 hover:border-[#FF6200]/30">
-      <div className="flex items-center gap-2.5 mb-3">
-        <span className="w-6 h-6 md:w-7 md:h-7 rounded-full bg-[#FF6200]/10 border border-[#FF6200]/30 flex items-center justify-center text-[10px] font-black text-[#FF6200] flex-shrink-0">
-          {num}
-        </span>
-        <span className="flex-1 text-[13px] md:text-sm font-extrabold uppercase tracking-wide text-[#0A0A0A]">{title}</span>
-        <Icon size={16} strokeWidth={2} className="text-[#FF6200]/60 flex-shrink-0" />
-      </div>
-      <ul className="space-y-1.5">
-        {bullets.map((b) => (
-          <li key={b} className="flex items-start gap-2">
-            <span className="mt-[6px] w-1 h-1 rounded-full bg-[#FF6200] flex-shrink-0" />
-            <span className="text-[11px] md:text-[11.5px] leading-snug text-black/55">{b}</span>
-          </li>
-        ))}
-      </ul>
-    </div>
-  );
-}
-
-function EngineDivider() {
-  return (
-    <div className="flex items-center gap-3 w-full max-w-xl mx-auto">
-      <span className="w-1.5 h-1.5 rounded-full bg-[#FF6200] flex-shrink-0" />
-      <span className="flex-1 h-px bg-black/10" />
-      <p className="text-[10.5px] md:text-[11.5px] font-semibold text-black/45 text-center px-1 leading-snug">
-        Content earns the trust <span className="text-black/25">—</span> outreach puts it in front of the right person.
-      </p>
-      <span className="flex-1 h-px bg-black/10" />
-      <span className="w-1.5 h-1.5 rounded-full bg-[#FF6200] flex-shrink-0" />
-    </div>
-  );
-}
-
+/* ── Slide 2 — The Complete Framework (React Flow node diagram) ───────── */
 function Slide2() {
   return (
     <motion.div
       variants={containerVariants}
       initial="hidden"
       animate="visible"
-      className="w-full h-full flex flex-col items-center justify-center gap-5 md:gap-6"
+      className="w-full h-full flex flex-col items-center justify-center gap-2"
     >
-      <motion.div variants={itemVariants} className="text-center">
-        <Eyebrow>The Complete Framework</Eyebrow>
-        <h2 className="display-headline text-[clamp(1.4rem,2.8vw,2.1rem)] text-[#0A0A0A] max-w-xl">
-          One recording. Six steps. <span className="text-[#FF6200]">One system, start to finish.</span>
-        </h2>
-      </motion.div>
-
-      <motion.div variants={itemVariants} className="w-full max-w-4xl">
-        <EngineLabel>Content Engine</EngineLabel>
-        <div className="flex flex-col md:flex-row items-stretch gap-2.5 md:gap-1">
-          {FRAMEWORK_CONTENT_STEPS.flatMap((s, i) => [
-            <FrameworkCard key={`c-${s.num}`} {...s} />,
-            i < FRAMEWORK_CONTENT_STEPS.length - 1 ? <StepArrow key={`c-arrow-${i}`} /> : null,
-          ])}
-        </div>
-      </motion.div>
-
       <motion.div variants={itemVariants}>
-        <EngineDivider />
+        <Eyebrow>The Complete Framework</Eyebrow>
       </motion.div>
-
-      <motion.div variants={itemVariants} className="w-full max-w-4xl">
-        <EngineLabel>Outreach Engine</EngineLabel>
-        <div className="flex flex-col md:flex-row items-stretch gap-2.5 md:gap-1">
-          {FRAMEWORK_OUTREACH_STEPS.flatMap((s, i) => [
-            <FrameworkCard key={`o-${s.num}`} {...s} />,
-            i < FRAMEWORK_OUTREACH_STEPS.length - 1 ? <StepArrow key={`o-arrow-${i}`} /> : null,
-          ])}
-        </div>
+      <motion.div variants={itemVariants} className="w-full">
+        <FrameworkFlowSlide />
       </motion.div>
     </motion.div>
   );
@@ -1010,12 +929,24 @@ export default function PitchDeck() {
     <section ref={sectionRef} className={cn('relative py-8 md:py-14', isFullscreen && '!py-0')}>
       <div className={cn('mx-auto px-6 md:px-10', isFullscreen ? 'max-w-full px-4' : 'max-w-[1400px]')}>
         <div
-          ref={deckRef}
           className={cn(
-            'relative rounded-[28px] md:rounded-[32px] border border-black/[0.06] bg-white/80 backdrop-blur-xl shadow-[0_24px_70px_rgba(0,0,0,0.08)] overflow-hidden',
-            isFullscreen && '!rounded-none !border-0 !shadow-none min-h-screen flex flex-col'
+            'relative',
+            !isFullscreen && 'rounded-[29px] md:rounded-[33px] p-[1.5px] bg-gradient-to-br from-black/[0.08] via-[#FF6200]/30 to-black/[0.08]'
           )}
         >
+          {!isFullscreen && (
+            <div
+              aria-hidden
+              className="pointer-events-none absolute -inset-6 md:-inset-10 -z-10 rounded-[44px] bg-[#FF6200]/10 blur-3xl opacity-70"
+            />
+          )}
+          <div
+            ref={deckRef}
+            className={cn(
+              'relative rounded-[28px] md:rounded-[32px] bg-white/80 backdrop-blur-xl shadow-[inset_0_1px_0_rgba(255,255,255,0.7),0_24px_70px_rgba(0,0,0,0.10),0_8px_20px_rgba(255,98,0,0.06)] overflow-hidden',
+              isFullscreen && '!rounded-none !border-0 !shadow-none min-h-screen flex flex-col'
+            )}
+          >
           {/* Top bar */}
           <div className={cn('flex items-center justify-between gap-4 px-5 md:px-8 pt-5 pb-3', isFullscreen && 'px-6 pt-6 pb-4')}>
             <AnimatePresence mode="wait">
@@ -1126,6 +1057,7 @@ export default function PitchDeck() {
               <ChevronRight size={isFullscreen ? 24 : 20} className="text-[#0A0A0A]" />
             </button>
           </div>
+        </div>
         </div>
 
         <p className="text-center text-[11px] md:text-xs text-black/30 font-medium mt-4">
