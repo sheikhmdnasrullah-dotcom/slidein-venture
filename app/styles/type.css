@@ -212,3 +212,83 @@ p {
     animation: none;
   }
 }
+
+/* ── 8 · THE WORDMARK ──────────────────────────────────────────────────────
+   There is no icon mark. The name IS the identity, so it has to be set the way
+   a wordmark is set rather than dropped in as two spans and a gap.
+
+   Five decisions, and each one is the difference between "typed" and "drawn":
+
+     1. OPTICAL SIZE. A 20px logo asked Fraunces for opsz 24 — a display cut
+        read slightly small. The face's own default (14, a text cut) gives you
+        the thick joins drawn for body copy, which is why most web wordmarks
+        look soft next to their print version.
+     2. TIGHT TRACKING. A wordmark is read as one shape, not as words. It sets
+        tighter than any running text on the site.
+     3. TWO REGISTERS. "SlideIn" is the name; "Venture" is a qualifier, so it
+        drops to the mono face, uppercase and widely tracked — the same
+        relationship the rest of the site uses between a headline and its
+        `.font-label`. The wordmark is an instance of the type system rather
+        than a separate piece of art.
+     4. OPTICAL ALIGNMENT. The mono qualifier is nudged up to sit on the
+        serif's x-height, not its baseline: aligning two faces of different
+        cap-heights on a shared baseline makes the smaller one look dropped.
+     5. OPTICAL MARGIN. `S` is a round letter. Aligned mathematically its left
+        edge reads inset, so the whole lockup hangs a hair left.
+
+   Everything is in `em`, so the size is set once by the parent. */
+.wordmark {
+  display: inline-flex;
+  align-items: baseline;
+  white-space: nowrap;
+  margin-left: -0.02em;              /* optical overhang on the round S */
+  font-feature-settings: 'kern' 1, 'liga' 1;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.wordmark-name {
+  font-family: var(--font-display);
+
+  --axis-opsz: 24;
+  --axis-soft: 6;
+  --axis-wonk: 0;
+  font-variation-settings:
+    'opsz' var(--axis-opsz),
+    'SOFT' var(--axis-soft),
+    'WONK' var(--axis-wonk);
+  font-size: 1em;
+  font-weight: var(--font-weight-display-sm);
+  letter-spacing: -0.022em;
+  line-height: 1;
+  color: var(--on-surface);
+}
+
+.wordmark-qualifier {
+  font-family: var(--font-mono);
+  font-size: 0.5em;
+  font-weight: var(--font-weight-label);
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+  line-height: 1;
+  color: var(--accent);
+  /* 0.52em clears the serif's `n` without opening a hole; the -0.34em lifts
+     the mono cap onto the serif's x-height. Both measured at 20px, and both
+     hold at any size because the wordmark is set entirely in em. */
+  margin-left: 0.52em;
+  transform: translateY(-0.34em);
+  transition: letter-spacing var(--dur-base) var(--ease-expo);
+}
+
+/* The only motion the mark has: the qualifier opens a fraction on hover, the
+   way a letterpress lockup breathes. Nothing moves, nothing scales. */
+.group:hover .wordmark-qualifier,
+.wordmark:hover .wordmark-qualifier {
+  letter-spacing: var(--tracking-label-wide);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wordmark-qualifier {
+    transition: none;
+  }
+}

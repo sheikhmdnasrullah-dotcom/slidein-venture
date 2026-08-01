@@ -4,7 +4,8 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import LetsTalkButton from './LetsTalkButton';
-import { LogoMark } from '@/components/Brand/Logo';
+import { LogoWordmark } from '@/components/Brand/Logo';
+import ThemeToggle from '@/components/Theme/ThemeToggle';
 
 const navLinks = [
   { label: 'Solutions', href: '/solutions' },
@@ -37,14 +38,12 @@ export default function Navbar() {
         <motion.div
           className="flex items-center gap-1 pl-3 pr-3 py-2.5"
           style={{
-            background: 'rgba(255, 255, 255, 0.72)',
+            background: 'var(--surface-glass)',
             backdropFilter: 'blur(24px) saturate(1.4)',
             WebkitBackdropFilter: 'blur(24px) saturate(1.4)',
-            borderRadius: '9999px',
-            border: '1px solid rgba(122, 10, 14, 0.08)',
-            boxShadow: scrolled
-              ? '0 8px 32px rgba(0,0,0,0.08), 0 2px 8px rgba(0,0,0,0.04)'
-              : '0 4px 24px rgba(0,0,0,0.06), 0 1px 4px rgba(0,0,0,0.03)',
+            borderRadius: 'var(--radius-pill)',
+            border: '1px solid var(--rule)',
+            boxShadow: scrolled ? 'var(--shadow-float)' : 'var(--shadow-raised)',
           }}
           initial={{ y: -20, opacity: 0 }}
           animate={{ y: 0, opacity: 1, scale: scrolled ? 0.955 : 1 }}
@@ -53,25 +52,15 @@ export default function Navbar() {
           {/* ── Logo Pill ──────────────────────────────────────────────── */}
           <Link
             href="/"
-            className="flex items-center gap-1.5 h-[48px] px-5 rounded-full flex-shrink-0 transition-all duration-300 hover:scale-[1.02] hover:bg-white group"
+            className="group flex h-[48px] flex-shrink-0 items-center rounded-full px-5 transition-all duration-300 hover:bg-[var(--surface)]"
             style={{
-              background: 'rgba(255, 255, 255, 0.85)',
-              border: '1px solid rgba(0, 0, 0, 0.06)',
-              boxShadow: '0 2px 12px rgba(0,0,0,0.03)',
+              background: 'var(--surface-glass)',
+              border: '1px solid var(--rule)',
+              boxShadow: 'var(--shadow-contact)',
             }}
             aria-label="SlideIn Venture"
           >
-            <LogoMark className="h-[22px] w-[22px] transition-transform duration-500 ease-out group-hover:rotate-[-6deg]" />
-            <span
-              className="font-normal text-[20px] leading-none select-none tracking-[-0.01em] text-[var(--color-ink)]"
-              style={{ fontFamily: 'var(--font-display)' }}
-            >
-              SlideIn
-            </span>
-            <span className="font-medium text-[16px] leading-none select-none tracking-tight text-[var(--color-brand)]">
-              Venture
-            </span>
-            <span className="sr-only">SlideIn Venture — home</span>
+            <LogoWordmark size="20px" />
           </Link>
 
           {/* ── Desktop Nav Links ─────────────────────────────────────── */}
@@ -81,12 +70,12 @@ export default function Navbar() {
                 key={link.label}
                 href={link.href}
                 onMouseEnter={() => setHoveredLink(link.label)}
-                className="relative px-5 py-2.5 text-[16px] font-[500] text-[var(--color-ink)]/80 rounded-full hover:text-black transition-colors duration-150 whitespace-nowrap inline-flex items-center"
+                className="relative inline-flex items-center whitespace-nowrap rounded-full px-5 py-2.5 text-[16px] font-[500] text-[var(--muted)] transition-colors duration-150 hover:text-[var(--on-surface)]"
               >
                 {hoveredLink === link.label && (
                   <motion.span
                     layoutId="nav-liquid-pill"
-                    className="absolute inset-0 rounded-full bg-black/[0.05]"
+                    className="absolute inset-0 rounded-full bg-[var(--rule)]"
                     transition={{ type: 'spring', stiffness: 400, damping: 32 }}
                   />
                 )}
@@ -95,7 +84,10 @@ export default function Navbar() {
             ))}
           </div>
 
-          {/* ── CTA Button (right side, white pill) ──────────────────── */}
+          {/* ── Day / night ───────────────────────────────────────────── */}
+          <ThemeToggle className="ml-1 mr-1 lg:ml-0" />
+
+          {/* ── CTA Button (right side) ───────────────────────────────── */}
           <div className="hidden lg:block">
             <LetsTalkButton />
           </div>
@@ -103,21 +95,21 @@ export default function Navbar() {
           {/* ── Mobile Hamburger ─────────────────────────────────────── */}
           <button
             className="lg:hidden flex items-center justify-center w-[44px] h-[44px] rounded-full transition-colors duration-150"
-            style={{ background: mobileOpen ? 'rgba(0,0,0,0.06)' : 'transparent' }}
+            style={{ background: mobileOpen ? 'var(--rule)' : 'transparent' }}
             onClick={() => setMobileOpen(!mobileOpen)}
             aria-label="Toggle menu"
           >
             <div className="w-[18px] flex flex-col gap-[4px]">
                 <span
-                  className="block h-[2px] bg-[var(--color-ink)] rounded-full origin-center transition-transform duration-200"
+                  className="block h-[2px] bg-[var(--on-surface)] rounded-full origin-center transition-transform duration-200"
                   style={{ transform: mobileOpen ? 'translateY(6px) rotate(45deg)' : 'none' }}
                 />
                 <span
-                  className="block h-[2px] bg-[var(--color-ink)] rounded-full transition-opacity duration-200"
+                  className="block h-[2px] bg-[var(--on-surface)] rounded-full transition-opacity duration-200"
                   style={{ opacity: mobileOpen ? 0 : 1 }}
                 />
                 <span
-                  className="block h-[2px] bg-[var(--color-ink)] rounded-full origin-center transition-transform duration-200"
+                  className="block h-[2px] bg-[var(--on-surface)] rounded-full origin-center transition-transform duration-200"
                   style={{ transform: mobileOpen ? 'translateY(-6px) rotate(-45deg)' : 'none' }}
                 />
             </div>
@@ -130,12 +122,12 @@ export default function Navbar() {
             <motion.div
               className="lg:hidden mt-2 overflow-hidden"
               style={{
-                background: 'rgba(255, 255, 255, 0.88)',
+                background: 'var(--surface-glass)',
                 backdropFilter: 'blur(24px) saturate(1.4)',
                 WebkitBackdropFilter: 'blur(24px) saturate(1.4)',
-                borderRadius: '24px',
-                border: '1px solid rgba(122, 10, 14, 0.08)',
-                boxShadow: '0 12px 48px rgba(0,0,0,0.08), 0 2px 8px rgba(0,0,0,0.04)',
+                borderRadius: 'var(--radius-md)',
+                border: '1px solid var(--rule)',
+                boxShadow: 'var(--shadow-float)',
               }}
               initial={{ opacity: 0, height: 0, scale: 0.95 }}
               animate={{ opacity: 1, height: 'auto', scale: 1 }}
@@ -147,7 +139,7 @@ export default function Navbar() {
                   <Link
                     key={link.label}
                     href={link.href}
-                    className="block px-4 py-3 text-[15px] font-[500] text-[var(--color-ink)]/80 rounded-2xl hover:text-black hover:bg-black/[0.04] transition-colors"
+                    className="block rounded-[var(--radius-md)] px-4 py-3 text-[15px] font-[500] text-[var(--muted)] transition-colors hover:bg-[var(--rule)] hover:text-[var(--on-surface)]"
                     onClick={() => setMobileOpen(false)}
                   >
                     {link.label}
@@ -155,7 +147,7 @@ export default function Navbar() {
                 ))}
 
                 {/* Mobile CTA */}
-                <div className="pt-3 mt-2 pb-4 flex justify-center" style={{ borderTop: '1px solid rgba(0,0,0,0.06)' }}>
+                <div className="pt-3 mt-2 pb-4 flex justify-center" style={{ borderTop: '1px solid var(--rule)' }}>
                   <LetsTalkButton isMobile={true} />
                 </div>
               </div>

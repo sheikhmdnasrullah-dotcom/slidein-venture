@@ -1,0 +1,326 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   SLIDEIN VENTURE — TONE LAYER
+   Macro contrast (Stage 3) + day / night theming
+   ---------------------------------------------------------------------------
+   TWO AXES, AND THEY ARE INDEPENDENT. Confusing them is how theme systems rot.
+
+     THEME  — day | night. A global user choice. Decides whether the site is
+              made of paper or of graphite. Set as data-theme on <html>.
+
+     TONE   — base | raised | anchor | terminal. A per-section choice. Decides
+              how DEEP that band sits relative to the others in the current
+              theme. It is a position in a rhythm, not a colour.
+
+   So `tone="anchor"` does not mean "dark". It means "this is the band that
+   anchors the page". In day that is paper-100 over a paper-200 well; in night
+   it is ink-deep. The section never knows which — that is the point.
+
+   THE FOUR TONES
+
+     base      the page's own value. Most sections.
+     raised    one step in. A panel that reads as lifted off the page.
+     anchor    the signature band. The framework/deck lives here.
+     terminal  the last thing on the page. The footer, a final CTA.
+
+   THE CONTRACT — the only names a component may consume
+
+     --surface       raised card fill sitting on this band
+     --surface-2     inset / nested fill (a well INSIDE a card)
+     --on-surface    primary text and hairline ink
+     --muted         secondary text
+     --faint         NOT TEXT. Icons, ticks, disabled affordances, decorative
+                     hairlines — anything held to the 3:1 non-text bar. On
+                     paper-50 it reaches 1.76:1, because there is no room for a
+                     third legible text tier between --muted (4.52:1) and AA.
+                     If you are about to set type in it, you want --muted.
+     --rule          hairline divider
+     --rule-strong   visible divider, card border
+     --accent        the orange that clears 4.5:1 as TEXT on this band
+     --accent-vivid  the orange for fills, strokes and graphics
+     --accent-wash   low-alpha orange fill
+     --accent-ring   mid-alpha orange border
+     --on-accent     text sitting on a solid orange fill
+     --surface-glass translucent --surface, for backdrop-blur chrome
+     --gloss         top sheen on a raised card (always lighter than --surface)
+     --status-live   the green that is legible here (system running)
+     --status-info   the blue that is legible here (asset ready)
+     --scrim         the veil behind a modal — a heavy dark wash, NOT --rule
+     --letterbox     the frame a video sits in: the darkest value, never #000
+
+   Components write `text-[var(--muted)]`, never `dark:text-neutral-400`.
+   There is no `dark:` variant anywhere in this codebase, by design: a variant
+   doubles every rule, and the one you forget is the one that ships.
+
+   RULE 1 HOLDS ON BOTH AXES. --accent and --accent-vivid are always hue 42.28.
+   A night band does not get a different orange; it gets the same orange read
+   at the lightness that clears AA against it. Every number below is measured —
+   see scripts/verify-contrast.mjs, which fails the build if one regresses.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ─────────────────────────────────────────────────────────────────────────
+   DAY — made of paper. Paper surfaces, ink type, orange accent.
+   The four tones step down the paper ramp: 50 → 100 → 100 → 200.
+   ───────────────────────────────────────────────────────────────────────── */
+
+:root,
+.tone-base {
+  --surface:       var(--color-paper-25);
+  --surface-2:     var(--color-paper-100);
+  --on-surface:    var(--color-ink);
+  --muted:         var(--color-slate-600);
+  --faint:         var(--color-bone-400);
+  --rule:          var(--color-bone-300);
+  --rule-strong:   color-mix(in oklch, var(--color-ink) 14%, transparent);
+  --accent:        var(--color-signal-deep);
+  --accent-vivid:  var(--color-brand);
+  --accent-wash:   color-mix(in oklch, var(--color-brand) 6%, transparent);
+  --accent-ring:   color-mix(in oklch, var(--color-brand) 35%, transparent);
+  --on-accent:     var(--color-paper-25);
+  --surface-glass: color-mix(in oklch, var(--color-paper-25) 70%, transparent);
+  --gloss:         color-mix(in oklch, var(--color-paper-25) 70%, transparent);
+  --status-live:   var(--color-live-deep);
+  --status-info:   var(--color-info-deep);
+  --scrim:         color-mix(in oklch, var(--color-ink) 55%, transparent);
+  --letterbox:     var(--color-ink-deep);
+  --bleed-to:      var(--color-paper-50);
+
+  /* What the document itself is painted with, under and around the bands:
+     the navbar spacer, overscroll rubber-banding, any gap between sections. */
+  --page-fill:     var(--color-paper-50);
+}
+
+html {
+  background-color: var(--page-fill);
+}
+
+.tone-base {
+  background-color: var(--color-paper-50);
+  color: var(--on-surface);
+}
+
+/* paper-100 is only 2.4% darker than paper-50, and that alone is enough to drop
+   slate-500 to 4.23:1 and signal to 4.21:1 — both under AA. A tone is not a
+   background swap; it has to re-point everything the new background made
+   illegible, including one more step of orange. */
+.tone-raised,
+.tone-anchor {
+  --surface:       var(--color-paper-25);
+  --surface-2:     var(--color-paper-200);
+  --on-surface:    var(--color-ink);
+  --muted:         var(--color-slate-600);
+  --faint:         var(--color-bone-400);
+  --rule:          var(--color-bone-300);
+  --rule-strong:   color-mix(in oklch, var(--color-ink) 14%, transparent);
+  --accent:        var(--color-signal-deeper);
+  --accent-vivid:  var(--color-brand);
+  --accent-wash:   color-mix(in oklch, var(--color-brand) 6%, transparent);
+  --accent-ring:   color-mix(in oklch, var(--color-brand) 35%, transparent);
+  --on-accent:     var(--color-paper-25);
+  --surface-glass: color-mix(in oklch, var(--color-paper-25) 70%, transparent);
+  --gloss:         color-mix(in oklch, var(--color-paper-25) 70%, transparent);
+  --status-live:   var(--color-live-deep);
+  --status-info:   var(--color-info-deep);
+
+  background-color: var(--color-paper-100);
+  color: var(--on-surface);
+
+  --bleed-to: var(--color-paper-100);
+}
+
+.tone-terminal {
+  --surface:       var(--color-paper-50);
+  --surface-2:     var(--color-paper-100);
+  --on-surface:    var(--color-ink);
+  --muted:         var(--color-slate-600);
+  --faint:         var(--color-bone-400);
+  --rule:          var(--color-bone-400);
+  --rule-strong:   color-mix(in oklch, var(--color-ink) 18%, transparent);
+  --accent:        var(--color-signal-deeper);
+  --accent-vivid:  var(--color-brand);
+  --accent-wash:   color-mix(in oklch, var(--color-brand) 8%, transparent);
+  --accent-ring:   color-mix(in oklch, var(--color-brand) 35%, transparent);
+  --on-accent:     var(--color-paper-25);
+  --surface-glass: color-mix(in oklch, var(--color-paper-50) 70%, transparent);
+  --gloss:         color-mix(in oklch, var(--color-paper-25) 70%, transparent);
+  --status-live:   var(--color-live-deep);
+  --status-info:   var(--color-info-deep);
+
+  background-color: var(--color-paper-200);
+  color: var(--on-surface);
+
+  --bleed-to: var(--color-paper-200);
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   NIGHT — made of graphite. The same four steps read from the other end of
+   the ramp: graphite-900 → graphite-800 → ink-deep → ink-deep.
+
+   This is NOT a mirror of day. The anchor band goes DARKEST in night while it
+   goes only one step in during day, because in both cases the anchor has to be
+   the band that pulls hardest away from the page's own value. Mirroring the
+   numbers would have made it the flattest band on the page.
+   ───────────────────────────────────────────────────────────────────────── */
+
+:root[data-theme='night'],
+:root[data-theme='night'] .tone-base {
+  --surface:       var(--color-graphite-800);
+  --surface-2:     var(--color-ink);
+  --on-surface:    var(--color-paper-50);
+  --muted:         var(--color-ash-300);
+  --faint:         color-mix(in oklch, var(--color-paper-50) 45%, transparent);
+  --rule:          color-mix(in oklch, var(--color-paper-25) 10%, transparent);
+  --rule-strong:   color-mix(in oklch, var(--color-paper-25) 18%, transparent);
+  --accent:        var(--color-brand-hi);
+  --accent-vivid:  var(--color-brand-hi);
+  --accent-wash:   color-mix(in oklch, var(--color-brand-hi) 10%, transparent);
+  --accent-ring:   color-mix(in oklch, var(--color-brand-hi) 45%, transparent);
+  --on-accent:     var(--color-ink);
+  --surface-glass: color-mix(in oklch, var(--color-graphite-800) 72%, transparent);
+  --gloss:         color-mix(in oklch, var(--color-paper-25) 7%, transparent);
+  --status-live:   var(--color-live-hi);
+  --status-info:   var(--color-info-hi);
+  --scrim:         color-mix(in oklch, var(--color-ink-deep) 78%, transparent);
+  --letterbox:     var(--color-ink-deep);
+  --bleed-to:      var(--color-graphite-900);
+  --page-fill:     var(--color-graphite-900);
+}
+
+:root[data-theme='night'] .tone-base {
+  background-color: var(--color-graphite-900);
+  color: var(--on-surface);
+}
+
+:root[data-theme='night'] .tone-raised {
+  --surface:       var(--color-graphite-700);
+  --surface-2:     var(--color-graphite-900);
+  --on-surface:    var(--color-paper-50);
+  --muted:         var(--color-ash-300);
+  --faint:         color-mix(in oklch, var(--color-paper-50) 45%, transparent);
+  --rule:          color-mix(in oklch, var(--color-paper-25) 12%, transparent);
+  --rule-strong:   color-mix(in oklch, var(--color-paper-25) 20%, transparent);
+  --accent:        var(--color-brand-hi);
+  --accent-vivid:  var(--color-brand-hi);
+  --accent-wash:   color-mix(in oklch, var(--color-brand-hi) 12%, transparent);
+  --accent-ring:   color-mix(in oklch, var(--color-brand-hi) 45%, transparent);
+  --on-accent:     var(--color-ink);
+  --surface-glass: color-mix(in oklch, var(--color-graphite-700) 72%, transparent);
+  --gloss:         color-mix(in oklch, var(--color-paper-25) 8%, transparent);
+  --status-live:   var(--color-live-hi);
+  --status-info:   var(--color-info-hi);
+
+  background-color: var(--color-graphite-800);
+  color: var(--on-surface);
+
+  --bleed-to: var(--color-graphite-800);
+}
+
+:root[data-theme='night'] .tone-anchor,
+:root[data-theme='night'] .tone-terminal {
+  --surface:       var(--color-graphite-800);
+  --surface-2:     var(--color-ink);
+  --on-surface:    var(--color-paper-25);
+  --muted:         var(--color-ash-400);
+  --faint:         color-mix(in oklch, var(--color-paper-25) 40%, transparent);
+  --rule:          color-mix(in oklch, var(--color-paper-25) 8%, transparent);
+  --rule-strong:   color-mix(in oklch, var(--color-paper-25) 16%, transparent);
+  --accent:        var(--color-brand-hi);
+  --accent-vivid:  var(--color-brand-hi);
+  --accent-wash:   color-mix(in oklch, var(--color-brand-hi) 10%, transparent);
+  --accent-ring:   color-mix(in oklch, var(--color-brand-hi) 45%, transparent);
+  --on-accent:     var(--color-ink-deep);
+  --surface-glass: color-mix(in oklch, var(--color-graphite-800) 72%, transparent);
+  --gloss:         color-mix(in oklch, var(--color-paper-25) 5%, transparent);
+  --status-live:   var(--color-live-hi);
+  --status-info:   var(--color-info-hi);
+
+  background-color: var(--color-ink-deep);
+  color: var(--on-surface);
+
+  --bleed-to: var(--color-ink-deep);
+}
+
+/* Night's anchor and terminal were both ink-deep, which merged the footer into
+   the deck band into one 1,000px slab. The page now descends to its darkest at
+   the anchor and settles one step back up at the footer — the same shape a
+   piece of music has, and the reason the join is legible without a border. */
+:root[data-theme='night'] .tone-terminal {
+  --surface: var(--color-graphite-800);
+  --surface-2: var(--color-ink-deep);
+
+  background-color: var(--color-ink);
+
+  --bleed-to: var(--color-ink);
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   HERO — the one band with a gradient. It is the light source, so it holds
+   the theme's brightest value at the top and settles onto the page fill by
+   the time it hands off. Same gesture in both themes, opposite direction.
+   ───────────────────────────────────────────────────────────────────────── */
+.tone-hero {
+  background-image: linear-gradient(
+    to bottom,
+    var(--color-paper-25) 0%,
+    var(--color-paper-25) 28%,
+    var(--color-paper-50) 100%
+  );
+}
+
+:root[data-theme='night'] .tone-hero {
+  background-image: linear-gradient(
+    to bottom,
+    var(--color-graphite-800) 0%,
+    var(--color-graphite-800) 22%,
+    var(--color-graphite-900) 100%
+  );
+}
+
+/* ═══ SEAM ════════════════════════════════════════════════════════════════
+   A 1px optical line at the join between two bands, fading out at both ends
+   so it reads as an edge and not as a table border.
+
+   The direction flips with the theme, and it has to: on graphite the trick is
+   a line BRIGHTER than either side (the one furniture photographers use); on
+   paper a bright hairline is invisible, so the same edge has to be drawn
+   darker. Same intent, opposite value. */
+.seam-top::before {
+  content: '';
+  position: absolute;
+  inset-inline: 0;
+  top: 0;
+  height: 1px;
+  background: linear-gradient(
+    to right,
+    transparent,
+    var(--rule) 20%,
+    var(--rule) 80%,
+    transparent
+  );
+  pointer-events: none;
+}
+
+:root[data-theme='night'] .seam-top::before {
+  background: linear-gradient(
+    to right,
+    transparent,
+    var(--color-seam) 20%,
+    var(--color-seam) 80%,
+    transparent
+  );
+}
+
+/* ═══ BLEED ═══════════════════════════════════════════════════════════════
+   A short run-up above a band so it appears to emerge out of the one above
+   rather than start at a butt joint. The pseudo-element overhangs the
+   section's own top edge, so it paints at z-index -1 and needs a parent that
+   is `isolate` — Section is. */
+.bleed-in::after {
+  content: '';
+  position: absolute;
+  inset-inline: 0;
+  top: calc(var(--spacing-bleed) * -1);
+  height: var(--spacing-bleed);
+  background: linear-gradient(to bottom, transparent, var(--bleed-to));
+  pointer-events: none;
+  z-index: -1;
+}

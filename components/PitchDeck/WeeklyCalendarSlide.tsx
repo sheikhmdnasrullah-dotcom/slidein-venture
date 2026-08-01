@@ -46,10 +46,10 @@ function I({ k, s = 12, c }: { k: Ic; s?: number; c?: string }) {
 type Status = 'scheduled' | 'editing' | 'ready' | 'published';
 
 const STATUS: Record<Status, { label: string; dot: string; chip: string }> = {
-  scheduled: { label: 'Scheduled', dot: '#16A34A', chip: 'bg-[#16A34A]/[0.08] text-[#15803D]' },
-  editing: { label: 'Editing', dot: '#FF6200', chip: 'bg-[#FF6200]/[0.09] text-[#C2410C]' },
-  ready: { label: 'Ready', dot: '#2563EB', chip: 'bg-[#2563EB]/[0.08] text-[#1D4ED8]' },
-  published: { label: 'Published', dot: '#9CA3AF', chip: 'bg-black/[0.05] text-black/50' },
+  scheduled: { label: 'Scheduled', dot: 'var(--status-live)', chip: 'bg-[var(--rule)] text-[var(--status-live)]' },
+  editing: { label: 'Editing', dot: 'var(--accent-vivid)', chip: 'bg-[var(--accent-wash)] text-[var(--accent)]' },
+  ready: { label: 'Ready', dot: 'var(--status-info)', chip: 'bg-[var(--rule)] text-[var(--status-info)]' },
+  published: { label: 'Published', dot: 'var(--muted)', chip: 'bg-[var(--rule)] text-[var(--muted)]' },
 };
 
 type Block = { time: string; title: string; icon: Ic; status: Status };
@@ -105,17 +105,17 @@ function ContentBlock({ b, delay }: { b: Block; delay: number }) {
     <motion.div
       initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.45, ease: EASE, delay }}
-      className="rounded-lg border border-black/[0.07] bg-white px-2 py-1.5 shadow-[0_1px_3px_rgba(10,10,10,0.04)] hover:-translate-y-0.5 hover:shadow-[0_6px_14px_rgba(10,10,10,0.08)] hover:border-[#FF6200]/40 transition-all duration-300 cursor-default"
+      className="rounded-lg border border-[var(--rule)] bg-[var(--surface)] px-2 py-1.5 shadow-[0_1px_3px_color-mix(in oklch, var(--on-surface) 4%, transparent)] hover:-translate-y-0.5 hover:shadow-[0_6px_14px_color-mix(in oklch, var(--on-surface) 8%, transparent)] hover:border-[var(--accent-vivid)]/40 transition-all duration-300 cursor-default"
     >
       <div className="flex items-center gap-1">
-        <span className="text-black/55"><I k={b.icon} s={10} /></span>
-        <span className="text-[7.5px] font-bold text-black/40 tabular-nums">{b.time}</span>
+        <span className="text-[var(--muted)]"><I k={b.icon} s={10} /></span>
+        <span className="text-[7.5px] font-bold text-[var(--muted)] tabular-nums">{b.time}</span>
         <span className="ml-auto w-1.5 h-1.5 rounded-full wc-blink" style={{ background: st.dot }} />
       </div>
-      <p className="mt-1 text-[8.5px] font-bold text-[#0A0A0A] leading-[1.25]">{b.title}</p>
+      <p className="mt-1 text-[8.5px] font-bold text-[var(--on-surface)] leading-[1.25]">{b.title}</p>
       <div className="mt-1 flex items-center gap-1">
         <span className={cn('text-[6.5px] font-bold tracking-wide px-1 py-[1px] rounded', st.chip)}>{st.label.toUpperCase()}</span>
-        <span className="ml-auto w-3 h-3 rounded-full bg-gradient-to-br from-[#FFB27A] to-[#FF6200] ring-1 ring-white" />
+        <span className="ml-auto w-3 h-3 rounded-full bg-gradient-to-br from-[var(--color-brand-pale)] to-[var(--accent-vivid)] ring-1 ring-white" />
       </div>
     </motion.div>
   );
@@ -132,11 +132,11 @@ export default function WeeklyCalendarSlide() {
         transition={{ duration: 0.6, ease: EASE }}
         className="text-center"
       >
-        <p className="text-[11px] md:text-xs font-bold tracking-[0.14em] uppercase text-[#FF6200]">The Weekly Output</p>
-        <h2 className="mt-1.5 display-headline text-[clamp(1.3rem,2.5vw,1.85rem)] text-[#0A0A0A]">
-          This is what your <span className="text-[#FF6200]">content calendar</span> looks like.
+        <p className="text-[11px] md:text-xs font-bold tracking-[0.14em] uppercase text-[var(--accent)]">The Weekly Output</p>
+        <h2 className="mt-1.5 display-headline text-[clamp(1.3rem,2.5vw,1.85rem)] text-[var(--on-surface)]">
+          This is what your <span className="text-[var(--accent)]">content calendar</span> looks like.
         </h2>
-        <p className="mt-1 text-[11.5px] text-black/45 font-medium">
+        <p className="mt-1 text-[11.5px] text-[var(--muted)] font-medium">
           One recording becomes a full week of scheduled content — planned, organized, ready to publish.
         </p>
       </motion.div>
@@ -149,11 +149,11 @@ export default function WeeklyCalendarSlide() {
       >
         {PIPELINE.map((s, i) => (
           <span key={s.label} className="flex items-center gap-1.5">
-            <span className="flex items-center gap-1 rounded-full border border-black/[0.08] bg-white/80 px-2 py-0.5 text-black/55">
+            <span className="flex items-center gap-1 rounded-full border border-[var(--rule)] bg-[var(--surface-glass)] px-2 py-0.5 text-[var(--muted)]">
               <I k={s.icon} s={9} />
               <span className="text-[7.5px] font-bold tracking-[0.12em] uppercase">{s.label}</span>
             </span>
-            {i < PIPELINE.length - 1 && <span className="text-black/25 text-[9px]">→</span>}
+            {i < PIPELINE.length - 1 && <span className="text-[var(--muted)] text-[9px]">→</span>}
           </span>
         ))}
       </motion.div>
@@ -162,46 +162,46 @@ export default function WeeklyCalendarSlide() {
       <motion.div
         initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.7, ease: EASE, delay: 0.25 }}
-        className="mt-3 rounded-2xl border border-black/10 bg-white shadow-[0_18px_50px_rgba(10,10,10,0.09)] overflow-hidden"
+        className="mt-3 rounded-2xl border border-[var(--rule)] bg-[var(--surface)] shadow-[0_18px_50px_color-mix(in oklch, var(--on-surface) 9%, transparent)] overflow-hidden"
       >
         {/* title bar */}
-        <div className="flex items-center gap-2.5 px-4 py-2 border-b border-black/[0.07] bg-black/[0.015]">
+        <div className="flex items-center gap-2.5 px-4 py-2 border-b border-[var(--rule)] bg-[var(--rule)]">
           <span className="flex gap-1.5" aria-hidden>
-            <span className="w-2 h-2 rounded-full bg-black/10" /><span className="w-2 h-2 rounded-full bg-black/10" /><span className="w-2 h-2 rounded-full bg-black/10" />
+            <span className="w-2 h-2 rounded-full bg-[var(--rule)]" /><span className="w-2 h-2 rounded-full bg-[var(--rule)]" /><span className="w-2 h-2 rounded-full bg-[var(--rule)]" />
           </span>
-          <span className="text-[10.5px] font-extrabold text-[#0A0A0A]">SlideIn Content Calendar</span>
-          <span className="hidden md:flex items-center gap-1 rounded-full bg-[#FF6200]/[0.07] border border-[#FF6200]/25 px-2 py-0.5">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#FF6200] wc-blink" />
-            <span className="text-[7px] font-bold tracking-[0.12em] text-[#C2410C] uppercase">Built automatically after each recording</span>
+          <span className="text-[10.5px] font-extrabold text-[var(--on-surface)]">SlideIn Content Calendar</span>
+          <span className="hidden md:flex items-center gap-1 rounded-full bg-[var(--accent-vivid)]/[0.07] border border-[var(--accent-vivid)]/25 px-2 py-0.5">
+            <span className="w-1.5 h-1.5 rounded-full bg-[var(--accent-vivid)] wc-blink" />
+            <span className="text-[7px] font-bold tracking-[0.12em] text-[var(--color-ember)] uppercase">Built automatically after each recording</span>
           </span>
-          <span className="ml-auto text-[8.5px] font-bold text-black/35 tabular-nums">May 12 – 18</span>
+          <span className="ml-auto text-[8.5px] font-bold text-[var(--muted)] tabular-nums">May 12 – 18</span>
         </div>
 
         <div className="flex">
           {/* left sidebar */}
-          <div className="hidden lg:flex flex-col w-[128px] shrink-0 border-r border-black/[0.06] bg-black/[0.012] px-2 py-2.5 gap-0.5">
+          <div className="hidden lg:flex flex-col w-[128px] shrink-0 border-r border-[var(--rule)] bg-[var(--rule)] px-2 py-2.5 gap-0.5">
             {SIDEBAR.map((s) => (
               <span key={s.label} className={cn(
                 'flex items-center gap-1.5 rounded-md px-2 py-1.5 text-[8.5px] font-bold',
-                s.active ? 'bg-[#FF6200]/[0.08] text-[#C2410C]' : 'text-black/40'
+                s.active ? 'bg-[var(--accent-vivid)]/[0.08] text-[var(--color-ember)]' : 'text-[var(--muted)]'
               )}>
                 <I k={s.icon} s={10} />{s.label}
               </span>
             ))}
-            <div className="mt-auto pt-2 border-t border-black/[0.06]">
-              <span className="text-[6.5px] font-bold tracking-[0.16em] text-black/25 uppercase px-2">Workspace v2.4</span>
+            <div className="mt-auto pt-2 border-t border-[var(--rule)]">
+              <span className="text-[6.5px] font-bold tracking-[0.16em] text-[var(--muted)] uppercase px-2">Workspace v2.4</span>
             </div>
           </div>
 
           {/* calendar grid */}
           <div className="flex-1 min-w-0 grid grid-cols-7 divide-x divide-black/[0.05]">
             {WEEK.map((d, di) => (
-              <div key={d.day} className={cn('flex flex-col min-w-0', d.today && 'bg-[#FF6200]/[0.025]')}>
-                <div className={cn('flex items-center justify-center gap-1 py-1.5 border-b border-black/[0.06]', d.today && 'border-b-[#FF6200]/30')}>
-                  <span className={cn('text-[7.5px] font-black tracking-[0.14em]', d.today ? 'text-[#FF6200]' : 'text-black/35')}>{d.day}</span>
+              <div key={d.day} className={cn('flex flex-col min-w-0', d.today && 'bg-[var(--accent-vivid)]/[0.025]')}>
+                <div className={cn('flex items-center justify-center gap-1 py-1.5 border-b border-[var(--rule)]', d.today && 'border-b-[var(--accent-vivid)]/30')}>
+                  <span className={cn('text-[7.5px] font-black tracking-[0.14em]', d.today ? 'text-[var(--accent)]' : 'text-[var(--muted)]')}>{d.day}</span>
                   <span className={cn(
                     'text-[8.5px] font-bold tabular-nums w-4 h-4 rounded-full flex items-center justify-center',
-                    d.today ? 'bg-[#FF6200] text-white' : 'text-black/50'
+                    d.today ? 'bg-[var(--accent-vivid)] text-[var(--on-accent)]' : 'text-[var(--muted)]'
                   )}>{d.date}</span>
                 </div>
                 <div className="flex flex-col gap-1.5 p-1.5 min-h-[190px]">
@@ -214,31 +214,31 @@ export default function WeeklyCalendarSlide() {
           </div>
 
           {/* right panel */}
-          <div className="hidden xl:flex flex-col w-[150px] shrink-0 border-l border-black/[0.06] bg-black/[0.012] px-2.5 py-2.5 gap-2.5">
+          <div className="hidden xl:flex flex-col w-[150px] shrink-0 border-l border-[var(--rule)] bg-[var(--rule)] px-2.5 py-2.5 gap-2.5">
             <div>
-              <p className="text-[6.5px] font-black tracking-[0.16em] text-black/30 uppercase">Upcoming post</p>
-              <div className="mt-1 rounded-lg border border-black/[0.07] bg-white p-2">
-                <div className="flex items-center gap-1 text-black/55"><I k="li" s={9} /><span className="text-[8px] font-bold text-[#0A0A0A]">Thought Leadership</span></div>
-                <p className="text-[7px] text-black/40 font-semibold mt-0.5">Monday · 9:00 AM</p>
+              <p className="text-[6.5px] font-black tracking-[0.16em] text-[var(--muted)] uppercase">Upcoming post</p>
+              <div className="mt-1 rounded-lg border border-[var(--rule)] bg-[var(--surface)] p-2">
+                <div className="flex items-center gap-1 text-[var(--muted)]"><I k="li" s={9} /><span className="text-[8px] font-bold text-[var(--on-surface)]">Thought Leadership</span></div>
+                <p className="text-[7px] text-[var(--muted)] font-semibold mt-0.5">Monday · 9:00 AM</p>
               </div>
             </div>
             <div>
-              <p className="text-[6.5px] font-black tracking-[0.16em] text-black/30 uppercase">Publishing queue</p>
-              <div className="mt-1 h-1 rounded-full bg-black/[0.06] overflow-hidden">
-                <motion.div className="h-full rounded-full bg-[#FF6200]"
+              <p className="text-[6.5px] font-black tracking-[0.16em] text-[var(--muted)] uppercase">Publishing queue</p>
+              <div className="mt-1 h-1 rounded-full bg-[var(--rule)] overflow-hidden">
+                <motion.div className="h-full rounded-full bg-[var(--accent-vivid)]"
                   initial={{ width: 0 }} animate={{ width: '72%' }}
                   transition={{ duration: 1.2, ease: EASE, delay: 1.4 }} />
               </div>
-              <p className="text-[7px] text-black/40 font-semibold mt-1">6 of 9 assets ready</p>
+              <p className="text-[7px] text-[var(--muted)] font-semibold mt-1">6 of 9 assets ready</p>
             </div>
             <div>
-              <p className="text-[6.5px] font-black tracking-[0.16em] text-black/30 uppercase">Weekly output</p>
-              <p className="text-[16px] font-extrabold text-[#0A0A0A] leading-tight mt-0.5">9 <span className="text-[8px] font-bold text-black/40">pieces</span></p>
-              <p className="text-[7px] text-black/40 font-semibold">from one 45-min recording</p>
+              <p className="text-[6.5px] font-black tracking-[0.16em] text-[var(--muted)] uppercase">Weekly output</p>
+              <p className="text-[16px] font-extrabold text-[var(--on-surface)] leading-tight mt-0.5">9 <span className="text-[8px] font-bold text-[var(--muted)]">pieces</span></p>
+              <p className="text-[7px] text-[var(--muted)] font-semibold">from one 45-min recording</p>
             </div>
-            <div className="mt-auto rounded-lg bg-[#0A0A0A] p-2">
-              <div className="flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-[#16A34A] wc-blink" /><span className="text-[7px] font-bold text-white tracking-wide">SYSTEM ACTIVE</span></div>
-              <p className="text-[6.5px] text-white/50 font-semibold mt-0.5">Next recording: Monday</p>
+            <div className="mt-auto rounded-lg bg-[var(--on-surface)] p-2">
+              <div className="flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-[var(--color-live)] wc-blink" /><span className="text-[7px] font-bold text-[var(--on-surface)] tracking-wide">SYSTEM ACTIVE</span></div>
+              <p className="text-[6.5px] text-[var(--muted)] font-semibold mt-0.5">Next recording: Monday</p>
             </div>
           </div>
         </div>

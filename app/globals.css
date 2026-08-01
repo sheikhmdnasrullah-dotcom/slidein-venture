@@ -4,6 +4,10 @@
 /* Type roles. Unlayered on purpose: a role class must beat a stray Tailwind
    utility, otherwise `text-[10px]` on a call site quietly defeats the system. */
 @import "./styles/type.css";
+/* Tone contract + seam/bleed. Also unlayered: a tone must beat the legacy
+   `body { @apply bg-background }` in @layer base, or every band renders
+   paper-50 and the value rhythm silently collapses back to one value. */
+@import "./styles/tone.css";
 @import "tw-animate-css";
 /* layer() keeps xyflow in the base cascade. Wrapping an @import inside
    `@layer base { ... }` is an invalid at-rule position in CSS. */
@@ -25,28 +29,31 @@
   --font-mono: var(--font-face-mono), ui-monospace, monospace;
   --font-display: var(--font-face-display), georgia, serif;
 
-  /* Legacy semantic aliases → token layer. Migrate call sites, then delete. */
-  --color-background:   var(--color-paper-50);
-  --color-foreground:   var(--color-ink);
-  --color-card:         var(--color-paper-25);
-  --color-card-foreground: var(--color-ink);
-  --color-primary-foreground: var(--color-paper-25);
-  --color-secondary:    var(--color-paper-100);
-  --color-secondary-foreground: var(--color-ink);
-  --color-muted:        var(--color-paper-100);
-  --color-muted-foreground: var(--color-slate-500);
-  --color-accent:       var(--color-brand);
-  --color-accent-foreground: var(--color-paper-25);
-  --color-destructive:  var(--color-signal);
-  --color-border:       var(--color-bone-300);
-  --color-input:        var(--color-bone-300);
-  --color-ring:         var(--color-signal);
-  --color-ink-light:    var(--color-slate-600);
-  --color-mist:         var(--color-slate-500);
-  --color-fog:          var(--color-bone-400);
-  --color-frost:        var(--color-bone-300);
-  --color-rose:         var(--color-brand);
-  --color-rose-soft:    var(--color-paper-100);
+  /* Legacy semantic aliases. These used to name a fixed token; they now point
+     at the TONE CONTRACT (app/styles/tone.css), which is what makes every
+     shadcn/ui component and every call site we have not migrated yet theme
+     itself for free instead of staying stubbornly light in night mode. */
+  --color-background:   var(--surface);
+  --color-foreground:   var(--on-surface);
+  --color-card:         var(--surface);
+  --color-card-foreground: var(--on-surface);
+  --color-primary-foreground: var(--on-accent);
+  --color-secondary:    var(--surface-2);
+  --color-secondary-foreground: var(--on-surface);
+  --color-muted:        var(--surface-2);
+  --color-muted-foreground: var(--muted);
+  --color-accent:       var(--accent-vivid);
+  --color-accent-foreground: var(--on-accent);
+  --color-destructive:  var(--accent);
+  --color-border:       var(--rule);
+  --color-input:        var(--rule);
+  --color-ring:         var(--accent);
+  --color-ink-light:    var(--muted);
+  --color-mist:         var(--muted);
+  --color-fog:          var(--faint);
+  --color-frost:        var(--rule);
+  --color-rose:         var(--accent-vivid);
+  --color-rose-soft:    var(--surface-2);
 
   /* Legacy shadow aliases → the two-layer elevation set. */
   --shadow-sm:   var(--shadow-contact);
@@ -61,76 +68,49 @@
   --ease-smooth: var(--ease-std);
 }
 
-/* ─── shadcn/ui CSS Variables ─────────────────────────────────────────────── */
+/* ─── shadcn/ui CSS Variables ───────────────────────────────────────────────
+   Every one of these shipped as a hardcoded neutral greyscale (oklch(0.145 0 0)
+   and friends), which is why shadcn components stayed light-grey no matter what
+   the rest of the page did. They now read the tone contract, so a Dialog inside
+   a night-mode page is a night-mode Dialog with no `.dark` class in sight.
+   The `.dark` block that used to live here is gone: there is one theme axis on
+   this site, data-theme, and two competing ones is how they drift apart.      */
 :root {
-  --card: var(--color-paper-25);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: var(--color-paper-25);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --destructive-foreground: var(--color-paper-25);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --radius: 0.625rem;
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --background: var(--color-paper-50);
-  --foreground: oklch(0.145 0 0);
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
-}
-
-.dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --destructive-foreground: var(--color-paper-25);
-  --border: color-mix(in oklch, var(--color-paper-25) 10%, transparent);
-  --input: color-mix(in oklch, var(--color-paper-25) 15%, transparent);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: color-mix(in oklch, var(--color-paper-25) 10%, transparent);
-  --sidebar-ring: oklch(0.556 0 0);
+  --card: var(--surface);
+  --card-foreground: var(--on-surface);
+  --popover: var(--surface);
+  --popover-foreground: var(--on-surface);
+  --primary: var(--on-surface);
+  --primary-foreground: var(--surface);
+  --secondary: var(--surface-2);
+  --secondary-foreground: var(--on-surface);
+  --muted-bg: var(--surface-2);
+  --muted-foreground: var(--muted);
+  /* NB: deliberately not `--accent` / `--accent-foreground`. Those names
+     belong to the tone contract; see the note in app/styles/tone.css. */
+  --accent-bg: var(--accent-wash);
+  --accent-bg-foreground: var(--on-surface);
+  --destructive: var(--accent);
+  --destructive-foreground: var(--on-accent);
+  --border: var(--rule);
+  --input: var(--rule);
+  --ring: var(--accent);
+  --radius: var(--radius-md);
+  --chart-1: var(--accent-vivid);
+  --chart-2: var(--muted);
+  --chart-3: var(--faint);
+  --chart-4: var(--status-live);
+  --chart-5: var(--status-info);
+  --background: var(--surface);
+  --foreground: var(--on-surface);
+  --sidebar: var(--surface);
+  --sidebar-foreground: var(--on-surface);
+  --sidebar-primary: var(--accent-vivid);
+  --sidebar-primary-foreground: var(--on-accent);
+  --sidebar-accent: var(--surface-2);
+  --sidebar-accent-foreground: var(--on-surface);
+  --sidebar-border: var(--rule);
+  --sidebar-ring: var(--accent);
 }
 
 /* ─── Reset & Base ───────────────────────────────────────────────────────── */
@@ -147,8 +127,16 @@ html {
 
 body {
   font-family: var(--font-sans);
-  background-color: var(--color-background);
-  color: var(--color-foreground);
+  /* The page fill is the BASE tone, not --surface: --surface is what a card is
+     made of, and painting the page with it flattens every raised element on it.
+     Sections paint their own band over the top of this; what shows through is
+     the navbar spacer and any overscroll rubber-banding.
+
+     --page-fill rather than a token directly, so the night override below is a
+     one-line custom-property swap instead of a competing background-color
+     declaration that has to win a specificity argument with this one. */
+  background-color: var(--page-fill);
+  color: var(--on-surface);
   font-weight: var(--font-weight-body);
   letter-spacing: var(--tracking-body);
   line-height: var(--leading-body);
@@ -166,11 +154,11 @@ body {
 
 /* Glass card effect - ultra premium */
 .glass-card {
-  background: color-mix(in oklch, var(--color-paper-25) 70%, transparent);
+  background: var(--surface-glass);
   backdrop-filter: blur(24px) saturate(1.4);
   -webkit-backdrop-filter: blur(24px) saturate(1.4);
-  border: 1px solid color-mix(in oklch, var(--color-brand) 4%, transparent);
-  box-shadow: var(--shadow-contact), inset 0 0 0 1px color-mix(in oklch, var(--color-paper-25) 50%, transparent);
+  border: 1px solid var(--rule);
+  box-shadow: var(--shadow-contact), var(--shadow-inset-top);
 }
 
 /* (Beam sweep and glow border effects removed - no decorative overlays) */
@@ -178,8 +166,8 @@ body {
 /* ─── Scrollbar ──────────────────────────────────────────────────────────── */
 ::-webkit-scrollbar { width: 6px; height: 6px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: var(--color-bone-400); border-radius: var(--radius-pill); }
-::-webkit-scrollbar-thumb:hover { background: var(--color-slate-500); }
+::-webkit-scrollbar-thumb { background: var(--faint); border-radius: var(--radius-pill); }
+::-webkit-scrollbar-thumb:hover { background: var(--muted); }
 
 .hide-scrollbar {
   -ms-overflow-style: none;
@@ -196,7 +184,7 @@ body {
 }
 
 /* ─── Selection ──────────────────────────────────────────────────────────── */
-::selection { background: color-mix(in oklch, var(--color-brand) 18%, transparent); }
+::selection { background: color-mix(in oklch, var(--accent-vivid) 22%, transparent); color: var(--on-surface); }
 
 /* ─── Focus ──────────────────────────────────────────────────────────────── */
 /* focus ring is defined once in app/styles/tokens.css */
@@ -220,14 +208,14 @@ body {
 
 /* ─── Gradient text utility ──────────────────────────────────────────────── */
 .gradient-text {
-  background: linear-gradient(135deg, var(--color-ink) 0%, var(--color-signal) 100%);
+  background: linear-gradient(135deg, var(--on-surface) 0%, var(--accent) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 
 .gradient-text-warm {
-  background: linear-gradient(135deg, var(--color-signal) 0%, var(--color-brand) 50%, var(--color-ink) 100%);
+  background: linear-gradient(135deg, var(--accent) 0%, var(--accent-vivid) 50%, var(--on-surface) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -240,7 +228,7 @@ body {
 }
 
 .shimmer {
-  background: linear-gradient(90deg, var(--color-paper-100) 25%, var(--color-bone-300) 50%, var(--color-paper-100) 75%);
+  background: linear-gradient(90deg, var(--surface-2) 25%, var(--rule) 50%, var(--surface-2) 75%);
   background-size: 200% 100%;
   animation: shimmer 2s infinite;
 }
@@ -309,10 +297,10 @@ body {
   --color-input: var(--input);
   --color-border: var(--border);
   --color-destructive: var(--destructive);
-  --color-accent-foreground: var(--accent-foreground);
-  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-bg-foreground);
+  --color-accent: var(--accent-bg);
   --color-muted-foreground: var(--muted-foreground);
-  --color-muted: var(--muted);
+  --color-muted: var(--muted-bg);
   --color-secondary-foreground: var(--secondary-foreground);
   --color-secondary: var(--secondary);
   /* --color-primary is deliberately NOT mapped to var(--primary) here.
@@ -331,7 +319,7 @@ body {
 
 @layer base {
   body {
-    @apply bg-background text-foreground;
+    color: var(--on-surface);
   }
 
   html {
@@ -384,6 +372,35 @@ body {
   }
 }
 
+/* ─── Theme transition ──────────────────────────────────────────────────────
+   The switch has to be felt, not just seen: colour eases over --dur-base while
+   everything else stays put. Scoped to the properties that actually change so
+   we are not animating layout, and skipped entirely under reduced motion
+   (Rule 5) — a full-page cross-fade is exactly the kind of thing that triggers
+   vestibular discomfort.
+
+   `transition` is set on the elements that paint a band or a surface rather
+   than on `*`, because `* { transition: … }` costs a style recalculation on
+   every element for every hover on the page. */
+:root[data-theme] body,
+:root[data-theme] [class*='tone-'],
+:root[data-theme] nav,
+:root[data-theme] footer {
+  transition:
+    background-color var(--dur-base) var(--ease-std),
+    border-color var(--dur-base) var(--ease-std),
+    color var(--dur-base) var(--ease-std);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root[data-theme] body,
+  :root[data-theme] [class*='tone-'],
+  :root[data-theme] nav,
+  :root[data-theme] footer {
+    transition: none;
+  }
+}
+
 /* ── SlideIn design language — premium button + card system ─────────────── */
 .btn-premium {
   position: relative;
@@ -396,7 +413,7 @@ body {
   content: '';
   position: absolute;
   inset: 0;
-  background: linear-gradient(115deg, transparent 30%, color-mix(in oklch, var(--color-paper-25) 45%, transparent) 50%, transparent 70%);
+  background: linear-gradient(115deg, transparent 30%, var(--gloss) 50%, transparent 70%);
   transform: translateX(-120%);
   transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
   pointer-events: none;
@@ -411,10 +428,10 @@ body {
 
 .card-premium {
   position: relative;
-  border: 1px solid color-mix(in oklch, var(--color-ink) 8%, transparent);
+  border: 1px solid var(--rule);
   background:
-    linear-gradient(180deg, color-mix(in oklch, var(--color-paper-25) 75%, transparent), transparent 45%),
-    color-mix(in oklch, var(--color-paper-25) 85%, transparent);
+    linear-gradient(180deg, var(--gloss), transparent 45%),
+    var(--surface-glass);
   box-shadow:
     var(--shadow-inset-top),
     var(--shadow-raised);

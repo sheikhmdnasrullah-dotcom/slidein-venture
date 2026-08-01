@@ -44,7 +44,7 @@ export default function AmbientEnvironment() {
   }, [mx, my]);
 
   return (
-    <div aria-hidden className="fixed inset-0 -z-10 overflow-hidden pointer-events-none">
+    <div aria-hidden className="absolute inset-0 -z-10 overflow-hidden pointer-events-none">
       {/* 2 — paper grain */}
       <div
         className="absolute inset-0 opacity-[0.016]"
@@ -57,7 +57,7 @@ export default function AmbientEnvironment() {
       <div
         className="absolute inset-0"
         style={{
-          backgroundImage: 'radial-gradient(circle, rgba(10,10,10,0.045) 1px, transparent 1px)',
+          backgroundImage: 'radial-gradient(circle, var(--grid-dot) 1px, transparent 1px)',
           backgroundSize: '28px 28px',
           maskImage: 'radial-gradient(ellipse 90% 80% at 50% 40%, black 40%, transparent 100%)',
           WebkitMaskImage: 'radial-gradient(ellipse 90% 80% at 50% 40%, black 40%, transparent 100%)',
@@ -66,23 +66,23 @@ export default function AmbientEnvironment() {
       {/* 4 — drifting radial light */}
       <motion.div
         className="absolute w-[900px] h-[900px] rounded-full"
-        style={{ background: 'radial-gradient(circle, rgba(255,98,0,0.05) 0%, transparent 65%)', top: '-15%', left: '-10%' }}
+        style={{ background: 'radial-gradient(circle, var(--ambient-a) 0%, transparent 65%)', top: '-15%', left: '-10%' }}
         animate={{ x: [0, 120, 0], y: [0, 60, 0] }}
         transition={{ duration: 38, repeat: Infinity, ease: 'easeInOut' }}
       />
       <motion.div
         className="absolute w-[800px] h-[800px] rounded-full"
-        style={{ background: 'radial-gradient(circle, rgba(255,98,0,0.04) 0%, transparent 65%)', bottom: '-20%', right: '-12%' }}
+        style={{ background: 'radial-gradient(circle, var(--ambient-b) 0%, transparent 65%)', bottom: '-20%', right: '-12%' }}
         animate={{ x: [0, -100, 0], y: [0, -70, 0] }}
         transition={{ duration: 46, repeat: Infinity, ease: 'easeInOut', delay: 6 }}
       />
       {/* 5 — blueprint construction guides */}
-      <div className="absolute inset-y-0 left-6 w-px border-l border-dashed border-black/[0.035]" />
-      <div className="absolute inset-y-0 right-6 w-px border-r border-dashed border-black/[0.035]" />
-      <span className="absolute top-3 left-8 text-[8px] font-mono tracking-[0.2em] text-black/[0.12] select-none">SIV · 00.01</span>
-      <span className="absolute bottom-3 right-8 text-[8px] font-mono tracking-[0.2em] text-black/[0.12] select-none">GRID · 28PX</span>
+      <div className="absolute inset-y-0 left-6 w-px border-l border-dashed border-[var(--rule)]" />
+      <div className="absolute inset-y-0 right-6 w-px border-r border-dashed border-[var(--rule)]" />
+      <span className="absolute top-3 left-8 text-[8px] font-mono tracking-[0.2em] text-[var(--muted)] select-none">SIV · 00.01</span>
+      <span className="absolute bottom-3 right-8 text-[8px] font-mono tracking-[0.2em] text-[var(--muted)] select-none">GRID · 28PX</span>
       {[...Array(14)].map((_, i) => (
-        <span key={i} className="absolute left-6 w-1.5 h-px bg-black/[0.07]" style={{ top: `${(i + 1) * 7}%` }} />
+        <span key={i} className="absolute left-6 w-1.5 h-px bg-[var(--rule)]" style={{ top: `${(i + 1) * 7}%` }} />
       ))}
       {/* 6 — floating particles */}
       {PARTICLES.map((p, i) => (
@@ -97,7 +97,7 @@ export default function AmbientEnvironment() {
       {/* 7 — cursor-following ambient light (desktop) */}
       <motion.div
         className="absolute w-[600px] h-[600px] rounded-full hidden md:block"
-        style={{ x: sx, y: sy, background: 'radial-gradient(circle, rgba(255,98,0,0.055) 0%, transparent 60%)' }}
+        style={{ x: sx, y: sy, background: 'radial-gradient(circle, var(--ambient-c) 0%, transparent 60%)' }}
       />
     </div>
   );

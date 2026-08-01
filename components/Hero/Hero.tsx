@@ -24,9 +24,11 @@ import {
   useReducedMotion,
 } from 'framer-motion';
 import VideoModal from '@/components/VideoModal/VideoModal';
+import AmbientEnvironment from '@/components/AmbientEnvironment/AmbientEnvironment';
+import { Section } from '@/components/Section';
 
 const EASE = [0.16, 1, 0.3, 1] as const;
-const ORANGE = 'var(--color-brand)';
+const ORANGE = 'var(--accent-vivid)';
 
 const PHRASES = ['Content Production.', 'Outreach Systems.', 'Backend Systems.'];
 const PHRASE_MS = 3400;
@@ -110,7 +112,7 @@ function Magnetic({
 function AccentRule() {
   return (
     <svg
-      className="accent-underline text-brand"
+      className="accent-underline text-[var(--accent-vivid)]"
       viewBox="0 0 100 6"
       preserveAspectRatio="none"
       aria-hidden
@@ -198,17 +200,23 @@ export default function Hero() {
   });
 
   return (
-    <section className="relative flex min-h-[calc(100svh-88px)] flex-col">
+    <Section
+      tone="base"
+      pad="none"
+      className="tone-hero flex min-h-[calc(100svh-88px)] flex-col"
+    >
+      {/* Ambient light belongs to the band that IS the light source. */}
+      <AmbientEnvironment />
       <VideoModal open={videoOpen} onClose={() => setVideoOpen(false)} />
 
       <div className="relative z-10 mx-auto flex w-full max-w-[1200px] flex-1 flex-col px-6 md:px-10">
         {/* ── Architectural header rule ───────────────────────────────── */}
         <motion.div className="flex items-center gap-4 pt-2 pb-10 md:pb-14" {...fade(0.05)}>
-          <span className="font-label font-label-wide text-slate-500">
+          <span className="font-label font-label-wide text-[var(--muted)]">
             01 — Index
           </span>
-          <span className="h-px flex-1 bg-black/[0.07]" />
-          <span className="font-label font-label-wide text-slate-500">
+          <span className="h-px flex-1 bg-[var(--rule)]" />
+          <span className="font-label font-label-wide text-[var(--muted)]">
             SIV · Studio
           </span>
         </motion.div>
@@ -216,9 +224,9 @@ export default function Hero() {
         <div className="flex flex-1 flex-col justify-center pb-16">
           {/* ── Eyebrow ───────────────────────────────────────────────── */}
           <motion.div {...fade(0.12)}>
-            <span className="inline-flex items-center gap-2.5 rounded-full border border-black/[0.08] bg-white/60 px-4 py-1.5 backdrop-blur-md">
+            <span className="inline-flex items-center gap-2.5 rounded-full border border-[var(--rule)] bg-[var(--surface-glass)] px-4 py-1.5 backdrop-blur-md">
               <span className="pulse-dot h-1.5 w-1.5 rounded-full" style={{ background: ORANGE }} />
-              <span className="font-label text-slate-600">
+              <span className="font-label text-[var(--muted)]">
                 Now booking · Q3
               </span>
             </span>
@@ -229,7 +237,7 @@ export default function Hero() {
             /* Two registers in one headline: Fraunces at opsz 144 / WONK 0 for
                the statement, the same face at WONK 1 in brand orange for the
                rotating phrase. Size floor is --text-hero, measured at 390px. */
-            className="font-display-xl mt-8 max-w-[16ch] text-[length:var(--text-hero)] text-ink md:max-w-[18ch]"
+            className="font-display-xl mt-8 max-w-[16ch] text-[length:var(--text-hero)] text-[var(--on-surface)] md:max-w-[18ch]"
           >
             <Line delay={0.2} still={still}>
               Helping founders with
@@ -241,7 +249,7 @@ export default function Hero() {
 
           {/* ── Subhead ───────────────────────────────────────────────── */}
           <motion.p
-            className="mt-7 max-w-[46ch] text-[clamp(1rem,1.4vw,1.175rem)] leading-[1.65] text-black/55"
+            className="mt-7 max-w-[46ch] text-[clamp(1rem,1.4vw,1.175rem)] leading-[1.65] text-[var(--muted)]"
             {...fade(0.5)}
           >
             Full-cycle video production and cold outreach — built, run, and
@@ -258,10 +266,10 @@ export default function Hero() {
             <Magnetic disabled={still} className="block w-full sm:inline-block sm:w-auto">
               <a
                 href="#framework"
-                className="btn-premium group flex w-full cursor-pointer items-center justify-center gap-2.5 rounded-2xl px-7 py-4 text-[15px] font-medium text-white sm:inline-flex sm:w-auto"
+                className="btn-premium group flex w-full cursor-pointer items-center justify-center gap-2.5 rounded-2xl px-7 py-4 text-[15px] font-medium text-paper-25 sm:inline-flex sm:w-auto"
                 style={{
                   background: 'linear-gradient(180deg,var(--color-graphite-800) 0%,var(--color-ink) 100%)',
-                  border: '1px solid rgba(255,255,255,0.06)',
+                  border: '1px solid var(--color-seam)',
                 }}
               >
                 The Framework
@@ -292,11 +300,11 @@ export default function Hero() {
             >
               <button
                 onClick={() => setVideoOpen(true)}
-                className="group flex w-full cursor-pointer items-center justify-center gap-3 rounded-2xl border border-black/[0.1] bg-white/70 px-6 py-4 text-[15px] font-medium text-ink backdrop-blur-md transition-[border-color,background-color,box-shadow] duration-500 hover:border-black/20 hover:bg-white hover:shadow-[0_10px_30px_rgba(10,10,10,0.06)] sm:inline-flex sm:w-auto"
+                className="group flex w-full cursor-pointer items-center justify-center gap-3 rounded-2xl border border-[var(--rule)] bg-[var(--surface-glass)] px-6 py-4 text-[15px] font-medium text-[var(--on-surface)] backdrop-blur-md transition-[border-color,background-color,box-shadow] duration-500 hover:border-[var(--rule-strong)] hover:bg-[var(--surface)] hover:shadow-[var(--shadow-raised)] sm:inline-flex sm:w-auto"
               >
                 <span
                   className="flex h-6 w-6 items-center justify-center rounded-full transition-transform duration-500 ease-out group-hover:scale-110"
-                  style={{ background: 'rgba(255,98,0,0.1)' }}
+                  style={{ background: 'var(--accent-wash)' }}
                   aria-hidden
                 >
                   <svg width="9" height="9" viewBox="0 0 10 10" fill="none">
@@ -314,8 +322,8 @@ export default function Hero() {
               <span key={c} className="flex items-center gap-5">
                 {/* divider hidden below sm so a wrapped label never starts a
                     line with a stray rule */}
-                {i > 0 && <span className="hidden h-3 w-px bg-black/[0.12] sm:block" aria-hidden />}
-                <span className="font-label font-label-wide text-slate-500">
+                {i > 0 && <span className="hidden h-3 w-px bg-[var(--rule-strong)] sm:block" aria-hidden />}
+                <span className="font-label font-label-wide text-[var(--muted)]">
                   {c}
                 </span>
               </span>
@@ -333,7 +341,8 @@ export default function Hero() {
         transition={{ duration: 0.9, delay: 0.85, ease: EASE }}
         style={{
           transformOrigin: 'top',
-          background: 'linear-gradient(to bottom, rgba(10,10,10,0), rgba(10,10,10,0.13))',
+          background:
+            'linear-gradient(to bottom, transparent, var(--rule-strong))',
         }}
       >
         {!still && (
@@ -345,6 +354,6 @@ export default function Hero() {
           />
         )}
       </motion.div>
-    </section>
+    </Section>
   );
 }

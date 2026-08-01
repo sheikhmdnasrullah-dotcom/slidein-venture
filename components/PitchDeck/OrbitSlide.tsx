@@ -19,8 +19,8 @@
 
 import { motion } from 'framer-motion';
 
-const ORANGE = '#FF6200';
-const INK = '#0A0A0A';
+const ORANGE = 'var(--accent-vivid)';
+const INK = 'var(--on-surface)';
 const EASE = [0.22, 1, 0.36, 1] as const;
 
 /* ----------------------------- brand assets ----------------------------- */
@@ -97,6 +97,10 @@ const OUTPUTS: OutputGroup[] = [
     y: 64,
     h: 126,
     items: [
+  /* The `brand` values below are third-party marks (YouTube red, Spotify green,
+     Apple Podcasts purple, Instagram, LinkedIn). They are fixed by their owners
+     and are the one exemption from the palette — a tokenised YouTube red would
+     not be YouTube red. Everything else in this file speaks the tone contract. */
       { name: 'YouTube', brand: '#FF0000', logo: LOGOS.youtube },
       { name: 'Spotify', brand: '#1ED760', logo: LOGOS.spotify },
       { name: 'Podcasts', brand: '#9933CC', logo: LOGOS.applepodcasts },
@@ -111,8 +115,8 @@ const OUTPUTS: OutputGroup[] = [
     items: [
       { name: 'Instagram', brand: '#E4405F', logo: LOGOS.instagram },
       { name: 'LinkedIn', brand: '#0A66C2', logo: LOGOS.linkedin },
-      { name: 'TikTok', brand: '#010101', logo: LOGOS.tiktok },
-      { name: 'X', brand: '#111111', logo: LOGOS.x },
+      { name: 'TikTok', brand: 'var(--on-surface)', logo: LOGOS.tiktok },
+      { name: 'X', brand: 'var(--on-surface)', logo: LOGOS.x },
     ],
   },
   {
@@ -303,7 +307,7 @@ function Connectors() {
       ))}
 
       {/* connector joints */}
-      <g fill="#FFFFFF" stroke={INK} strokeOpacity={0.28} strokeWidth={1}>
+      <g fill="var(--surface)" stroke={INK} strokeOpacity={0.28} strokeWidth={1}>
         <circle cx={ORIGIN.x + ORIGIN.w} cy={O_CY} r={2.6} />
         <circle cx={ENGINE.x} cy={E_CY} r={2.6} />
         <circle cx={ENGINE.x + ENGINE.w} cy={E_CY} r={2.6} />
@@ -384,16 +388,16 @@ function OriginCard() {
         x={ORIGIN.x} y={ORIGIN.y} width={ORIGIN.w} height={ORIGIN.h} rx={20}
         fill="url(#bpOrigin)" filter="url(#bpOriginShadow)"
       />
-      <rect x={ORIGIN.x} y={ORIGIN.y} width={ORIGIN.w} height={ORIGIN.h} rx={20} fill="none" stroke="#FFFFFF" strokeOpacity={0.22} strokeWidth={1} />
+      <rect x={ORIGIN.x} y={ORIGIN.y} width={ORIGIN.w} height={ORIGIN.h} rx={20} fill="none" stroke="var(--on-accent)" strokeOpacity={0.22} strokeWidth={1} />
       {/* mic icon chip */}
-      <circle cx={ORIGIN.x + 36} cy={ORIGIN.y + 36} r={17} fill="rgba(255,255,255,0.16)" stroke="rgba(255,255,255,0.3)" strokeWidth={1} />
-      <g fill="none" stroke="#FFFFFF" strokeWidth={1.9} strokeLinecap="round" strokeLinejoin="round"
+      <circle cx={ORIGIN.x + 36} cy={ORIGIN.y + 36} r={17} fill="color-mix(in oklch, var(--on-accent) 16%, transparent)" stroke="color-mix(in oklch, var(--on-accent) 30%, transparent)" strokeWidth={1} />
+      <g fill="none" stroke="var(--on-accent)" strokeWidth={1.9} strokeLinecap="round" strokeLinejoin="round"
         transform={`translate(${ORIGIN.x + 36 - 8} ${ORIGIN.y + 36 - 8}) scale(0.667)`}>
         <rect x={9} y={2} width={6} height={12} rx={3} />
         <path d="M5 10v1a7 7 0 0 0 14 0v-1M12 18v4" />
       </g>
       {/* REC dot */}
-      <circle cx={ORIGIN.x + ORIGIN.w - 26} cy={ORIGIN.y + 26} r={4} fill="#FFFFFF" className="bp-rec" />
+      <circle cx={ORIGIN.x + ORIGIN.w - 26} cy={ORIGIN.y + 26} r={4} fill="var(--on-accent)" className="bp-rec" />
       <text x={ORIGIN.x + ORIGIN.w - 36} y={ORIGIN.y + 30} textAnchor="end" className="bp-rec-label">REC</text>
       <text x={ORIGIN.x + 22} y={ORIGIN.y + 82} className="bp-origin-t1">You Record</text>
       <text x={ORIGIN.x + 22} y={ORIGIN.y + 104} className="bp-origin-t1">Once a Week</text>
@@ -413,9 +417,9 @@ function EngineModule() {
       transition={{ duration: 0.7, ease: EASE, delay: 0.45 }}
     >
       {/* layered card stack */}
-      <rect x={ENGINE.x + 10} y={ENGINE.y + 12} width={ENGINE.w} height={ENGINE.h} rx={18} fill="#FFFFFF" stroke={INK} strokeOpacity={0.06} />
-      <rect x={ENGINE.x + 5} y={ENGINE.y + 6} width={ENGINE.w} height={ENGINE.h} rx={18} fill="#FFFFFF" stroke={INK} strokeOpacity={0.08} />
-      <rect x={ENGINE.x} y={ENGINE.y} width={ENGINE.w} height={ENGINE.h} rx={18} fill="#FFFFFF" stroke={INK} strokeOpacity={0.13} filter="url(#bpCard)" />
+      <rect x={ENGINE.x + 10} y={ENGINE.y + 12} width={ENGINE.w} height={ENGINE.h} rx={18} fill="var(--surface)" stroke={INK} strokeOpacity={0.06} />
+      <rect x={ENGINE.x + 5} y={ENGINE.y + 6} width={ENGINE.w} height={ENGINE.h} rx={18} fill="var(--surface)" stroke={INK} strokeOpacity={0.08} />
+      <rect x={ENGINE.x} y={ENGINE.y} width={ENGINE.w} height={ENGINE.h} rx={18} fill="var(--surface)" stroke={INK} strokeOpacity={0.13} filter="url(#bpCard)" />
       {/* header */}
       <circle cx={ENGINE.x + 22} cy={ENGINE.y + 24} r={3} fill={ORANGE} className="bp-glow" />
       <text x={ENGINE.x + 33} y={ENGINE.y + 28} className="bp-engine-title">SLIDEIN CONTENT ENGINE</text>
@@ -443,7 +447,7 @@ function EngineModule() {
       })}
       {/* footer */}
       <line x1={ENGINE.x + 18} y1={ENGINE.y + ENGINE.h - 26} x2={ENGINE.x + ENGINE.w - 18} y2={ENGINE.y + ENGINE.h - 26} stroke={INK} strokeOpacity={0.08} />
-      <circle cx={ENGINE.x + 24} cy={ENGINE.y + ENGINE.h - 13} r={2.6} fill="#16A34A" className="bp-blink" />
+      <circle cx={ENGINE.x + 24} cy={ENGINE.y + ENGINE.h - 13} r={2.6} fill="var(--color-live)" className="bp-blink" />
       <text x={ENGINE.x + 34} y={ENGINE.y + ENGINE.h - 9.5} className="bp-engine-foot">RUNNING · AI + HUMAN IN THE LOOP</text>
     </motion.g>
   );
@@ -468,9 +472,9 @@ function ProductionModule({
       }}
     >
       <rect className="bp-mod-bg" x={COL.x} y={y} width={COL.w} height={COL.cardH} rx={14}
-        fill="#FFFFFF" stroke={INK} strokeOpacity={0.11} filter="url(#bpCard)" />
+        fill="var(--surface)" stroke={INK} strokeOpacity={0.11} filter="url(#bpCard)" />
       {/* icon chip */}
-      <rect className="bp-mod-chip" x={COL.x + 13} y={y + 13} width={32} height={32} rx={9} fill="rgba(10,10,10,0.035)" />
+      <rect className="bp-mod-chip" x={COL.x + 13} y={y + 13} width={32} height={32} rx={9} fill="color-mix(in oklch, var(--on-surface) 3.5%, transparent)" />
       <g className="bp-mod-icon" transform={`translate(${COL.x + 13 + 7} ${y + 13 + 7}) scale(0.75)`}>
         <ModuleGlyph kind={m.icon} />
       </g>
@@ -501,7 +505,7 @@ function OutputGroupCard({ g, i }: { g: OutputGroup; i: number }) {
       transition={{ duration: 0.6, ease: EASE, delay: 2.0 + i * 0.12 }}
     >
       <rect x={GROUP_X} y={g.y} width={GROUP_W} height={g.h} rx={16}
-        fill="rgba(10,10,10,0.014)" stroke={INK} strokeOpacity={0.1} strokeDasharray="3 5" />
+        fill="color-mix(in oklch, var(--on-surface) 1.4%, transparent)" stroke={INK} strokeOpacity={0.1} strokeDasharray="3 5" />
       <circle cx={GROUP_X + 18} cy={g.y + 20} r={2.6} fill={ORANGE} />
       <text x={GROUP_X + 28} y={g.y + 24} className="bp-group-title">{g.label.toUpperCase()}</text>
       <text x={GROUP_X + GROUP_W - 16} y={g.y + 24} textAnchor="end" className="bp-group-count">{g.count}</text>
@@ -509,7 +513,7 @@ function OutputGroupCard({ g, i }: { g: OutputGroup; i: number }) {
         const cx = startX + k * gap;
         return (
           <g key={item.name} className="bp-chip" style={{ ['--brand' as string]: item.brand }}>
-            <circle cx={cx} cy={chipCY} r={17} fill="#FFFFFF" stroke={INK} strokeOpacity={0.12} filter="url(#bpCard)" />
+            <circle cx={cx} cy={chipCY} r={17} fill="var(--surface)" stroke={INK} strokeOpacity={0.12} filter="url(#bpCard)" />
             <g className="bp-chip-glyph" transform={`translate(${cx - 8} ${chipCY - 8}) scale(0.667)`}>
               <ChipGlyph item={item} />
             </g>
@@ -532,9 +536,9 @@ export default function OrbitSlide({ onOpenService }: { onOpenService: (id: stri
         transition={{ duration: 0.6, ease: EASE }}
         className="text-center"
       >
-        <p className="text-[11px] md:text-xs font-bold tracking-[0.14em] uppercase text-[#FF6200]">The Content System</p>
-        <h2 className="mt-1.5 display-headline text-[clamp(1.3rem,2.6vw,1.9rem)] text-[#0A0A0A]">
-          One recording becomes an <span className="text-[#FF6200]">entire content ecosystem</span>.
+        <p className="text-[11px] md:text-xs font-bold tracking-[0.14em] uppercase text-[var(--accent)]">The Content System</p>
+        <h2 className="mt-1.5 display-headline text-[clamp(1.3rem,2.6vw,1.9rem)] text-[var(--on-surface)]">
+          One recording becomes an <span className="text-[var(--accent)]">entire content ecosystem</span>.
         </h2>
       </motion.div>
 
@@ -548,15 +552,15 @@ export default function OrbitSlide({ onOpenService }: { onOpenService: (id: stri
         >
           <defs>
             <pattern id="bpDots" width="26" height="26" patternUnits="userSpaceOnUse">
-              <circle cx="1" cy="1" r="1" fill="rgba(10,10,10,0.05)" />
+              <circle cx="1" cy="1" r="1" fill="color-mix(in oklch, var(--on-surface) 5%, transparent)" />
             </pattern>
             <linearGradient id="bpOrigin" x1="0" y1="0" x2="1" y2="1">
-              <stop offset="0%" stopColor="#FF7A26" />
+              <stop offset="0%" stopColor="var(--color-brand-lift)" />
               <stop offset="55%" stopColor={ORANGE} />
-              <stop offset="100%" stopColor="#E65700" />
+              <stop offset="100%" stopColor="var(--color-ember)" />
             </linearGradient>
             <filter id="bpOriginShadow" x="-40%" y="-40%" width="180%" height="180%">
-              <feDropShadow dx="0" dy="12" stdDeviation="16" floodColor="#E65700" floodOpacity="0.3" />
+              <feDropShadow dx="0" dy="12" stdDeviation="16" floodColor="var(--color-ember)" floodOpacity="0.3" />
             </filter>
             <filter id="bpCard" x="-30%" y="-30%" width="160%" height="160%">
               <feDropShadow dx="0" dy="4" stdDeviation="6" floodColor={INK} floodOpacity="0.07" />
@@ -583,38 +587,38 @@ export default function OrbitSlide({ onOpenService }: { onOpenService: (id: stri
 
       {/* scoped styles */}
       <style>{`
-        .bp-section { font-size: 9.5px; letter-spacing: .22em; fill: rgba(10,10,10,0.38); font-weight: 700; }
-        .bp-annot { font-size: 12px; fill: rgba(10,10,10,0.4); font-style: italic; font-family: ui-serif, Georgia, serif; }
+        .bp-section { font-size: 9.5px; letter-spacing: .22em; fill: color-mix(in oklch, var(--on-surface) 38%, transparent); font-weight: 700; }
+        .bp-annot { font-size: 12px; fill: color-mix(in oklch, var(--on-surface) 40%, transparent); font-style: italic; font-family: ui-serif, Georgia, serif; }
 
-        .bp-origin-t1 { font-size: 19px; font-weight: 800; fill: #FFFFFF; letter-spacing: -0.01em; }
-        .bp-origin-t2 { font-size: 8.5px; font-weight: 600; fill: #FFFFFF; letter-spacing: .18em; }
-        .bp-rec-label { font-size: 8px; font-weight: 700; fill: rgba(255,255,255,0.8); letter-spacing: .2em; }
+        .bp-origin-t1 { font-size: 19px; font-weight: 800; fill: var(--on-accent); letter-spacing: -0.01em; }
+        .bp-origin-t2 { font-size: 8.5px; font-weight: 600; fill: var(--on-accent); letter-spacing: .18em; }
+        .bp-rec-label { font-size: 8px; font-weight: 700; fill: color-mix(in oklch, var(--on-accent) 80%, transparent); letter-spacing: .2em; }
 
         .bp-engine-title { font-size: 9.5px; letter-spacing: .18em; fill: ${INK}; font-weight: 800; }
-        .bp-engine-row { font-size: 11px; fill: rgba(10,10,10,0.72); font-weight: 600; }
-        .bp-engine-foot { font-size: 7.5px; letter-spacing: .14em; fill: rgba(10,10,10,0.4); font-weight: 700; }
+        .bp-engine-row { font-size: 11px; fill: color-mix(in oklch, var(--on-surface) 72%, transparent); font-weight: 600; }
+        .bp-engine-foot { font-size: 7.5px; letter-spacing: .14em; fill: color-mix(in oklch, var(--on-surface) 40%, transparent); font-weight: 700; }
 
         .bp-mod { cursor: pointer; }
         .bp-mod-bg, .bp-mod-chip, .bp-mod-icon, .bp-mod-arrow { transition: all .3s cubic-bezier(.22,1,.36,1); }
-        .bp-mod-icon { color: rgba(10,10,10,0.7); }
+        .bp-mod-icon { color: color-mix(in oklch, var(--on-surface) 70%, transparent); }
         .bp-mod:hover .bp-mod-bg { stroke: ${ORANGE}; stroke-opacity: .55; }
-        .bp-mod:hover .bp-mod-chip { fill: rgba(255,98,0,0.09); }
+        .bp-mod:hover .bp-mod-chip { fill: color-mix(in oklch, var(--accent-vivid) 9%, transparent); }
         .bp-mod:hover .bp-mod-icon { color: ${ORANGE}; }
         .bp-mod:hover .bp-mod-arrow { stroke: ${ORANGE}; stroke-opacity: .8; }
         .bp-mod-title { font-size: 12px; font-weight: 800; fill: ${INK}; }
-        .bp-mod-desc { font-size: 9.5px; fill: rgba(10,10,10,0.45); font-weight: 500; }
-        .bp-mod-status { font-size: 7.5px; letter-spacing: .16em; fill: rgba(10,10,10,0.35); font-weight: 700; }
+        .bp-mod-desc { font-size: 9.5px; fill: color-mix(in oklch, var(--on-surface) 45%, transparent); font-weight: 500; }
+        .bp-mod-status { font-size: 7.5px; letter-spacing: .16em; fill: color-mix(in oklch, var(--on-surface) 35%, transparent); font-weight: 700; }
 
-        .bp-group-title { font-size: 9.5px; letter-spacing: .2em; fill: rgba(10,10,10,0.55); font-weight: 800; }
-        .bp-group-count { font-size: 9.5px; letter-spacing: .12em; fill: rgba(10,10,10,0.25); font-weight: 700; }
-        .bp-chip-glyph { color: rgba(10,10,10,0.6); transition: color .3s ease; }
+        .bp-group-title { font-size: 9.5px; letter-spacing: .2em; fill: color-mix(in oklch, var(--on-surface) 55%, transparent); font-weight: 800; }
+        .bp-group-count { font-size: 9.5px; letter-spacing: .12em; fill: color-mix(in oklch, var(--on-surface) 25%, transparent); font-weight: 700; }
+        .bp-chip-glyph { color: color-mix(in oklch, var(--on-surface) 60%, transparent); transition: color .3s ease; }
         .bp-chip { cursor: default; }
         .bp-chip:hover .bp-chip-glyph { color: var(--brand); }
         .bp-chip > circle { transition: transform .3s cubic-bezier(.22,1,.36,1); transform-box: fill-box; transform-origin: center; }
         .bp-chip:hover > circle { transform: scale(1.1); }
-        .bp-chip-label { font-size: 8.5px; fill: rgba(10,10,10,0.5); font-weight: 600; letter-spacing: .03em; }
+        .bp-chip-label { font-size: 8.5px; fill: color-mix(in oklch, var(--on-surface) 50%, transparent); font-weight: 600; letter-spacing: .03em; }
 
-        .bp-glow { filter: drop-shadow(0 0 3px rgba(255,98,0,0.55)); }
+        .bp-glow { filter: drop-shadow(0 0 3px color-mix(in oklch, var(--accent-vivid) 55%, transparent)); }
         .bp-halo { transform-box: fill-box; transform-origin: center; animation: bpHalo 4.6s ease-in-out infinite; }
         @keyframes bpHalo { 0%,100% { transform: scale(1); opacity: .06; } 50% { transform: scale(1.08); opacity: .1; } }
         .bp-rec { transform-box: fill-box; transform-origin: center; animation: bpRec 1.8s ease-in-out infinite; }

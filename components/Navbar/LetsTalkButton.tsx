@@ -10,7 +10,14 @@ const SPRING_CARD   = { type: 'spring', bounce: 0.15, duration: 0.7 } as const;
 const SPRING_AVATAR = { type: 'spring', bounce: 0.2, duration: 0.8 } as const;
 
 /* ─── Brand colours ─────────────────────────────────────────────────────── */
-const RED  = 'var(--color-brand)';
+/* Two names for one orange, and the split is load-bearing:
+   --accent       the instance that clears 4.5:1 as TEXT on the current band
+   --accent-vivid the full-chroma instance, for FILLS, strokes and icons
+   Setting type in --accent-vivid reaches only 2.73:1 on paper. Same hue, same
+   Rule 1 — different lightness, because text and a filled chip are not the
+   same contrast problem. */
+const RED = 'var(--accent-vivid)';
+const RED_TEXT = 'var(--accent)';
 
 /* ─── Verified badge SVG (blue checkmark, same path as the Framer source) ─ */
 function VerifiedBadge({ size = 18 }: { size?: number }) {
@@ -40,15 +47,15 @@ function EmailRow({ email, label }: { email: string, label?: string }) {
         <span className="text-[10px] font-medium uppercase tracking-wider" style={{ color: 'var(--color-bone-400)' }}>
           {label || "Email"}
         </span>
-        <span className="text-[13px] font-semibold" style={{ color: 'var(--color-ink)', letterSpacing: '-0.01em' }}>
+        <span className="text-[13px] font-semibold" style={{ color: 'var(--on-surface)', letterSpacing: '-0.01em' }}>
           {email}
         </span>
       </div>
       <div
-        className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-semibold transition-all duration-200 group-hover:bg-[var(--color-ink)] group-hover:text-white"
+        className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-semibold transition-all duration-200 group-hover:bg-[var(--on-surface)] group-hover:text-[var(--surface)]"
         style={{
           background: 'var(--color-paper-100)',
-          color: 'var(--color-ink)',
+          color: 'var(--on-surface)',
         }}
       >
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -73,12 +80,12 @@ function ContactCard({ isMobile = false }: { isMobile?: boolean }) {
         isMobile ? 'relative mt-3 mx-auto' : 'absolute top-[calc(100%+12px)] right-0'
       }`}
       style={{
-        background: 'rgba(255,255,255,0.96)',
+        background: 'var(--surface)',
         backdropFilter: 'blur(16px)',
         WebkitBackdropFilter: 'blur(16px)',
-        border: '1px solid rgba(0,0,0,0.08)',
+        border: '1px solid var(--rule)',
         borderRadius: 24,
-        boxShadow: '0 20px 60px rgba(0,0,0,0.12), 0 4px 16px rgba(0,0,0,0.06)',
+        boxShadow: 'var(--shadow-float)',
         padding: 20,
       }}
       // Prevent card from closing when user moves mouse into it
@@ -95,7 +102,7 @@ function ContactCard({ isMobile = false }: { isMobile?: boolean }) {
         >
           <div
             className="w-[72px] h-[72px] rounded-2xl overflow-hidden"
-            style={{ border: '1.5px solid rgba(0,0,0,0.08)' }}
+            style={{ border: '1.5px solid var(--rule)' }}
           >
             {/* Real photo avatar */}
             <img src="/profile.png" alt="Nasrullah Tanim" className="w-full h-full object-cover" />
@@ -123,7 +130,7 @@ function ContactCard({ isMobile = false }: { isMobile?: boolean }) {
               />
               <span className="relative inline-flex rounded-full h-[8px] w-[8px]" style={{ backgroundColor: 'var(--color-live)' }} />
             </span>
-            <span className="text-[16px] font-bold leading-tight" style={{ color: 'var(--color-ink)', letterSpacing: '-0.025em' }}>
+            <span className="text-[16px] font-bold leading-tight" style={{ color: 'var(--on-surface)', letterSpacing: '-0.025em' }}>
               Nasrullah Tanim
             </span>
           </div>
@@ -147,7 +154,7 @@ function ContactCard({ isMobile = false }: { isMobile?: boolean }) {
               style={{
                 background: RED,
                 color: 'var(--color-paper-25)',
-                boxShadow: `0 4px 12px ${RED}40`,
+                boxShadow: `0 4px 12px color-mix(in oklch, var(--accent-vivid) 25%, transparent)`,
               }}
             >
               {/* Calendar icon */}
@@ -207,17 +214,17 @@ export default function LetsTalkButton({ isMobile = false }: { isMobile?: boolea
       <motion.button
         onClick={handleClick}
         animate={isHovered
-          ? { background: 'var(--color-ink)', color: 'var(--color-paper-25)', scale: 1.03 }
-          : { background: 'var(--color-paper-25)', color: RED, scale: 1 }
+          ? { background: 'var(--on-surface)', color: 'var(--surface)', scale: 1.03 }
+          : { background: 'var(--surface)', color: RED_TEXT, scale: 1 }
         }
         transition={SPRING_FAST}
         className="btn-premium relative inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-[14px] font-[600] whitespace-nowrap outline-none cursor-pointer overflow-hidden"
         style={{
-          background: 'var(--color-paper-25)',
-          color: RED,
+          background: 'var(--surface)',
+          color: RED_TEXT,
           boxShadow: isHovered
-            ? '0 2px 12px rgba(0,0,0,0.18)'
-            : '0 1px 4px rgba(0,0,0,0.08)',
+            ? 'var(--shadow-raised)'
+            : 'var(--shadow-contact)',
           letterSpacing: '-0.01em',
           transition: 'box-shadow 200ms',
         }}

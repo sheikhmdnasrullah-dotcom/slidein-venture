@@ -22,7 +22,7 @@ export default function VideoModal({ open, onClose }: VideoModalProps) {
         >
           {/* Backdrop with heavy blur and dark overlay */}
           <motion.div
-            className="absolute inset-0 bg-black/80 backdrop-blur-xl"
+            className="absolute inset-0 bg-[var(--scrim)] backdrop-blur-xl"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -31,7 +31,7 @@ export default function VideoModal({ open, onClose }: VideoModalProps) {
 
           {/* Modal Container */}
           <motion.div
-            className="relative z-10 bg-black rounded-2xl shadow-[0_40px_100px_rgba(0,0,0,0.8)] max-w-[960px] w-full overflow-hidden border border-white/20"
+            className="relative z-10 bg-[var(--letterbox)] rounded-[var(--radius-md)] shadow-[0_40px_100px_color-mix(in oklch, var(--on-surface) 80%, transparent)] max-w-[960px] w-full overflow-hidden border border-[var(--rule)]"
             initial={{ opacity: 0, y: 24, scale: 0.96 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 24, scale: 0.96 }}
@@ -40,7 +40,7 @@ export default function VideoModal({ open, onClose }: VideoModalProps) {
             {/* Close button */}
             <button
               onClick={onClose}
-              className="absolute top-4 right-4 w-10 h-10 rounded-full bg-black/60 border border-white/20 flex items-center justify-center text-white hover:bg-black/80 hover:border-white/40 transition-all duration-150 z-20 cursor-pointer"
+              className="absolute top-4 right-4 w-10 h-10 rounded-full bg-[var(--rule-strong)] border border-[var(--rule)] flex items-center justify-center text-[var(--on-accent)] hover:bg-[var(--rule-strong)] hover:border-[var(--rule)] transition-all duration-150 z-20 cursor-pointer"
               aria-label="Close video"
             >
               <svg width="14" height="14" viewBox="0 0 14 14" fill="none">

@@ -131,11 +131,11 @@ const INPUT_CHIPS = [
 function Connector({ delay = 0 }: { delay?: number }) {
   return (
     <div className="hidden lg:flex flex-col items-center justify-center w-10 shrink-0 relative" aria-hidden>
-      <div className="relative w-full h-px bg-black/[0.14]">
-        <span className="absolute -left-0.5 -top-[2.5px] w-[6px] h-[6px] rounded-full bg-white border border-black/25" />
-        <span className="absolute -right-0.5 -top-[2.5px] w-[6px] h-[6px] rounded-full bg-white border border-black/25" />
+      <div className="relative w-full h-px bg-[var(--rule-strong)]">
+        <span className="absolute -left-0.5 -top-[2.5px] w-[6px] h-[6px] rounded-full bg-[var(--surface)] border border-[var(--rule-strong)]" />
+        <span className="absolute -right-0.5 -top-[2.5px] w-[6px] h-[6px] rounded-full bg-[var(--surface)] border border-[var(--rule-strong)]" />
         <motion.span
-          className="absolute -top-[2px] w-[5px] h-[5px] rounded-full bg-[#FF6200] shadow-[0_0_6px_rgba(255,98,0,0.6)]"
+          className="absolute -top-[2px] w-[5px] h-[5px] rounded-full bg-[var(--accent-vivid)] shadow-[0_0_6px_color-mix(in oklch, var(--accent-vivid) 60%, transparent)]"
           animate={{ left: ['0%', '96%'], opacity: [0, 1, 1, 0] }}
           transition={{ duration: 1.8, repeat: Infinity, ease: 'easeInOut', delay, repeatDelay: 0.6 }}
         />
@@ -151,10 +151,10 @@ function InputPanel() {
     <motion.div
       initial={{ opacity: 0, x: -16 }} animate={{ opacity: 1, x: 0 }}
       transition={{ duration: 0.6, ease: EASE, delay: 0.1 }}
-      className="w-full lg:w-[218px] shrink-0 rounded-2xl border border-black/10 bg-white shadow-[0_4px_14px_rgba(10,10,10,0.06)] p-4 relative"
+      className="w-full lg:w-[218px] shrink-0 rounded-2xl border border-[var(--rule)] bg-[var(--surface)] shadow-[0_4px_14px_color-mix(in oklch, var(--on-surface) 6%, transparent)] p-4 relative"
     >
-      <p className="text-[8.5px] font-bold tracking-[0.2em] text-black/35 uppercase">Client Input</p>
-      <h3 className="mt-1.5 text-[13px] font-extrabold leading-snug text-[#0A0A0A]">
+      <p className="text-[8.5px] font-bold tracking-[0.2em] text-[var(--muted)] uppercase">Client Input</p>
+      <h3 className="mt-1.5 text-[13px] font-extrabold leading-snug text-[var(--on-surface)]">
         You tell us who you want to work with
       </h3>
       <div className="mt-3.5 flex flex-col gap-2">
@@ -163,16 +163,16 @@ function InputPanel() {
             key={c.label}
             initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.45, ease: EASE, delay: 0.35 + i * 0.12 }}
-            className="rounded-xl border border-black/[0.08] bg-black/[0.02] px-3 py-2"
+            className="rounded-xl border border-[var(--rule)] bg-[var(--rule)] px-3 py-2"
           >
-            <p className="text-[8px] font-bold tracking-[0.14em] text-black/35 uppercase">{c.label}</p>
-            <p className="text-[11px] font-bold text-[#0A0A0A] mt-0.5">{c.value}</p>
+            <p className="text-[8px] font-bold tracking-[0.14em] text-[var(--muted)] uppercase">{c.label}</p>
+            <p className="text-[11px] font-bold text-[var(--on-surface)] mt-0.5">{c.value}</p>
           </motion.div>
         ))}
       </div>
       <div className="mt-3.5 flex items-center gap-1.5">
-        <span className="w-1.5 h-1.5 rounded-full bg-[#FF6200] os-blink" />
-        <span className="text-[8px] font-bold tracking-[0.16em] text-black/35 uppercase">Told us once · That&apos;s it</span>
+        <span className="w-1.5 h-1.5 rounded-full bg-[var(--accent-vivid)] os-blink" />
+        <span className="text-[8px] font-bold tracking-[0.16em] text-[var(--muted)] uppercase">Told us once · That&apos;s it</span>
       </div>
     </motion.div>
   );
@@ -185,19 +185,19 @@ function EngineWindow({ onOpen }: { onOpen: (i: number) => void }) {
     <motion.div
       initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.7, ease: EASE, delay: 0.25 }}
-      className="flex-1 min-w-0 rounded-2xl border border-black/10 bg-white shadow-[0_14px_40px_rgba(10,10,10,0.08)] overflow-hidden"
+      className="flex-1 min-w-0 rounded-2xl border border-[var(--rule)] bg-[var(--surface)] shadow-[0_14px_40px_color-mix(in oklch, var(--on-surface) 8%, transparent)] overflow-hidden"
     >
       {/* title bar */}
-      <div className="flex items-center gap-2.5 px-4 py-2.5 border-b border-black/[0.07] bg-black/[0.015]">
+      <div className="flex items-center gap-2.5 px-4 py-2.5 border-b border-[var(--rule)] bg-[var(--rule)]">
         <span className="flex gap-1.5" aria-hidden>
-          <span className="w-2 h-2 rounded-full bg-black/10" />
-          <span className="w-2 h-2 rounded-full bg-black/10" />
-          <span className="w-2 h-2 rounded-full bg-black/10" />
+          <span className="w-2 h-2 rounded-full bg-[var(--rule)]" />
+          <span className="w-2 h-2 rounded-full bg-[var(--rule)]" />
+          <span className="w-2 h-2 rounded-full bg-[var(--rule)]" />
         </span>
-        <span className="text-[11px] font-extrabold text-[#0A0A0A] tracking-tight">Manual Outreach Engine</span>
-        <span className="ml-auto flex items-center gap-1.5 rounded-full border border-black/[0.08] bg-white px-2 py-0.5">
-          <span className="w-1.5 h-1.5 rounded-full bg-[#16A34A] os-blink" />
-          <span className="text-[7.5px] font-bold tracking-[0.16em] text-black/40 uppercase">Running</span>
+        <span className="text-[11px] font-extrabold text-[var(--on-surface)] tracking-tight">Manual Outreach Engine</span>
+        <span className="ml-auto flex items-center gap-1.5 rounded-full border border-[var(--rule)] bg-[var(--surface)] px-2 py-0.5">
+          <span className="w-1.5 h-1.5 rounded-full bg-[var(--color-live)] os-blink" />
+          <span className="text-[7.5px] font-bold tracking-[0.16em] text-[var(--muted)] uppercase">Running</span>
         </span>
       </div>
       {/* modules */}
@@ -209,22 +209,22 @@ function EngineWindow({ onOpen }: { onOpen: (i: number) => void }) {
             onClick={() => onOpen(i)}
             initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, ease: EASE, delay: 0.45 + i * 0.08 }}
-            className="group text-left rounded-xl border border-black/[0.08] bg-white p-3 hover:border-[#FF6200]/50 hover:shadow-[0_8px_20px_rgba(255,98,0,0.1)] hover:-translate-y-0.5 transition-all duration-300 cursor-pointer"
+            className="group text-left rounded-xl border border-[var(--rule)] bg-[var(--surface)] p-3 hover:border-[var(--accent-vivid)]/50 hover:shadow-[0_8px_20px_color-mix(in oklch, var(--accent-vivid) 10%, transparent)] hover:-translate-y-0.5 transition-all duration-300 cursor-pointer"
           >
             <div className="flex items-center gap-2">
-              <span className="w-7 h-7 rounded-lg bg-black/[0.035] flex items-center justify-center text-black/65 group-hover:bg-[#FF6200]/10 group-hover:text-[#FF6200] transition-colors duration-300">
+              <span className="w-7 h-7 rounded-lg bg-[var(--rule)] flex items-center justify-center text-[var(--muted)] group-hover:bg-[var(--accent-vivid)]/10 group-hover:text-[var(--accent)] transition-colors duration-300">
                 <Icon kind={m.icon} size={14} />
               </span>
-              <span className="text-[8px] font-black tracking-[0.14em] text-[#FF6200]">{m.num}</span>
+              <span className="text-[8px] font-black tracking-[0.14em] text-[var(--accent)]">{m.num}</span>
               <span className="ml-auto flex items-center gap-1">
-                <span className="w-1.5 h-1.5 rounded-full bg-[#16A34A] os-blink" style={{ animationDelay: `${i * 0.35}s` }} />
-                <svg width={10} height={10} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.4} strokeLinecap="round" strokeLinejoin="round" className="text-black/25 group-hover:text-[#FF6200] transition-colors" aria-hidden>
+                <span className="w-1.5 h-1.5 rounded-full bg-[var(--color-live)] os-blink" style={{ animationDelay: `${i * 0.35}s` }} />
+                <svg width={10} height={10} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.4} strokeLinecap="round" strokeLinejoin="round" className="text-[var(--muted)] group-hover:text-[var(--accent)] transition-colors" aria-hidden>
                   <path d="M7 17 17 7M9 7h8v8" />
                 </svg>
               </span>
             </div>
-            <p className="mt-2 text-[11.5px] font-extrabold text-[#0A0A0A] leading-tight">{m.title}</p>
-            <p className="mt-1 text-[9.5px] leading-snug text-black/45">{m.blurb}</p>
+            <p className="mt-2 text-[11.5px] font-extrabold text-[var(--on-surface)] leading-tight">{m.title}</p>
+            <p className="mt-1 text-[9.5px] leading-snug text-[var(--muted)]">{m.blurb}</p>
           </motion.button>
         ))}
       </div>
@@ -248,10 +248,10 @@ function OutputPanel() {
       className="w-full lg:w-[224px] shrink-0 relative"
     >
       {/* ambient glow */}
-      <div aria-hidden className="pointer-events-none absolute -inset-5 rounded-[28px] bg-[#FF6200]/[0.07] blur-2xl os-halo" />
-      <div className="relative rounded-2xl border border-[#FF6200]/35 bg-white shadow-[0_14px_36px_rgba(230,89,0,0.12)] p-4">
-        <p className="text-[8.5px] font-bold tracking-[0.2em] text-black/35 uppercase">Output</p>
-        <h3 className="mt-1.5 text-[13px] font-extrabold leading-snug text-[#0A0A0A]">Qualified Conversations</h3>
+      <div aria-hidden className="pointer-events-none absolute -inset-5 rounded-[28px] bg-[var(--accent-vivid)]/[0.07] blur-2xl os-halo" />
+      <div className="relative rounded-2xl border border-[var(--accent-ring)] bg-[var(--surface)] shadow-[var(--shadow-raised)] p-4">
+        <p className="text-[8.5px] font-bold tracking-[0.2em] text-[var(--muted)] uppercase">Output</p>
+        <h3 className="mt-1.5 text-[13px] font-extrabold leading-snug text-[var(--on-surface)]">Qualified Conversations</h3>
         <div className="mt-3 flex flex-col gap-1.5">
           {REPLIES.map((r, i) => (
             <motion.div
@@ -260,27 +260,27 @@ function OutputPanel() {
               transition={{ duration: 2.6, repeat: Infinity, repeatDelay: 3.4, delay: i * 1.15, ease: 'easeOut' }}
               className={cn(
                 'flex items-center gap-2 rounded-lg border px-2.5 py-2',
-                r.ok ? 'border-[#FF6200]/35 bg-[#FF6200]/[0.05]' : 'border-black/[0.07] bg-black/[0.015]'
+                r.ok ? 'border-[var(--accent-vivid)]/35 bg-[var(--accent-vivid)]/[0.05]' : 'border-[var(--rule)] bg-[var(--rule)]'
               )}
             >
-              <span className={cn('w-5 h-5 rounded-full flex items-center justify-center shrink-0', r.ok ? 'bg-[#FF6200]/12 text-[#FF6200]' : 'bg-black/[0.05] text-black/30')}>
+              <span className={cn('w-5 h-5 rounded-full flex items-center justify-center shrink-0', r.ok ? 'bg-[var(--accent-vivid)]/12 text-[var(--accent)]' : 'bg-[var(--rule)] text-[var(--muted)]')}>
                 <Icon kind={r.ok ? 'chat' : 'user'} size={10} />
               </span>
-              <span className={cn('text-[9px] font-bold leading-tight', r.ok ? 'text-[#0A0A0A]' : 'text-black/35 line-through')}>{r.name}</span>
+              <span className={cn('text-[9px] font-bold leading-tight', r.ok ? 'text-[var(--on-surface)]' : 'text-[var(--muted)] line-through')}>{r.name}</span>
             </motion.div>
           ))}
         </div>
         {/* filter divider */}
         <div className="my-3 flex items-center gap-2" aria-hidden>
-          <span className="flex-1 h-px bg-black/[0.08]" />
-          <span className="text-[7px] font-bold tracking-[0.18em] text-black/30 uppercase">Filtered</span>
-          <span className="flex-1 h-px bg-black/[0.08]" />
+          <span className="flex-1 h-px bg-[var(--rule)]" />
+          <span className="text-[7px] font-bold tracking-[0.18em] text-[var(--muted)] uppercase">Filtered</span>
+          <span className="flex-1 h-px bg-[var(--rule)]" />
         </div>
-        <div className="rounded-xl bg-[#0A0A0A] px-3 py-2.5 flex items-center gap-2.5">
-          <span className="w-2 h-2 rounded-full bg-[#16A34A] os-blink shrink-0" />
+        <div className="rounded-xl bg-[var(--on-surface)] px-3 py-2.5 flex items-center gap-2.5">
+          <span className="w-2 h-2 rounded-full bg-[var(--color-live)] os-blink shrink-0" />
           <div>
-            <p className="text-[10px] font-extrabold text-white leading-tight">Meeting booked</p>
-            <p className="text-[8px] font-semibold text-white/50 mt-0.5">You&apos;re notified. That&apos;s all you do.</p>
+            <p className="text-[10px] font-extrabold text-[var(--on-surface)] leading-tight">Meeting booked</p>
+            <p className="text-[8px] font-semibold text-[var(--muted)] mt-0.5">You&apos;re notified. That&apos;s all you do.</p>
           </div>
         </div>
       </div>
@@ -297,69 +297,69 @@ function DetailPanel({ m, onClose }: { m: Module; onClose: () => void }) {
         initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
         transition={{ duration: 0.25 }}
         onClick={onClose}
-        className="absolute inset-0 z-30 bg-[#0A0A0A]/[0.16] backdrop-blur-[2px] rounded-2xl cursor-pointer"
+        className="absolute inset-0 z-30 bg-[var(--on-surface)]/[0.16] backdrop-blur-[2px] rounded-2xl cursor-pointer"
       />
       <motion.aside
         initial={{ x: '104%' }} animate={{ x: 0 }} exit={{ x: '104%' }}
         transition={{ duration: 0.45, ease: EASE }}
-        className="absolute top-0 right-0 bottom-0 z-40 w-full max-w-[350px] bg-white border-l border-black/10 shadow-[-24px_0_60px_rgba(10,10,10,0.14)] rounded-r-2xl overflow-y-auto"
+        className="absolute top-0 right-0 bottom-0 z-40 w-full max-w-[350px] bg-[var(--surface)] border-l border-[var(--rule)] shadow-[-24px_0_60px_color-mix(in oklch, var(--on-surface) 14%, transparent)] rounded-r-2xl overflow-y-auto"
       >
-        <div className="sticky top-0 bg-white/90 backdrop-blur border-b border-black/[0.07] px-5 py-3.5 flex items-center gap-3">
-          <span className="w-8 h-8 rounded-lg bg-[#FF6200]/10 text-[#FF6200] flex items-center justify-center shrink-0">
+        <div className="sticky top-0 bg-[var(--surface-glass)] backdrop-blur border-b border-[var(--rule)] px-5 py-3.5 flex items-center gap-3">
+          <span className="w-8 h-8 rounded-lg bg-[var(--accent-vivid)]/10 text-[var(--accent)] flex items-center justify-center shrink-0">
             <Icon kind={m.icon} size={15} />
           </span>
           <div className="min-w-0">
-            <p className="text-[8px] font-black tracking-[0.16em] text-[#FF6200]">MODULE {m.num}</p>
-            <p className="text-[13px] font-extrabold text-[#0A0A0A] leading-tight truncate">{m.title}</p>
+            <p className="text-[8px] font-black tracking-[0.16em] text-[var(--accent)]">MODULE {m.num}</p>
+            <p className="text-[13px] font-extrabold text-[var(--on-surface)] leading-tight truncate">{m.title}</p>
           </div>
           <button
             type="button" onClick={onClose} aria-label="Close details"
-            className="ml-auto w-7 h-7 rounded-full flex items-center justify-center text-black/40 hover:text-[#0A0A0A] hover:bg-black/[0.05] transition-colors cursor-pointer"
+            className="ml-auto w-7 h-7 rounded-full flex items-center justify-center text-[var(--muted)] hover:text-[var(--on-surface)] hover:bg-[var(--rule)] transition-colors cursor-pointer"
           >
             <svg width={12} height={12} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.2} strokeLinecap="round" aria-hidden><path d="M6 6l12 12M18 6 6 18" /></svg>
           </button>
         </div>
 
         <div className="px-5 py-4 flex flex-col gap-4">
-          <p className="text-[12px] leading-relaxed text-black/60">{m.blurb}</p>
+          <p className="text-[12px] leading-relaxed text-[var(--muted)]">{m.blurb}</p>
 
           {/* why it matters — callout */}
-          <div className="rounded-xl border-l-[3px] border-[#FF6200] bg-[#FF6200]/[0.05] px-3.5 py-3">
-            <p className="text-[8px] font-black tracking-[0.16em] text-[#FF6200] uppercase">Why it matters</p>
-            <p className="mt-1 text-[11px] leading-relaxed text-[#0A0A0A] font-medium">{m.why}</p>
+          <div className="rounded-xl border-l-[3px] border-[var(--accent-vivid)] bg-[var(--accent-vivid)]/[0.05] px-3.5 py-3">
+            <p className="text-[8px] font-black tracking-[0.16em] text-[var(--accent)] uppercase">Why it matters</p>
+            <p className="mt-1 text-[11px] leading-relaxed text-[var(--on-surface)] font-medium">{m.why}</p>
           </div>
 
           {/* what we do — checklist */}
           <div>
-            <p className="text-[8px] font-black tracking-[0.16em] text-black/35 uppercase">What we actually do</p>
+            <p className="text-[8px] font-black tracking-[0.16em] text-[var(--muted)] uppercase">What we actually do</p>
             <ul className="mt-2 flex flex-col gap-1.5">
               {m.work.map((w) => (
                 <li key={w} className="flex items-start gap-2">
-                  <span className="mt-[3px] w-3.5 h-3.5 rounded-full bg-[#16A34A]/10 text-[#16A34A] flex items-center justify-center shrink-0">
+                  <span className="mt-[3px] w-3.5 h-3.5 rounded-full bg-[var(--color-live)]/10 text-[var(--color-live)] flex items-center justify-center shrink-0">
                     <svg width={8} height={8} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={3} strokeLinecap="round" strokeLinejoin="round" aria-hidden><path d="m5 12.5 4.5 4.5L19 7.5" /></svg>
                   </span>
-                  <span className="text-[11px] leading-snug text-black/70 font-medium">{w}</span>
+                  <span className="text-[11px] leading-snug text-[var(--muted)] font-medium">{w}</span>
                 </li>
               ))}
             </ul>
           </div>
 
           {/* mini flow */}
-          <div className="rounded-xl border border-black/[0.08] bg-black/[0.015] p-3">
-            <p className="text-[8px] font-black tracking-[0.16em] text-black/35 uppercase">How it flows</p>
+          <div className="rounded-xl border border-[var(--rule)] bg-[var(--rule)] p-3">
+            <p className="text-[8px] font-black tracking-[0.16em] text-[var(--muted)] uppercase">How it flows</p>
             <div className="mt-2.5 flex items-center flex-wrap gap-y-1.5">
               {m.flow.map((f, i) => (
                 <span key={f} className="flex items-center">
                   <span className={cn(
                     'text-[9px] font-bold px-2 py-1 rounded-md border whitespace-nowrap',
                     i === m.flow.length - 1
-                      ? 'border-[#FF6200]/40 bg-[#FF6200]/[0.07] text-[#FF6200]'
-                      : 'border-black/[0.09] bg-white text-black/60'
+                      ? 'border-[var(--accent-vivid)]/40 bg-[var(--accent-vivid)]/[0.07] text-[var(--accent)]'
+                      : 'border-[var(--rule)] bg-[var(--surface)] text-[var(--muted)]'
                   )}>
                     {f}
                   </span>
                   {i < m.flow.length - 1 && (
-                    <svg width={12} height={12} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="mx-1 text-black/25 shrink-0" aria-hidden><path d="M5 12h14m-6-6 6 6-6 6" /></svg>
+                    <svg width={12} height={12} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="mx-1 text-[var(--muted)] shrink-0" aria-hidden><path d="M5 12h14m-6-6 6 6-6 6" /></svg>
                   )}
                 </span>
               ))}
@@ -367,9 +367,9 @@ function DetailPanel({ m, onClose }: { m: Module; onClose: () => void }) {
           </div>
 
           {/* outcome */}
-          <div className="rounded-xl bg-[#0A0A0A] px-4 py-3.5">
-            <p className="text-[8px] font-black tracking-[0.16em] text-[#FF6200] uppercase">Outcome</p>
-            <p className="mt-1 text-[11.5px] leading-relaxed text-white font-semibold">{m.outcome}</p>
+          <div className="rounded-xl bg-[var(--on-surface)] px-4 py-3.5">
+            <p className="text-[8px] font-black tracking-[0.16em] text-[var(--accent)] uppercase">Outcome</p>
+            <p className="mt-1 text-[11.5px] leading-relaxed text-[var(--on-surface)] font-semibold">{m.outcome}</p>
           </div>
         </div>
       </motion.aside>
@@ -390,9 +390,9 @@ export default function OutreachOSSlide() {
         transition={{ duration: 0.6, ease: EASE }}
         className="text-center mb-4"
       >
-        <p className="text-[11px] md:text-xs font-bold tracking-[0.14em] uppercase text-[#FF6200]">The Outreach System</p>
-        <h2 className="mt-1.5 display-headline text-[clamp(1.3rem,2.6vw,1.9rem)] text-[#0A0A0A]">
-          You tell us once. <span className="text-[#FF6200]">The engine does the rest</span>.
+        <p className="text-[11px] md:text-xs font-bold tracking-[0.14em] uppercase text-[var(--accent)]">The Outreach System</p>
+        <h2 className="mt-1.5 display-headline text-[clamp(1.3rem,2.6vw,1.9rem)] text-[var(--on-surface)]">
+          You tell us once. <span className="text-[var(--accent)]">The engine does the rest</span>.
         </h2>
       </motion.div>
 
@@ -402,15 +402,15 @@ export default function OutreachOSSlide() {
         <div
           aria-hidden
           className="absolute inset-0 pointer-events-none opacity-70"
-          style={{ backgroundImage: 'radial-gradient(circle, rgba(10,10,10,0.05) 1px, transparent 1px)', backgroundSize: '26px 26px' }}
+          style={{ backgroundImage: 'radial-gradient(circle, color-mix(in oklch, var(--on-surface) 5%, transparent) 1px, transparent 1px)', backgroundSize: '26px 26px' }}
         />
-        <div aria-hidden className="absolute inset-x-0 top-0 h-px bg-black/[0.05] pointer-events-none" />
+        <div aria-hidden className="absolute inset-x-0 top-0 h-px bg-[var(--rule)] pointer-events-none" />
         {/* section labels */}
         <div aria-hidden className="relative hidden lg:flex items-center justify-between px-1 pb-3">
           {['01 — Input', '02 — Engine', '03 — Output'].map((sLabel) => (
             <span key={sLabel} className="flex items-center gap-2">
-              <span className="w-[2px] h-2.5 bg-[#FF6200]/80 rounded-full" />
-              <span className="text-[8.5px] font-bold tracking-[0.22em] text-black/35 uppercase">{sLabel.toUpperCase()}</span>
+              <span className="w-[2px] h-2.5 bg-[var(--accent-vivid)]/80 rounded-full" />
+              <span className="text-[8.5px] font-bold tracking-[0.22em] text-[var(--muted)] uppercase">{sLabel.toUpperCase()}</span>
             </span>
           ))}
         </div>
@@ -426,7 +426,7 @@ export default function OutreachOSSlide() {
         {/* annotation */}
         <motion.p
           initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 2.2, duration: 0.8 }}
-          className="relative hidden lg:block text-center mt-3 text-[11px] italic text-black/35 [font-family:ui-serif,Georgia,serif]"
+          className="relative hidden lg:block text-center mt-3 text-[11px] italic text-[var(--muted)] [font-family:ui-serif,Georgia,serif]"
         >
           Everything in the middle happens without you. Click any module to see inside.
         </motion.p>

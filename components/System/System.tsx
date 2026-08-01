@@ -13,6 +13,10 @@
 
 import { cn } from '@/lib/utils';
 
+/* Stage 3: these primitives read --muted / --rule from the tone contract
+   (app/styles/tone.css) rather than naming a grey. That is what lets the
+   identical markup sit on paper-50 and on ink-deep without a `dark:` variant. */
+
 /* ─── Technical metadata label ────────────────────────────────────────────── */
 export function MonoLabel({
   children,
@@ -24,7 +28,7 @@ export function MonoLabel({
   return (
     /* Size, case and tracking come from the .font-label role in
        app/styles/type.css — never restate them here. */
-    <span className={cn('font-label font-label-wide text-slate-500', className)}>
+    <span className={cn('font-label font-label-wide text-[var(--muted)]', className)}>
       {children}
     </span>
   );
@@ -44,10 +48,10 @@ export function SectionRule({
 }) {
   return (
     <div className={cn('flex items-center gap-4', className)}>
-      <MonoLabel className="text-slate-600">
+      <MonoLabel className="text-[var(--on-surface)]">
         {index} — {label}
       </MonoLabel>
-      <span className="h-px flex-1 bg-black/[0.07]" aria-hidden />
+      <span className="h-px flex-1 bg-[var(--rule)]" aria-hidden />
       {coordinate && <MonoLabel>{coordinate}</MonoLabel>}
     </div>
   );
@@ -61,7 +65,7 @@ export function CornerBrackets({
   size?: number;
   className?: string;
 }) {
-  const base = 'absolute border-black/[0.14]';
+  const base = 'absolute border-[var(--rule-strong)]';
   const s = { width: size, height: size };
   return (
     <span aria-hidden className={cn('pointer-events-none', className)}>
@@ -80,7 +84,7 @@ export function Ticks({ count = 12, className }: { count?: number; className?: s
       {Array.from({ length: count }).map((_, i) => (
         <span
           key={i}
-          className="absolute h-px w-full bg-black/[0.08]"
+          className="absolute h-px w-full bg-[var(--rule)]"
           style={{ top: `${((i + 1) / (count + 1)) * 100}%` }}
         />
       ))}

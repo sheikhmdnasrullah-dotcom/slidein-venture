@@ -15,8 +15,8 @@
 
 import { motion } from 'framer-motion';
 
-const ORANGE = '#FF6200';
-const INK = '#0A0A0A';
+const ORANGE = 'var(--accent-vivid)';
+const INK = 'var(--on-surface)';
 const EASE = [0.22, 1, 0.36, 1] as const;
 
 /* ------------------------------- geometry -------------------------------- */
@@ -196,7 +196,7 @@ function Connectors() {
         />
       ))}
       {/* joints */}
-      <g fill="#FFFFFF" stroke={INK} strokeOpacity={0.28} strokeWidth={1}>
+      <g fill="var(--surface)" stroke={INK} strokeOpacity={0.28} strokeWidth={1}>
         {[TOP_CY, BOT_CY].map((cy) =>
           COLS.map((x, c) => (
             <g key={`${cy}-${c}`}>
@@ -212,7 +212,7 @@ function Connectors() {
         style={{ transformBox: 'fill-box', transformOrigin: 'center' }}
         transition={{ duration: 0.5, ease: EASE, delay: 1.6 }}
       >
-        <circle cx={JUNCTION.x} cy={JUNCTION.y} r={13} fill="#FFF9F3" stroke={ORANGE} strokeOpacity={0.4} strokeWidth={1.2} strokeDasharray="3 4" className="fw-spin" />
+        <circle cx={JUNCTION.x} cy={JUNCTION.y} r={13} fill="var(--surface)" stroke={ORANGE} strokeOpacity={0.4} strokeWidth={1.2} strokeDasharray="3 4" className="fw-spin" />
         <circle cx={JUNCTION.x} cy={JUNCTION.y} r={4.5} fill={ORANGE} className="fw-glow" />
       </motion.g>
       {/* flowing particles */}
@@ -246,9 +246,9 @@ function SystemNode({ n, col, row, delay }: { n: NodeDef; col: number; row: 'top
       transition={{ duration: 0.6, ease: EASE, delay }}
     >
       <rect className="fw-node-bg" x={x} y={y} width={NODE_W} height={NODE_H} rx={16}
-        fill="#FFFFFF" stroke={INK} strokeOpacity={0.11} filter="url(#fwCard)" />
+        fill="var(--surface)" stroke={INK} strokeOpacity={0.11} filter="url(#fwCard)" />
       <rect x={x} y={y} width={NODE_W} height={NODE_H} rx={16} fill="url(#fwGloss)" pointerEvents="none" />
-      <rect className="fw-node-chip" x={x + 16} y={y + 19} width={40} height={40} rx={12} fill="rgba(10,10,10,0.035)" />
+      <rect className="fw-node-chip" x={x + 16} y={y + 19} width={40} height={40} rx={12} fill="color-mix(in oklch, var(--on-surface) 3.5%, transparent)" />
       <g className="fw-node-icon" transform={`translate(${x + 16 + 8.5} ${y + 19 + 8.5}) scale(0.96)`}>
         <Glyph kind={n.icon} />
       </g>
@@ -271,16 +271,16 @@ function HeroModule() {
       {/* ambient light */}
       <circle cx={HERO.x + HERO.w / 2} cy={HERO_CY} r={118} fill="url(#fwAmbient)" className="fw-halo" />
       {/* layered stack */}
-      <rect x={HERO.x + 8} y={HERO.y + 10} width={HERO.w} height={HERO.h} rx={20} fill="#FFFFFF" stroke={INK} strokeOpacity={0.06} />
-      <rect x={HERO.x + 4} y={HERO.y + 5} width={HERO.w} height={HERO.h} rx={20} fill="#FFFFFF" stroke={INK} strokeOpacity={0.08} />
-      <rect x={HERO.x} y={HERO.y} width={HERO.w} height={HERO.h} rx={20} fill="#FFFFFF" stroke={ORANGE} strokeOpacity={0.45} strokeWidth={1.2} filter="url(#fwHero)" />
+      <rect x={HERO.x + 8} y={HERO.y + 10} width={HERO.w} height={HERO.h} rx={20} fill="var(--surface)" stroke={INK} strokeOpacity={0.06} />
+      <rect x={HERO.x + 4} y={HERO.y + 5} width={HERO.w} height={HERO.h} rx={20} fill="var(--surface)" stroke={INK} strokeOpacity={0.08} />
+      <rect x={HERO.x} y={HERO.y} width={HERO.w} height={HERO.h} rx={20} fill="var(--surface)" stroke={ORANGE} strokeOpacity={0.45} strokeWidth={1.2} filter="url(#fwHero)" />
       <rect x={HERO.x} y={HERO.y} width={HERO.w} height={HERO.h} rx={20} fill="url(#fwGloss)" pointerEvents="none" />
       {/* success chip */}
       <rect x={HERO.x + 20} y={HERO.y + 20} width={42} height={42} rx={13} fill={ORANGE} filter="url(#fwChip)" />
-      <g transform={`translate(${HERO.x + 20 + 9} ${HERO.y + 20 + 9})`} style={{ color: '#FFFFFF' }}>
+      <g transform={`translate(${HERO.x + 20 + 9} ${HERO.y + 20 + 9})`} style={{ color: 'var(--on-accent)' }}>
         <Glyph kind="check" />
       </g>
-      <circle cx={HERO.x + HERO.w - 21} cy={HERO.y + 22} r={2.6} fill="#16A34A" className="fw-blink" />
+      <circle cx={HERO.x + HERO.w - 21} cy={HERO.y + 22} r={2.6} fill="var(--color-live)" className="fw-blink" />
       <text x={HERO.x + HERO.w - 30} y={HERO.y + 26} textAnchor="end" className="fw-hero-live">LIVE</text>
       <text x={HERO.x + 20} y={HERO.y + 88} className="fw-hero-title">More Clients,</text>
       <text x={HERO.x + 20} y={HERO.y + 108} className="fw-hero-title">Faster</text>
@@ -302,11 +302,11 @@ export default function FrameworkFlowSlide() {
       >
         <defs>
           <pattern id="fwDots" width="26" height="26" patternUnits="userSpaceOnUse">
-            <circle cx="1" cy="1" r="1" fill="rgba(10,10,10,0.05)" />
+            <circle cx="1" cy="1" r="1" fill="color-mix(in oklch, var(--on-surface) 5%, transparent)" />
           </pattern>
           <linearGradient id="fwGloss" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#FFFFFF" stopOpacity="0.7" />
-            <stop offset="45%" stopColor="#FFFFFF" stopOpacity="0" />
+            <stop offset="0%" stopColor="var(--gloss)" stopOpacity="0.7" />
+            <stop offset="45%" stopColor="var(--gloss)" stopOpacity="0" />
           </linearGradient>
           <radialGradient id="fwAmbient" cx="50%" cy="50%" r="50%">
             <stop offset="0%" stopColor={ORANGE} stopOpacity="0.13" />
@@ -317,10 +317,10 @@ export default function FrameworkFlowSlide() {
             <feDropShadow dx="0" dy="4" stdDeviation="6" floodColor={INK} floodOpacity="0.07" />
           </filter>
           <filter id="fwHero" x="-40%" y="-40%" width="180%" height="180%">
-            <feDropShadow dx="0" dy="14" stdDeviation="18" floodColor="#C2410C" floodOpacity="0.18" />
+            <feDropShadow dx="0" dy="14" stdDeviation="18" floodColor="var(--color-ember)" floodOpacity="0.18" />
           </filter>
           <filter id="fwChip" x="-60%" y="-60%" width="220%" height="220%">
-            <feDropShadow dx="0" dy="5" stdDeviation="7" floodColor="#E65700" floodOpacity="0.4" />
+            <feDropShadow dx="0" dy="5" stdDeviation="7" floodColor="var(--color-ember)" floodOpacity="0.4" />
           </filter>
         </defs>
 
@@ -346,23 +346,23 @@ export default function FrameworkFlowSlide() {
       </svg>
 
       <style>{`
-        .fw-section { font-size: 9.5px; letter-spacing: .22em; fill: rgba(10,10,10,0.38); font-weight: 700; }
-        .fw-sys { font-size: 9px; letter-spacing: .24em; fill: rgba(10,10,10,0.3); font-weight: 800; }
-        .fw-annot { font-size: 12px; fill: rgba(10,10,10,0.38); font-style: italic; font-family: ui-serif, Georgia, serif; }
+        .fw-section { font-size: 9.5px; letter-spacing: .22em; fill: color-mix(in oklch, var(--on-surface) 38%, transparent); font-weight: 700; }
+        .fw-sys { font-size: 9px; letter-spacing: .24em; fill: color-mix(in oklch, var(--on-surface) 30%, transparent); font-weight: 800; }
+        .fw-annot { font-size: 12px; fill: color-mix(in oklch, var(--on-surface) 38%, transparent); font-style: italic; font-family: ui-serif, Georgia, serif; }
 
         .fw-node-bg, .fw-node-chip, .fw-node-icon { transition: all .3s cubic-bezier(.22,1,.36,1); }
-        .fw-node-icon { color: rgba(10,10,10,0.68); }
+        .fw-node-icon { color: color-mix(in oklch, var(--on-surface) 68%, transparent); }
         .fw-node:hover .fw-node-bg { stroke: ${ORANGE}; stroke-opacity: .5; }
-        .fw-node:hover .fw-node-chip { fill: rgba(255,98,0,0.09); }
+        .fw-node:hover .fw-node-chip { fill: color-mix(in oklch, var(--accent-vivid) 9%, transparent); }
         .fw-node:hover .fw-node-icon { color: ${ORANGE}; }
         .fw-node-title { font-size: 12.5px; font-weight: 800; fill: ${INK}; letter-spacing: -0.01em; }
-        .fw-node-desc { font-size: 9.5px; fill: rgba(10,10,10,0.45); font-weight: 500; }
+        .fw-node-desc { font-size: 9.5px; fill: color-mix(in oklch, var(--on-surface) 45%, transparent); font-weight: 500; }
 
         .fw-hero-title { font-size: 18px; font-weight: 800; fill: ${INK}; letter-spacing: -0.015em; }
-        .fw-hero-meta { font-size: 7.5px; letter-spacing: .18em; fill: rgba(10,10,10,0.38); font-weight: 700; }
-        .fw-hero-live { font-size: 8px; letter-spacing: .2em; fill: rgba(10,10,10,0.35); font-weight: 700; }
+        .fw-hero-meta { font-size: 7.5px; letter-spacing: .18em; fill: color-mix(in oklch, var(--on-surface) 38%, transparent); font-weight: 700; }
+        .fw-hero-live { font-size: 8px; letter-spacing: .2em; fill: color-mix(in oklch, var(--on-surface) 35%, transparent); font-weight: 700; }
 
-        .fw-glow { filter: drop-shadow(0 0 3px rgba(255,98,0,0.55)); }
+        .fw-glow { filter: drop-shadow(0 0 3px color-mix(in oklch, var(--accent-vivid) 55%, transparent)); }
         .fw-blink { animation: fwBlink 2.2s ease-in-out infinite; }
         @keyframes fwBlink { 0%,100% { opacity: 1; } 50% { opacity: .25; } }
         .fw-halo { transform-box: fill-box; transform-origin: center; animation: fwHalo 4.4s ease-in-out infinite; }

@@ -67,6 +67,10 @@ const CLUSTERS: Cluster[] = [
     x: 1010, y: 105, w: 330, h: 172, entryY: 191,
     branch: 'M 838 407 C 938 380, 872 191, 1006 191',
     items: [
+  /* The `brand` values below are third-party marks (YouTube red, Spotify green,
+     Apple Podcasts purple, Instagram, LinkedIn). They are fixed by their owners
+     and are the one exemption from the palette — a tokenised YouTube red would
+     not be YouTube red. Everything else in this file speaks the tone contract. */
       { name: 'YouTube', brand: '#FF0000', logo: LOGOS.youtube },
       { name: 'Spotify', brand: '#1ED760', logo: LOGOS.spotify },
       { name: 'Apple Podcasts', brand: '#9933CC', logo: LOGOS.applepodcasts },
@@ -80,9 +84,9 @@ const CLUSTERS: Cluster[] = [
     branch: 'M 844 416 C 918 418, 952 418, 1042 418',
     items: [
       { name: 'Instagram', brand: '#E4405F', logo: LOGOS.instagram },
-      { name: 'TikTok', brand: '#010101', logo: LOGOS.tiktok },
+      { name: 'TikTok', brand: 'var(--on-surface)', logo: LOGOS.tiktok },
       { name: 'LinkedIn', brand: '#0A66C2', logo: LOGOS.linkedin },
-      { name: 'X', brand: '#111111', logo: LOGOS.x },
+      { name: 'X', brand: 'var(--on-surface)', logo: LOGOS.x },
     ],
   },
   {
@@ -92,8 +96,8 @@ const CLUSTERS: Cluster[] = [
     x: 1010, y: 560, w: 300, h: 172, entryY: 646,
     branch: 'M 838 423 C 938 452, 872 646, 1006 646',
     items: [
-      { name: 'Website', brand: '#F4610A', strokeIcon: 'globe' },
-      { name: 'Newsletter', brand: '#F4610A', strokeIcon: 'mail' },
+      { name: 'Website', brand: 'var(--accent-vivid)', strokeIcon: 'globe' },
+      { name: 'Newsletter', brand: 'var(--accent-vivid)', strokeIcon: 'mail' },
     ],
   },
 ];
@@ -132,7 +136,7 @@ function PlatformIcon({
   const off = (24 * Number(s)) / 2;
   return (
     <g className="cd-icon" style={{ ['--brand' as string]: item.brand }}>
-      <circle cx={cx} cy={cy} r={r} fill="#FFFFFF" stroke="#EFE3D8" strokeWidth={1} filter="url(#cdSoft)" />
+      <circle cx={cx} cy={cy} r={r} fill="var(--surface)" stroke="var(--rule)" strokeWidth={1} filter="url(#cdSoft)" />
       <g className="cd-glyph" transform={`translate(${cx - off} ${cy - off}) scale(${s})`}>
         {item.logo ? <path d={item.logo} fill="currentColor" /> : <StrokeIcon kind={item.strokeIcon!} />}
       </g>
@@ -157,16 +161,16 @@ function ClusterCard({ c, i }: { c: Cluster; i: number }) {
       transition={{ duration: 0.7, ease: EASE, delay: 1.7 + i * 0.14 }}
     >
       <rect x={c.x} y={c.y} width={c.w} height={c.h} rx={20}
-        fill="rgba(255,255,255,0.72)" stroke="#EEDFD2" strokeWidth={1} filter="url(#cdCard)" />
+        fill="var(--surface-glass)" stroke="var(--rule)" strokeWidth={1} filter="url(#cdCard)" />
       <rect x={c.x} y={c.y} width={c.w} height={c.h} rx={20} fill="url(#cdGlass)" pointerEvents="none" />
       {/* cable port on the left edge */}
-      <circle cx={c.x} cy={c.entryY} r={4} fill="#F4610A" filter="url(#cdGlow)" />
-      <circle cx={c.x} cy={c.entryY} r={8} fill="none" stroke="#F4610A" strokeOpacity={0.3} strokeWidth={1} />
+      <circle cx={c.x} cy={c.entryY} r={4} fill="var(--accent-vivid)" filter="url(#cdGlow)" />
+      <circle cx={c.x} cy={c.entryY} r={8} fill="none" stroke="var(--accent-vivid)" strokeOpacity={0.3} strokeWidth={1} />
       {/* header */}
-      <circle cx={c.x + 26} cy={c.y + 31} r={3.2} fill="#F4610A" />
+      <circle cx={c.x + 26} cy={c.y + 31} r={3.2} fill="var(--accent-vivid)" />
       <text x={c.x + 38} y={c.y + 35} className="cd-cluster-title">{c.title.toUpperCase()}</text>
       <text x={c.x + c.w - 24} y={c.y + 35} textAnchor="end" className="cd-cluster-count">{c.count}</text>
-      <line x1={c.x + 24} y1={c.y + 50} x2={c.x + c.w - 24} y2={c.y + 50} stroke="#F0E4D8" strokeWidth={1} />
+      <line x1={c.x + 24} y1={c.y + 50} x2={c.x + c.w - 24} y2={c.y + 50} stroke="var(--rule)" strokeWidth={1} />
       {c.items.map((it, k) => (
         <PlatformIcon key={it.name} cx={start + k * gap} cy={cy} r={iconR} item={it} />
       ))}
@@ -178,10 +182,10 @@ function ClusterCard({ c, i }: { c: Cluster; i: number }) {
 
 export default function DistributionSlide() {
   return (
-    <section className="relative mx-auto w-full max-w-[920px] overflow-hidden rounded-[28px] bg-[#FBF4EC] font-sans antialiased shadow-[0_30px_80px_-40px_rgba(120,60,10,0.25)]">
+    <section className="relative mx-auto w-full max-w-[920px] overflow-hidden rounded-[28px] bg-[var(--surface)] font-sans antialiased shadow-[var(--shadow-float)]">
       {/* corner ticks */}
-      <span className="pointer-events-none absolute left-5 top-5 h-3 w-3 border-l-2 border-t-2 border-[#F4610A]/70" />
-      <span className="pointer-events-none absolute bottom-5 right-5 h-3 w-3 border-b-2 border-r-2 border-[#F4610A]/70" />
+      <span className="pointer-events-none absolute left-5 top-5 h-3 w-3 border-l-2 border-t-2 border-[var(--accent-vivid)]/70" />
+      <span className="pointer-events-none absolute bottom-5 right-5 h-3 w-3 border-b-2 border-r-2 border-[var(--accent-vivid)]/70" />
 
       {/* header */}
       <div className="relative z-10 flex items-end justify-between px-8 pt-5 md:px-12">
@@ -190,12 +194,12 @@ export default function DistributionSlide() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, ease: EASE }}
         >
-          <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-[#F4610A]">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-[var(--accent)]">
             04 — Content Distribution
           </p>
-          <h2 className="mt-1.5 text-xl font-semibold tracking-tight text-[#191410] md:text-[26px] md:leading-[1.05]">
+          <h2 className="mt-1.5 text-xl font-semibold tracking-tight text-[var(--on-surface)] md:text-[26px] md:leading-[1.05]">
             Record once.{' '}
-            <span className="bg-gradient-to-r from-[#F4610A] to-[#FF9A3D] bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-[var(--accent-vivid)] to-[var(--color-brand-lift)] bg-clip-text text-transparent">
               Publish everywhere.
             </span>
           </h2>
@@ -204,13 +208,13 @@ export default function DistributionSlide() {
           initial={{ opacity: 0, y: 14 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, ease: EASE, delay: 0.15 }}
-          className="hidden items-center gap-2 rounded-full border border-[#EEDFD2] bg-white/70 px-4 py-2 backdrop-blur md:flex"
+          className="hidden items-center gap-2 rounded-full border border-[var(--rule)] bg-[var(--surface-glass)] px-4 py-2 backdrop-blur md:flex"
         >
           <span className="relative flex h-2 w-2">
-            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#F4610A] opacity-60" />
-            <span className="relative inline-flex h-2 w-2 rounded-full bg-[#F4610A]" />
+            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[var(--accent-vivid)] opacity-60" />
+            <span className="relative inline-flex h-2 w-2 rounded-full bg-[var(--accent-vivid)]" />
           </span>
-          <span className="text-[11px] font-medium uppercase tracking-[0.18em] text-[#8A7B6E]">
+          <span className="text-[11px] font-medium uppercase tracking-[0.18em] text-[var(--muted)]">
             Live system
           </span>
         </motion.div>
@@ -222,63 +226,63 @@ export default function DistributionSlide() {
           aria-label="Content distribution system: one recording flows through the content engine, is processed by AI and humans, then routes automatically to video, social and owned channels.">
           <defs>
             <radialGradient id="cdAmbient" cx="50%" cy="50%" r="50%">
-              <stop offset="0%" stopColor="#F4610A" stopOpacity="0.14" />
-              <stop offset="55%" stopColor="#F4610A" stopOpacity="0.05" />
-              <stop offset="100%" stopColor="#F4610A" stopOpacity="0" />
+              <stop offset="0%" stopColor="var(--accent-vivid)" stopOpacity="0.14" />
+              <stop offset="55%" stopColor="var(--accent-vivid)" stopOpacity="0.05" />
+              <stop offset="100%" stopColor="var(--accent-vivid)" stopOpacity="0" />
             </radialGradient>
             <radialGradient id="cdCore" cx="36%" cy="30%" r="80%">
-              <stop offset="0%" stopColor="#FFB27A" />
-              <stop offset="45%" stopColor="#F97316" />
-              <stop offset="100%" stopColor="#DE4A00" />
+              <stop offset="0%" stopColor="var(--color-brand-pale)" />
+              <stop offset="45%" stopColor="var(--color-brand-lift)" />
+              <stop offset="100%" stopColor="var(--color-ember)" />
             </radialGradient>
             <radialGradient id="cdHalo" cx="50%" cy="50%" r="50%">
-              <stop offset="0%" stopColor="#FF7A1A" stopOpacity="0.55" />
-              <stop offset="100%" stopColor="#FF7A1A" stopOpacity="0" />
+              <stop offset="0%" stopColor="var(--color-brand-lift)" stopOpacity="0.55" />
+              <stop offset="100%" stopColor="var(--color-brand-lift)" stopOpacity="0" />
             </radialGradient>
             <linearGradient id="cdGlass" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="#FFFFFF" stopOpacity="0.55" />
-              <stop offset="100%" stopColor="#FFFFFF" stopOpacity="0" />
+              <stop offset="0%" stopColor="var(--gloss)" stopOpacity="0.55" />
+              <stop offset="100%" stopColor="var(--gloss)" stopOpacity="0" />
             </linearGradient>
             <linearGradient id="cdCable" x1="0" y1="0" x2="1" y2="0">
-              <stop offset="0%" stopColor="#F4610A" stopOpacity="0.55" />
-              <stop offset="100%" stopColor="#F4610A" stopOpacity="0.14" />
+              <stop offset="0%" stopColor="var(--accent-vivid)" stopOpacity="0.55" />
+              <stop offset="100%" stopColor="var(--accent-vivid)" stopOpacity="0.14" />
             </linearGradient>
             <linearGradient id="cdArc" x1="0" y1="0" x2="1" y2="1">
-              <stop offset="0%" stopColor="#F4610A" stopOpacity="0.65" />
-              <stop offset="100%" stopColor="#FFB27A" stopOpacity="0.1" />
+              <stop offset="0%" stopColor="var(--accent-vivid)" stopOpacity="0.65" />
+              <stop offset="100%" stopColor="var(--color-brand-pale)" stopOpacity="0.1" />
             </linearGradient>
             <pattern id="cdDots" width="26" height="26" patternUnits="userSpaceOnUse">
-              <circle cx="1.2" cy="1.2" r="1.2" fill="#D9C6B4" />
+              <circle cx="1.2" cy="1.2" r="1.2" fill="var(--rule)" />
             </pattern>
             <radialGradient id="cdDotFade" cx="42%" cy="50%" r="60%">
-              <stop offset="0%" stopColor="#fff" stopOpacity="0.75" />
-              <stop offset="70%" stopColor="#fff" stopOpacity="0.25" />
-              <stop offset="100%" stopColor="#fff" stopOpacity="0" />
+              <stop offset="0%" stopColor="var(--gloss)" stopOpacity="0.75" />
+              <stop offset="70%" stopColor="var(--gloss)" stopOpacity="0.25" />
+              <stop offset="100%" stopColor="var(--gloss)" stopOpacity="0" />
             </radialGradient>
             <mask id="cdDotMask">
               <rect width="1440" height="810" fill="url(#cdDotFade)" />
             </mask>
             <filter id="cdSoft" x="-40%" y="-40%" width="180%" height="180%">
-              <feDropShadow dx="0" dy="3" stdDeviation="5" floodColor="#7A4A20" floodOpacity="0.16" />
+              <feDropShadow dx="0" dy="3" stdDeviation="5" floodColor="var(--color-ember)" floodOpacity="0.16" />
             </filter>
             <filter id="cdCard" x="-20%" y="-20%" width="140%" height="140%">
-              <feDropShadow dx="0" dy="14" stdDeviation="18" floodColor="#7A4A20" floodOpacity="0.10" />
+              <feDropShadow dx="0" dy="14" stdDeviation="18" floodColor="var(--color-ember)" floodOpacity="0.10" />
             </filter>
             <filter id="cdGlow" x="-150%" y="-150%" width="400%" height="400%">
               <feGaussianBlur stdDeviation="2.2" result="b" />
               <feMerge><feMergeNode in="b" /><feMergeNode in="SourceGraphic" /></feMerge>
             </filter>
             <filter id="cdEngineShadow" x="-60%" y="-60%" width="220%" height="220%">
-              <feDropShadow dx="0" dy="18" stdDeviation="24" floodColor="#C2410C" floodOpacity="0.35" />
+              <feDropShadow dx="0" dy="18" stdDeviation="24" floodColor="var(--color-ember)" floodOpacity="0.35" />
             </filter>
           </defs>
 
           {/* --------------------------- background --------------------------- */}
           <rect width="1440" height="810" fill="url(#cdDots)" mask="url(#cdDotMask)" opacity="0.55" />
           <circle cx={E.x} cy={E.y} r={430} fill="url(#cdAmbient)" />
-          <circle cx={E.x} cy={E.y} r={262} fill="none" stroke="#E7D5C4" strokeOpacity="0.55" strokeWidth="1" />
-          <circle cx={E.x} cy={E.y} r={430} fill="none" stroke="#E7D5C4" strokeOpacity="0.35" strokeWidth="1" />
-          <line x1="60" y1={E.y} x2="1380" y2={E.y} stroke="#E7D5C4" strokeOpacity="0.35" strokeWidth="1" strokeDasharray="1 8" />
+          <circle cx={E.x} cy={E.y} r={262} fill="none" stroke="var(--rule)" strokeOpacity="0.55" strokeWidth="1" />
+          <circle cx={E.x} cy={E.y} r={430} fill="none" stroke="var(--rule)" strokeOpacity="0.35" strokeWidth="1" />
+          <line x1="60" y1={E.y} x2="1380" y2={E.y} stroke="var(--rule)" strokeOpacity="0.35" strokeWidth="1" strokeDasharray="1 8" />
 
           {/* --------------------- routing cables (layer 3) -------------------- */}
           {/* input: record → engine */}
@@ -298,7 +302,7 @@ export default function DistributionSlide() {
           {CLUSTERS.map((c, i) => (
             <g key={c.id}>
               {/* soft glow underlay */}
-              <path d={c.branch} fill="none" stroke="#F4610A" strokeOpacity={0.07} strokeWidth={7} />
+              <path d={c.branch} fill="none" stroke="var(--accent-vivid)" strokeOpacity={0.07} strokeWidth={7} />
               <motion.path
                 id={`cd-branch-${c.id}`} d={c.branch}
                 fill="none" stroke="url(#cdCable)" strokeWidth={1.8}
@@ -306,28 +310,28 @@ export default function DistributionSlide() {
                 transition={{ duration: 0.7, ease: 'easeOut', delay: 1.45 + i * 0.12 }}
               />
               {/* flowing energy overlay */}
-              <path className="cd-flow" d={c.branch} fill="none" stroke="#F4610A" strokeOpacity={0.5} strokeWidth={1.8} />
+              <path className="cd-flow" d={c.branch} fill="none" stroke="var(--accent-vivid)" strokeOpacity={0.5} strokeWidth={1.8} />
             </g>
           ))}
-          <path className="cd-flow" d="M 196 415 C 300 415, 356 415, 424 415" fill="none" stroke="#F4610A" strokeOpacity={0.45} strokeWidth={2} />
-          <path className="cd-flow" d="M 612 415 C 690 415, 748 415, 816 415" fill="none" stroke="#F4610A" strokeOpacity={0.55} strokeWidth={2.2} />
+          <path className="cd-flow" d="M 196 415 C 300 415, 356 415, 424 415" fill="none" stroke="var(--accent-vivid)" strokeOpacity={0.45} strokeWidth={2} />
+          <path className="cd-flow" d="M 612 415 C 690 415, 748 415, 816 415" fill="none" stroke="var(--accent-vivid)" strokeOpacity={0.55} strokeWidth={2.2} />
 
           {/* traveling particles */}
           <motion.g initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 2.3, duration: 0.8 }}>
             {CLUSTERS.map((c, i) => (
               <g key={c.id}>
-                <circle r={3.2} fill="#FF7A1A" filter="url(#cdGlow)">
+                <circle r={3.2} fill="var(--color-brand-lift)" filter="url(#cdGlow)">
                   <animateMotion dur={`${2.6 + i * 0.4}s`} begin={`${i * 0.9}s`} repeatCount="indefinite" path={c.branch} />
                 </circle>
-                <circle r={2} fill="#FFB27A" filter="url(#cdGlow)">
+                <circle r={2} fill="var(--color-brand-pale)" filter="url(#cdGlow)">
                   <animateMotion dur={`${2.6 + i * 0.4}s`} begin={`${1.3 + i * 0.9}s`} repeatCount="indefinite" path={c.branch} />
                 </circle>
               </g>
             ))}
-            <circle r={3} fill="#FF7A1A" filter="url(#cdGlow)">
+            <circle r={3} fill="var(--color-brand-lift)" filter="url(#cdGlow)">
               <animateMotion dur="2.2s" repeatCount="indefinite" path="M 196 415 C 300 415, 356 415, 424 415" />
             </circle>
-            <circle r={3.4} fill="#FF7A1A" filter="url(#cdGlow)">
+            <circle r={3.4} fill="var(--color-brand-lift)" filter="url(#cdGlow)">
               <animateMotion dur="1.8s" repeatCount="indefinite" path="M 612 415 C 690 415, 748 415, 816 415" />
             </circle>
           </motion.g>
@@ -337,9 +341,9 @@ export default function DistributionSlide() {
             initial={{ opacity: 0, x: -14 }} animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.7, ease: EASE, delay: 0.65 }}
           >
-            <circle cx={160} cy={415} r={34} fill="#FFFFFF" stroke="#EEDFD2" strokeWidth={1} filter="url(#cdSoft)" />
-            <circle cx={160} cy={415} r={10} fill="#F4610A" className="cd-rec" />
-            <circle cx={160} cy={415} r={17} fill="none" stroke="#F4610A" strokeOpacity={0.35} strokeWidth={1.5} className="cd-rec-ring" />
+            <circle cx={160} cy={415} r={34} fill="var(--surface)" stroke="var(--rule)" strokeWidth={1} filter="url(#cdSoft)" />
+            <circle cx={160} cy={415} r={10} fill="var(--accent-vivid)" className="cd-rec" />
+            <circle cx={160} cy={415} r={17} fill="none" stroke="var(--accent-vivid)" strokeOpacity={0.35} strokeWidth={1.5} className="cd-rec-ring" />
             <text x={160} y={475} textAnchor="middle" className="cd-stage">RECORD ONCE</text>
             <text x={160} y={492} textAnchor="middle" className="cd-substage">one long-form session</text>
           </motion.g>
@@ -347,23 +351,23 @@ export default function DistributionSlide() {
           {/* -------------------- processing ring (layer 2) -------------------- */}
           <motion.g initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 1, delay: 0.55 }}>
             <circle className="cd-ring-slow" cx={E.x} cy={E.y} r={134} fill="none"
-              stroke="#F4610A" strokeOpacity={0.28} strokeWidth={1.2} strokeDasharray="1 7" strokeLinecap="round" />
+              stroke="var(--accent-vivid)" strokeOpacity={0.28} strokeWidth={1.2} strokeDasharray="1 7" strokeLinecap="round" />
             <circle className="cd-ring-fast" cx={E.x} cy={E.y} r={168} fill="none"
               stroke="url(#cdArc)" strokeWidth={2.4} strokeDasharray="72 46 148 64 96 104" strokeLinecap="round" />
             {/* orbiting particles */}
-            <circle r={3} fill="#F4610A" filter="url(#cdGlow)">
+            <circle r={3} fill="var(--accent-vivid)" filter="url(#cdGlow)">
               <animateMotion dur="9s" repeatCount="indefinite"
                 path={`M ${E.x + 151} ${E.y} a 151 151 0 1 1 -302 0 a 151 151 0 1 1 302 0`} />
             </circle>
-            <circle r={2.2} fill="#FFB27A" filter="url(#cdGlow)">
+            <circle r={2.2} fill="var(--color-brand-pale)" filter="url(#cdGlow)">
               <animateMotion dur="13s" repeatCount="indefinite" keyPoints="1;0" keyTimes="0;1" calcMode="linear"
                 path={`M ${E.x + 151} ${E.y} a 151 151 0 1 1 -302 0 a 151 151 0 1 1 302 0`} />
             </circle>
             {/* automation micro-nodes */}
             {RING_NODES.map((n) => (
               <g key={n.label}>
-                <circle cx={n.x} cy={n.y} r={4} fill="#F4610A" filter="url(#cdGlow)" />
-                <circle cx={n.x} cy={n.y} r={9} fill="none" stroke="#F4610A" strokeOpacity={0.3} strokeWidth={1} className="cd-rec-ring" />
+                <circle cx={n.x} cy={n.y} r={4} fill="var(--accent-vivid)" filter="url(#cdGlow)" />
+                <circle cx={n.x} cy={n.y} r={9} fill="none" stroke="var(--accent-vivid)" strokeOpacity={0.3} strokeWidth={1} className="cd-rec-ring" />
                 <text x={n.x + n.lx} y={n.y + n.ly} textAnchor="middle" className="cd-micro">{n.label}</text>
               </g>
             ))}
@@ -378,11 +382,11 @@ export default function DistributionSlide() {
           >
             <circle cx={E.x} cy={E.y} r={122} fill="url(#cdHalo)" className="cd-halo" />
             <circle cx={E.x} cy={E.y} r={88} fill="url(#cdCore)" filter="url(#cdEngineShadow)" />
-            <circle cx={E.x} cy={E.y} r={88} fill="none" stroke="#FFFFFF" strokeOpacity={0.35} strokeWidth={1.2} />
-            <circle cx={E.x} cy={E.y} r={72} fill="none" stroke="#FFFFFF" strokeOpacity={0.16} strokeWidth={1} strokeDasharray="2 5" />
-            <ellipse cx={E.x - 26} cy={E.y - 38} rx={40} ry={22} fill="#FFFFFF" opacity={0.18} />
+            <circle cx={E.x} cy={E.y} r={88} fill="none" stroke="var(--on-accent)" strokeOpacity={0.35} strokeWidth={1.2} />
+            <circle cx={E.x} cy={E.y} r={72} fill="none" stroke="var(--on-accent)" strokeOpacity={0.16} strokeWidth={1} strokeDasharray="2 5" />
+            <ellipse cx={E.x - 26} cy={E.y - 38} rx={40} ry={22} fill="var(--on-accent)" opacity={0.18} />
             {/* living waveform */}
-            <g fill="#FFFFFF">
+            <g fill="var(--on-accent)">
               {[-24, -12, 0, 12, 24].map((dx, i) => (
                 <rect key={dx} className="cd-wave" x={E.x + dx - 2.5} y={E.y - 34} width={5} height={26} rx={2.5}
                   style={{ animationDelay: `${i * 0.14}s` }} />
@@ -396,9 +400,9 @@ export default function DistributionSlide() {
           <motion.g initial={{ opacity: 0, scale: 0.6 }} animate={{ opacity: 1, scale: 1 }}
             style={{ transformBox: 'fill-box', transformOrigin: 'center' }}
             transition={{ duration: 0.6, ease: EASE, delay: 1.5 }}>
-            <circle cx={JUNCTION.x} cy={JUNCTION.y} r={15} fill="#FFF9F3" stroke="#F4610A" strokeOpacity={0.4}
+            <circle cx={JUNCTION.x} cy={JUNCTION.y} r={15} fill="var(--surface)" stroke="var(--accent-vivid)" strokeOpacity={0.4}
               strokeWidth={1.2} strokeDasharray="3 4" className="cd-ring-slow2" />
-            <circle cx={JUNCTION.x} cy={JUNCTION.y} r={5.5} fill="#F4610A" filter="url(#cdGlow)" />
+            <circle cx={JUNCTION.x} cy={JUNCTION.y} r={5.5} fill="var(--accent-vivid)" filter="url(#cdGlow)" />
             <text x={JUNCTION.x} y={JUNCTION.y + 46} textAnchor="middle" className="cd-stage">SMART ROUTING</text>
           </motion.g>
 
@@ -413,13 +417,13 @@ export default function DistributionSlide() {
       <motion.div
         initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.7, ease: EASE, delay: 2.1 }}
-        className="relative z-10 flex flex-wrap items-center justify-center gap-x-3 gap-y-2 px-8 pb-5 pt-0.5 text-[10.5px] font-medium uppercase tracking-[0.2em] text-[#9A8A7B]"
+        className="relative z-10 flex flex-wrap items-center justify-center gap-x-3 gap-y-2 px-8 pb-5 pt-0.5 text-[10.5px] font-medium uppercase tracking-[0.2em] text-[var(--muted)]"
       >
         {['Record once', 'Content engine', 'AI + human processing', 'Smart routing', 'Nine destinations'].map(
           (s, i, arr) => (
             <span key={s} className="flex items-center gap-3">
-              <span className={i === arr.length - 1 ? 'text-[#F4610A]' : ''}>{s}</span>
-              {i < arr.length - 1 && <span className="text-[#D8C6B4]">→</span>}
+              <span className={i === arr.length - 1 ? 'text-[var(--accent)]' : ''}>{s}</span>
+              {i < arr.length - 1 && <span className="text-[var(--muted)]">→</span>}
             </span>
           )
         )}
@@ -451,19 +455,19 @@ export default function DistributionSlide() {
         .cd-cluster:hover { transform: translateY(-6px); }
 
         .cd-icon { cursor: pointer; }
-        .cd-glyph { color: #33291F; transition: color .3s ease; }
+        .cd-glyph { color: var(--on-surface); transition: color .3s ease; }
         .cd-icon:hover .cd-glyph { color: var(--brand); }
         .cd-icon > circle { transition: transform .3s cubic-bezier(.22,1,.36,1); transform-box: fill-box; transform-origin: center; }
         .cd-icon:hover > circle { transform: scale(1.08); }
 
-        .cd-item-label { font-size: 10px; letter-spacing: .04em; fill: #8A7B6E; font-weight: 500; }
-        .cd-cluster-title { font-size: 10.5px; letter-spacing: .22em; fill: #6E6055; font-weight: 600; }
-        .cd-cluster-count { font-size: 10.5px; letter-spacing: .18em; fill: #C9B7A5; font-weight: 600; }
-        .cd-stage { font-size: 10px; letter-spacing: .24em; fill: #A08F7E; font-weight: 600; }
-        .cd-substage { font-size: 10px; letter-spacing: .04em; fill: #BCAC9B; font-weight: 500; }
-        .cd-micro { font-size: 8.5px; letter-spacing: .2em; fill: #B39B85; font-weight: 600; }
-        .cd-engine-t1 { font-size: 13px; letter-spacing: .18em; fill: #FFFFFF; font-weight: 700; }
-        .cd-engine-t2 { font-size: 8px; letter-spacing: .3em; fill: rgba(255,255,255,.75); font-weight: 600; }
+        .cd-item-label { font-size: 10px; letter-spacing: .04em; fill: var(--muted); font-weight: 500; }
+        .cd-cluster-title { font-size: 10.5px; letter-spacing: .22em; fill: var(--muted); font-weight: 600; }
+        .cd-cluster-count { font-size: 10.5px; letter-spacing: .18em; fill: var(--muted); font-weight: 600; }
+        .cd-stage { font-size: 10px; letter-spacing: .24em; fill: var(--muted); font-weight: 600; }
+        .cd-substage { font-size: 10px; letter-spacing: .04em; fill: var(--muted); font-weight: 500; }
+        .cd-micro { font-size: 8.5px; letter-spacing: .2em; fill: var(--muted); font-weight: 600; }
+        .cd-engine-t1 { font-size: 13px; letter-spacing: .18em; fill: var(--on-accent); font-weight: 700; }
+        .cd-engine-t2 { font-size: 8px; letter-spacing: .3em; fill: color-mix(in oklch, var(--on-accent) 75%, transparent); font-weight: 600; }
 
         @media (prefers-reduced-motion: reduce) {
           .cd-flow, .cd-ring-slow, .cd-ring-fast, .cd-ring-slow2, .cd-halo,

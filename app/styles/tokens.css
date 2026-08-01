@@ -29,10 +29,18 @@
      Never #000000 (Rule 2): ink-deep is the darkest value on the site. */
   --color-slate-500:    oklch(0.545 0.016 75);   /* 4.52:1 on paper-50 — AA */
   --color-slate-600:    oklch(0.470 0.018 74);   /* body on light panels */
+  --color-graphite-700: oklch(0.290 0.013 72);   /* raised card on a dark band */
   --color-graphite-800: oklch(0.235 0.012 70);   /* dark panel tint */
   --color-graphite-900: oklch(0.185 0.011 68);   /* dark section base */
   --color-ink:          oklch(0.155 0.010 66);   /* 17.83:1 on paper-50 */
   --color-ink-deep:     oklch(0.115 0.009 64);   /* darkest on the site */
+
+  /* ── ASH RAMP — muted text on the dark tones ────────────────────────────
+     The mirror of slate-500/600. Same warm hue family, read from the other
+     end of the ramp, so a caption on graphite-900 recedes by exactly as much
+     as the same caption recedes on paper-50. Measured, see verify-contrast. */
+  --color-ash-300:      oklch(0.780 0.010 80);   /* 8.48:1 on graphite-900 */
+  --color-ash-400:      oklch(0.720 0.010 80);   /* 8.20:1 on ink-deep */
 
   /* ── BRAND ─────────────────────────────────────────────────────────────
      --color-brand is #FF6200 converted exactly (culori). Hue 42.28 is the
@@ -49,8 +57,21 @@
   --color-brand:        oklch(0.691 0.207 42.28);  /* exact #FF6200 */
   --color-brand-hi:     oklch(0.700 0.198 42.28);  /* orange on dark surfaces */
   --color-signal:       oklch(0.563 0.168 42.28);  /* the only orange for small text */
+  --color-signal-deep:  oklch(0.542 0.163 42.28);  /* signal one step down — orange text still
+                                                      clears AA on paper-100 (4.59:1) */
+  --color-signal-deeper: oklch(0.522 0.158 42.28); /* two steps down — AA on paper-200 (4.55:1),
+                                                      the darkest surface day mode uses */
   --color-ember:        oklch(0.380 0.120 42.28);  /* deep orange — FILLS AND BORDERS ONLY,
                                                       never text: 1.9:1 on graphite-900 */
+
+  /* Two more instances of the SAME hue, added in Stage 3 to absorb the loose
+     oranges the deck slides had accumulated (#F4610A, #FF7A1A, #FF9A3D,
+     #F97316, #FFB27A, #E65700, #DE4A00 — seven strangers, several of them
+     Tailwind's orange ramp). Hue 42.28 is held, so this is still one orange
+     read at different lightnesses, not a second one (Rule 1). Gradients and
+     graphic fills only — neither clears 4.5:1 as text on paper. */
+  --color-brand-lift:   oklch(0.760 0.170 42.28);  /* gradient highlight end */
+  --color-brand-pale:   oklch(0.855 0.098 42.28);  /* far end of an orange ramp */
 
   /* ── STATUS ────────────────────────────────────────────────────────────
      Not brand colour. Reserved for live/scheduled system indicators, which
@@ -58,6 +79,13 @@
      warm palette rather than shouting UI-kit green. */
   --color-live:         oklch(0.530 0.148 149);   /* 4.50:1 on paper-50 */
   --color-live-deep:    oklch(0.430 0.120 149);   /* on light chips */
+  --color-live-hi:      oklch(0.780 0.130 149);   /* the same green, read on a dark chip */
+  /* Stage 3 addition. The weekly-output board has a fourth state, "Ready",
+     which had been carrying Tailwind's blue-600/blue-700 straight out of the
+     box. Desaturated to sit inside the warm palette like the greens do. */
+  --color-info:         oklch(0.530 0.128 255);   /* 4.84:1 on paper-50, 4.52:1 on paper-100 */
+  --color-info-deep:    oklch(0.460 0.110 255);   /* on light chips */
+  --color-info-hi:      oklch(0.790 0.085 255);   /* on dark chips */
 
   /* ── RADII — three values. A fourth is a design failure (Rule 3). ────── */
   --radius-sm:          6px;     /* inputs, tags, tiny chips */
@@ -134,6 +162,16 @@
   /* ── SPACING — 8pt base, 4pt half-steps ────────────────────────────── */
   --spacing-section-y:  clamp(5rem, 3rem + 10vw, 11rem);
   --spacing-gutter:     clamp(1.25rem, 0.5rem + 3.2vw, 3.5rem);
+  /* The run-up a dark band uses to emerge out of the light one above it.
+     Short on purpose — a long fade reads as a gradient, not as a seam. */
+  --spacing-bleed:      clamp(3rem, 1.4rem + 4vw, 7.5rem);
+
+  /* ── SEAM — the 1px optical line where two value bands meet ────────────
+     Brighter than either side. This is the furniture-photography trick: a
+     hard butt joint between two values looks printed, a lit edge looks
+     built. paper-25 at low alpha, never oklch(1 0 0) — Rule 2 holds even
+     inside a 14% hairline. */
+  --color-seam:         color-mix(in oklch, var(--color-paper-25) 14%, transparent);
 
   /* ── MOTION — two easings, not five ────────────────────────────────── */
   --ease-expo:          cubic-bezier(0.16, 1, 0.30, 1);
@@ -159,8 +197,10 @@
     0 1px 2px -1px oklch(0.155 0.010 66 / 8%),
     0 12px 28px -12px oklch(0.155 0.010 66 / 12%),
     0 40px 72px -32px oklch(0.155 0.010 66 / 14%);
-  /* paper-25, not oklch(1 0 0) — pure white is forbidden even in a highlight */
-  --shadow-inset-top:   inset 0 1px 0 oklch(0.978 0.004 85 / 55%);
+  /* paper-25, not oklch(1 0 0) — pure white is forbidden even in a highlight.
+     Reads --gloss so the top highlight is a 70% paper edge on a paper card and
+     a 7% one on graphite; a 55% white edge on a dark card is a blown seam. */
+  --shadow-inset-top:   inset 0 1px 0 var(--gloss);
 }
 
 /* ── Non-namespaced tokens ───────────────────────────────────────────────
@@ -188,12 +228,26 @@
   --axis-opsz: 14;
   --axis-soft: 0;
   --axis-wonk: 0;
+
+  /* ── Ambient light — hero band only ─────────────────────────────────────
+     Three intensities of the same brand hue, used as LIGHT (radial washes and
+     a dot grid), never as a block. Scoped here rather than inlined in
+     AmbientEnvironment.tsx so the alphas are auditable in one place. */
+  --grid-dot:    color-mix(in oklch, var(--on-surface) 4.5%, transparent);
+  --ambient-a:   color-mix(in oklch, var(--accent-vivid) 5%, transparent);
+  --ambient-b:   color-mix(in oklch, var(--accent-vivid) 4%, transparent);
+  --ambient-c:   color-mix(in oklch, var(--accent-vivid) 5.5%, transparent);
 }
 
-/* ── Focus ring (Rule 5) — one visible treatment, everywhere ───────────── */
+/* ── Focus ring (Rule 5) — one visible treatment, everywhere ─────────────
+   Stage 3: the ring reads --accent, not --color-signal. Signal is the light
+   band's orange; on graphite-900 it lands at 2.8:1, under the 3:1 that WCAG
+   2.2 SC 1.4.11 asks of a focus indicator. --accent re-points to brand-hi
+   inside a dark band (6.47:1), so the same one rule stays visible on all four
+   tones without a second selector. */
 @layer base {
   :focus-visible {
-    outline: 2px solid var(--color-signal);
+    outline: 2px solid var(--accent);
     outline-offset: 2px;
     border-radius: var(--radius-sm);
   }

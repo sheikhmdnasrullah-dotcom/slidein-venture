@@ -14,8 +14,8 @@
 
 import { motion } from 'framer-motion';
 
-const ORANGE = '#FF6200';
-const INK = '#0A0A0A';
+const ORANGE = 'var(--accent-vivid)';
+const INK = 'var(--on-surface)';
 const EASE = [0.22, 1, 0.36, 1] as const;
 
 const VB = { w: 1240, h: 620 };
@@ -64,7 +64,7 @@ function Panel({
       transition={{ duration: 0.7, ease: EASE, delay }}
     >
       <text x={p.x + 2} y={p.y - 12} className="gl-sys">{sysLabel}</text>
-      <rect x={p.x} y={p.y} width={p.w} height={p.h} rx={18} fill="#FFFFFF" stroke={INK} strokeOpacity={0.11} filter="url(#glCard)" />
+      <rect x={p.x} y={p.y} width={p.w} height={p.h} rx={18} fill="var(--surface)" stroke={INK} strokeOpacity={0.11} filter="url(#glCard)" />
       <rect x={p.x} y={p.y} width={p.w} height={p.h} rx={18} fill="url(#glGloss)" pointerEvents="none" />
       {/* title bar */}
       <circle cx={p.x + 22} cy={p.y + 24} r={3} fill={ORANGE} className="gl-glow" />
@@ -80,19 +80,19 @@ function Panel({
             initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.45, ease: EASE, delay: delay + 0.25 + i * 0.09 }}
           >
-            <rect className="gl-row-bg" x={p.x + 16} y={y} width={p.w - 32} height={32} rx={10} fill="rgba(10,10,10,0.018)" stroke={INK} strokeOpacity={0.06} />
-            <circle cx={p.x + 30} cy={y + 16} r={9} fill="#FFFFFF" stroke={INK} strokeOpacity={0.12} />
+            <rect className="gl-row-bg" x={p.x + 16} y={y} width={p.w - 32} height={32} rx={10} fill="color-mix(in oklch, var(--on-surface) 1.8%, transparent)" stroke={INK} strokeOpacity={0.06} />
+            <circle cx={p.x + 30} cy={y + 16} r={9} fill="var(--surface)" stroke={INK} strokeOpacity={0.12} />
             <g className="gl-row-icon" transform={`translate(${p.x + 30 - 6} ${y + 16 - 6}) scale(0.5)`}>
               <path d={r.icon} fill="none" stroke="currentColor" strokeWidth={1.9} strokeLinecap="round" strokeLinejoin="round" />
             </g>
             <text x={p.x + 48} y={y + 20} className="gl-row-label">{r.label}</text>
-            <circle cx={p.x + p.w - 30} cy={y + 16} r={2} fill="#16A34A" className="gl-blink" style={{ animationDelay: `${i * 0.3}s` }} />
+            <circle cx={p.x + p.w - 30} cy={y + 16} r={2} fill="var(--color-live)" className="gl-blink" style={{ animationDelay: `${i * 0.3}s` }} />
           </motion.g>
         );
       })}
       {/* ports */}
-      <circle cx={align === 'l' ? p.x + p.w : p.x} cy={196} r={3.5} fill="#FFFFFF" stroke={ORANGE} strokeOpacity={0.7} strokeWidth={1.2} />
-      <circle cx={align === 'l' ? p.x + p.w : p.x} cy={324} r={3.5} fill="#FFFFFF" stroke={ORANGE} strokeOpacity={0.7} strokeWidth={1.2} />
+      <circle cx={align === 'l' ? p.x + p.w : p.x} cy={196} r={3.5} fill="var(--surface)" stroke={ORANGE} strokeOpacity={0.7} strokeWidth={1.2} />
+      <circle cx={align === 'l' ? p.x + p.w : p.x} cy={324} r={3.5} fill="var(--surface)" stroke={ORANGE} strokeOpacity={0.7} strokeWidth={1.2} />
     </motion.g>
   );
 }
@@ -105,9 +105,9 @@ export default function GrowthLoopSlide() {
         transition={{ duration: 0.6, ease: EASE }}
         className="text-center mb-1"
       >
-        <p className="text-[11px] md:text-xs font-bold tracking-[0.14em] uppercase text-[#FF6200]">Why It&apos;s One System</p>
-        <h2 className="mt-1.5 display-headline text-[clamp(1.3rem,2.6vw,1.9rem)] text-[#0A0A0A]">
-          Not two services. <span className="text-[#FF6200]">One growth engine.</span>
+        <p className="text-[11px] md:text-xs font-bold tracking-[0.14em] uppercase text-[var(--accent)]">Why It&apos;s One System</p>
+        <h2 className="mt-1.5 display-headline text-[clamp(1.3rem,2.6vw,1.9rem)] text-[var(--on-surface)]">
+          Not two services. <span className="text-[var(--accent)]">One growth engine.</span>
         </h2>
       </motion.div>
 
@@ -119,11 +119,11 @@ export default function GrowthLoopSlide() {
       >
         <defs>
           <pattern id="glDots" width="26" height="26" patternUnits="userSpaceOnUse">
-            <circle cx="1" cy="1" r="1" fill="rgba(10,10,10,0.05)" />
+            <circle cx="1" cy="1" r="1" fill="color-mix(in oklch, var(--on-surface) 5%, transparent)" />
           </pattern>
           <linearGradient id="glGloss" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#FFFFFF" stopOpacity="0.7" />
-            <stop offset="45%" stopColor="#FFFFFF" stopOpacity="0" />
+            <stop offset="0%" stopColor="var(--gloss)" stopOpacity="0.7" />
+            <stop offset="45%" stopColor="var(--gloss)" stopOpacity="0" />
           </linearGradient>
           <radialGradient id="glAmbient" cx="50%" cy="50%" r="50%">
             <stop offset="0%" stopColor={ORANGE} stopOpacity="0.12" />
@@ -142,7 +142,7 @@ export default function GrowthLoopSlide() {
             <feDropShadow dx="0" dy="4" stdDeviation="6" floodColor={INK} floodOpacity="0.07" />
           </filter>
           <filter id="glHero" x="-40%" y="-40%" width="180%" height="180%">
-            <feDropShadow dx="0" dy="12" stdDeviation="16" floodColor="#C2410C" floodOpacity="0.18" />
+            <feDropShadow dx="0" dy="12" stdDeviation="16" floodColor="var(--color-ember)" floodOpacity="0.18" />
           </filter>
         </defs>
 
@@ -201,7 +201,7 @@ export default function GrowthLoopSlide() {
           transition={{ duration: 0.7, ease: EASE, delay: 1.35 }}
         >
           <circle cx={CX} cy={CY} r={64} fill="none" stroke={ORANGE} strokeOpacity={0.3} strokeWidth={1.2} strokeDasharray="3 6" className="gl-spin" />
-          <rect x={CX - 78} y={CY - 34} width={156} height={68} rx={16} fill="rgba(255,255,255,0.92)" stroke={ORANGE} strokeOpacity={0.4} strokeWidth={1.1} filter="url(#glHero)" />
+          <rect x={CX - 78} y={CY - 34} width={156} height={68} rx={16} fill="var(--surface)" stroke={ORANGE} strokeOpacity={0.4} strokeWidth={1.1} filter="url(#glHero)" />
           <circle cx={CX - 56} cy={CY - 12} r={3} fill={ORANGE} className="gl-glow gl-blink" />
           <text x={CX - 46} y={CY - 8} className="gl-hub-t1">GROWTH SYSTEM</text>
           <text x={CX - 56} y={CY + 12} className="gl-hub-t2">ONE MACHINE · TWO HALVES</text>
@@ -221,13 +221,13 @@ export default function GrowthLoopSlide() {
           transition={{ duration: 0.7, ease: EASE, delay: 2.15 }}
         >
           <circle cx={CX} cy={OUT.y + OUT.h / 2} r={96} fill="url(#glAmbient)" className="gl-halo" />
-          <rect x={OUT.x + 6} y={OUT.y + 8} width={OUT.w} height={OUT.h} rx={18} fill="#FFFFFF" stroke={INK} strokeOpacity={0.07} />
-          <rect x={OUT.x} y={OUT.y} width={OUT.w} height={OUT.h} rx={18} fill="#FFFFFF" stroke={ORANGE} strokeOpacity={0.5} strokeWidth={1.2} filter="url(#glHero)" />
+          <rect x={OUT.x + 6} y={OUT.y + 8} width={OUT.w} height={OUT.h} rx={18} fill="var(--surface)" stroke={INK} strokeOpacity={0.07} />
+          <rect x={OUT.x} y={OUT.y} width={OUT.w} height={OUT.h} rx={18} fill="var(--surface)" stroke={ORANGE} strokeOpacity={0.5} strokeWidth={1.2} filter="url(#glHero)" />
           <rect x={OUT.x + 18} y={OUT.y + 18} width={36} height={36} rx={11} fill={ORANGE} />
-          <g transform={`translate(${OUT.x + 18 + 7} ${OUT.y + 18 + 7})`} stroke="#FFFFFF" strokeWidth={2} fill="none" strokeLinecap="round" strokeLinejoin="round">
+          <g transform={`translate(${OUT.x + 18 + 7} ${OUT.y + 18 + 7})`} stroke="var(--on-accent)" strokeWidth={2} fill="none" strokeLinecap="round" strokeLinejoin="round">
             <path d="M11 1.8 13.7 7.2l6 .9-4.3 4.2 1 6-5.4-2.8-5.4 2.8 1-6L1.3 8.1l6-.9z" transform="scale(0.95)" />
           </g>
-          <circle cx={OUT.x + OUT.w - 20} cy={OUT.y + 20} r={2.6} fill="#16A34A" className="gl-blink" />
+          <circle cx={OUT.x + OUT.w - 20} cy={OUT.y + 20} r={2.6} fill="var(--color-live)" className="gl-blink" />
           <text x={OUT.x + 68} y={OUT.y + 34} className="gl-out-t1">High-Quality Clients</text>
           <text x={OUT.x + 68} y={OUT.y + 52} className="gl-out-t2">The compounding result</text>
           <text x={OUT.x + 18} y={OUT.y + OUT.h - 14} className="gl-hub-t2">BOTH SYSTEMS FEED THIS · EVERY WEEK</text>
@@ -239,21 +239,21 @@ export default function GrowthLoopSlide() {
       </svg>
 
       <style>{`
-        .gl-sys { font-size: 9px; letter-spacing: .24em; fill: rgba(10,10,10,0.3); font-weight: 800; }
+        .gl-sys { font-size: 9px; letter-spacing: .24em; fill: color-mix(in oklch, var(--on-surface) 30%, transparent); font-weight: 800; }
         .gl-title { font-size: 10px; letter-spacing: .18em; fill: ${INK}; font-weight: 800; }
-        .gl-row-label { font-size: 10.5px; fill: rgba(10,10,10,0.72); font-weight: 600; }
-        .gl-row-icon { color: rgba(10,10,10,0.6); transition: color .3s ease; }
+        .gl-row-label { font-size: 10.5px; fill: color-mix(in oklch, var(--on-surface) 72%, transparent); font-weight: 600; }
+        .gl-row-icon { color: color-mix(in oklch, var(--on-surface) 60%, transparent); transition: color .3s ease; }
         .gl-row-bg { transition: all .3s cubic-bezier(.22,1,.36,1); }
-        .gl-row:hover .gl-row-bg { stroke: ${ORANGE}; stroke-opacity: .45; fill: rgba(255,98,0,0.04); }
+        .gl-row:hover .gl-row-bg { stroke: ${ORANGE}; stroke-opacity: .45; fill: color-mix(in oklch, var(--accent-vivid) 4%, transparent); }
         .gl-row:hover .gl-row-icon { color: ${ORANGE}; }
         .gl-stream { font-size: 10px; letter-spacing: .26em; fill: ${ORANGE}; font-weight: 800; }
-        .gl-annot { font-size: 11px; fill: rgba(10,10,10,0.38); font-style: italic; font-family: ui-serif, Georgia, serif; }
+        .gl-annot { font-size: 11px; fill: color-mix(in oklch, var(--on-surface) 38%, transparent); font-style: italic; font-family: ui-serif, Georgia, serif; }
         .gl-hub-t1 { font-size: 11.5px; letter-spacing: .1em; fill: ${INK}; font-weight: 800; }
-        .gl-hub-t2 { font-size: 7.5px; letter-spacing: .16em; fill: rgba(10,10,10,0.4); font-weight: 700; }
+        .gl-hub-t2 { font-size: 7.5px; letter-spacing: .16em; fill: color-mix(in oklch, var(--on-surface) 40%, transparent); font-weight: 700; }
         .gl-out-t1 { font-size: 15px; font-weight: 800; fill: ${INK}; letter-spacing: -0.01em; }
-        .gl-out-t2 { font-size: 10px; fill: rgba(10,10,10,0.45); font-weight: 500; }
+        .gl-out-t2 { font-size: 10px; fill: color-mix(in oklch, var(--on-surface) 45%, transparent); font-weight: 500; }
 
-        .gl-glow { filter: drop-shadow(0 0 3px rgba(255,98,0,0.55)); }
+        .gl-glow { filter: drop-shadow(0 0 3px color-mix(in oklch, var(--accent-vivid) 55%, transparent)); }
         .gl-blink { animation: glBlink 2.2s ease-in-out infinite; }
         @keyframes glBlink { 0%,100% { opacity: 1; } 50% { opacity: .25; } }
         .gl-halo { animation: glHalo 5s ease-in-out infinite; }

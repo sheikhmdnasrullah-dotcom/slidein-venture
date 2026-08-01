@@ -8,15 +8,19 @@
  *
  *   app/icon.svg        vector, used by modern browsers at any size
  *   app/favicon.ico     16/32/48 PNG payloads, legacy + Chrome tab strip
- *   app/apple-icon.png  180x180 on paper — iOS composites transparency to black
+ *   app/apple-icon.png  180x180, FULL BLEED — iOS applies its own squircle
+ *                       mask, so a pre-rounded source gets rounded twice
+ *
+ * The source is a solid brand-orange chip, not a letterform: the identity is
+ * the wordmark, and the tab icon's only job is to be recognisable at 16px.
  *
  * sharp cannot encode ICO, so the container is assembled by hand below.
  */
 import sharp from 'sharp';
 import { readFile, writeFile, copyFile } from 'node:fs/promises';
 
-const SRC = 'logos/concepts/concept-3-icon.svg';
-const PAPER = { r: 0xfa, g: 0xfa, b: 0xf8, alpha: 1 }; // never pure #FFFFFF
+const SRC = 'logos/mark/tab-chip.svg';
+const BRAND = { r: 0xff, g: 0x62, b: 0x00, alpha: 1 }; // --color-brand, exact
 const TRANSPARENT = { r: 0, g: 0, b: 0, alpha: 0 };
 
 const svg = await readFile(SRC);
@@ -24,11 +28,12 @@ const svg = await readFile(SRC);
 /* ── app/icon.svg — vector, smallest and sharpest ──────────────────────── */
 await copyFile(SRC, 'app/icon.svg');
 
-/* ── app/apple-icon.png — iOS has no transparency, so bake paper in ────── */
-await sharp(svg, { density: 384 })
-  .resize(160, 160, { fit: 'contain', background: TRANSPARENT })
-  .extend({ top: 10, bottom: 10, left: 10, right: 10, background: PAPER })
-  .flatten({ background: PAPER })
+/* ── app/apple-icon.png — full bleed. iOS masks it into a squircle itself,
+      and it has no transparency, so the chip is drawn edge to edge in brand
+      orange rather than floated on a paper square. ─────────────────────── */
+await sharp({
+  create: { width: 180, height: 180, channels: 4, background: BRAND },
+})
   .png()
   .toFile('app/apple-icon.png');
 

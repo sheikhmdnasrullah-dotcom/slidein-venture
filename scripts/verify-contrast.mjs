@@ -34,6 +34,18 @@ const T = {
   brand: 'oklch(0.691 0.207 42.28)',
   brandHi: 'oklch(0.700 0.198 42.28)',
   signal: 'oklch(0.563 0.168 42.28)',
+  /* Stage 3 — the tone contract's dark-band instances. */
+  graphite800: 'oklch(0.235 0.012 70)',
+  ash300: 'oklch(0.780 0.010 80)',
+  ash400: 'oklch(0.720 0.010 80)',
+  bone400: 'oklch(0.790 0.014 80)',
+  liveHi: 'oklch(0.780 0.130 149)',
+  liveDeep: 'oklch(0.430 0.120 149)',
+  info: 'oklch(0.530 0.128 255)',
+  signalDeep: 'oklch(0.542 0.163 42.28)',
+  infoDeep: 'oklch(0.460 0.110 255)',
+  infoHi: 'oklch(0.790 0.085 255)',
+  brandLift: 'oklch(0.760 0.170 42.28)',
 };
 
 /* [label, fg, bg, minimum, note] */
@@ -48,6 +60,35 @@ const CHECKS = [
   ['brand on graphite-900', T.brand, T.graphite900, 4.5],
   ['paper-50 on graphite-900', T.paper50, T.graphite900, 4.5, 'body text on dark bands'],
   ['paper-50 on ink-deep', T.paper50, T.inkDeep, 4.5],
+
+  /* ── Stage 3 · the tone contract on every band it ships on ──────────────
+     One row per (--token, band) pair that carries text. If a tone re-points
+     --muted or --accent and the new instance does not clear 4.5:1 on that
+     band's own fill, this file fails the build rather than the audit. */
+
+  /* tone: dark — ground graphite-900, cards graphite-800 */
+  ['--on-surface on dark band', T.paper50, T.graphite900, 4.5, 'paper-50 / graphite-900'],
+  ['--on-surface on dark card', T.paper50, T.graphite800, 4.5, 'paper-50 / graphite-800'],
+  ['--muted on dark band', T.ash300, T.graphite900, 4.5, 'ash-300 — captions, deck chrome'],
+  ['--muted on dark card', T.ash300, T.graphite800, 4.5],
+  ['--accent on dark band', T.brandHi, T.graphite900, 4.5],
+  ['--accent on dark card', T.brandHi, T.graphite800, 4.5, 'eyebrows inside deck panels'],
+  ['--on-accent on accent (dark)', T.ink, T.brandHi, 4.5, 'ink label on an orange fill'],
+  ['--status-live on dark card', T.liveHi, T.graphite800, 4.5],
+  ['--status-info on dark card', T.infoHi, T.graphite800, 4.5],
+
+  /* tone: deep — ground ink-deep, cards graphite-900 */
+  ['--on-surface on deep band', T.paper25, T.inkDeep, 4.5],
+  ['--muted on deep band', T.ash400, T.inkDeep, 4.5, 'ash-400 — footer captions'],
+  ['--accent on deep band', T.brandHi, T.inkDeep, 4.5],
+
+  /* tone: light / lifted */
+  ['--muted on lifted band', T.slate600, T.paper100, 4.5, 'slate-500 falls to 4.23:1 here'],
+  ['--accent on lifted band', T.signalDeep, T.paper100, 4.5, 'signal falls to 4.21:1 here'],
+  ['--status-live on light card', T.liveDeep, T.paper25, 4.5],
+  ['--status-info on light card', T.infoDeep, T.paper25, 4.5],
+  ['--color-info on paper-50', T.info, T.paper50, 4.5, 'the new status blue'],
+  ['--color-info on paper-100', T.info, T.paper100, 4.5],
 ];
 
 /* Documented ceilings. These are MEASURED FACTS about the brand hue, not
@@ -64,6 +105,9 @@ const CHECKS = [
 const LIMITS = [
   ['brand on paper-50', T.brand, T.paper50, 'decorative fill only — never text'],
   ['brand on paper-25', T.brand, T.paper25, 'decorative fill only — never text'],
+  ['brand-lift on paper-50', T.brandLift, T.paper50, 'gradient stop only — never text'],
+  ['brand-lift on graphite-900', T.brandLift, T.graphite900, 'gradient stop only'],
+  ['bone-400 (--faint) on paper-50', T.bone400, T.paper50, 'tertiary — never load-bearing text'],
 ];
 
 let failed = 0;
