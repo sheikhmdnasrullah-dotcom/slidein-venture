@@ -36,6 +36,7 @@ import WeeklyCalendarSlide from '@/components/PitchDeck/WeeklyCalendarSlide';
 import DistributionSlide from '@/components/PitchDeck/DistributionSlide';
 import PipelineSlide from '@/components/PitchDeck/PipelineSlide';
 import InputSlide from '@/components/PitchDeck/InputSlide';
+import TheWeekSlide from '@/components/PitchDeck/TheWeekSlide';
 
 const EASE = [0.16, 1, 0.3, 1] as const;
 
@@ -592,6 +593,7 @@ function Slide9({ onSeeFramework }: { onSeeFramework: () => void }) {
 const SLIDE_META = [
   { kicker: 'The Input' },
   { kicker: 'The Complete Framework' },
+  { kicker: 'The Week' },
   { kicker: 'The Content System' },
   { kicker: 'Content Distribution' },
   { kicker: 'The Outreach System' },
@@ -739,6 +741,7 @@ export default function PitchDeck() {
     () => [
       <Slide1 key="s1" />,
       <Slide2 key="s2" />,
+      <TheWeekSlide key="s-week" />,
       <Slide4 key="s4" onOpenService={openService} />,
       <Slide4b key="s4b" />,
       <Slide5 key="s5" />,
