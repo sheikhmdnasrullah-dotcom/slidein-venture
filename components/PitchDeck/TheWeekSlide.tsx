@@ -16,8 +16,7 @@
  * WHAT IS NEW
  *   · Giant "9" in display serif at top-left, ~180px
  *   · One mono line beneath it: "PIECES · FROM ONE 45-MINUTE SESSION"
- *   · Dark ground (bg-[var(--surface-2)])
- *   · Every card has a 1px border — borderless cards on dark dissolve
+ *   · Full tone-contract compliance (adapts seamlessly between Day/Night mode)
  *   · Status pills: SCHEDULED/PUBLISHED = green; READY/EDITING = orange
  *   · "May 12 – 18" → "MAY 12 TO 18"
  *   · Right rail keeps only publishing queue + next recording chip
@@ -70,15 +69,15 @@ type Status = 'scheduled' | 'editing' | 'ready' | 'published';
 const STATUS: Record<Status, { label: string; dot: string; bg: string; text: string }> = {
   scheduled: {
     label: 'Scheduled',
-    dot: 'var(--status-live, #22c55e)',
-    bg: 'rgba(34,197,94,0.12)',
-    text: 'var(--status-live, #22c55e)',
+    dot: 'var(--status-live)',
+    bg: 'color-mix(in oklch, var(--status-live) 12%, transparent)',
+    text: 'var(--status-live)',
   },
   published: {
     label: 'Published',
-    dot: 'var(--status-live, #22c55e)',
-    bg: 'rgba(34,197,94,0.09)',
-    text: 'var(--status-live, #22c55e)',
+    dot: 'var(--status-live)',
+    bg: 'color-mix(in oklch, var(--status-live) 9%, transparent)',
+    text: 'var(--status-live)',
   },
   editing: {
     label: 'Editing',
@@ -145,19 +144,20 @@ function ContentBlock({ b, colIdx, rowIdx }: { b: Block; colIdx: number; rowIdx:
       transition={{ duration: 0.4, ease: EASE, delay }}
       className="rounded-lg border px-2 py-1.5 cursor-default
                  hover:-translate-y-0.5 transition-all duration-300
-                 hover:shadow-[0_6px_18px_rgba(0,0,0,0.35)]"
+                 shadow-[var(--shadow-contact)]
+                 hover:shadow-[var(--shadow-raised)]"
       style={{
-        backgroundColor: 'rgba(255,255,255,0.05)',
-        borderColor: 'rgba(255,255,255,0.10)',
+        backgroundColor: 'var(--surface-glass)',
+        borderColor: 'var(--rule)',
       }}
     >
       <div className="flex items-center gap-1">
-        <span style={{ color: 'rgba(255,255,255,0.35)' }}><I k={b.icon} s={10} /></span>
-        <span className="text-[7.5px] font-bold tabular-nums" style={{ color: 'rgba(255,255,255,0.35)' }}>{b.time}</span>
+        <span style={{ color: 'var(--muted)' }}><I k={b.icon} s={10} /></span>
+        <span className="text-[7.5px] font-bold tabular-nums" style={{ color: 'var(--muted)' }}>{b.time}</span>
         {/* status dot */}
         <span className="ml-auto w-1.5 h-1.5 rounded-full wk-blink" style={{ background: st.dot }} />
       </div>
-      <p className="mt-1 text-[8.5px] font-bold leading-[1.25]" style={{ color: 'rgba(255,255,255,0.88)' }}>
+      <p className="mt-1 text-[8.5px] font-bold leading-[1.25]" style={{ color: 'var(--on-surface)' }}>
         {b.title}
       </p>
       <div className="mt-1 flex items-center gap-1">
@@ -189,7 +189,7 @@ export default function TheWeekSlide() {
           className="font-serif tabular-nums leading-none select-none"
           style={{
             fontSize: 'clamp(4.5rem, 14vw, 11.25rem)',
-            color: 'rgba(255,255,255,0.95)',
+            color: 'var(--on-surface)',
             letterSpacing: '-0.03em',
             lineHeight: 0.85,
           }}
@@ -215,36 +215,36 @@ export default function TheWeekSlide() {
         transition={{ duration: 0.6, ease: EASE, delay: 0.06 }}
         className="rounded-2xl overflow-hidden"
         style={{
-          border: '1px solid rgba(255,255,255,0.10)',
-          background: 'rgba(255,255,255,0.03)',
-          boxShadow: '0 24px 60px rgba(0,0,0,0.5)',
+          border: '1px solid var(--rule-strong)',
+          background: 'var(--surface)',
+          boxShadow: '0 24px 60px color-mix(in oklch, var(--on-surface) 6%, transparent)',
         }}
       >
         {/* title bar */}
         <div
           className="flex items-center gap-2.5 px-4 py-2 border-b"
-          style={{ borderColor: 'rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.04)' }}
+          style={{ borderColor: 'var(--rule)', background: 'var(--surface-2)' }}
         >
           <span className="flex gap-1.5" aria-hidden>
-            {['rgba(255,95,87,0.6)', 'rgba(254,188,46,0.6)', 'rgba(40,200,64,0.6)'].map((c, i) => (
+            {['rgba(255,95,87,0.8)', 'rgba(254,188,46,0.8)', 'rgba(40,200,64,0.8)'].map((c, i) => (
               <span key={i} className="w-2 h-2 rounded-full block" style={{ background: c }} />
             ))}
           </span>
-          <span className="text-[10.5px] font-extrabold" style={{ color: 'rgba(255,255,255,0.7)' }}>
+          <span className="text-[10.5px] font-extrabold" style={{ color: 'var(--on-surface)' }}>
             SlideIn Content Calendar
           </span>
           {/* auto-built badge */}
           <span
             className="hidden md:flex items-center gap-1 rounded-full px-2 py-0.5"
-            style={{ background: 'rgba(255,98,0,0.10)', border: '1px solid rgba(255,98,0,0.25)' }}
+            style={{ background: 'var(--accent-wash)', border: '1px solid var(--accent-ring)' }}
           >
             <span className="w-1.5 h-1.5 rounded-full wk-blink" style={{ background: 'var(--accent-vivid)' }} />
-            <span className="text-[7px] font-bold tracking-[0.12em] uppercase" style={{ color: 'var(--accent-vivid)' }}>
+            <span className="text-[7px] font-bold tracking-[0.12em] uppercase" style={{ color: 'var(--accent)' }}>
               Built automatically after each recording
             </span>
           </span>
-          {/* date range — updated per spec */}
-          <span className="ml-auto text-[8.5px] font-bold tabular-nums" style={{ color: 'rgba(255,255,255,0.35)' }}>
+          {/* date range */}
+          <span className="ml-auto text-[8.5px] font-bold tabular-nums" style={{ color: 'var(--muted)' }}>
             MAY 12 TO 18
           </span>
         </div>
@@ -253,7 +253,7 @@ export default function TheWeekSlide() {
           {/* left sidebar */}
           <div
             className="hidden lg:flex flex-col w-[128px] shrink-0 px-2 py-2.5 gap-0.5"
-            style={{ borderRight: '1px solid rgba(255,255,255,0.07)', background: 'rgba(255,255,255,0.02)' }}
+            style={{ borderRight: '1px solid var(--rule)', background: 'var(--surface-2)' }}
           >
             {SIDEBAR.map((s) => (
               <span
@@ -261,8 +261,8 @@ export default function TheWeekSlide() {
                 className={cn('flex items-center gap-1.5 rounded-md px-2 py-1.5 text-[8.5px] font-bold')}
                 style={
                   s.active
-                    ? { color: 'var(--accent-vivid)', background: 'rgba(255,98,0,0.10)' }
-                    : { color: 'rgba(255,255,255,0.30)' }
+                    ? { color: 'var(--accent)', background: 'var(--accent-wash)' }
+                    : { color: 'var(--muted)' }
                 }
               >
                 <I k={s.icon} s={10} />{s.label}
@@ -270,11 +270,11 @@ export default function TheWeekSlide() {
             ))}
             <div
               className="mt-auto pt-2"
-              style={{ borderTop: '1px solid rgba(255,255,255,0.07)' }}
+              style={{ borderTop: '1px solid var(--rule)' }}
             >
               <span
                 className="text-[6.5px] font-bold tracking-[0.16em] uppercase px-2"
-                style={{ color: 'rgba(255,255,255,0.20)' }}
+                style={{ color: 'var(--faint)' }}
               >
                 Workspace v2.4
               </span>
@@ -282,7 +282,7 @@ export default function TheWeekSlide() {
           </div>
 
           {/* calendar grid — 7 columns fill left-to-right, 90ms stagger */}
-          <div className="flex-1 min-w-0 grid grid-cols-7" style={{ borderRight: '1px solid rgba(255,255,255,0.07)' }}>
+          <div className="flex-1 min-w-0 grid grid-cols-7" style={{ borderRight: '1px solid var(--rule)' }}>
             {WEEK.map((d, di) => (
               <motion.div
                 key={d.day}
@@ -291,18 +291,18 @@ export default function TheWeekSlide() {
                 transition={{ duration: 0.35, ease: EASE, delay: 0.1 + di * 0.09 }}
                 className={cn('flex flex-col min-w-0')}
                 style={{
-                  borderRight: di < 6 ? '1px solid rgba(255,255,255,0.06)' : undefined,
-                  background: d.today ? 'rgba(255,98,0,0.04)' : undefined,
+                  borderRight: di < 6 ? '1px solid var(--rule)' : undefined,
+                  background: d.today ? 'var(--accent-wash)' : undefined,
                 }}
               >
                 {/* day header */}
                 <div
                   className="flex items-center justify-center gap-1 py-1.5"
-                  style={{ borderBottom: '1px solid rgba(255,255,255,0.08)' }}
+                  style={{ borderBottom: '1px solid var(--rule)' }}
                 >
                   <span
                     className="text-[7.5px] font-black tracking-[0.14em]"
-                    style={{ color: d.today ? 'var(--accent-vivid)' : 'rgba(255,255,255,0.35)' }}
+                    style={{ color: d.today ? 'var(--accent)' : 'var(--muted)' }}
                   >
                     {d.day}
                   </span>
@@ -310,8 +310,8 @@ export default function TheWeekSlide() {
                     className="text-[8.5px] font-bold tabular-nums w-4 h-4 rounded-full flex items-center justify-center"
                     style={
                       d.today
-                        ? { background: 'var(--accent-vivid)', color: '#fff' }
-                        : { color: 'rgba(255,255,255,0.30)' }
+                        ? { background: 'var(--accent-vivid)', color: 'var(--on-accent)' }
+                        : { color: 'var(--muted)' }
                     }
                   >
                     {d.date}
@@ -331,29 +331,29 @@ export default function TheWeekSlide() {
           {/* right rail — publishing queue + next recording only */}
           <div
             className="hidden xl:flex flex-col w-[150px] shrink-0 px-2.5 py-2.5 gap-3"
-            style={{ borderLeft: '1px solid rgba(255,255,255,0.07)', background: 'rgba(255,255,255,0.02)' }}
+            style={{ borderLeft: '1px solid var(--rule)', background: 'var(--surface-2)' }}
           >
             {/* publishing queue progress */}
             <div>
               <p
                 className="text-[6.5px] font-black tracking-[0.16em] uppercase"
-                style={{ color: 'rgba(255,255,255,0.30)' }}
+                style={{ color: 'var(--muted)' }}
               >
                 Publishing Queue
               </p>
               <div
                 className="mt-1.5 h-1 rounded-full overflow-hidden"
-                style={{ background: 'rgba(255,255,255,0.08)' }}
+                style={{ background: 'var(--rule)' }}
               >
                 <motion.div
                   className="h-full rounded-full"
-                  style={{ background: 'var(--status-live, #22c55e)' }}
+                  style={{ background: 'var(--status-live)' }}
                   initial={{ width: 0 }}
                   animate={{ width: '72%' }}
                   transition={{ duration: 1.2, ease: EASE, delay: 1.0 }}
                 />
               </div>
-              <p className="text-[7px] font-semibold mt-1" style={{ color: 'rgba(255,255,255,0.35)' }}>
+              <p className="text-[7px] font-semibold mt-1" style={{ color: 'var(--muted)' }}>
                 6 of 9 assets ready
               </p>
             </div>
@@ -362,21 +362,21 @@ export default function TheWeekSlide() {
             <div>
               <p
                 className="text-[6.5px] font-black tracking-[0.16em] uppercase"
-                style={{ color: 'rgba(255,255,255,0.30)' }}
+                style={{ color: 'var(--muted)' }}
               >
                 Upcoming Post
               </p>
               <div
                 className="mt-1 rounded-lg p-2"
-                style={{ border: '1px solid rgba(255,255,255,0.09)', background: 'rgba(255,255,255,0.04)' }}
+                style={{ border: '1px solid var(--rule)', background: 'var(--surface)' }}
               >
-                <div className="flex items-center gap-1" style={{ color: 'rgba(255,255,255,0.40)' }}>
+                <div className="flex items-center gap-1" style={{ color: 'var(--muted)' }}>
                   <I k="li" s={9} />
-                  <span className="text-[8px] font-bold" style={{ color: 'rgba(255,255,255,0.70)' }}>
+                  <span className="text-[8px] font-bold" style={{ color: 'var(--on-surface)' }}>
                     Thought Leadership
                   </span>
                 </div>
-                <p className="text-[7px] font-semibold mt-0.5" style={{ color: 'rgba(255,255,255,0.35)' }}>
+                <p className="text-[7px] font-semibold mt-0.5" style={{ color: 'var(--muted)' }}>
                   Monday · 9:00 AM
                 </p>
               </div>
@@ -385,15 +385,15 @@ export default function TheWeekSlide() {
             {/* next recording chip */}
             <div
               className="mt-auto rounded-lg p-2"
-              style={{ background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.10)' }}
+              style={{ background: 'var(--surface)', border: '1px solid var(--rule)' }}
             >
               <div className="flex items-center gap-1">
-                <span className="w-1.5 h-1.5 rounded-full wk-blink" style={{ background: 'var(--status-live, #22c55e)' }} />
-                <span className="text-[7px] font-bold tracking-wide" style={{ color: 'rgba(255,255,255,0.65)' }}>
+                <span className="w-1.5 h-1.5 rounded-full wk-blink" style={{ background: 'var(--status-live)' }} />
+                <span className="text-[7px] font-bold tracking-wide" style={{ color: 'var(--on-surface)' }}>
                   SYSTEM ACTIVE
                 </span>
               </div>
-              <p className="text-[6.5px] font-semibold mt-0.5" style={{ color: 'rgba(255,255,255,0.35)' }}>
+              <p className="text-[6.5px] font-semibold mt-0.5" style={{ color: 'var(--muted)' }}>
                 Next recording: Monday
               </p>
             </div>
