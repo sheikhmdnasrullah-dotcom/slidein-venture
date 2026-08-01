@@ -63,6 +63,12 @@ type Module = {
   title: string;
   blurb: string;
   icon: IconKind;
+  /* Replaces the status dot that used to sit in each module's top-right. Some
+     of those dots were green and some were pale with nothing distinguishing
+     them, which is the worst state for a status light: it looks like it means
+     something. Either they all carry information or they all go. These carry
+     information, and they read down the grid as a funnel. */
+  throughput: string;
   why: string;
   work: string[];
   flow: string[];
@@ -71,7 +77,7 @@ type Module = {
 
 const MODULES: Module[] = [
   {
-    num: '01', title: 'Ideal Client Research', icon: 'target',
+    num: '01', title: 'Ideal Client Research', icon: 'target', throughput: '1 PROFILE',
     blurb: "We define exactly who you're trying to reach.",
     why: 'Great outreach fails with the wrong audience. Targeting is 80% of replies.',
     work: ['Interview you on your best past clients', 'Map industry, size and buying triggers', 'Write your ideal client profile'],
@@ -79,7 +85,7 @@ const MODULES: Module[] = [
     outcome: 'A precise definition of who we contact — and who we never will.',
   },
   {
-    num: '02', title: 'Manual List Building', icon: 'list',
+    num: '02', title: 'Manual List Building', icon: 'list', throughput: '420 / WK',
     blurb: 'Every prospect is researched by hand.',
     why: 'Purchased lists burn domains, reputations and trust.',
     work: ['Find prospects one by one on LinkedIn', 'Check fit against your client profile', 'Log research notes for the writer'],
@@ -87,7 +93,7 @@ const MODULES: Module[] = [
     outcome: 'A hand-built list of people who actually match.',
   },
   {
-    num: '03', title: 'Email Verification', icon: 'shield',
+    num: '03', title: 'Email Verification', icon: 'shield', throughput: '396 VERIFIED',
     blurb: 'Every address is verified before sending.',
     why: 'One bad address hurts deliverability for everyone after it.',
     work: ['Triple-verify every single address', 'Remove risky and catch-all domains', 'Warm sending domains continuously'],
@@ -95,7 +101,7 @@ const MODULES: Module[] = [
     outcome: 'Emails that land in the inbox, not the spam folder.',
   },
   {
-    num: '04', title: 'Personalized Copywriting', icon: 'pen',
+    num: '04', title: 'Personalized Copywriting', icon: 'pen', throughput: '396 WRITTEN',
     blurb: 'Every email is written like a real human.',
     why: 'People reply to people. Nobody replies to a mail merge.',
     work: ['Start from the prospect research notes', 'Reference something true about them', 'Human review before anything sends'],
@@ -103,7 +109,7 @@ const MODULES: Module[] = [
     outcome: 'Emails that read like you wrote them yourself.',
   },
   {
-    num: '05', title: 'Sequence Management', icon: 'clock',
+    num: '05', title: 'Sequence Management', icon: 'clock', throughput: '3 TOUCHES',
     blurb: 'We manage every send and follow-up.',
     why: 'Most replies come from polite, well-timed follow-ups.',
     work: ['Schedule sends at the right times', 'Space follow-ups naturally', 'Stop instantly when someone replies'],
@@ -111,7 +117,7 @@ const MODULES: Module[] = [
     outcome: 'A steady rhythm that never feels like spam.',
   },
   {
-    num: '06', title: 'Reply Management', icon: 'inbox',
+    num: '06', title: 'Reply Management', icon: 'inbox', throughput: '38 REPLIES',
     blurb: 'You only receive conversations worth your time.',
     why: 'Your time should go to interested buyers only.',
     work: ['Read and sort every single reply', "Filter out the no's and out-of-offices", 'Hand over warm conversations'],
@@ -122,7 +128,7 @@ const MODULES: Module[] = [
 
 const INPUT_CHIPS = [
   { label: 'Industry', value: 'B2B Services' },
-  { label: 'Company size', value: '10 – 200 people' },
+  { label: 'Company size', value: '10 to 200 people' },
   { label: 'Ideal buyer', value: 'Founder / CMO' },
 ];
 
@@ -185,7 +191,7 @@ function EngineWindow({ onOpen }: { onOpen: (i: number) => void }) {
     <motion.div
       initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.7, ease: EASE, delay: 0.25 }}
-      className="flex-1 min-w-0 rounded-2xl border border-[var(--rule)] bg-[var(--surface)] shadow-[0_14px_40px_color-mix(in oklch, var(--on-surface) 8%, transparent)] overflow-hidden"
+      className="flex-1 min-w-0 rounded-2xl border border-[var(--rule)] bg-[var(--surface)] shadow-[0_8px_24px_color-mix(in oklch, var(--on-surface) 6%, transparent)] overflow-hidden"
     >
       {/* title bar */}
       <div className="flex items-center gap-2.5 px-4 py-2.5 border-b border-[var(--rule)] bg-[var(--rule)]">
@@ -208,23 +214,38 @@ function EngineWindow({ onOpen }: { onOpen: (i: number) => void }) {
             type="button"
             onClick={() => onOpen(i)}
             initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, ease: EASE, delay: 0.45 + i * 0.08 }}
-            className="group text-left rounded-xl border border-[var(--rule)] bg-[var(--surface)] p-3 hover:border-[var(--accent-vivid)]/50 hover:shadow-[0_8px_20px_color-mix(in oklch, var(--accent-vivid) 10%, transparent)] hover:-translate-y-0.5 transition-all duration-300 cursor-pointer"
+            transition={{ duration: 0.5, ease: EASE, delay: 0.65 + i * 0.09 }}
+            /* The bottom caption used to say "click any module to see inside".
+               A sentence explaining an affordance is a sign the affordance is
+               missing, so the sentence is gone and the card announces itself:
+               a real button chip at rest, an orange edge, a lift, and a rule
+               that draws along the bottom on hover. */
+            className="group relative overflow-hidden text-left rounded-xl border border-[var(--rule)] bg-[var(--surface)] p-3 hover:border-[var(--accent-vivid)]/50 hover:bg-[var(--accent-vivid)]/[0.025] hover:shadow-[0_8px_20px_color-mix(in oklch, var(--accent-vivid) 10%, transparent)] hover:-translate-y-0.5 transition-all duration-300 cursor-pointer"
           >
             <div className="flex items-center gap-2">
               <span className="w-7 h-7 rounded-lg bg-[var(--rule)] flex items-center justify-center text-[var(--muted)] group-hover:bg-[var(--accent-vivid)]/10 group-hover:text-[var(--accent)] transition-colors duration-300">
                 <Icon kind={m.icon} size={14} />
               </span>
               <span className="text-[8px] font-black tracking-[0.14em] text-[var(--accent)]">{m.num}</span>
-              <span className="ml-auto flex items-center gap-1">
-                <span className="w-1.5 h-1.5 rounded-full bg-[var(--color-live)] os-blink" style={{ animationDelay: `${i * 0.35}s` }} />
-                <svg width={10} height={10} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.4} strokeLinecap="round" strokeLinejoin="round" className="text-[var(--muted)] group-hover:text-[var(--accent)] transition-colors" aria-hidden>
-                  <path d="M7 17 17 7M9 7h8v8" />
-                </svg>
+              <span className="ml-auto flex items-center gap-1.5">
+                <span className="text-[7.5px] font-bold tracking-[0.14em] text-[var(--muted)] tabular-nums whitespace-nowrap">
+                  {m.throughput}
+                </span>
+                {/* The affordance itself: a chip that already looks pressable
+                    before the pointer arrives. */}
+                <span className="flex h-4 w-4 items-center justify-center rounded-[5px] border border-[var(--rule-strong)] text-[var(--muted)] transition-colors duration-300 group-hover:border-[var(--accent-vivid)]/60 group-hover:bg-[var(--accent-vivid)]/10 group-hover:text-[var(--accent)]">
+                  <svg width={8} height={8} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.6} strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                    <path d="M7 17 17 7M9 7h8v8" />
+                  </svg>
+                </span>
               </span>
             </div>
             <p className="mt-2 text-[11.5px] font-extrabold text-[var(--on-surface)] leading-tight">{m.title}</p>
             <p className="mt-1 text-[9.5px] leading-snug text-[var(--muted)]">{m.blurb}</p>
+            <span
+              aria-hidden
+              className="pointer-events-none absolute inset-x-0 bottom-0 h-px origin-left scale-x-0 bg-[var(--accent-vivid)] transition-transform duration-300 ease-out group-hover:scale-x-100"
+            />
           </motion.button>
         ))}
       </div>
@@ -234,11 +255,58 @@ function EngineWindow({ onOpen }: { onOpen: (i: number) => void }) {
 
 /* ------------------------------ right panel ------------------------------- */
 
+/* `at` is the module's own beat in the slide's sequence. The two good replies
+   land first, in reading order; the out-of-office arrives LAST and is filtered
+   in place. That ordering is the joke — the slide shows you a reply, lets you
+   read it, then crosses it out in front of you. It is also the most credible
+   thing on the slide, because it admits the system catches junk. Do not
+   reorder these and do not let the strike render before the card is read. */
 const REPLIES = [
-  { name: 'Interested — wants pricing', ok: true },
-  { name: 'Out of office', ok: false },
-  { name: '"Can we talk next week?"', ok: true },
+  { name: 'Interested — wants pricing', ok: true, at: 1.85 },
+  { name: 'Out of office', ok: false, at: 2.55 },
+  { name: '"Can we talk next week?"', ok: true, at: 2.1 },
 ];
+
+function ReplyCard({ r }: { r: (typeof REPLIES)[number] }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 10 }}
+      animate={r.ok ? { opacity: 1, y: 0 } : { opacity: [0, 1, 1, 0.45], y: [10, 0, 0, 0] }}
+      transition={
+        r.ok
+          ? { duration: 0.5, ease: EASE, delay: r.at }
+          : { duration: 1.9, times: [0, 0.24, 0.62, 1], ease: EASE, delay: r.at }
+      }
+      className={cn(
+        /* The reply cards carry more elevation than anything else on the
+           slide. They are the end of the story and the eye has to finish
+           here, not on the module grid in the middle of it. */
+        'relative flex items-center gap-2 rounded-lg border px-2.5 py-2',
+        r.ok
+          ? 'border-[var(--accent-vivid)]/35 bg-[var(--accent-vivid)]/[0.05] shadow-[0_6px_18px_color-mix(in oklch, var(--accent-vivid) 16%, transparent)]'
+          : 'border-[var(--rule)] bg-[var(--rule)]'
+      )}
+    >
+      <span className={cn('w-5 h-5 rounded-full flex items-center justify-center shrink-0', r.ok ? 'bg-[var(--accent-vivid)]/12 text-[var(--accent)]' : 'bg-[var(--rule)] text-[var(--muted)]')}>
+        <Icon kind={r.ok ? 'chat' : 'user'} size={10} />
+      </span>
+      <span className={cn('relative text-[9px] font-bold leading-tight', r.ok ? 'text-[var(--on-surface)]' : 'text-[var(--muted)]')}>
+        {r.name}
+        {/* The strike is drawn, not pre-rendered. It sweeps left to right once
+            the card has had a beat to be read. */}
+        {!r.ok && (
+          <motion.span
+            aria-hidden
+            className="pointer-events-none absolute inset-x-0 top-1/2 h-px origin-left bg-current"
+            initial={{ scaleX: 0 }}
+            animate={{ scaleX: 1 }}
+            transition={{ duration: 0.34, ease: EASE, delay: r.at + 0.62 }}
+          />
+        )}
+      </span>
+    </motion.div>
+  );
+}
 
 function OutputPanel() {
   return (
@@ -249,25 +317,15 @@ function OutputPanel() {
     >
       {/* ambient glow */}
       <div aria-hidden className="pointer-events-none absolute -inset-5 rounded-[28px] bg-[var(--accent-vivid)]/[0.07] blur-2xl os-halo" />
-      <div className="relative rounded-2xl border border-[var(--accent-ring)] bg-[var(--surface)] shadow-[var(--shadow-raised)] p-4">
-        <p className="text-[8.5px] font-bold tracking-[0.2em] text-[var(--muted)] uppercase">Output</p>
+      {/* 1px orange border and the heaviest shadow on the canvas — the output
+          column used to sit at the same visual weight as the input column,
+          which left the six-module grid as the loudest object on the slide. */}
+      <div className="relative rounded-2xl border border-[var(--accent-vivid)] bg-[var(--surface)] shadow-[0_20px_54px_color-mix(in oklch, var(--on-surface) 14%, transparent),0_0_0_4px_color-mix(in oklch, var(--accent-vivid) 7%, transparent)] p-4">
+        <p className="text-[8.5px] font-bold tracking-[0.2em] text-[var(--accent)] uppercase">Output</p>
         <h3 className="mt-1.5 text-[13px] font-extrabold leading-snug text-[var(--on-surface)]">Qualified Conversations</h3>
         <div className="mt-3 flex flex-col gap-1.5">
-          {REPLIES.map((r, i) => (
-            <motion.div
-              key={r.name}
-              animate={r.ok ? { opacity: [0, 1, 1], y: [10, 0, 0] } : { opacity: [0, 0.55, 0.15], y: [10, 0, 0] }}
-              transition={{ duration: 2.6, repeat: Infinity, repeatDelay: 3.4, delay: i * 1.15, ease: 'easeOut' }}
-              className={cn(
-                'flex items-center gap-2 rounded-lg border px-2.5 py-2',
-                r.ok ? 'border-[var(--accent-vivid)]/35 bg-[var(--accent-vivid)]/[0.05]' : 'border-[var(--rule)] bg-[var(--rule)]'
-              )}
-            >
-              <span className={cn('w-5 h-5 rounded-full flex items-center justify-center shrink-0', r.ok ? 'bg-[var(--accent-vivid)]/12 text-[var(--accent)]' : 'bg-[var(--rule)] text-[var(--muted)]')}>
-                <Icon kind={r.ok ? 'chat' : 'user'} size={10} />
-              </span>
-              <span className={cn('text-[9px] font-bold leading-tight', r.ok ? 'text-[var(--on-surface)]' : 'text-[var(--muted)] line-through')}>{r.name}</span>
-            </motion.div>
+          {REPLIES.map((r) => (
+            <ReplyCard key={r.name} r={r} />
           ))}
         </div>
         {/* filter divider */}
@@ -276,11 +334,15 @@ function OutputPanel() {
           <span className="text-[7px] font-bold tracking-[0.18em] text-[var(--muted)] uppercase">Filtered</span>
           <span className="flex-1 h-px bg-[var(--rule)]" />
         </div>
+        {/* The dark chip sat on --on-surface and painted its heading in
+            --on-surface too, so "Meeting booked" rendered ink-on-ink and was
+            invisible in the light theme. Text on this chip has to come from
+            the surface side of the palette, not the ink side. */}
         <div className="rounded-xl bg-[var(--on-surface)] px-3 py-2.5 flex items-center gap-2.5">
           <span className="w-2 h-2 rounded-full bg-[var(--color-live)] os-blink shrink-0" />
           <div>
-            <p className="text-[10px] font-extrabold text-[var(--on-surface)] leading-tight">Meeting booked</p>
-            <p className="text-[8px] font-semibold text-[var(--muted)] mt-0.5">You&apos;re notified. That&apos;s all you do.</p>
+            <p className="text-[10px] font-extrabold text-[var(--surface)] leading-tight">Meeting booked</p>
+            <p className="text-[8px] font-semibold text-[color-mix(in_oklch,var(--surface)_66%,transparent)] mt-0.5">You&apos;re notified. That&apos;s all you do.</p>
           </div>
         </div>
       </div>
@@ -384,20 +446,18 @@ export default function OutreachOSSlide() {
 
   return (
     <div className="relative w-full max-w-[1120px] mx-auto">
-      {/* header */}
-      <motion.div
-        initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, ease: EASE }}
-        className="text-center mb-4"
-      >
-        <p className="text-[11px] md:text-xs font-bold tracking-[0.14em] uppercase text-[var(--accent)]">The Outreach System</p>
-        <h2 className="mt-1.5 display-headline text-[clamp(1.3rem,2.6vw,1.9rem)] text-[var(--on-surface)]">
-          You tell us once. <span className="text-[var(--accent)]">The engine does the rest</span>.
-        </h2>
-      </motion.div>
-
       {/* canvas */}
       <div className="relative rounded-2xl p-4 lg:p-5 overflow-hidden">
+        {/* The centred eyebrow and centred headline are gone. The title sits
+            top left on the same axis as the input column, in the display
+            serif, the way every other slide in the deck now opens. */}
+        <motion.h2
+          initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, ease: EASE }}
+          className="relative font-display-md mb-5 text-[clamp(1.5rem,3.1vw,2.5rem)] text-[var(--on-surface)]"
+        >
+          You tell us once.
+        </motion.h2>
         {/* blueprint background */}
         <div
           aria-hidden
@@ -407,7 +467,7 @@ export default function OutreachOSSlide() {
         <div aria-hidden className="absolute inset-x-0 top-0 h-px bg-[var(--rule)] pointer-events-none" />
         {/* section labels */}
         <div aria-hidden className="relative hidden lg:flex items-center justify-between px-1 pb-3">
-          {['01 — Input', '02 — Engine', '03 — Output'].map((sLabel) => (
+          {['01 · Input', '02 · Engine', '03 · Output'].map((sLabel) => (
             <span key={sLabel} className="flex items-center gap-2">
               <span className="w-[2px] h-2.5 bg-[var(--accent-vivid)]/80 rounded-full" />
               <span className="text-[8.5px] font-bold tracking-[0.22em] text-[var(--muted)] uppercase">{sLabel.toUpperCase()}</span>
@@ -417,19 +477,17 @@ export default function OutreachOSSlide() {
 
         <div className="relative flex flex-col lg:flex-row items-stretch lg:items-center gap-3 lg:gap-0">
           <InputPanel />
-          <Connector delay={0.2} />
+          <Connector delay={0.45} />
           <EngineWindow onOpen={setActive} />
-          <Connector delay={1.1} />
+          <Connector delay={1.25} />
           <OutputPanel />
         </div>
 
-        {/* annotation */}
-        <motion.p
-          initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 2.2, duration: 0.8 }}
-          className="relative hidden lg:block text-center mt-3 text-[11px] italic text-[var(--muted)] [font-family:ui-serif,Georgia,serif]"
-        >
-          Everything in the middle happens without you. Click any module to see inside.
-        </motion.p>
+        {/* The bottom caption is gone. Its first half ("everything in the
+            middle happens without you") is what the three-column layout
+            already says; its second half ("click any module to see inside")
+            was a sentence standing in for an affordance, and the modules now
+            carry that affordance themselves — see EngineWindow. */}
 
         {/* side panel */}
         <AnimatePresence>

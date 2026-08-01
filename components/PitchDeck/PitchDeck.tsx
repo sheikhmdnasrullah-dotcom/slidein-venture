@@ -33,7 +33,6 @@ import OrbitSlide from '@/components/PitchDeck/OrbitSlide';
 import OutreachOSSlide from '@/components/PitchDeck/OutreachOSSlide';
 import GrowthLoopSlide from '@/components/PitchDeck/GrowthLoopSlide';
 import WeeklyCalendarSlide from '@/components/PitchDeck/WeeklyCalendarSlide';
-import DistributionSlide from '@/components/PitchDeck/DistributionSlide';
 import PipelineSlide from '@/components/PitchDeck/PipelineSlide';
 import InputSlide from '@/components/PitchDeck/InputSlide';
 import TheWeekSlide from '@/components/PitchDeck/TheWeekSlide';
@@ -428,21 +427,11 @@ function Slide4({ onOpenService }: { onOpenService: (id: string) => void }) {
   );
 }
 
-/* ── Slide 4 — Content Distribution ──────────────────────────────────── */
-function Slide4b() {
-  return (
-    <motion.div
-      variants={containerVariants}
-      initial="hidden"
-      animate="visible"
-      className="w-full h-full flex flex-col items-center justify-center"
-    >
-      <motion.div variants={itemVariants} className="w-full">
-        <DistributionSlide />
-      </motion.div>
-    </motion.div>
-  );
-}
+/* Content Distribution (the sphere slide) was deleted. Its concentric rings,
+   orbital paths and processing sphere were decoration around an argument the
+   content slide already makes. The one thing worth keeping — the SMART ROUTING
+   junction and its three curved branches — was grafted into OrbitSlide, where
+   it replaced a straight orthogonal bus. */
 
 /* ── Slide 5 — The Outreach System (interactive OS) ───────────────────── */
 function Slide5() {
@@ -595,7 +584,6 @@ const SLIDE_META = [
   { kicker: 'The Complete Framework' },
   { kicker: 'The Week' },
   { kicker: 'The Content System' },
-  { kicker: 'Content Distribution' },
   { kicker: 'The Outreach System' },
   { kicker: 'The System, Running' },
   { kicker: "Why It's One System" },
@@ -743,7 +731,6 @@ export default function PitchDeck() {
       <Slide2 key="s2" />,
       <TheWeekSlide key="s-week" />,
       <Slide4 key="s4" onOpenService={openService} />,
-      <Slide4b key="s4b" />,
       <Slide5 key="s5" />,
       <SlidePipeline key="s-pipeline" />,
       <Slide6 key="s6" />,

@@ -6,15 +6,13 @@
  * A product-blueprint canvas, read left to right:
  *
  *   01 ORIGIN      one orange focal card — "You Record Once a Week"
- *   02 ENGINE      the SlideIn Content Engine, a living processing module
- *   03 PRODUCTION  six intelligent output modules (click → service modal)
- *   04 PUBLISH     grouped destinations (video / social / owned)
+ *   02 PRODUCTION  six intelligent output modules (click → service modal)
+ *   03 PUBLISH     grouped destinations (video / social / owned)
  *
- * White canvas, architectural helper lines, thin FigJam-style connectors,
- * flowing data particles, tiny handwritten annotations. Orange is used
- * only to guide attention.
+ * The Engine Visual has been removed. The flow goes directly:
+ *   Record → Production Cards → Smart Routing → Destinations
  *
- * Platform marks are official simple-icons path data.
+ * Layout is relaxed with more breathing room between nodes and wires.
  */
 
 import { motion } from 'framer-motion';
@@ -41,18 +39,29 @@ const LOGOS: Record<string, string> = {
     'M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.225 0z',
 };
 
-/* ------------------------------- geometry -------------------------------- */
+/* ------------------------------- geometry --------------------------------
+   Three columns now (Engine removed). Canvas widened to 1400 with more
+   breathing room between each stage. Everything sits on one BASELINE.
+   Cards are taller and spaced further apart for a relaxed, airy feel. */
 
-const VB = { w: 1240, h: 560 };
+const VB = { w: 1400, h: 660 };
 
-const ORIGIN = { x: 56, y: 216, w: 216, h: 128 };
-const ENGINE = { x: 352, y: 200, w: 208, h: 160 };
-const COL = { x: 636, w: 248, cardH: 58, gap: 14, top: 71 };
-const BUS1 = 608; // engine → production
-const BUS2 = 918; // production → publish
+const BASELINE = 330;
 
-const O_CY = ORIGIN.y + ORIGIN.h / 2; // 280
-const E_CY = ENGINE.y + ENGINE.h / 2; // 280
+/* Origin card — the anchor, client's moment stays orange */
+const ORIGIN = { x: 80, y: BASELINE - 80, w: 240, h: 160 };
+
+/* Production cards start further right — direct jump from origin */
+const COL = { x: 520, w: 268, cardH: 68, gap: 18, top: 110 };
+const BUS1 = 492; // origin → production bus
+
+/* Smart routing junction and output groups */
+const JUNCTION = { x: 1100, y: BASELINE };
+
+const GROUP_X = 1168;
+const GROUP_W = 196;
+
+const O_CY = ORIGIN.y + ORIGIN.h / 2;
 
 const cardY = (i: number) => COL.top + i * (COL.cardH + COL.gap);
 const cardCY = (i: number) => cardY(i) + COL.cardH / 2;
@@ -61,21 +70,23 @@ const cardCY = (i: number) => cardY(i) + COL.cardH / 2;
 
 type Module = {
   id: string;
-  /** Matching id in framework.data.ts's ENGINES[0].items */
   serviceId: string;
   title: string;
   desc: string;
+  turnaround: string;
   icon: 'notes' | 'film' | 'image' | 'play' | 'doc' | 'linkedin';
 };
 
 const PIPELINE: Module[] = [
-  { id: 'show-notes', serviceId: 'c-notes', title: 'Show Notes', desc: 'Timestamped, ready to publish', icon: 'notes' },
-  { id: 'edited-episode', serviceId: 'c-audio', title: 'Edited Episode', desc: 'Trimmed, balanced, mastered', icon: 'film' },
-  { id: 'thumbnail', serviceId: 'c-thumbnails', title: 'Thumbnail', desc: 'One look, reused every episode', icon: 'image' },
-  { id: 'short-clips', serviceId: 'c-clips', title: 'Short Clips', desc: 'Captioned 30–60s cuts', icon: 'play' },
-  { id: 'full-articles', serviceId: 'c-blog', title: 'Full Articles', desc: 'Rewritten in your voice', icon: 'doc' },
-  { id: 'linkedin-posts', serviceId: 'c-social', title: 'LinkedIn Posts', desc: 'From what you actually said', icon: 'linkedin' },
+  { id: 'show-notes', serviceId: 'c-notes', title: 'Show Notes', desc: 'Timestamped, ready to publish', turnaround: '2 HRS', icon: 'notes' },
+  { id: 'edited-episode', serviceId: 'c-audio', title: 'Edited Episode', desc: 'Trimmed, balanced, mastered', turnaround: '24 HRS', icon: 'film' },
+  { id: 'thumbnail', serviceId: 'c-thumbnails', title: 'Thumbnail', desc: 'One look, reused every episode', turnaround: '4 HRS', icon: 'image' },
+  { id: 'short-clips', serviceId: 'c-clips', title: 'Short Clips', desc: 'Captioned 30 to 60s cuts', turnaround: '24 HRS', icon: 'play' },
+  { id: 'full-articles', serviceId: 'c-blog', title: 'Full Articles', desc: 'Rewritten in your voice', turnaround: '24 HRS', icon: 'doc' },
+  { id: 'linkedin-posts', serviceId: 'c-social', title: 'LinkedIn Posts', desc: 'From what you actually said', turnaround: '4 HRS', icon: 'linkedin' },
 ];
+
+/* ── Output groups ────────────────────────────────────────────────────────── */
 
 type OutputGroup = {
   id: string;
@@ -86,21 +97,14 @@ type OutputGroup = {
   items: { name: string; brand: string; logo?: string; strokeIcon?: 'globe' | 'mail' }[];
 };
 
-const GROUP_X = 952;
-const GROUP_W = 236;
-
 const OUTPUTS: OutputGroup[] = [
   {
     id: 'video',
     label: 'Video & Audio',
     count: '03',
-    y: 64,
-    h: 126,
+    y: 120,
+    h: 130,
     items: [
-  /* The `brand` values below are third-party marks (YouTube red, Spotify green,
-     Apple Podcasts purple, Instagram, LinkedIn). They are fixed by their owners
-     and are the one exemption from the palette — a tokenised YouTube red would
-     not be YouTube red. Everything else in this file speaks the tone contract. */
       { name: 'YouTube', brand: '#FF0000', logo: LOGOS.youtube },
       { name: 'Spotify', brand: '#1ED760', logo: LOGOS.spotify },
       { name: 'Podcasts', brand: '#9933CC', logo: LOGOS.applepodcasts },
@@ -110,8 +114,8 @@ const OUTPUTS: OutputGroup[] = [
     id: 'social',
     label: 'Social',
     count: '04',
-    y: 214,
-    h: 132,
+    y: BASELINE - 72,
+    h: 144,
     items: [
       { name: 'Instagram', brand: '#E4405F', logo: LOGOS.instagram },
       { name: 'LinkedIn', brand: '#0A66C2', logo: LOGOS.linkedin },
@@ -123,8 +127,8 @@ const OUTPUTS: OutputGroup[] = [
     id: 'owned',
     label: 'Owned',
     count: '02',
-    y: 370,
-    h: 118,
+    y: BASELINE + 88,
+    h: 120,
     items: [
       { name: 'Website', brand: ORANGE, strokeIcon: 'globe' },
       { name: 'Newsletter', brand: ORANGE, strokeIcon: 'mail' },
@@ -134,11 +138,11 @@ const OUTPUTS: OutputGroup[] = [
 
 const GROUP_CY = (g: OutputGroup) => g.y + g.h / 2;
 
+/* Section labels — 3 columns only */
 const SECTIONS = [
-  { label: '01 — Origin', x: ORIGIN.x },
-  { label: '02 — Engine', x: ENGINE.x },
-  { label: '03 — Production', x: COL.x },
-  { label: '04 — Publish', x: GROUP_X },
+  { label: '01 · Origin', x: ORIGIN.x },
+  { label: '02 · Production', x: COL.x },
+  { label: '03 · Publish', x: GROUP_X },
 ];
 
 /* ------------------------------ tiny icons -------------------------------- */
@@ -212,28 +216,36 @@ function BlueprintChrome() {
   return (
     <g aria-hidden>
       {/* ruler ticks along the top */}
-      {Array.from({ length: 30 }, (_, i) => 56 + i * 40).map((x) => (
-        <line key={x} x1={x} y1={10} x2={x} y2={x % 200 === 56 % 200 ? 18 : 14} stroke={INK} strokeOpacity={0.08} strokeWidth={1} />
+      {Array.from({ length: 32 }, (_, i) => ORIGIN.x + i * 42).map((x, i) => (
+        <line key={x} x1={x} y1={10} x2={x} y2={i % 5 === 0 ? 18 : 14} stroke={INK} strokeOpacity={0.07} strokeWidth={1} />
       ))}
-      {/* zone separator guides */}
-      {[320, 610, 920].map((x) => (
-        <line key={x} x1={x} y1={26} x2={x} y2={540} stroke={INK} strokeOpacity={0.045} strokeWidth={1} strokeDasharray="1 7" />
+      {/* zone separator guides — fewer, more breathing room */}
+      {[380, 840].map((x) => (
+        <line key={x} x1={x} y1={92} x2={x} y2={600} stroke={INK} strokeOpacity={0.04} strokeWidth={1} strokeDasharray="1 8" />
       ))}
-      {/* construction circles behind the engine */}
-      <circle cx={ENGINE.x + ENGINE.w / 2} cy={E_CY} r={124} fill="none" stroke={INK} strokeOpacity={0.05} strokeWidth={1} strokeDasharray="2 6" />
-      <circle cx={ENGINE.x + ENGINE.w / 2} cy={E_CY} r={156} fill="none" stroke={ORANGE} strokeOpacity={0.05} strokeWidth={1} />
       {/* corner crosshairs */}
       {[
-        [40, 40], [1200, 40], [40, 524], [1200, 524],
+        [1360, 40], [40, 620],
       ].map(([x, y]) => (
-        <g key={`${x}-${y}`} stroke={INK} strokeOpacity={0.14} strokeWidth={1}>
+        <g key={`${x}-${y}`} stroke={INK} strokeOpacity={0.12} strokeWidth={1}>
           <line x1={x - 5} y1={y} x2={x + 5} y2={y} />
           <line x1={x} y1={y - 5} x2={x} y2={y + 5} />
         </g>
       ))}
-      {/* horizontal baseline through the system */}
-      <line x1={40} y1={280} x2={1200} y2={280} stroke={INK} strokeOpacity={0.04} strokeWidth={1} strokeDasharray="1 8" />
+      {/* horizontal baseline */}
+      <line x1={40} y1={BASELINE} x2={1360} y2={BASELINE} stroke={INK} strokeOpacity={0.04} strokeWidth={1} strokeDasharray="1 9" />
     </g>
+  );
+}
+
+function Title() {
+  return (
+    <motion.g
+      initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, ease: EASE }}
+    >
+      <text x={ORIGIN.x} y={68} className="bp-title">One in. Nine out.</text>
+    </motion.g>
   );
 }
 
@@ -242,8 +254,8 @@ function SectionLabels() {
     <g>
       {SECTIONS.map((s) => (
         <g key={s.label}>
-          <line x1={s.x + 1} y1={26} x2={s.x + 1} y2={34} stroke={ORANGE} strokeOpacity={0.8} strokeWidth={2} strokeLinecap="round" />
-          <text x={s.x + 9} y={33} className="bp-section">{s.label.toUpperCase()}</text>
+          <line x1={s.x + 1} y1={101} x2={s.x + 1} y2={110} stroke={ORANGE} strokeOpacity={0.8} strokeWidth={2} strokeLinecap="round" />
+          <text x={s.x + 9} y={109} className="bp-section">{s.label.toUpperCase()}</text>
         </g>
       ))}
     </g>
@@ -252,92 +264,132 @@ function SectionLabels() {
 
 /* ------------------------------- connectors ------------------------------- */
 
+/* Relaxed, wide Bezier curves from the production cards gathering to the junction */
+const gather = (fromY: number) => {
+  const dy = JUNCTION.y - fromY;
+  if (Math.abs(dy) < 1) return `M ${COL.x + COL.w} ${fromY} L ${JUNCTION.x - 8} ${JUNCTION.y}`;
+  // Wider control points for a more relaxed, gentle curve
+  const cp1x = COL.x + COL.w + 60;
+  const cp2x = JUNCTION.x - 70;
+  return `M ${COL.x + COL.w} ${fromY} C ${cp1x} ${fromY}, ${cp2x} ${JUNCTION.y - dy * 0.12}, ${JUNCTION.x - 6} ${JUNCTION.y - (dy > 0 ? 6 : -6)}`;
+};
+
+/* Relaxed fan branches from the junction to output groups */
+const branch = (toY: number) => {
+  const dy = toY - JUNCTION.y;
+  if (Math.abs(dy) < 1) return `M ${JUNCTION.x + 8} ${JUNCTION.y} L ${GROUP_X} ${toY}`;
+  const lift = dy > 0 ? 7 : -7;
+  // Wider control points for gentle, airy arcs
+  const cp1x = JUNCTION.x + 60;
+  const cp2x = GROUP_X - 60;
+  return `M ${JUNCTION.x + 6} ${JUNCTION.y + lift} C ${cp1x} ${JUNCTION.y + dy * 0.22}, ${cp2x} ${toY}, ${GROUP_X} ${toY}`;
+};
+
 function Connectors() {
   return (
     <g aria-hidden>
-      {/* origin → engine */}
-      <motion.line
-        x1={ORIGIN.x + ORIGIN.w} y1={O_CY} x2={ENGINE.x} y2={E_CY}
-        stroke={INK} strokeOpacity={0.16} strokeWidth={1.4}
-        initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ duration: 0.5, ease: 'easeOut', delay: 0.7 }}
-      />
-      {/* engine → production trunk + bus */}
+      {/* origin → production bus: single wide cubic curve */}
       <motion.path
-        d={`M ${ENGINE.x + ENGINE.w} ${E_CY} H ${BUS1}`}
-        fill="none" stroke={INK} strokeOpacity={0.16} strokeWidth={1.4}
-        initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ duration: 0.4, ease: 'easeOut', delay: 1.0 }}
+        d={`M ${ORIGIN.x + ORIGIN.w} ${O_CY} C ${ORIGIN.x + ORIGIN.w + 80} ${O_CY}, ${BUS1 - 60} ${cardCY(2)}, ${BUS1} ${cardCY(2)}`}
+        fill="none" stroke={INK} strokeOpacity={0.15} strokeWidth={1.4}
+        initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ duration: 0.8, ease: 'easeOut', delay: 0.5 }}
       />
+
+      {/* vertical bus connecting all card entry points */}
       <motion.line
         x1={BUS1} y1={cardCY(0)} x2={BUS1} y2={cardCY(5)}
-        stroke={INK} strokeOpacity={0.12} strokeWidth={1.2}
-        initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ duration: 0.6, ease: 'easeOut', delay: 1.15 }}
+        stroke={INK} strokeOpacity={0.10} strokeWidth={1.2}
+        initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ duration: 0.7, ease: 'easeOut', delay: 0.9 }}
       />
+
+      {/* bus → each production card */}
       {PIPELINE.map((m, i) => (
         <motion.line
           key={`b1-${m.id}`}
           x1={BUS1} y1={cardCY(i)} x2={COL.x} y2={cardCY(i)}
-          stroke={INK} strokeOpacity={0.14} strokeWidth={1.2}
+          stroke={INK} strokeOpacity={0.12} strokeWidth={1.2}
           initial={{ pathLength: 0 }} animate={{ pathLength: 1 }}
-          transition={{ duration: 0.3, ease: 'easeOut', delay: 1.3 + i * 0.07 }}
-        />
-      ))}
-      {/* production → publish bus */}
-      {PIPELINE.map((m, i) => (
-        <motion.line
-          key={`b2-${m.id}`}
-          x1={COL.x + COL.w} y1={cardCY(i)} x2={BUS2} y2={cardCY(i)}
-          stroke={INK} strokeOpacity={0.1} strokeWidth={1.1}
-          initial={{ pathLength: 0 }} animate={{ pathLength: 1 }}
-          transition={{ duration: 0.3, ease: 'easeOut', delay: 1.6 + i * 0.05 }}
-        />
-      ))}
-      <motion.line
-        x1={BUS2} y1={cardCY(0)} x2={BUS2} y2={cardCY(5)}
-        stroke={INK} strokeOpacity={0.12} strokeWidth={1.2}
-        initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ duration: 0.6, ease: 'easeOut', delay: 1.8 }}
-      />
-      {OUTPUTS.map((g, i) => (
-        <motion.line
-          key={`b3-${g.id}`}
-          x1={BUS2} y1={GROUP_CY(g)} x2={GROUP_X} y2={GROUP_CY(g)}
-          stroke={INK} strokeOpacity={0.14} strokeWidth={1.2}
-          initial={{ pathLength: 0 }} animate={{ pathLength: 1 }}
-          transition={{ duration: 0.3, ease: 'easeOut', delay: 1.95 + i * 0.08 }}
+          transition={{ duration: 0.3, ease: 'easeOut', delay: 1.1 + i * 0.08 }}
         />
       ))}
 
+      {/* production → junction: relaxed gather curves */}
+      {PIPELINE.map((m, i) => (
+        <motion.path
+          key={`b2-${m.id}`}
+          d={gather(cardCY(i))} fill="none"
+          stroke={INK} strokeOpacity={0.11} strokeWidth={1.1}
+          initial={{ pathLength: 0 }} animate={{ pathLength: 1 }}
+          transition={{ duration: 0.55, ease: 'easeOut', delay: 1.5 + i * 0.06 }}
+        />
+      ))}
+
+      {/* junction fan-out: relaxed arc branches */}
+      {OUTPUTS.map((g, i) => (
+        <motion.path
+          key={`b3-${g.id}`}
+          d={branch(GROUP_CY(g))} fill="none"
+          stroke={ORANGE} strokeOpacity={0.30} strokeWidth={1.5}
+          initial={{ pathLength: 0 }} animate={{ pathLength: 1 }}
+          transition={{ duration: 0.55, ease: 'easeOut', delay: 2.0 + i * 0.10 }}
+        />
+      ))}
+
+      {/* routing junction node */}
+      <motion.g
+        initial={{ opacity: 0, scale: 0.6 }} animate={{ opacity: 1, scale: 1 }}
+        style={{ transformBox: 'fill-box', transformOrigin: 'center' }}
+        transition={{ duration: 0.5, ease: EASE, delay: 1.9 }}
+      >
+        <circle cx={JUNCTION.x} cy={JUNCTION.y} r={14} fill="var(--surface)" stroke={ORANGE} strokeOpacity={0.38}
+          strokeWidth={1.2} strokeDasharray="3 4" className="bp-spin" />
+        <circle cx={JUNCTION.x} cy={JUNCTION.y} r={5} fill={ORANGE} className="bp-glow" />
+        <text x={JUNCTION.x} y={JUNCTION.y + 36} textAnchor="middle" className="bp-stage">SMART ROUTING</text>
+      </motion.g>
+
       {/* connector joints */}
-      <g fill="var(--surface)" stroke={INK} strokeOpacity={0.28} strokeWidth={1}>
-        <circle cx={ORIGIN.x + ORIGIN.w} cy={O_CY} r={2.6} />
-        <circle cx={ENGINE.x} cy={E_CY} r={2.6} />
-        <circle cx={ENGINE.x + ENGINE.w} cy={E_CY} r={2.6} />
-        <circle cx={BUS1} cy={E_CY} r={2.6} />
+      <g fill="var(--surface)" stroke={INK} strokeOpacity={0.25} strokeWidth={1}>
+        <circle cx={ORIGIN.x + ORIGIN.w} cy={O_CY} r={2.8} />
+        <circle cx={BUS1} cy={cardCY(2)} r={2.8} />
         {PIPELINE.map((m, i) => (
           <circle key={`j1-${m.id}`} cx={BUS1} cy={cardCY(i)} r={2.2} />
         ))}
         {OUTPUTS.map((g) => (
-          <circle key={`j2-${g.id}`} cx={BUS2} cy={GROUP_CY(g)} r={2.6} />
+          <circle key={`j2-${g.id}`} cx={GROUP_X} cy={GROUP_CY(g)} r={2.6} />
         ))}
       </g>
 
       {/* flowing data particles */}
-      <motion.g initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 2.4, duration: 0.8 }}>
+      <motion.g initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 2.2, duration: 0.8 }}>
+        {/* particle: origin → bus */}
         <circle r={2.6} fill={ORANGE} className="bp-glow">
-          <animateMotion dur="2.4s" repeatCount="indefinite" path={`M ${ORIGIN.x + ORIGIN.w} ${O_CY} L ${ENGINE.x} ${E_CY}`} />
+          <animateMotion dur="2.8s" repeatCount="indefinite"
+            path={`M ${ORIGIN.x + ORIGIN.w} ${O_CY} C ${ORIGIN.x + ORIGIN.w + 80} ${O_CY}, ${BUS1 - 60} ${cardCY(2)}, ${BUS1} ${cardCY(2)}`} />
         </circle>
+        {/* particles: bus → cards */}
         {[0, 2, 4].map((i, k) => (
           <circle key={`p1-${i}`} r={2.2} fill={ORANGE} className="bp-glow">
             <animateMotion
-              dur={`${3 + k * 0.5}s`} begin={`${k * 0.8}s`} repeatCount="indefinite"
-              path={`M ${ENGINE.x + ENGINE.w} ${E_CY} L ${BUS1} ${E_CY} L ${BUS1} ${cardCY(i)} L ${COL.x} ${cardCY(i)}`}
+              dur={`${3.2 + k * 0.5}s`} begin={`${k * 0.9}s`} repeatCount="indefinite"
+              path={`M ${BUS1} ${cardCY(i)} L ${COL.x} ${cardCY(i)}`}
             />
           </circle>
         ))}
+        {/* particles: gather */}
         {[1, 3, 5].map((i, k) => (
           <circle key={`p2-${i}`} r={2} fill={ORANGE} fillOpacity={0.85} className="bp-glow">
             <animateMotion
-              dur={`${3.4 + k * 0.4}s`} begin={`${0.6 + k * 0.9}s`} repeatCount="indefinite"
-              path={`M ${COL.x + COL.w} ${cardCY(i)} L ${BUS2} ${cardCY(i)} L ${BUS2} ${GROUP_CY(OUTPUTS[k])} L ${GROUP_X} ${GROUP_CY(OUTPUTS[k])}`}
+              dur={`${3.6 + k * 0.4}s`} begin={`${0.6 + k * 0.9}s`} repeatCount="indefinite"
+              path={gather(cardCY(i))}
+            />
+          </circle>
+        ))}
+        {/* particles: fan-out branches */}
+        {OUTPUTS.map((g, k) => (
+          <circle key={`p3-${g.id}`} r={2.2} fill={ORANGE} className="bp-glow">
+            <animateMotion
+              dur={`${2.8 + k * 0.35}s`} begin={`${1.2 + k * 0.7}s`} repeatCount="indefinite"
+              path={branch(GROUP_CY(g))}
             />
           </circle>
         ))}
@@ -346,30 +398,13 @@ function Connectors() {
   );
 }
 
-/* ------------------------------ annotations ------------------------------- */
+/* ---------------------------- footnote ------------------------------------ */
 
-function Annotations() {
+function Footnote() {
   return (
-    <motion.g initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.9, delay: 2.6 }} aria-hidden>
-      <g className="bp-annot-g">
-        <text x={ORIGIN.x + 8} y={196} className="bp-annot">Everything starts here.</text>
-        <path d={`M ${ORIGIN.x + 60} 202 Q ${ORIGIN.x + 68} 210 ${ORIGIN.x + 74} 214`} fill="none" stroke={INK} strokeOpacity={0.22} strokeWidth={1} />
-      </g>
-      <g className="bp-annot-g">
-        <text x={ENGINE.x + 4} y={398} className="bp-annot">Repurpose automatically.</text>
-        <path d={`M ${ENGINE.x + 60} 384 Q ${ENGINE.x + 54} 372 ${ENGINE.x + 56} 364`} fill="none" stroke={INK} strokeOpacity={0.22} strokeWidth={1} />
-      </g>
-      <g className="bp-annot-g">
-        <text x={COL.x + 62} y={526} className="bp-annot">Human reviewed. Every piece.</text>
-        <path d={`M ${COL.x + 118} 512 Q ${COL.x + 112} 502 ${COL.x + 114} 494`} fill="none" stroke={INK} strokeOpacity={0.22} strokeWidth={1} />
-      </g>
-      <g className="bp-annot-g">
-        <text x={GROUP_X + 62} y={46} className="bp-annot">Publish everywhere.</text>
-      </g>
-      <g className="bp-annot-g">
-        <text x={472} y={124} className="bp-annot">One recording in.</text>
-        <path d="M 512 130 Q 500 146 484 160" fill="none" stroke={INK} strokeOpacity={0.22} strokeWidth={1} />
-      </g>
+    <motion.g initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.8, delay: 2.6 }} aria-hidden>
+      <line x1={ORIGIN.x} y1={620} x2={ORIGIN.x + 22} y2={620} stroke={ORANGE} strokeOpacity={0.7} strokeWidth={1.5} strokeLinecap="round" />
+      <text x={ORIGIN.x + 32} y={623} className="bp-foot">HUMAN REVIEWED. EVERY PIECE.</text>
     </motion.g>
   );
 }
@@ -382,73 +417,24 @@ function OriginCard() {
       initial={{ opacity: 0, x: -16 }} animate={{ opacity: 1, x: 0 }}
       transition={{ duration: 0.7, ease: EASE, delay: 0.15 }}
     >
-      {/* breathing halo */}
-      <circle cx={ORIGIN.x + ORIGIN.w / 2} cy={O_CY} r={110} fill={ORANGE} opacity={0.06} className="bp-halo" />
       <rect
-        x={ORIGIN.x} y={ORIGIN.y} width={ORIGIN.w} height={ORIGIN.h} rx={20}
+        x={ORIGIN.x} y={ORIGIN.y} width={ORIGIN.w} height={ORIGIN.h} rx={22}
         fill="url(#bpOrigin)" filter="url(#bpOriginShadow)"
       />
-      <rect x={ORIGIN.x} y={ORIGIN.y} width={ORIGIN.w} height={ORIGIN.h} rx={20} fill="none" stroke="var(--on-accent)" strokeOpacity={0.22} strokeWidth={1} />
+      <rect x={ORIGIN.x} y={ORIGIN.y} width={ORIGIN.w} height={ORIGIN.h} rx={22} fill="none" stroke="var(--on-accent)" strokeOpacity={0.22} strokeWidth={1} />
       {/* mic icon chip */}
-      <circle cx={ORIGIN.x + 36} cy={ORIGIN.y + 36} r={17} fill="color-mix(in oklch, var(--on-accent) 16%, transparent)" stroke="color-mix(in oklch, var(--on-accent) 30%, transparent)" strokeWidth={1} />
+      <circle cx={ORIGIN.x + 38} cy={ORIGIN.y + 40} r={19} fill="color-mix(in oklch, var(--on-accent) 16%, transparent)" stroke="color-mix(in oklch, var(--on-accent) 30%, transparent)" strokeWidth={1} />
       <g fill="none" stroke="var(--on-accent)" strokeWidth={1.9} strokeLinecap="round" strokeLinejoin="round"
-        transform={`translate(${ORIGIN.x + 36 - 8} ${ORIGIN.y + 36 - 8}) scale(0.667)`}>
+        transform={`translate(${ORIGIN.x + 38 - 9} ${ORIGIN.y + 40 - 9}) scale(0.75)`}>
         <rect x={9} y={2} width={6} height={12} rx={3} />
         <path d="M5 10v1a7 7 0 0 0 14 0v-1M12 18v4" />
       </g>
       {/* REC dot */}
-      <circle cx={ORIGIN.x + ORIGIN.w - 26} cy={ORIGIN.y + 26} r={4} fill="var(--on-accent)" className="bp-rec" />
-      <text x={ORIGIN.x + ORIGIN.w - 36} y={ORIGIN.y + 30} textAnchor="end" className="bp-rec-label">REC</text>
-      <text x={ORIGIN.x + 22} y={ORIGIN.y + 82} className="bp-origin-t1">You Record</text>
-      <text x={ORIGIN.x + 22} y={ORIGIN.y + 104} className="bp-origin-t1">Once a Week</text>
-      <text x={ORIGIN.x + 22} y={ORIGIN.y + ORIGIN.h - 8} className="bp-origin-t2" opacity={0.75}>ONE LONG-FORM SESSION · 45 MIN</text>
-    </motion.g>
-  );
-}
-
-/* ------------------------------ engine module ----------------------------- */
-
-const ENGINE_ROWS = ['Transcribe', 'Repurpose', 'Schedule'];
-
-function EngineModule() {
-  return (
-    <motion.g
-      initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.7, ease: EASE, delay: 0.45 }}
-    >
-      {/* layered card stack */}
-      <rect x={ENGINE.x + 10} y={ENGINE.y + 12} width={ENGINE.w} height={ENGINE.h} rx={18} fill="var(--surface)" stroke={INK} strokeOpacity={0.06} />
-      <rect x={ENGINE.x + 5} y={ENGINE.y + 6} width={ENGINE.w} height={ENGINE.h} rx={18} fill="var(--surface)" stroke={INK} strokeOpacity={0.08} />
-      <rect x={ENGINE.x} y={ENGINE.y} width={ENGINE.w} height={ENGINE.h} rx={18} fill="var(--surface)" stroke={INK} strokeOpacity={0.13} filter="url(#bpCard)" />
-      {/* header */}
-      <circle cx={ENGINE.x + 22} cy={ENGINE.y + 24} r={3} fill={ORANGE} className="bp-glow" />
-      <text x={ENGINE.x + 33} y={ENGINE.y + 28} className="bp-engine-title">SLIDEIN CONTENT ENGINE</text>
-      <line x1={ENGINE.x + 18} y1={ENGINE.y + 40} x2={ENGINE.x + ENGINE.w - 18} y2={ENGINE.y + 40} stroke={INK} strokeOpacity={0.08} />
-      {/* process rows */}
-      {ENGINE_ROWS.map((row, i) => {
-        const ry = ENGINE.y + 62 + i * 30;
-        return (
-          <g key={row}>
-            <circle cx={ENGINE.x + 26} cy={ry} r={3.2} fill={ORANGE} className="bp-blink" style={{ animationDelay: `${i * 0.5}s` }} />
-            <text x={ENGINE.x + 40} y={ry + 3.5} className="bp-engine-row">{row}</text>
-            {/* mini equalizer */}
-            <g fill={INK} fillOpacity={0.22}>
-              {[0, 1, 2].map((b) => (
-                <rect
-                  key={b}
-                  className="bp-eq"
-                  style={{ animationDelay: `${i * 0.3 + b * 0.18}s` }}
-                  x={ENGINE.x + ENGINE.w - 44 + b * 9} y={ry - 6} width={3.5} height={12} rx={1.75}
-                />
-              ))}
-            </g>
-          </g>
-        );
-      })}
-      {/* footer */}
-      <line x1={ENGINE.x + 18} y1={ENGINE.y + ENGINE.h - 26} x2={ENGINE.x + ENGINE.w - 18} y2={ENGINE.y + ENGINE.h - 26} stroke={INK} strokeOpacity={0.08} />
-      <circle cx={ENGINE.x + 24} cy={ENGINE.y + ENGINE.h - 13} r={2.6} fill="var(--color-live)" className="bp-blink" />
-      <text x={ENGINE.x + 34} y={ENGINE.y + ENGINE.h - 9.5} className="bp-engine-foot">RUNNING · AI + HUMAN IN THE LOOP</text>
+      <circle cx={ORIGIN.x + ORIGIN.w - 28} cy={ORIGIN.y + 28} r={4.5} fill="var(--on-accent)" className="bp-rec" />
+      <text x={ORIGIN.x + ORIGIN.w - 38} y={ORIGIN.y + 33} textAnchor="end" className="bp-rec-label">REC</text>
+      <text x={ORIGIN.x + 24} y={ORIGIN.y + 96} className="bp-origin-t1">You Record</text>
+      <text x={ORIGIN.x + 24} y={ORIGIN.y + 122} className="bp-origin-t1">Once a Week</text>
+      <text x={ORIGIN.x + 24} y={ORIGIN.y + ORIGIN.h - 10} className="bp-origin-t2" opacity={0.75}>ONE LONG-FORM SESSION · 45 MIN</text>
     </motion.g>
   );
 }
@@ -463,7 +449,7 @@ function ProductionModule({
     <motion.g
       className="bp-mod"
       initial={{ opacity: 0, x: 14 }} animate={{ opacity: 1, x: 0 }}
-      transition={{ duration: 0.55, ease: EASE, delay: 1.35 + i * 0.09 }}
+      transition={{ duration: 0.55, ease: EASE, delay: 1.2 + i * 0.10 }}
       onClick={() => onOpen(m.serviceId)}
       role="button"
       tabIndex={0}
@@ -471,21 +457,21 @@ function ProductionModule({
         if (e.key === 'Enter' || e.key === ' ') onOpen(m.serviceId);
       }}
     >
-      <rect className="bp-mod-bg" x={COL.x} y={y} width={COL.w} height={COL.cardH} rx={14}
+      <rect className="bp-mod-bg" x={COL.x} y={y} width={COL.w} height={COL.cardH} rx={16}
         fill="var(--surface)" stroke={INK} strokeOpacity={0.11} filter="url(#bpCard)" />
       {/* icon chip */}
-      <rect className="bp-mod-chip" x={COL.x + 13} y={y + 13} width={32} height={32} rx={9} fill="color-mix(in oklch, var(--on-surface) 3.5%, transparent)" />
-      <g className="bp-mod-icon" transform={`translate(${COL.x + 13 + 7} ${y + 13 + 7}) scale(0.75)`}>
+      <rect className="bp-mod-chip" x={COL.x + 14} y={y + 14} width={40} height={40} rx={10} fill="color-mix(in oklch, var(--on-surface) 3.5%, transparent)" />
+      <g className="bp-mod-icon" transform={`translate(${COL.x + 14 + 9} ${y + 14 + 9}) scale(0.75)`}>
         <ModuleGlyph kind={m.icon} />
       </g>
-      <text x={COL.x + 57} y={y + 25} className="bp-mod-title">{m.title}</text>
-      <text x={COL.x + 57} y={y + 42} className="bp-mod-desc">{m.desc}</text>
+      <text x={COL.x + 68} y={y + 30} className="bp-mod-title">{m.title}</text>
+      <text x={COL.x + 68} y={y + 50} className="bp-mod-desc">{m.desc}</text>
       {/* status */}
-      <circle cx={COL.x + COL.w - 45} cy={y + 20} r={2.4} fill={ORANGE} className="bp-blink" style={{ animationDelay: `${i * 0.4}s` }} />
-      <text x={COL.x + COL.w - 38} y={y + 23.5} className="bp-mod-status">AUTO</text>
+      <circle cx={COL.x + COL.w - 62} cy={y + 24} r={2.6} fill={ORANGE} className="bp-blink" style={{ animationDelay: `${i * 0.4}s` }} />
+      <text x={COL.x + COL.w - 54} y={y + 27.5} className="bp-mod-status">{m.turnaround}</text>
       {/* open hint */}
       <g className="bp-mod-arrow" fill="none" stroke={INK} strokeOpacity={0.3} strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round">
-        <path d={`M ${COL.x + COL.w - 26} ${y + 36} l 5 5 m 0 -5 v 5 h -5`} transform={`rotate(-90 ${COL.x + COL.w - 23.5} ${y + 38.5})`} />
+        <path d={`M ${COL.x + COL.w - 28} ${y + 44} l 5 5 m 0 -5 v 5 h -5`} transform={`rotate(-90 ${COL.x + COL.w - 25} ${y + 46})`} />
       </g>
     </motion.g>
   );
@@ -495,29 +481,29 @@ function ProductionModule({
 
 function OutputGroupCard({ g, i }: { g: OutputGroup; i: number }) {
   const n = g.items.length;
-  const gap = n === 4 ? 58 : n === 3 ? 70 : 84;
+  const gap = n === 4 ? 46 : n === 3 ? 60 : 72;
   const startX = GROUP_X + (GROUP_W - (n - 1) * gap) / 2;
-  const chipCY = g.y + g.h / 2 + 10;
+  const chipCY = g.y + g.h / 2 + 12;
   return (
     <motion.g
       className="bp-group"
       initial={{ opacity: 0, x: 14 }} animate={{ opacity: 1, x: 0 }}
       transition={{ duration: 0.6, ease: EASE, delay: 2.0 + i * 0.12 }}
     >
-      <rect x={GROUP_X} y={g.y} width={GROUP_W} height={g.h} rx={16}
-        fill="color-mix(in oklch, var(--on-surface) 1.4%, transparent)" stroke={INK} strokeOpacity={0.1} strokeDasharray="3 5" />
-      <circle cx={GROUP_X + 18} cy={g.y + 20} r={2.6} fill={ORANGE} />
-      <text x={GROUP_X + 28} y={g.y + 24} className="bp-group-title">{g.label.toUpperCase()}</text>
-      <text x={GROUP_X + GROUP_W - 16} y={g.y + 24} textAnchor="end" className="bp-group-count">{g.count}</text>
+      <rect x={GROUP_X} y={g.y} width={GROUP_W} height={g.h} rx={18}
+        fill="color-mix(in oklch, var(--on-surface) 1.4%, transparent)" stroke={INK} strokeOpacity={0.09} strokeDasharray="3 5" />
+      <circle cx={GROUP_X + 18} cy={g.y + 22} r={2.8} fill={ORANGE} />
+      <text x={GROUP_X + 30} y={g.y + 26} className="bp-group-title">{g.label.toUpperCase()}</text>
+      <text x={GROUP_X + GROUP_W - 16} y={g.y + 26} textAnchor="end" className="bp-group-count">{g.count}</text>
       {g.items.map((item, k) => {
         const cx = startX + k * gap;
         return (
           <g key={item.name} className="bp-chip" style={{ ['--brand' as string]: item.brand }}>
-            <circle cx={cx} cy={chipCY} r={17} fill="var(--surface)" stroke={INK} strokeOpacity={0.12} filter="url(#bpCard)" />
+            <circle cx={cx} cy={chipCY} r={18} fill="var(--surface)" stroke={INK} strokeOpacity={0.11} filter="url(#bpCard)" />
             <g className="bp-chip-glyph" transform={`translate(${cx - 8} ${chipCY - 8}) scale(0.667)`}>
               <ChipGlyph item={item} />
             </g>
-            <text x={cx} y={chipCY + 31} textAnchor="middle" className="bp-chip-label">{item.name}</text>
+            <text x={cx} y={chipCY + 33} textAnchor="middle" className="bp-chip-label">{item.name}</text>
           </g>
         );
       })}
@@ -530,29 +516,16 @@ function OutputGroupCard({ g, i }: { g: OutputGroup; i: number }) {
 export default function OrbitSlide({ onOpenService }: { onOpenService: (id: string) => void }) {
   return (
     <div className="w-full flex flex-col items-center">
-      {/* header */}
-      <motion.div
-        initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, ease: EASE }}
-        className="text-center"
-      >
-        <p className="text-[11px] md:text-xs font-bold tracking-[0.14em] uppercase text-[var(--accent)]">The Content System</p>
-        <h2 className="mt-1.5 display-headline text-[clamp(1.3rem,2.6vw,1.9rem)] text-[var(--on-surface)]">
-          One recording becomes an <span className="text-[var(--accent)]">entire content ecosystem</span>.
-        </h2>
-      </motion.div>
-
-      {/* blueprint canvas */}
-      <div className="relative w-full max-w-[1080px] mt-2">
+      <div className="relative w-full max-w-[1200px]">
         <svg
           viewBox={`0 0 ${VB.w} ${VB.h}`}
           className="block h-auto w-full"
           role="img"
-          aria-label="The content system blueprint: you record once a week, the SlideIn content engine turns it into show notes, an edited episode, a thumbnail, short clips, full articles and LinkedIn posts, then publishes to video, social and owned channels."
+          aria-label="One in, nine out. You record once a week and SlideIn produces show notes, an edited episode, a thumbnail, short clips, full articles and LinkedIn posts — then smart routing sends them to nine destinations across video and audio, social, and owned channels."
         >
           <defs>
-            <pattern id="bpDots" width="26" height="26" patternUnits="userSpaceOnUse">
-              <circle cx="1" cy="1" r="1" fill="color-mix(in oklch, var(--on-surface) 5%, transparent)" />
+            <pattern id="bpDots" width="28" height="28" patternUnits="userSpaceOnUse">
+              <circle cx="1" cy="1" r="1" fill="color-mix(in oklch, var(--on-surface) 4.5%, transparent)" />
             </pattern>
             <linearGradient id="bpOrigin" x1="0" y1="0" x2="1" y2="1">
               <stop offset="0%" stopColor="var(--color-brand-lift)" />
@@ -560,43 +533,49 @@ export default function OrbitSlide({ onOpenService }: { onOpenService: (id: stri
               <stop offset="100%" stopColor="var(--color-ember)" />
             </linearGradient>
             <filter id="bpOriginShadow" x="-40%" y="-40%" width="180%" height="180%">
-              <feDropShadow dx="0" dy="12" stdDeviation="16" floodColor="var(--color-ember)" floodOpacity="0.3" />
+              <feDropShadow dx="0" dy="14" stdDeviation="18" floodColor="var(--color-ember)" floodOpacity="0.28" />
             </filter>
             <filter id="bpCard" x="-30%" y="-30%" width="160%" height="160%">
-              <feDropShadow dx="0" dy="4" stdDeviation="6" floodColor={INK} floodOpacity="0.07" />
+              <feDropShadow dx="0" dy="4" stdDeviation="7" floodColor={INK} floodOpacity="0.07" />
             </filter>
           </defs>
 
           {/* canvas texture */}
           <rect width={VB.w} height={VB.h} fill="url(#bpDots)" opacity={0.7} />
           <BlueprintChrome />
+          <Title />
           <SectionLabels />
 
           <Connectors />
           <OriginCard />
-          <EngineModule />
           {PIPELINE.map((m, i) => (
             <ProductionModule key={m.id} m={m} i={i} onOpen={onOpenService} />
           ))}
           {OUTPUTS.map((g, i) => (
             <OutputGroupCard key={g.id} g={g} i={i} />
           ))}
-          <Annotations />
+          <Footnote />
         </svg>
       </div>
 
       {/* scoped styles */}
       <style>{`
-        .bp-section { font-size: 9.5px; letter-spacing: .22em; fill: color-mix(in oklch, var(--on-surface) 38%, transparent); font-weight: 700; }
-        .bp-annot { font-size: 12px; fill: color-mix(in oklch, var(--on-surface) 40%, transparent); font-style: italic; font-family: ui-serif, Georgia, serif; }
+        .bp-title {
+          font-family: var(--font-display);
+          font-size: 42px;
+          font-weight: var(--font-weight-display-md);
+          letter-spacing: var(--tracking-display-md);
+          fill: ${INK};
+          font-variation-settings: 'opsz' var(--opsz-display-md), 'SOFT' 8, 'WONK' 0;
+        }
 
-        .bp-origin-t1 { font-size: 19px; font-weight: 800; fill: var(--on-accent); letter-spacing: -0.01em; }
+        .bp-section { font-size: 9.5px; letter-spacing: .22em; fill: color-mix(in oklch, var(--on-surface) 38%, transparent); font-weight: 700; }
+        .bp-foot { font-size: 9px; letter-spacing: .2em; fill: color-mix(in oklch, var(--on-surface) 42%, transparent); font-weight: 700; }
+        .bp-stage { font-size: 8px; letter-spacing: .2em; fill: color-mix(in oklch, var(--on-surface) 40%, transparent); font-weight: 700; }
+
+        .bp-origin-t1 { font-size: 21px; font-weight: 800; fill: var(--on-accent); letter-spacing: -0.01em; }
         .bp-origin-t2 { font-size: 8.5px; font-weight: 600; fill: var(--on-accent); letter-spacing: .18em; }
         .bp-rec-label { font-size: 8px; font-weight: 700; fill: color-mix(in oklch, var(--on-accent) 80%, transparent); letter-spacing: .2em; }
-
-        .bp-engine-title { font-size: 9.5px; letter-spacing: .18em; fill: ${INK}; font-weight: 800; }
-        .bp-engine-row { font-size: 11px; fill: color-mix(in oklch, var(--on-surface) 72%, transparent); font-weight: 600; }
-        .bp-engine-foot { font-size: 7.5px; letter-spacing: .14em; fill: color-mix(in oklch, var(--on-surface) 40%, transparent); font-weight: 700; }
 
         .bp-mod { cursor: pointer; }
         .bp-mod-bg, .bp-mod-chip, .bp-mod-icon, .bp-mod-arrow { transition: all .3s cubic-bezier(.22,1,.36,1); }
@@ -605,9 +584,9 @@ export default function OrbitSlide({ onOpenService }: { onOpenService: (id: stri
         .bp-mod:hover .bp-mod-chip { fill: color-mix(in oklch, var(--accent-vivid) 9%, transparent); }
         .bp-mod:hover .bp-mod-icon { color: ${ORANGE}; }
         .bp-mod:hover .bp-mod-arrow { stroke: ${ORANGE}; stroke-opacity: .8; }
-        .bp-mod-title { font-size: 12px; font-weight: 800; fill: ${INK}; }
-        .bp-mod-desc { font-size: 9.5px; fill: color-mix(in oklch, var(--on-surface) 45%, transparent); font-weight: 500; }
-        .bp-mod-status { font-size: 7.5px; letter-spacing: .16em; fill: color-mix(in oklch, var(--on-surface) 35%, transparent); font-weight: 700; }
+        .bp-mod-title { font-size: 13px; font-weight: 800; fill: ${INK}; }
+        .bp-mod-desc { font-size: 10px; fill: color-mix(in oklch, var(--on-surface) 45%, transparent); font-weight: 500; }
+        .bp-mod-status { font-size: 8px; letter-spacing: .16em; fill: color-mix(in oklch, var(--on-surface) 35%, transparent); font-weight: 700; }
 
         .bp-group-title { font-size: 9.5px; letter-spacing: .2em; fill: color-mix(in oklch, var(--on-surface) 55%, transparent); font-weight: 800; }
         .bp-group-count { font-size: 9.5px; letter-spacing: .12em; fill: color-mix(in oklch, var(--on-surface) 25%, transparent); font-weight: 700; }
@@ -619,17 +598,15 @@ export default function OrbitSlide({ onOpenService }: { onOpenService: (id: stri
         .bp-chip-label { font-size: 8.5px; fill: color-mix(in oklch, var(--on-surface) 50%, transparent); font-weight: 600; letter-spacing: .03em; }
 
         .bp-glow { filter: drop-shadow(0 0 3px color-mix(in oklch, var(--accent-vivid) 55%, transparent)); }
-        .bp-halo { transform-box: fill-box; transform-origin: center; animation: bpHalo 4.6s ease-in-out infinite; }
-        @keyframes bpHalo { 0%,100% { transform: scale(1); opacity: .06; } 50% { transform: scale(1.08); opacity: .1; } }
+        .bp-spin { transform-box: fill-box; transform-origin: center; animation: bpSpin 14s linear infinite; }
+        @keyframes bpSpin { to { transform: rotate(360deg); } }
         .bp-rec { transform-box: fill-box; transform-origin: center; animation: bpRec 1.8s ease-in-out infinite; }
         @keyframes bpRec { 0%,100% { opacity: 1; } 50% { opacity: .3; } }
         .bp-blink { animation: bpBlink 2.2s ease-in-out infinite; }
         @keyframes bpBlink { 0%,100% { opacity: 1; } 50% { opacity: .25; } }
-        .bp-eq { transform-box: fill-box; transform-origin: center bottom; animation: bpEq 1.1s ease-in-out infinite; }
-        @keyframes bpEq { 0%,100% { transform: scaleY(.35); } 50% { transform: scaleY(1); } }
 
         @media (prefers-reduced-motion: reduce) {
-          .bp-halo, .bp-rec, .bp-blink, .bp-eq { animation: none; }
+          .bp-spin, .bp-rec, .bp-blink { animation: none; }
         }
       `}</style>
     </div>
