@@ -8,7 +8,7 @@ import { LogoWordmark } from '@/components/Brand/Logo';
 import ThemeToggle from '@/components/Theme/ThemeToggle';
 
 const navLinks = [
-  { label: 'Solutions', href: '/solutions' },
+  { label: 'Steps', href: '/solutions' },
   { label: 'Portfolio', href: '/portfolio' },
   { label: 'Pricing', href: '/pricing' },
 ];

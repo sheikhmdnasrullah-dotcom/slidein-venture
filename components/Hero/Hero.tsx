@@ -30,10 +30,10 @@ import { Section } from '@/components/Section';
 const EASE = [0.16, 1, 0.3, 1] as const;
 const ORANGE = 'var(--accent-vivid)';
 
-const PHRASES = ['Content Production.', 'Outreach Systems.', 'Backend Systems.'];
+const PHRASES = ['Content Production.', 'Outreach Systems.', 'Backend Tasks.'];
 const PHRASE_MS = 3400;
 
-const CAPABILITIES = ['Video Production', 'Cold Outreach', 'Distribution'];
+
 
 /* ─── Masked line reveal ──────────────────────────────────────────────────── */
 function Line({
@@ -210,27 +210,8 @@ export default function Hero() {
       <VideoModal open={videoOpen} onClose={() => setVideoOpen(false)} />
 
       <div className="relative z-10 mx-auto flex w-full max-w-[1200px] flex-1 flex-col px-6 md:px-10">
-        {/* ── Architectural header rule ───────────────────────────────── */}
-        <motion.div className="flex items-center gap-4 pt-2 pb-10 md:pb-14" {...fade(0.05)}>
-          <span className="font-label font-label-wide text-[var(--muted)]">
-            01 — Index
-          </span>
-          <span className="h-px flex-1 bg-[var(--rule)]" />
-          <span className="font-label font-label-wide text-[var(--muted)]">
-            SIV · Studio
-          </span>
-        </motion.div>
 
         <div className="flex flex-1 flex-col justify-center pb-16">
-          {/* ── Eyebrow ───────────────────────────────────────────────── */}
-          <motion.div {...fade(0.12)}>
-            <span className="inline-flex items-center gap-2.5 rounded-full border border-[var(--rule)] bg-[var(--surface-glass)] px-4 py-1.5 backdrop-blur-md">
-              <span className="pulse-dot h-1.5 w-1.5 rounded-full" style={{ background: ORANGE }} />
-              <span className="font-label text-[var(--muted)]">
-                Now booking · Q3
-              </span>
-            </span>
-          </motion.div>
 
           {/* ── Headline ──────────────────────────────────────────────── */}
           <h1
@@ -247,14 +228,6 @@ export default function Hero() {
             </Line>
           </h1>
 
-          {/* ── Subhead ───────────────────────────────────────────────── */}
-          <motion.p
-            className="mt-7 max-w-[46ch] text-[clamp(1rem,1.4vw,1.175rem)] leading-[1.65] text-[var(--muted)]"
-            {...fade(0.5)}
-          >
-            Full-cycle video production and cold outreach — built, run, and
-            measured as one system.
-          </motion.p>
 
           {/* ── CTAs ──────────────────────────────────────────────────── */}
           <motion.div
@@ -316,19 +289,6 @@ export default function Hero() {
             </Magnetic>
           </motion.div>
 
-          {/* ── Capability labels ─────────────────────────────────────── */}
-          <motion.div className="mt-16 flex flex-wrap items-center gap-x-5 gap-y-3" {...fade(0.72)}>
-            {CAPABILITIES.map((c, i) => (
-              <span key={c} className="flex items-center gap-5">
-                {/* divider hidden below sm so a wrapped label never starts a
-                    line with a stray rule */}
-                {i > 0 && <span className="hidden h-3 w-px bg-[var(--rule-strong)] sm:block" aria-hidden />}
-                <span className="font-label font-label-wide text-[var(--muted)]">
-                  {c}
-                </span>
-              </span>
-            ))}
-          </motion.div>
         </div>
       </div>
 
