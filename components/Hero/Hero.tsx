@@ -15,7 +15,7 @@
  *  · Every motion path is disabled under prefers-reduced-motion.
  */
 
-import { useState, useEffect, useRef, type ReactNode } from 'react';
+import { useState, useEffect, useRef, useCallback, type ReactNode } from 'react';
 import {
   motion,
   AnimatePresence,
@@ -118,16 +118,30 @@ function AccentRule() {
       aria-hidden
     >
       <path
-        d="M0,3 Q25,1 50,3 T100,3"
+        d="M0,3.1 Q25,1.9 50,3 T100,3.1"
         pathLength="100"
         fill="none"
         stroke="currentColor"
-        strokeWidth="0.7"
+        strokeWidth="0.6"
         strokeLinecap="round"
         className="underline-draw"
       />
     </svg>
   );
+}
+
+/* ─── The thread's origin ─────────────────────────────────────────────────────
+   The hairline terminates in a dot. That dot is where the deck's visual thread
+   begins: on load it detaches, drifts down the page, and comes to rest at the
+   fold beside the scroll label (see ScrollThread). The hero and the nine-slide
+   deck are then one continuous object rather than two designs that happen to
+   share a page — and the scroll cue is a consequence of the composition instead
+   of a generic bouncing chevron bolted to the bottom.
+
+   Marked with a data attribute so ScrollThread can measure it without a ref
+   handshake through the phrase rotator, which remounts on every phrase. */
+function ThreadOrigin() {
+  return <span data-thread-origin className="accent-terminal" aria-hidden />;
 }
 
 /* ─── Rotating phrase — zero layout shift ─────────────────────────────────── */
@@ -157,6 +171,7 @@ function RotatingPhrase({ still }: { still: boolean }) {
           <span className="relative inline-block">
             {PHRASES[0]}
             <AccentRule />
+            <ThreadOrigin />
           </span>
         ) : (
           <AnimatePresence mode="wait" initial={false}>
@@ -177,6 +192,7 @@ function RotatingPhrase({ still }: { still: boolean }) {
               {/* Remounts with the phrase, so the rule redraws to the new word's
                   measure instead of hanging over a shorter one. */}
               <AccentRule />
+              <ThreadOrigin />
             </motion.span>
           </AnimatePresence>
         )}
@@ -188,10 +204,143 @@ function RotatingPhrase({ still }: { still: boolean }) {
   );
 }
 
+/* ─── Scroll cue — the thread coming to rest ──────────────────────────────────
+   The whole argument for this page lives below the fold, which makes the
+   invitation to scroll the primary conversion element after the CTA — not
+   decoration, and not something to leave to an unlabelled 40px dash that could
+   equally be a scrollbar, a divider or a drag handle.
+
+   So it is built out of continuity rather than an arrow. The dot that
+   terminates the hairline under the orange phrase detaches on load, drifts down
+   the page, and lands here beside a mono label that names the destination. The
+   same dot leaves slide 01 of the deck and travels through every slide after
+   it, so the hero is the first frame of that sequence rather than a separate
+   design sitting on top of it.
+
+   Travel is measured, not hardcoded: the origin is read off the live
+   [data-thread-origin] box after fonts settle and the headline reveal lands, so
+   the path stays correct at every breakpoint and for every phrase width. */
+function ScrollCue({ still, onDepart }: { still: boolean; onDepart: () => void }) {
+  const slotRef = useRef<HTMLSpanElement>(null);
+  const [from, setFrom] = useState<{ x: number; y: number } | null>(null);
+
+  useEffect(() => {
+    if (still) return;
+    let cancelled = false;
+
+    const run = async () => {
+      /* Fraunces at display size changes the phrase's measure substantially
+         between fallback and webfont, and the headline is still sliding up for
+         the first ~1.3s. Measuring before both settle aims the thread at a
+         position the dot never occupies. */
+      try {
+        await document.fonts.ready;
+      } catch {
+        /* no-op: a browser without the fonts API still gets the timeout below */
+      }
+      await new Promise((r) => setTimeout(r, 1350));
+      if (cancelled) return;
+
+      const origin = document.querySelector('[data-thread-origin]');
+      const slot = slotRef.current;
+      if (!origin || !slot) return;
+
+      const o = origin.getBoundingClientRect();
+      const s = slot.getBoundingClientRect();
+      setFrom({
+        x: o.left + o.width / 2 - (s.left + s.width / 2),
+        y: o.top + o.height / 2 - (s.top + s.height / 2),
+      });
+      onDepart();
+    };
+
+    run();
+    return () => {
+      cancelled = true;
+    };
+  }, [still, onDepart]);
+
+  return (
+    <div className="relative pb-10 pt-8">
+      <a
+        href="#framework"
+        className="group inline-flex items-center gap-3 text-[var(--muted)] transition-colors duration-300 hover:text-[var(--on-surface)]"
+      >
+        {/* The rest slot. The travelling dot animates INTO this box, so the
+            landing point is wherever the label actually sits — no magic
+            numbers, and it survives a copy change. */}
+        <span ref={slotRef} className="relative block h-[7px] w-[7px]" aria-hidden>
+          {still ? (
+            <span
+              className="absolute inset-0 rounded-full"
+              style={{ background: ORANGE }}
+            />
+          ) : (
+            from && (
+              <motion.span
+                className="absolute inset-0 rounded-full"
+                style={{
+                  background: ORANGE,
+                  boxShadow: '0 0 10px color-mix(in oklch, var(--accent-vivid) 60%, transparent)',
+                }}
+                initial={{ x: from.x, y: from.y, scale: 0.5, opacity: 0 }}
+                animate={{ x: 0, y: 0, scale: 1, opacity: 1 }}
+                /* Deliberately NOT the deck's expo ease. Expo spends a third of
+                   its duration covering ninety percent of the distance, which
+                   turns a drift into a snap. The two axes also run on different
+                   curves so the path bows: the dot falls first, then curves
+                   left into the label, instead of sliding down a straight
+                   diagonal. */
+                transition={{
+                  y: { duration: 1.9, ease: [0.4, 0, 0.16, 1] },
+                  x: { duration: 1.9, ease: [0.72, 0, 0.3, 1] },
+                  scale: { duration: 0.7, ease: 'easeOut' },
+                  opacity: { duration: 0.3, ease: 'easeOut' },
+                }}
+              />
+            )
+          )}
+        </span>
+
+        <span className="font-mono text-[10px] uppercase tracking-[0.22em]">
+          Scroll · the framework
+        </span>
+
+        <svg
+          width="11"
+          height="11"
+          viewBox="0 0 12 12"
+          fill="none"
+          aria-hidden
+          className="transition-transform duration-500 ease-out group-hover:translate-y-[3px]"
+        >
+          <path
+            d="M6 2v8M2.5 6.5 6 10l3.5-3.5"
+            stroke="currentColor"
+            strokeWidth="1.3"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        </svg>
+      </a>
+    </div>
+  );
+}
+
 /* ─── Hero ────────────────────────────────────────────────────────────────── */
 export default function Hero() {
   const [videoOpen, setVideoOpen] = useState(false);
   const still = !!useReducedMotion();
+
+  /* Set once the thread leaves the hairline, so the origin dot does not come
+     back with the next phrase. Flag lives on <html> — see .accent-terminal. */
+  const handleDepart = useCallback(() => {
+    document.documentElement.dataset.threadDeparted = '1';
+  }, []);
+
+  useEffect(() => () => {
+    delete document.documentElement.dataset.threadDeparted;
+  }, []);
 
   const fade = (delay: number) => ({
     initial: still ? false : { opacity: 0, y: 14 },
@@ -211,7 +360,10 @@ export default function Hero() {
 
       <div className="relative z-10 mx-auto flex w-full max-w-[1200px] flex-1 flex-col px-6 md:px-10">
 
-        <div className="flex flex-1 flex-col justify-center pb-16">
+        {/* The cluster is centred in what remains AFTER the scroll cue takes
+            its band at the bottom, which is what stops it floating high over a
+            large unclaimed gap. */}
+        <div className="flex flex-1 flex-col justify-center pt-[10vh]">
 
           {/* ── Headline ──────────────────────────────────────────────── */}
           <h1
@@ -231,7 +383,7 @@ export default function Hero() {
 
           {/* ── CTAs ──────────────────────────────────────────────────── */}
           <motion.div
-            className="mt-11 flex flex-col items-stretch gap-3.5 sm:flex-row sm:items-center"
+            className="mt-9 flex flex-col items-start gap-2 sm:flex-row sm:items-center sm:gap-7"
             {...fade(0.6)}
           >
             {/* Primary: ink slab with soft internal lighting and an orange edge
@@ -266,54 +418,43 @@ export default function Hero() {
               </a>
             </Magnetic>
 
-            <Magnetic
-              disabled={still}
-              strength={0.2}
-              className="block w-full sm:inline-block sm:w-auto"
+            {/* Secondary: a bare line, not a second pill. Two pills of similar
+                weight and near-identical shape read as a toolbar and leave the
+                page with no primary. The hierarchy comes from the contrast
+                between a solid object and an unenclosed line — so this loses
+                its container, its border and its magnetism, and keeps only the
+                glyph. Copy names the commitment: "Watch This" sets no
+                expectation and asks for an unknown length of attention. */}
+            <button
+              onClick={() => setVideoOpen(true)}
+              className="group inline-flex w-fit cursor-pointer items-center gap-2.5 py-2 text-[15px] font-medium text-[var(--muted)] transition-colors duration-300 hover:text-[var(--on-surface)] sm:py-4"
             >
-              <button
-                onClick={() => setVideoOpen(true)}
-                className="group flex w-full cursor-pointer items-center justify-center gap-3 rounded-2xl border border-[var(--rule)] bg-[var(--surface-glass)] px-6 py-4 text-[15px] font-medium text-[var(--on-surface)] backdrop-blur-md transition-[border-color,background-color,box-shadow] duration-500 hover:border-[var(--rule-strong)] hover:bg-[var(--surface)] hover:shadow-[var(--shadow-raised)] sm:inline-flex sm:w-auto"
+              <svg
+                width="11"
+                height="11"
+                viewBox="0 0 10 10"
+                fill="none"
+                aria-hidden
+                style={{ color: ORANGE }}
+                className="transition-transform duration-500 ease-out group-hover:translate-x-[2px]"
               >
-                <span
-                  className="flex h-6 w-6 items-center justify-center rounded-full transition-transform duration-500 ease-out group-hover:scale-110"
-                  style={{ background: 'var(--accent-wash)' }}
-                  aria-hidden
-                >
-                  <svg width="9" height="9" viewBox="0 0 10 10" fill="none">
-                    <path d="M3 2L8 5L3 8V2Z" fill={ORANGE} />
-                  </svg>
-                </span>
-                Watch This
-              </button>
-            </Magnetic>
+                <path d="M2.5 1.5 8.5 5l-6 3.5V1.5Z" fill="currentColor" />
+              </svg>
+              <span className="underline decoration-[var(--rule-strong)] decoration-1 underline-offset-[6px] transition-colors duration-300 group-hover:decoration-[var(--accent-vivid)]">
+                Watch 90 seconds
+              </span>
+            </button>
           </motion.div>
 
         </div>
-      </div>
 
-      {/* ── Connector into the next section ───────────────────────────── */}
-      <motion.div
-        className="pointer-events-none relative z-10 mx-auto h-20 w-px"
-        aria-hidden
-        initial={still ? false : { scaleY: 0, opacity: 0 }}
-        animate={{ scaleY: 1, opacity: 1 }}
-        transition={{ duration: 0.9, delay: 0.85, ease: EASE }}
-        style={{
-          transformOrigin: 'top',
-          background:
-            'linear-gradient(to bottom, transparent, var(--rule-strong))',
-        }}
-      >
-        {!still && (
-          <motion.span
-            className="absolute left-1/2 h-1.5 w-1.5 -translate-x-1/2 rounded-full"
-            style={{ background: ORANGE }}
-            animate={{ y: [0, 72], opacity: [0, 1, 0] }}
-            transition={{ duration: 2.8, repeat: Infinity, ease: 'easeInOut', delay: 1.6 }}
-          />
-        )}
-      </motion.div>
+        {/* The thread lands here, on the same left axis as the headline. It
+            also does the vertical work: the cluster used to float high with an
+            enormous unanchored gap under it. */}
+        <motion.div {...fade(0.85)}>
+          <ScrollCue still={still} onDepart={handleDepart} />
+        </motion.div>
+      </div>
     </Section>
   );
 }

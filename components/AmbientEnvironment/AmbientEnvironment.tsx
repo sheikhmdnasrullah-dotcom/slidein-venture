@@ -16,6 +16,12 @@
 import { useEffect } from 'react';
 import { motion, useMotionValue, useSpring } from 'framer-motion';
 
+/* Stamped by next.config.ts from `git rev-parse --short=7 HEAD`. Empty when git
+   is unavailable, and the label is skipped entirely rather than falling back to
+   a made-up version string. The corner chrome either reports the real build or
+   it says nothing. */
+const BUILD_SHA = process.env.NEXT_PUBLIC_BUILD_SHA ?? '';
+
 const PARTICLES = [
   { l: '8%', t: '18%', s: 3, d: 0, dr: 18, o: 0.14 },
   { l: '22%', t: '72%', s: 2, d: 4, dr: 14, o: 0.12 },
@@ -63,27 +69,43 @@ export default function AmbientEnvironment() {
           WebkitMaskImage: 'radial-gradient(ellipse 90% 80% at 50% 40%, black 40%, transparent 100%)',
         }}
       />
-      {/* 4 — drifting radial light */}
+      {/* 4 — drifting radial light.
+             A single ambient source only reads as lighting if it lights the
+             thing that matters. Both lobes are pulled up and left so the warm
+             centre sits BEHIND and slightly ABOVE the headline — the type is
+             what appears illuminated. Parked over empty canvas, the same
+             gradient reads as a stray blob rather than as a light source. */}
       <motion.div
         className="absolute w-[900px] h-[900px] rounded-full"
-        style={{ background: 'radial-gradient(circle, var(--ambient-a) 0%, transparent 65%)', top: '-15%', left: '-10%' }}
+        style={{ background: 'radial-gradient(circle, var(--ambient-a) 0%, transparent 65%)', top: '-28%', left: '-16%' }}
         animate={{ x: [0, 120, 0], y: [0, 60, 0] }}
         transition={{ duration: 38, repeat: Infinity, ease: 'easeInOut' }}
       />
       <motion.div
-        className="absolute w-[800px] h-[800px] rounded-full"
-        style={{ background: 'radial-gradient(circle, var(--ambient-b) 0%, transparent 65%)', bottom: '-20%', right: '-12%' }}
-        animate={{ x: [0, -100, 0], y: [0, -70, 0] }}
+        className="absolute w-[760px] h-[760px] rounded-full"
+        style={{ background: 'radial-gradient(circle, var(--ambient-b) 0%, transparent 62%)', top: '-16%', left: '4%' }}
+        animate={{ x: [0, 64, 0], y: [0, 38, 0] }}
         transition={{ duration: 46, repeat: Infinity, ease: 'easeInOut', delay: 6 }}
       />
-      {/* 5 — blueprint construction guides */}
-      <div className="absolute inset-y-0 left-6 w-px border-l border-dashed border-[var(--rule)]" />
-      <div className="absolute inset-y-0 right-6 w-px border-r border-dashed border-[var(--rule)]" />
-      <span className="absolute top-3 left-8 text-[8px] font-mono tracking-[0.2em] text-[var(--muted)] select-none">SIV · 00.01</span>
-      <span className="absolute bottom-3 right-8 text-[8px] font-mono tracking-[0.2em] text-[var(--muted)] select-none">GRID · 28PX</span>
-      {[...Array(14)].map((_, i) => (
-        <span key={i} className="absolute left-6 w-1.5 h-px bg-[var(--rule)]" style={{ top: `${(i + 1) * 7}%` }} />
-      ))}
+      {/* 5 — blueprint construction guides.
+             The rules sit on the CONTENT axis, not on the viewport edge. Same
+             max-width and padding as the page container, so the dashed line
+             marks the actual left edge of the type instead of framing a few
+             hundred pixels of nothing. */}
+      <div className="absolute inset-y-0 left-1/2 w-full max-w-[1200px] -translate-x-1/2 px-6 md:px-10">
+        <div className="relative h-full">
+          <div className="absolute inset-y-0 left-0 w-px border-l border-dashed border-[var(--rule)]" />
+          <div className="absolute inset-y-0 right-0 w-px border-r border-dashed border-[var(--rule)]" />
+          {BUILD_SHA && (
+            <span className="absolute left-2 top-3 select-none font-mono text-[8px] tracking-[0.2em] text-[var(--muted)]">
+              SIV · {BUILD_SHA}
+            </span>
+          )}
+          {[...Array(14)].map((_, i) => (
+            <span key={i} className="absolute left-0 h-px w-1.5 bg-[var(--rule)]" style={{ top: `${(i + 1) * 7}%` }} />
+          ))}
+        </div>
+      </div>
       {/* 6 — floating particles */}
       {PARTICLES.map((p, i) => (
         <motion.span

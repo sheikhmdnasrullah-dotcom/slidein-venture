@@ -177,11 +177,16 @@ p {
    the block is the giveaway. The SVG is stretched to the word's measure, so
    the path carries pathLength="100" and the stroke is left to scale; see the
    note on AccentRule in components/Hero/Hero.tsx. */
+/* The rule stops at the period's right sidebearing, not at the inline box's
+   right edge. A period carries far more advance width than ink, so a 100% rule
+   overshoots the visible glyph by roughly a tenth of an em and reads as a
+   miss rather than as a decision. Underlining instead of highlighting is only
+   worth doing if the line lands exactly. */
 .accent-underline {
   position: absolute;
   left: 0;
   bottom: -0.1em;
-  width: 100%;
+  width: calc(100% - 0.105em);
   height: 0.1em;
   overflow: visible;
   pointer-events: none;
@@ -200,6 +205,46 @@ p {
 @keyframes underline-draw {
   to {
     stroke-dashoffset: 0;
+  }
+}
+
+/* The dot the rule terminates in — the head of the deck's visual thread.
+   Positioned off the same two numbers the rule uses, so it sits exactly on the
+   line's right end: 0.105em in from the inline box (the period sidebearing
+   trim) and 0.05em below the text box bottom (the rule's own centre). */
+.accent-terminal {
+  position: absolute;
+  right: calc(0.105em - 3.5px);
+  bottom: calc(-0.05em - 3.5px);
+  width: 7px;
+  height: 7px;
+  border-radius: var(--radius-pill);
+  background: var(--accent-vivid);
+  box-shadow: 0 0 10px color-mix(in oklch, var(--accent-vivid) 60%, transparent);
+  opacity: 0;
+  pointer-events: none;
+  animation: accent-terminal-in var(--dur-base) var(--ease-std)
+    calc(var(--dur-base) + var(--dur-reveal)) forwards;
+}
+
+@keyframes accent-terminal-in {
+  to {
+    opacity: 1;
+  }
+}
+
+/* Once the thread has left, the rule simply ends. The flag lives on the root
+   element because the phrase rotator remounts this dot on every phrase change,
+   so a React prop would bring it back three seconds after it departed. */
+[data-thread-departed] .accent-terminal {
+  animation: none;
+  opacity: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .accent-terminal {
+    animation: none;
+    opacity: 1;
   }
 }
 

@@ -31,8 +31,13 @@ export default function Navbar() {
       <div className="h-[88px]" />
 
       {/* ── Floating Pill Navbar ─────────────────────────────────────────── */}
+      {/* The nav is centred while the page content is left-aligned. Two
+          alignment logics on one screen only work if one of them is clearly
+          deliberate, so the nav commits to being a detached floating object:
+          more air under the top edge than a docked bar would ever have, which
+          stops it reading as a failed attempt to align with the headline. */}
       <nav
-        className="fixed top-4 left-1/2 z-[1000] -translate-x-1/2"
+        className="fixed top-7 left-1/2 z-[1000] -translate-x-1/2"
         style={{ width: 'auto' }}
       >
         <motion.div
