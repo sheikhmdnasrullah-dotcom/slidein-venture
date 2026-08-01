@@ -34,7 +34,8 @@ import OutreachOSSlide from '@/components/PitchDeck/OutreachOSSlide';
 import GrowthLoopSlide from '@/components/PitchDeck/GrowthLoopSlide';
 import WeeklyCalendarSlide from '@/components/PitchDeck/WeeklyCalendarSlide';
 import DistributionSlide from '@/components/PitchDeck/DistributionSlide';
-import OpeningSystemSlide from '@/components/PitchDeck/OpeningSystemSlide';
+import PipelineSlide from '@/components/PitchDeck/PipelineSlide';
+import InputSlide from '@/components/PitchDeck/InputSlide';
 
 const EASE = [0.16, 1, 0.3, 1] as const;
 
@@ -379,23 +380,30 @@ function CornerAccent({ position }: { position: 'top-left' | 'bottom-right' }) {
   );
 }
 
-/* ── Slide 1 — The System ─────────────────────────────────────────────── */
+/* ── Slide 1 — The Input ──────────────────────────────────────────────── */
 function Slide1() {
-  return <OpeningSystemSlide />;
+  return <InputSlide />;
 }
 
-/* ── Slide 2 — The Complete Framework (React Flow node diagram) ───────── */
+/* ── Slide 6 — The System, Running ────────────────────────────────────────
+   Was slide 1. Moved here because a status readout only means something once
+   the four engines it is reporting on have each been introduced. */
+function SlidePipeline() {
+  return <PipelineSlide />;
+}
+
+/* ── Slide 2 — Two Systems. One Loop. ─────────────────────────────────────
+   No eyebrow. The title lives inside the canvas now, left-aligned to the first
+   track card, and the ~200px that the centred eyebrow and its gap were costing
+   went back to the diagram. See FrameworkFlowSlide.tsx. */
 function Slide2() {
   return (
     <motion.div
       variants={containerVariants}
       initial="hidden"
       animate="visible"
-      className="w-full h-full flex flex-col items-center justify-center gap-2"
+      className="w-full h-full flex flex-col items-center justify-center"
     >
-      <motion.div variants={itemVariants}>
-        <Eyebrow>The Complete Framework</Eyebrow>
-      </motion.div>
       <motion.div variants={itemVariants} className="w-full">
         <FrameworkFlowSlide />
       </motion.div>
@@ -582,16 +590,39 @@ function Slide9({ onSeeFramework }: { onSeeFramework: () => void }) {
 /* ── Carousel shell ────────────────────────────────────────────────────── */
 
 const SLIDE_META = [
-  { kicker: 'SlideIn OS' },
+  { kicker: 'The Input' },
   { kicker: 'The Complete Framework' },
   { kicker: 'The Content System' },
   { kicker: 'Content Distribution' },
   { kicker: 'The Outreach System' },
+  { kicker: 'The System, Running' },
   { kicker: "Why It's One System" },
   { kicker: 'What This Replaces' },
   { kicker: 'The Weekly Output' },
   { kicker: 'The Close' },
 ];
+
+/** Two-digit slide numbering. `0{n}` was hardcoded and broke at ten slides. */
+const pad = (n: number) => String(n).padStart(2, '0');
+
+/* ── THE THREAD ────────────────────────────────────────────────────────────
+   Slide 01 ends with a dot detaching from the rule under "45" and leaving the
+   frame to the right (see InputSlide.tsx). That dot is the recording entering
+   the system, and it is the single continuous idea the deck is built on — so
+   every slide after the first opens with the same dot arriving from the left.
+
+   It is rendered here rather than inside each slide for one reason: nine
+   copies of the same eight lines is nine chances for one of them to drift.
+   Keyed on `index` so it replays on every slide change, including backwards —
+   the thread is the deck's spine, not a first-visit flourish. */
+function ThreadArrival({ index }: { index: number }) {
+  if (index === 0) return null;
+  return (
+    <span key={index} className="deck-thread" aria-hidden>
+      <span className="deck-thread-dot" />
+    </span>
+  );
+}
 
 const slideVariants: Variants = {
   enter: (dir: number) => ({ opacity: 0, x: dir > 0 ? 48 : -48, scale: 0.98, filter: 'blur(6px)' }),
@@ -711,6 +742,7 @@ export default function PitchDeck() {
       <Slide4 key="s4" onOpenService={openService} />,
       <Slide4b key="s4b" />,
       <Slide5 key="s5" />,
+      <SlidePipeline key="s-pipeline" />,
       <Slide6 key="s6" />,
       <Slide7 key="s7" />,
       <Slide8 key="s8" />,
@@ -779,7 +811,7 @@ export default function PitchDeck() {
             </AnimatePresence>
             <div className="flex items-center gap-3">
               <span className="text-[11px] md:text-xs font-bold text-[var(--muted)] tabular-nums">
-                0{index + 1} / 0{total}
+                {pad(index + 1)} / {pad(total)}
               </span>
               {/* Fullscreen toggle */}
               <button
@@ -822,6 +854,8 @@ export default function PitchDeck() {
             onPointerDown={onPointerDown}
             onPointerUp={onPointerUp}
           >
+            <ThreadArrival index={index} />
+
             <AnimatePresence custom={direction} mode="wait">
               <motion.div
                 key={index}
@@ -871,6 +905,40 @@ export default function PitchDeck() {
       </div>
 
       <ServiceDetailModal open={modalOpen} onClose={closeModal} serviceId={modalServiceId} onChange={setModalServiceId} />
+
+      <style>{`
+        /* The arriving half of the thread. Enters from outside the stage's left
+           edge, crosses about a fifth of the frame and fades — it hands off to
+           the slide rather than competing with it. */
+        .deck-thread {
+          position: absolute;
+          left: 0;
+          top: 50%;
+          z-index: 15;
+          pointer-events: none;
+        }
+
+        @keyframes deck-thread-arrive {
+          0%   { transform: translate(-8vw, -50%) scale(1); opacity: 0; }
+          14%  { opacity: 1; }
+          62%  { opacity: 1; }
+          100% { transform: translate(22vw, -50%) scale(0.4); opacity: 0; }
+        }
+
+        .deck-thread-dot {
+          display: block;
+          width: 6px;
+          height: 6px;
+          border-radius: var(--radius-pill);
+          background: var(--accent-vivid);
+          box-shadow: 0 0 10px color-mix(in oklch, var(--accent-vivid) 70%, transparent);
+          animation: deck-thread-arrive calc(var(--dur-reveal) * 1.4) var(--ease-std) both;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+          .deck-thread-dot { animation: none; opacity: 0; }
+        }
+      `}</style>
     </Section>
   );
 }

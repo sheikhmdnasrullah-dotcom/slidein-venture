@@ -1,16 +1,21 @@
 'use client';
 
 /**
- * OPENING SLIDE — SLIDEIN OS · THE CONTENT TO REVENUE PLAYBOOK
- * --------------------------------------------------------------
- * The first slide is not a hero. It is the opening screen of an operating
- * system: an editorial statement on the left, a live processing pipeline on
- * the right, and a quiet blueprint environment behind both.
+ * SLIDE 06 — THE SYSTEM, RUNNING
+ * ---------------------------------------------------------------------------
+ * A live status readout of the whole pipeline: 01 Record Once → 06 Revenue
+ * Growth, drawn as interface modules with status LEDs, draw-in progress bars,
+ * dashed connectors and travelling orange pulses.
  *
- *   LEFT   kicker → huge serif statement → orange emphasis → supporting copy
- *   RIGHT  01 Record Once → 06 Revenue Growth, drawn as interface modules
- *          with status LEDs, draw-in progress bars, dashed connectors and
- *          travelling orange pulses.
+ * THIS USED TO BE SLIDE 01, AND IT DID NOT WORK THERE. A status readout is
+ * only legible once you know what the system is; at position 1 the viewer had
+ * met none of the four engines, so six modules with progress bars read as
+ * ornament rather than as information. It now runs after the content system,
+ * distribution and outreach have each been shown on their own, which is the
+ * first moment the readout means anything.
+ *
+ *   LEFT   kicker → serif statement → supporting copy
+ *   RIGHT  the pipeline stack
  *   AMBIENT  dot grid, architectural grid, construction circles, ruler ticks,
  *          measurement guide, corner brackets, faint noise + orange glow.
  *
@@ -103,25 +108,22 @@ function Editorial() {
     <div className="w-full max-w-xl shrink-0">
       <div className="flex items-center gap-3">
         <span className="h-px w-9 bg-[var(--accent-vivid)]/70" />
-        <MonoTag className="text-[var(--accent)]">The Content to Revenue Playbook</MonoTag>
+        <MonoTag className="text-[var(--accent)]">Inside the machine</MonoTag>
       </div>
 
       <h2 className="font-display-xl mt-6 text-[clamp(1.9rem,3.4vw,3.05rem)] text-[var(--on-surface)]">
-        Record once
+        Six stages.
         <br />
-        a week.
+        One input.
       </h2>
 
       <p className="font-display-md mt-1.5 text-[clamp(1.9rem,3.4vw,3.05rem)] text-[var(--accent)]">
-        Everything else
-        <br />
-        <span className="wonk">compounds</span>.
+        Zero <span className="wonk">handoffs</span>.
       </p>
 
       <p className="mt-6 max-w-[44ch] text-[12.5px] leading-[1.75] text-[var(--muted)] md:text-[13.5px]">
-        One 45-minute recording feeds a content engine, a distribution pipeline
-        and a personal outreach system. SlideIn runs the loop every week — you
-        stay out of it.
+        Everything between the Monday recording and the reply in your inbox,
+        running as one pipeline. Nothing waits on a person to pass it along.
       </p>
 
       <div className="mt-5 hidden items-center gap-2 md:flex">
@@ -448,7 +450,7 @@ function FooterBar() {
 }
 
 /* ── Slide ────────────────────────────────────────────────────────────── */
-export default function OpeningSystemSlide() {
+export default function PipelineSlide() {
   const sectionRef = useRef<HTMLElement>(null);
   const reduced = useReducedMotion();
 
