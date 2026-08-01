@@ -105,14 +105,14 @@ const BOT_NODES: NodeDef[] = [
 /* ── The 01 INPUT cell, on both tracks ──────────────────────────────────────
    Not a fifth column: a fifth column would break the four-across symmetry
    between the two tracks, and that symmetry is what holds the diagram
-   together. Instead the input cell splits into two stacked rows inside one
-   card — who does the thinking on top, the client's one small job underneath.
+   Instead the input cell splits into two stacked rows inside one
+   card — the client briefing up top, the research underneath.
 
    Each row carries a mono owner tag. The client's row is the only orange one
    on the left half of the canvas, so the eye finds it immediately and reads
    the point without being told: of everything in this column, one strip is
-   yours. It is also the row the connector leaves from — the recording, and
-   the one briefing, are what actually move downstream. */
+   yours. It is also the row the connector leaves from — the briefing, and
+   the one recording, are what actually move downstream. */
 type SplitRow = { owner: string; title: string; icon: NodeDef['icon']; mine?: boolean };
 type SplitDef = { id: string; rows: [SplitRow, SplitRow] };
 
@@ -127,8 +127,8 @@ const TOP_INPUT: SplitDef = {
 const BOT_INPUT: SplitDef = {
   id: 'outreach-input',
   rows: [
+    { owner: 'You', title: 'We Discuss Your ICP', icon: 'tell', mine: true },
     { owner: 'SlideIn', title: 'Ideal Client Research', icon: 'target' },
-    { owner: 'You', title: 'You Tell Us Once', icon: 'tell', mine: true },
   ],
 };
 
@@ -148,11 +148,12 @@ const link = (col: number, cy: number) =>
 const ROW_H = NODE_H / 2; // 60
 const SPLIT_DROP = ROW_H / 2; // 30 — how far row 2's centre sits below the track line
 
-/* The input card's connector leaves from row 2 only, so it starts 30px low and
-   climbs to the track line. The lift is the diagram saying which of the two
-   rows is the thing that moves. */
-const splitLink = (cy: number) => {
-  const from = cy + SPLIT_DROP;
+/* The input card's connector leaves from the client's row — row 2 on the
+   content card, row 1 on the outreach card — starting low or high and
+   climbing back to the track line. The lift is the diagram saying which of
+   the two rows is the thing that moves. */
+const splitLink = (cy: number, fromBottom = true) => {
+  const from = fromBottom ? cy + SPLIT_DROP : cy - SPLIT_DROP;
   return `M ${COLS[0] + NODE_W} ${from} C ${COLS[0] + NODE_W + 26} ${from}, ${COLS[1] - 26} ${cy}, ${COLS[1]} ${cy}`;
 };
 
@@ -317,7 +318,7 @@ function Connectors() {
   const draws: { d: string; delay: number; hot?: boolean; w?: number; dur?: number }[] = [
     { d: splitLink(TOP_CY), delay: T.topLink(0), dur: 0.22 },
     { d: link(1, TOP_CY), delay: T.topLink(1), dur: 0.22 },
-    { d: splitLink(BOT_CY), delay: T.botLink(0), dur: 0.22 },
+    { d: splitLink(BOT_CY, false), delay: T.botLink(0), dur: 0.22 },
     { d: link(1, BOT_CY), delay: T.botLink(1), dur: 0.22 },
     { d: MERGE_TOP, delay: T.mergeTop, hot: true, w: 1.6, dur: 0.24 },
     { d: MERGE_BOT, delay: T.mergeBot, hot: true, w: 1.6, dur: 0.24 },
@@ -346,14 +347,14 @@ function Connectors() {
           transition={{ duration: p.dur ?? 0.22, ease: 'easeOut', delay: p.delay }}
         />
       ))}
-      {/* Joints. Column 0's exit joint rides 30px low with the split card's
-          second row — it marks where the client's contribution enters. */}
+      {/* Joints. Column 0's exit joint rides with the split card's client
+          row — it marks where the client's contribution enters. */}
       <g fill="var(--surface)" stroke={INK} strokeOpacity={0.28} strokeWidth={1}>
         {[TOP_CY, BOT_CY].map((cy) =>
           COLS.map((x, c) => (
             <g key={`${cy}-${c}`}>
               {c > 0 && <circle cx={x} cy={cy} r={2.4} />}
-              <circle cx={x + NODE_W} cy={c === 0 ? cy + SPLIT_DROP : cy} r={2.4} />
+              <circle cx={x + NODE_W} cy={c === 0 ? (cy === BOT_CY ? cy - SPLIT_DROP : cy + SPLIT_DROP) : cy} r={2.4} />
             </g>
           ))
         )}
@@ -372,7 +373,7 @@ function Connectors() {
         {[
           { d: splitLink(TOP_CY), dur: 2.4, b: 0 },
           { d: link(1, TOP_CY), dur: 2.4, b: 0.7 },
-          { d: splitLink(BOT_CY), dur: 2.6, b: 0.4 },
+          { d: splitLink(BOT_CY, false), dur: 2.6, b: 0.4 },
           { d: link(1, BOT_CY), dur: 2.6, b: 1.1 },
           { d: MERGE_TOP, dur: 2.2, b: 0.2 },
           { d: MERGE_BOT, dur: 2.2, b: 1.3 },
@@ -533,7 +534,7 @@ export default function FrameworkFlowSlide() {
         viewBox={`0 0 ${VB.w} ${VB.h}`}
         className="block h-auto w-full"
         role="img"
-        aria-label="Two systems, one loop. A content system (SlideIn writes the ideation and script, you record once, then content production and multi-platform presence) and an outreach system (SlideIn researches your ideal client, you tell us once, then manual outreach and qualified conversations) converge into one outcome — more clients, faster, across six hands-off stages."
+        aria-label="Two systems, one loop. A content system (SlideIn writes the ideation and script, you record once, then content production and multi-platform presence) and an outreach system (you discuss your ICP, SlideIn researches your ideal client, then manual outreach and qualified conversations) converge into one outcome — more clients, faster, across six hands-off stages."
       >
         <defs>
           <pattern id="fwDots" width="26" height="26" patternUnits="userSpaceOnUse">
