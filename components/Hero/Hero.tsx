@@ -3,8 +3,26 @@
 /**
  * HERO — SlideIn Venture
  * ---------------------------------------------------------------------------
- * The above-the-fold moment. Editorial serif display against mono architectural
- * labels, layered over the site-wide AmbientEnvironment.
+ * The above-the-fold moment. A full-bleed apricot band — the brand hue read at
+ * the light end — with ink type on it, running edge to edge and up to y=0 with
+ * the nav pill floating on top of it. The page never uses a coloured surface
+ * again, which is what makes this one read as the opening rather than as a
+ * decorated section.
+ *
+ * The band is `tone="hero"` (app/styles/tone.css), which re-points the whole
+ * tone contract rather than swapping a background. Nothing in this file names a
+ * colour; it reads --accent / --accent-vivid / --muted like every other
+ * component and gets the hero's instances of them.
+ *
+ * Two things this band got wrong on the way here, both worth not repeating:
+ *
+ *   · It was full-chroma --color-brand for one release. At chroma 0.207 the
+ *     field competes with everything on it, and it leaves no orange to accent
+ *     WITH — the rotating phrase had to go ink because orange on orange is
+ *     nothing. Apricot is chroma 0.055 and the phrase is orange again.
+ *   · Navbar rendered an 88px spacer, so 88px of page-fill sat ABOVE the band:
+ *     a white stripe with a hard join right under the nav. The spacer is gone
+ *     and the padding lives inside the band now.
  *
  * Craft notes:
  *  · Headline reveals by LINE, never by letter (masked overflow + upward slide).
@@ -28,7 +46,17 @@ import AmbientEnvironment from '@/components/AmbientEnvironment/AmbientEnvironme
 import { Section } from '@/components/Section';
 
 const EASE = [0.16, 1, 0.3, 1] as const;
-const ORANGE = 'var(--accent-vivid)';
+
+/* TWO accents, and the split is the tone contract's, not this file's:
+     --accent        the orange that clears 4.5:1 as TEXT on this band
+     --accent-vivid  the full-chroma orange, for FILLS, strokes and glyphs
+   On the apricot hero, --accent-vivid reaches only 2.38:1 — fine for a glowing
+   dot, wrong for the rotating phrase. This was one constant while the band was
+   full-chroma brand and everything on it had to be ink; now that the band is
+   light, the distinction is live again and getting it wrong is a legibility
+   bug rather than a preference. */
+const ACCENT_TEXT = 'var(--accent)';
+const ACCENT_VIVID = 'var(--accent-vivid)';
 
 const PHRASES = ['Content Production.', 'Outreach Systems.', 'Backend Tasks.'];
 const PHRASE_MS = 3400;
@@ -112,7 +140,7 @@ function Magnetic({
 function AccentRule() {
   return (
     <svg
-      className="accent-underline text-[var(--accent-vivid)]"
+      className="accent-underline text-[var(--accent)]"
       viewBox="0 0 100 6"
       preserveAspectRatio="none"
       aria-hidden
@@ -166,7 +194,7 @@ function RotatingPhrase({ still }: { still: boolean }) {
         </span>
       ))}
 
-      <span className="col-start-1 row-start-1" style={{ color: ORANGE }} aria-hidden>
+      <span className="col-start-1 row-start-1" style={{ color: ACCENT_TEXT }} aria-hidden>
         {still ? (
           <span className="relative inline-block">
             {PHRASES[0]}
@@ -273,14 +301,14 @@ function ScrollCue({ still, onDepart }: { still: boolean; onDepart: () => void }
           {still ? (
             <span
               className="absolute inset-0 rounded-full"
-              style={{ background: ORANGE }}
+              style={{ background: ACCENT_VIVID }}
             />
           ) : (
             from && (
               <motion.span
                 className="absolute inset-0 rounded-full"
                 style={{
-                  background: ORANGE,
+                  background: ACCENT_VIVID,
                   boxShadow: '0 0 10px color-mix(in oklch, var(--accent-vivid) 60%, transparent)',
                 }}
                 initial={{ x: from.x, y: from.y, scale: 0.5, opacity: 0 }}
@@ -349,21 +377,32 @@ export default function Hero() {
   });
 
   return (
+    /* min-h-svh, not `calc(100svh - 88px)`. Navbar no longer renders a spacer,
+       so this band starts at y=0 and runs the full first screen with the nav
+       pill floating on top of it. The 88px the spacer used to occupy is now
+       padding INSIDE the band (below), which is the difference between the
+       colour reaching the top of the window and a white stripe above it. */
     <Section
-      tone="base"
+      tone="hero"
       pad="none"
-      className="tone-hero flex min-h-[calc(100svh-88px)] flex-col"
+      className="flex min-h-svh flex-col"
     >
       {/* Ambient light belongs to the band that IS the light source. */}
       <AmbientEnvironment />
       <VideoModal open={videoOpen} onClose={() => setVideoOpen(false)} />
 
-      <div className="relative z-10 mx-auto flex w-full max-w-[1200px] flex-1 flex-col px-6 md:px-10">
+      {/* pt-[88px] is the nav's own height, held here rather than by a spacer
+          element outside the band. */}
+      <div className="relative z-10 mx-auto flex w-full max-w-[1200px] flex-1 flex-col px-6 pt-[88px] md:px-10">
 
         {/* The cluster is centred in what remains AFTER the scroll cue takes
             its band at the bottom, which is what stops it floating high over a
             large unclaimed gap. */}
-        <div className="flex flex-1 flex-col justify-center pt-[10vh]">
+        {/* 4vh, not 10vh. The band gained the navbar's 88px when the spacer
+            was removed, and the cluster was already offset down inside it —
+            the two together left the headline sitting well below centre with a
+            dead third above it. */}
+        <div className="flex flex-1 flex-col justify-center pt-[4vh]">
 
           {/* ── Headline ──────────────────────────────────────────────── */}
           <h1
@@ -404,7 +443,7 @@ export default function Hero() {
                   viewBox="0 0 15 15"
                   fill="none"
                   aria-hidden
-                  style={{ color: ORANGE }}
+                  style={{ color: ACCENT_VIVID }}
                   className="transition-transform duration-500 ease-out group-hover:translate-x-1"
                 >
                   <path
@@ -435,7 +474,7 @@ export default function Hero() {
                 viewBox="0 0 10 10"
                 fill="none"
                 aria-hidden
-                style={{ color: ORANGE }}
+                style={{ color: ACCENT_TEXT }}
                 className="transition-transform duration-500 ease-out group-hover:translate-x-[2px]"
               >
                 <path d="M2.5 1.5 8.5 5l-6 3.5V1.5Z" fill="currentColor" />

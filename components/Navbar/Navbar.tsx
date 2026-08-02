@@ -4,7 +4,6 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import LetsTalkButton from './LetsTalkButton';
-import ThemeToggle from '@/components/Theme/ThemeToggle';
 
 const navLinks = [
   { label: 'Steps', href: '/solutions' },
@@ -26,8 +25,12 @@ export default function Navbar() {
 
   return (
     <>
-      {/* Spacer to push content below the floating navbar area */}
-      <div className="h-[88px]" />
+      {/* NO SPACER. There used to be an `h-[88px]` div here, and because the
+          nav is fixed, that spacer was 88px of bare page-fill above whatever
+          the page's first band was — a white stripe sitting on top of the
+          hero's colour, with a hard horizontal join right under the nav pill.
+          The nav floats OVER the first band now; every page pads its own first
+          section to clear it (the pill's bottom edge is at 96px). */}
 
       {/* ── Floating Pill Navbar ─────────────────────────────────────────── */}
       {/* The nav is centred while the page content is left-aligned. Two
@@ -89,9 +92,6 @@ export default function Navbar() {
               </Link>
             ))}
           </div>
-
-          {/* ── Day / night ───────────────────────────────────────────── */}
-          <ThemeToggle className="ml-1 mr-1 lg:ml-0" />
 
           {/* ── CTA Button (right side) ───────────────────────────────── */}
           <div className="hidden lg:block">

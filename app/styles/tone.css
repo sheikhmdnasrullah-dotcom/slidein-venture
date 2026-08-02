@@ -1,19 +1,19 @@
 /* ═══════════════════════════════════════════════════════════════════════════
    SLIDEIN VENTURE — TONE LAYER
-   Macro contrast (Stage 3) + day / night theming
+   Macro contrast. ONE AXIS.
    ---------------------------------------------------------------------------
-   TWO AXES, AND THEY ARE INDEPENDENT. Confusing them is how theme systems rot.
-
-     THEME  — day | night. A global user choice. Decides whether the site is
-              made of paper or of graphite. Set as data-theme on <html>.
+   The site is made of paper. There is no theme switch, no night tone set, no
+   `data-theme` attribute and no `dark:` variant — all four were removed. What
+   remains is the axis that was always doing the real work:
 
      TONE   — base | raised | anchor | terminal. A per-section choice. Decides
-              how DEEP that band sits relative to the others in the current
-              theme. It is a position in a rhythm, not a colour.
+              how DEEP that band sits relative to the others. It is a position
+              in a rhythm, not a colour.
 
    So `tone="anchor"` does not mean "dark". It means "this is the band that
-   anchors the page". In day that is paper-100 over a paper-200 well; in night
-   it is ink-deep. The section never knows which — that is the point.
+   anchors the page": paper-100 over a paper-200 well. The section never learns
+   the value, only the depth — that is the point, and it is what lets the ramp
+   be retuned in this one file.
 
    THE FOUR TONES
 
@@ -51,14 +51,14 @@
    There is no `dark:` variant anywhere in this codebase, by design: a variant
    doubles every rule, and the one you forget is the one that ships.
 
-   RULE 1 HOLDS ON BOTH AXES. --accent and --accent-vivid are always hue 42.28.
-   A night band does not get a different orange; it gets the same orange read
+   RULE 1 HOLDS ON EVERY TONE. --accent and --accent-vivid are always hue 42.28.
+   A deeper band does not get a different orange; it gets the same orange read
    at the lightness that clears AA against it. Every number below is measured —
    see scripts/verify-contrast.mjs, which fails the build if one regresses.
    ═══════════════════════════════════════════════════════════════════════════ */
 
 /* ─────────────────────────────────────────────────────────────────────────
-   DAY — made of paper. Paper surfaces, ink type, orange accent.
+   PAPER — paper surfaces, ink type, orange accent.
    The four tones step down the paper ramp: 50 → 100 → 100 → 200.
    ───────────────────────────────────────────────────────────────────────── */
 
@@ -151,54 +151,131 @@ html {
   --bleed-to: var(--color-paper-200);
 }
 
-/* ─────────────────────────────────────────────────────────────────────────
-   NIGHT — made of graphite. The same four steps read from the other end of
-   the ramp: graphite-900 → graphite-800 → ink-deep → ink-deep.
+/* The night tone set used to live here — a graphite mirror of the four blocks
+   above, plus a `[data-theme='night']` override for every one of them. It is
+   gone, and with it the toggle, the pre-paint script and the `dark:` variant.
+   Do not add a second theme axis back: the four tones already carry the whole
+   value rhythm, and the deep end of the page is now the terminal band and the
+   STAGE band below, both of which are made of ink on purpose rather than
+   because a user flipped a switch. */
 
-   This is NOT a mirror of day. The anchor band goes DARKEST in night while it
-   goes only one step in during day, because in both cases the anchor has to be
-   the band that pulls hardest away from the page's own value. Mirroring the
-   numbers would have made it the flattest band on the page.
-   ───────────────────────────────────────────────────────────────────────── */
+/* ═══ HERO ════════════════════════════════════════════════════════════════
+   The opening band. Apricot — the brand hue read at the light end of the ramp
+   (see --color-apricot-100 in tokens.css for why it is chroma 0.055 and not
+   the full-chroma brand orange this band shipped with first).
 
+   Two things follow from the band being LIGHT rather than saturated, and both
+   are why this is a tone and not a background-color:
 
+     · --accent stays ORANGE. On full-chroma brand there was no orange left to
+       accent with, so the hero's rotating phrase had to be ink. On apricot,
+       signal-deeper clears 4.5:1 (4.65) and the phrase is orange again — which
+       is the thing the hero was recognised by.
+     · --rule can be a real hairline instead of an ink smear, so the ambient
+       blueprint guides and the dot grid read as construction lines rather than
+       as dirt on a coloured field.
 
+   The band still runs edge to edge and UNDER the floating nav — there is no
+   paper strip above it. Navbar renders no spacer; the hero owns the top of the
+   document and pads for the nav itself. That stripe was the single most
+   visible thing wrong with the first version.
 
-
-
-
-
-
-/* Night's anchor and terminal were both ink-deep, which merged the footer into
-   the deck band into one 1,000px slab. The page now descends to its darkest at
-   the anchor and settles one step back up at the footer — the same shape a
-   piece of music has, and the reason the join is legible without a border. */
-
-
-/* ─────────────────────────────────────────────────────────────────────────
-   HERO — the one band with a gradient. It is the light source, so it holds
-   the theme's brightest value at the top and settles onto the page fill by
-   the time it hands off. Same gesture in both themes, opposite direction.
-   ───────────────────────────────────────────────────────────────────────── */
+   Measured on --color-apricot-100 — the HERO BAND rows in
+   scripts/verify-contrast.mjs fail the check if any of these regresses:
+     ink             15.52:1  ✓ headline and body
+     slate-600        5.43:1  ✓ secondary text
+     signal-deeper    4.65:1  ✓ the accent phrase, at any size
+     brand            2.38:1  ✗ fills, strokes and the drawn rule only */
 .tone-hero {
-  background-image: linear-gradient(
-    to bottom,
-    var(--color-paper-25) 0%,
-    var(--color-paper-25) 28%,
-    var(--color-paper-50) 100%
-  );
+  --surface:       var(--color-apricot-100);
+  --surface-2:     var(--color-apricot-200);
+  --on-surface:    var(--color-ink);
+  --muted:         var(--color-slate-600);
+  --faint:         color-mix(in oklch, var(--color-ink) 34%, transparent);
+  --rule:          color-mix(in oklch, var(--color-ink) 10%, transparent);
+  --rule-strong:   color-mix(in oklch, var(--color-ink) 18%, transparent);
+  --accent:        var(--color-signal-deeper);
+  --accent-vivid:  var(--color-brand);
+  --accent-wash:   color-mix(in oklch, var(--color-brand) 10%, transparent);
+  --accent-ring:   color-mix(in oklch, var(--color-brand) 32%, transparent);
+  --on-accent:     var(--color-paper-25);
+  --surface-glass: color-mix(in oklch, var(--color-paper-25) 70%, transparent);
+  --gloss:         color-mix(in oklch, var(--color-paper-25) 42%, transparent);
+  --status-live:   var(--color-live-deep);
+  --status-info:   var(--color-info-deep);
+
+  background-color: var(--color-apricot-100);
+  color: var(--on-surface);
+
+  --bleed-to: var(--color-apricot-100);
+
+  /* AmbientEnvironment's washes, held DELIBERATELY LOW. On paper these run at
+     4–5.5% and read as light. On a coloured ground the same layers are far more
+     visible, and at 10–13% they turned the band into a blotchy radial gradient
+     with a pale centre and saturated corners — the opposite of the flat field
+     this is meant to be. 5% is enough to keep the band from looking like a
+     swatch and not enough to be seen as a shape. */
+  --grid-dot:  color-mix(in oklch, var(--color-ink) 5%, transparent);
+  --ambient-a: color-mix(in oklch, var(--color-brand) 5%, transparent);
+  --ambient-b: color-mix(in oklch, var(--color-brand) 4%, transparent);
+  --ambient-c: color-mix(in oklch, var(--color-brand) 5%, transparent);
 }
 
+/* The hero hands off to paper. Without this the apricot stops at a butt joint
+   and reads as a coloured box dropped on the page; with it, the band sinks into
+   the paper over its last few hundred pixels the way the seam and bleed do
+   everywhere else. */
+.tone-hero::after {
+  content: '';
+  position: absolute;
+  inset-inline: 0;
+  bottom: 0;
+  height: clamp(4rem, 1rem + 7vw, 11rem);
+  background: linear-gradient(to bottom, transparent, var(--color-paper-50));
+  pointer-events: none;
+  z-index: 1;
+}
 
+/* ═══ STAGE ═══════════════════════════════════════════════════════════════
+   The deepest band on the site, and the only ink one. It exists for the two
+   places the page has to stop being paper: the closing statement and the
+   final call. Not a theme — a destination.
+
+   ink-deep, not #000 (Rule 2). Orange reads --color-brand-hi here, which is
+   the same hue 42.28 at the lightness that clears AA on it (6.47:1). */
+.tone-stage {
+  --surface:       var(--color-graphite-900);
+  --surface-2:     var(--color-graphite-800);
+  --on-surface:    var(--color-paper-25);
+  --muted:         var(--color-ash-400);
+  --faint:         color-mix(in oklch, var(--color-paper-25) 30%, transparent);
+  --rule:          color-mix(in oklch, var(--color-paper-25) 10%, transparent);
+  --rule-strong:   color-mix(in oklch, var(--color-paper-25) 18%, transparent);
+  --accent:        var(--color-brand-hi);
+  --accent-vivid:  var(--color-brand);
+  --accent-wash:   color-mix(in oklch, var(--color-brand) 12%, transparent);
+  --accent-ring:   color-mix(in oklch, var(--color-brand) 40%, transparent);
+  --on-accent:     var(--color-paper-25);
+  --surface-glass: color-mix(in oklch, var(--color-graphite-900) 70%, transparent);
+  --gloss:         color-mix(in oklch, var(--color-paper-25) 7%, transparent);
+  --status-live:   var(--color-live-hi);
+  --status-info:   var(--color-info-hi);
+
+  background-color: var(--color-ink-deep);
+  color: var(--on-surface);
+
+  --bleed-to: var(--color-ink-deep);
+}
 
 /* ═══ SEAM ════════════════════════════════════════════════════════════════
    A 1px optical line at the join between two bands, fading out at both ends
    so it reads as an edge and not as a table border.
 
-   The direction flips with the theme, and it has to: on graphite the trick is
-   a line BRIGHTER than either side (the one furniture photographers use); on
-   paper a bright hairline is invisible, so the same edge has to be drawn
-   darker. Same intent, opposite value. */
+   It reads --rule, so it is drawn DARKER than either side on the paper bands
+   (a bright hairline is invisible on paper) and BRIGHTER than either side on
+   the stage band, where --rule is paper at 10% — the trick furniture
+   photographers use. One declaration, correct on both, because the value comes
+   from the tone rather than from a literal. */
 .seam-top::before {
   content: '';
   position: absolute;

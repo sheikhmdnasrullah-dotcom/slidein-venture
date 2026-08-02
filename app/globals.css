@@ -14,6 +14,13 @@
 @import "@xyflow/react/dist/style.css" layer(base);
 @import "shadcn/tailwind.css";
 
+/* The site has ONE theme — paper. Sections vary by TONE, never by theme.
+   This line is NOT vestigial and must not be deleted: Tailwind v4's built-in
+   `dark:` variant is `@media (prefers-color-scheme: dark)`, so removing the
+   override would hand every `dark:` class shadcn ships in components/ui back
+   to the visitor's OS setting and quietly reintroduce a half-dark UI on a site
+   that has no dark mode. Pointing the variant at a `.dark` ancestor that is
+   never rendered makes those utilities dead instead of conditional. */
 @custom-variant dark (&:is(.dark *));
 
 /* ─── Tailwind v4 Theme ───────────────────────────────────────────────────── */
@@ -31,8 +38,8 @@
 
   /* Legacy semantic aliases. These used to name a fixed token; they now point
      at the TONE CONTRACT (app/styles/tone.css), which is what makes every
-     shadcn/ui component and every call site we have not migrated yet theme
-     itself for free instead of staying stubbornly light in night mode. */
+     shadcn/ui component and every call site we have not migrated yet pick up
+     the tone of the band it sits in for free. */
   --color-background:   var(--surface);
   --color-foreground:   var(--on-surface);
   --color-card:         var(--surface);
@@ -71,10 +78,10 @@
 /* ─── shadcn/ui CSS Variables ───────────────────────────────────────────────
    Every one of these shipped as a hardcoded neutral greyscale (oklch(0.145 0 0)
    and friends), which is why shadcn components stayed light-grey no matter what
-   the rest of the page did. They now read the tone contract, so a Dialog inside
-   a night-mode page is a night-mode Dialog with no `.dark` class in sight.
-   The `.dark` block that used to live here is gone: there is one theme axis on
-   this site, data-theme, and two competing ones is how they drift apart.      */
+   the rest of the page did. They now read the tone contract, so a Dialog opened
+   from inside a deeper band is made of that band's surface.
+   The `.dark` block that used to live here is gone, along with the night tone
+   set: one theme, four tones, no second axis to drift out of sync.            */
 :root {
   --card: var(--surface);
   --card-foreground: var(--on-surface);
@@ -120,6 +127,14 @@ html {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   scroll-behavior: smooth;
+  /* Declared, not inferred. Without it a visitor whose OS is in dark mode gets
+     dark form controls, a dark scrollbar and a dark autofill wash on a page
+     that is made of paper. One theme means telling the UA so. */
+  color-scheme: light;
+  /* Sections are scroll targets now that the deck is a scroll narrative, and
+     the navbar floats over the top of them. Landing a chapter flush under the
+     nav pill hides its own heading. */
+  scroll-padding-top: 104px;
   /* The old `cv11` / `ss01` / `opsz 32` block here was Inter's alternate set,
      inherited by every element. Switzer has no cv11 or ss01, and a global
      opsz override defeats the per-role optical sizing in styles/type.css. */
@@ -132,7 +147,7 @@ body {
      Sections paint their own band over the top of this; what shows through is
      the navbar spacer and any overscroll rubber-banding.
 
-     --page-fill rather than a token directly, so the night override below is a
+     --page-fill rather than a token directly, so the page's own value stays a
      one-line custom-property swap instead of a competing background-color
      declaration that has to win a specificity argument with this one. */
   background-color: var(--page-fill);
@@ -372,34 +387,11 @@ body {
   }
 }
 
-/* ─── Theme transition ──────────────────────────────────────────────────────
-   The switch has to be felt, not just seen: colour eases over --dur-base while
-   everything else stays put. Scoped to the properties that actually change so
-   we are not animating layout, and skipped entirely under reduced motion
-   (Rule 5) — a full-page cross-fade is exactly the kind of thing that triggers
-   vestibular discomfort.
-
-   `transition` is set on the elements that paint a band or a surface rather
-   than on `*`, because `* { transition: … }` costs a style recalculation on
-   every element for every hover on the page. */
-:root[data-theme] body,
-:root[data-theme] [class*='tone-'],
-:root[data-theme] nav,
-:root[data-theme] footer {
-  transition:
-    background-color var(--dur-base) var(--ease-std),
-    border-color var(--dur-base) var(--ease-std),
-    color var(--dur-base) var(--ease-std);
-}
-
-@media (prefers-reduced-motion: reduce) {
-  :root[data-theme] body,
-  :root[data-theme] [class*='tone-'],
-  :root[data-theme] nav,
-  :root[data-theme] footer {
-    transition: none;
-  }
-}
+/* The theme-transition block that used to sit here cross-faded every band when
+   the day/night switch flipped. There is no switch and no night, so a
+   transition on background-color across every toned element was pure style
+   recalculation for a change that can no longer happen. Deleted with the
+   toggle. */
 
 /* ── SlideIn design language — premium button + card system ─────────────── */
 .btn-premium {

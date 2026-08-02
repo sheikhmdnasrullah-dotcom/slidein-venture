@@ -1,26 +1,20 @@
 'use client';
 
-import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 
-/* ── Theme ────────────────────────────────────────────────────────────────── */
+/* ── Palette ──────────────────────────────────────────────────────────────
+   This slide used to carry two palettes and a MutationObserver on <html>'s
+   data-theme so it could repaint itself for night mode. Night is gone, so is
+   the observer, and the component is no longer a client-state machine that
+   re-renders on an attribute nothing writes.
 
-const THEME_NIGHT = 'night';
-const THEME_DAY = 'day';
-
-const NIGHT_COLORS = {
-  bg: 'var(--color-graphite-900)',
-  ink: 'var(--color-paper-25)',
-  muted: 'var(--color-ash-300)',
-  accent: 'var(--color-brand-hi)',
-  iconChipBg: 'color-mix(in oklch, var(--color-paper-25) 7%, transparent)',
-  border: 'color-mix(in oklch, var(--color-paper-25) 8%, transparent)',
-  ruleStrong: 'color-mix(in oklch, var(--color-paper-25) 11%, transparent)',
-};
-
-const DAY_COLORS = {
+   The object survives because every colour on the slide is set through inline
+   style (the SVG icons need real values, not classes), and one object is the
+   only place those values can be audited. Ink on paper-100, brand orange for
+   the one figure that matters. */
+const COLORS = {
   bg: 'var(--color-paper-100)',
   ink: 'var(--color-ink)',
   muted: 'var(--color-slate-600)',
@@ -29,11 +23,6 @@ const DAY_COLORS = {
   border: 'color-mix(in oklch, var(--color-ink) 8%, transparent)',
   ruleStrong: 'color-mix(in oklch, var(--color-ink) 11%, transparent)',
 };
-
-function getTheme() {
-  if (typeof window === 'undefined') return THEME_NIGHT;
-  return document.documentElement.getAttribute('data-theme') === THEME_DAY ? THEME_DAY : THEME_NIGHT;
-}
 
 /* ── Money ────────────────────────────────────────────────────────────────
    Market monthly rates for a competent freelancer or part-time contractor in
@@ -138,7 +127,7 @@ function Glyph({ kind }: { kind: IconKind }) {
   }
 }
 
-function IconChip({ kind, colors }: { kind: IconKind; colors: typeof DAY_COLORS | typeof NIGHT_COLORS }) {
+function IconChip({ kind, colors }: { kind: IconKind; colors: typeof COLORS }) {
   return (
     <span
       aria-hidden
@@ -159,7 +148,7 @@ function IconChip({ kind, colors }: { kind: IconKind; colors: typeof DAY_COLORS 
    Both columns use these so the mono lines and the totals are literally the
    same components at the same sizes. Any divergence would give the viewer a
    reason to doubt the comparison. */
-function ColumnHead({ children, accent, colors }: { children: React.ReactNode; accent?: boolean; colors: typeof DAY_COLORS | typeof NIGHT_COLORS }) {
+function ColumnHead({ children, accent, colors }: { children: React.ReactNode; accent?: boolean; colors: typeof COLORS }) {
   return (
     <p
       className="font-mono text-[10px] font-bold uppercase leading-none tracking-[0.22em]"
@@ -170,7 +159,7 @@ function ColumnHead({ children, accent, colors }: { children: React.ReactNode; a
   );
 }
 
-function Total({ value, label, colors }: { value: number; label: string; colors: typeof DAY_COLORS | typeof NIGHT_COLORS }) {
+function Total({ value, label, colors }: { value: number; label: string; colors: typeof COLORS }) {
   return (
     <div>
       <p className="font-mono text-[9px] font-bold uppercase tracking-[0.2em]" style={{ color: colors.muted }}>
@@ -190,7 +179,7 @@ function Total({ value, label, colors }: { value: number; label: string; colors:
   );
 }
 
-function Ledger({ lines, colors }: { lines: { text: string; accent?: boolean }[]; colors: typeof DAY_COLORS | typeof NIGHT_COLORS }) {
+function Ledger({ lines, colors }: { lines: { text: string; accent?: boolean }[]; colors: typeof COLORS }) {
   return (
     <ul className="mt-5 flex flex-col gap-1.5">
       {lines.map((l) => (
@@ -209,15 +198,7 @@ function Ledger({ lines, colors }: { lines: { text: string; accent?: boolean }[]
 /* ── Slide ────────────────────────────────────────────────────────────────── */
 
 export default function AlternativeSlide() {
-  const [theme, setTheme] = useState(getTheme);
-  const colors = theme === THEME_DAY ? DAY_COLORS : NIGHT_COLORS;
-
-  useEffect(() => {
-    const root = document.documentElement;
-    const observer = new MutationObserver(() => setTheme(getTheme()));
-    observer.observe(root, { attributes: true, attributeFilter: ['data-theme'] });
-    return () => observer.disconnect();
-  }, []);
+  const colors = COLORS;
 
   return (
     <section
@@ -233,9 +214,7 @@ export default function AlternativeSlide() {
         className="pointer-events-none absolute inset-0 opacity-[0.5]"
         style={{
           backgroundImage:
-            theme === THEME_DAY
-              ? 'radial-gradient(circle, color-mix(in oklch, var(--color-ink) 8%, transparent) 1px, transparent 1px)'
-              : 'radial-gradient(circle, color-mix(in oklch, var(--color-paper-25) 6%, transparent) 1px, transparent 1px)',
+            'radial-gradient(circle, color-mix(in oklch, var(--color-ink) 8%, transparent) 1px, transparent 1px)',
           backgroundSize: '26px 26px',
           maskImage: 'radial-gradient(120% 100% at 30% 40%, black, transparent 92%)',
           WebkitMaskImage: 'radial-gradient(120% 100% at 30% 40%, black, transparent 92%)',

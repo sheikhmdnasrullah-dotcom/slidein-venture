@@ -1,661 +1,172 @@
 'use client';
 
-import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
+/**
+ * THE FRAMEWORK — a scroll narrative
+ * ---------------------------------------------------------------------------
+ * This was a ten-slide carousel: one 660px stage, arrows, a progress bar, a
+ * fullscreen button and nine of the ten visuals hidden at any moment. It is now
+ * four chapters laid down the page, read by scrolling.
+ *
+ * Every slide component is untouched. Each one still renders into a box with
+ * exactly the geometry the old stage gave it (see CANVAS_MIN and the absolutely
+ * positioned inner frame in Chapter) — that is deliberate, and it is what keeps
+ * the diagrams pixel-identical instead of reflowing into a shape nobody
+ * designed them for.
+ *
+ * WHAT CHANGED, AND WHY
+ *
+ *  · Slides became chapters. A chapter has a heading, so the argument is
+ *    legible from the page outline rather than from a kicker that changed as
+ *    you clicked. The headings were already written — they were the carousel's
+ *    `kicker` strings doing the job at 11px.
+ *  · Five chapters left. See the note under CHAPTERS: the back half of the deck
+ *    moved to /solutions, because it answers a different question than the
+ *    homepage is asking.
+ *  · The frame went. See the note on the canvas in Chapter — the rounded card
+ *    around each diagram was deck furniture, and down a page it read as a
+ *    screenshot pasted into a document.
+ *  · Deferred mount. A chapter renders its visual only once it has come near
+ *    the viewport. Every slide carries its own entrance animation keyed to
+ *    mount; render them all at page load and they all play to an empty room,
+ *    and the reader arrives at four finished diagrams. Height is reserved up
+ *    front, so nothing shifts.
+ *  · The thread. In the carousel a dot flew in from the left on every slide
+ *    change. Down a page the same idea is literal: a dashed rule runs between
+ *    chapters and a dot sits on each join. It is the same thread the hero
+ *    releases, and it is what makes separate diagrams read as one system.
+ *  · The index rail. The progress segments became a fixed rail on the left at
+ *    xl and up: one tick per chapter, the current one lit, each a jump link.
+ *    Below xl it is not rendered at all rather than being squeezed — the
+ *    headings already do the wayfinding on a narrow screen.
+ */
+
+import { useState, useCallback, useMemo } from 'react';
 import Link from 'next/link';
-import { motion, AnimatePresence, type Variants } from 'framer-motion';
-import {
-  ArrowLeft01Icon as ChevronLeft,
-  ArrowRight01Icon as ChevronRight,
-  ArrowRight02Icon as ArrowIcon,
-  RepeatIcon as LoopIcon,
-  UserGroupIcon as AgencyIcon,
-  Film01Icon as EpisodeIcon,
-  PlaySquareIcon as ClipIcon,
-  Doc02Icon as ArticleIcon,
-  Linkedin01Icon as LinkedInIcon,
-  Target01Icon as TargetIcon,
-  SentIcon as SendIcon,
-  SecurityCheckIcon as TrustIcon,
-  Search01Icon as ResearchIcon,
-  PenTool02Icon as WriteIcon,
-  InboxIcon as SortIcon,
-  Message01Icon as ConvoIcon,
-  Mic01Icon as PodcastIcon,
-  YoutubeIcon,
-  Maximize01Icon as FullscreenIcon,
-  Minimize01Icon as MinimizeIcon,
-} from 'hugeicons-react';
-import { cn } from '@/lib/utils';
+import { useReducedMotion } from 'framer-motion';
+import { ArrowRight02Icon as ArrowIcon } from 'hugeicons-react';
 import { Section } from '@/components/Section';
 import ServiceDetailModal from '@/components/ServiceDetailModal/ServiceDetailModal';
+import ScrollReveal, { Rise } from '@/components/PitchDeck/ScrollReveal';
+import ChapterRun, { type ChapterDef } from '@/components/PitchDeck/ChapterRun';
 import FrameworkFlowSlide from '@/components/PitchDeck/FrameworkFlowSlide';
 import OrbitSlide from '@/components/PitchDeck/OrbitSlide';
 import OutreachOSSlide from '@/components/PitchDeck/OutreachOSSlide';
-import GrowthLoopSlide from '@/components/PitchDeck/GrowthLoopSlide';
-import PipelineSlide from '@/components/PitchDeck/PipelineSlide';
 import InputSlide from '@/components/PitchDeck/InputSlide';
-import TheWeekSlide from '@/components/PitchDeck/TheWeekSlide';
-import AlternativeSlide from '@/components/PitchDeck/AlternativeSlide';
-import CompoundSlide from '@/components/PitchDeck/CompoundSlide';
 
-const EASE = [0.16, 1, 0.3, 1] as const;
-
-/* ── Shared entrance variants ─────────────────────────────────────────── */
-const containerVariants: Variants = {
-  hidden: {},
-  visible: { transition: { staggerChildren: 0.09, delayChildren: 0.04 } },
-};
-const itemVariants: Variants = {
-  hidden: { opacity: 0, y: 22 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.55, ease: EASE } },
-};
-const connectorVariants: Variants = {
-  hidden: { scaleY: 0, opacity: 0 },
-  visible: { opacity: 1, scaleY: 1, transition: { duration: 0.45, ease: EASE } },
-};
-
-/* ── Small building blocks ────────────────────────────────────────────── */
-
-type IconType = React.ComponentType<{ size?: number; strokeWidth?: number; className?: string }>;
-
-function Connector() {
-  return (
-    <motion.div
-      variants={connectorVariants}
-      className="relative w-px h-10 md:h-12 mx-auto"
-      style={{ transformOrigin: 'top' }}
-    >
-      <span className="absolute inset-0 border-l-2 border-dashed border-[var(--rule-strong)]" />
-      <span className="absolute -bottom-[3px] left-1/2 -translate-x-1/2 w-2 h-2 rounded-full bg-[var(--faint)]" />
-    </motion.div>
-  );
-}
-
-function Pill({
-  icon: Icon,
-  tone = 'default',
-  tooltip,
-  width,
-  children,
-}: {
-  icon?: IconType;
-  tone?: 'default' | 'ink' | 'accent';
-  tooltip?: string;
-  width?: number;
-  children: React.ReactNode;
-}) {
-  const [hover, setHover] = useState(false);
-  /* Accent no longer means "solid orange block". It means an ink-legible
-     surface carrying an orange hairline + orange icon + soft orange light —
-     attention without a saturated slab. */
-  const toneClasses =
-    tone === 'accent'
-      ? 'bg-[var(--surface)] border-[var(--accent-ring)] text-[var(--on-surface)] shadow-[var(--shadow-raised)]'
-      : tone === 'ink'
-      ? 'bg-[var(--surface-2)] border-[var(--surface-2)] text-[var(--on-surface)]'
-      : 'bg-[var(--surface-glass)] border-[var(--rule)] text-[var(--on-surface)]';
-  const iconWrapClasses =
-    tone === 'ink'
-      ? 'bg-[var(--rule-strong)] text-[var(--on-surface)]'
-      : 'bg-[var(--accent-wash)] text-[var(--accent)]';
-
-  return (
-    <div
-      className={cn('relative max-w-full', width ? 'mx-auto' : 'w-fit')}
-      style={width ? { width } : undefined}
-      onMouseEnter={() => setHover(true)}
-      onMouseLeave={() => setHover(false)}
-    >
-      <div
-        className={cn(
-          'flex items-center gap-3 px-5 py-3 min-h-[52px] rounded-full border shadow-sm backdrop-blur-md transition-transform duration-300 cursor-default',
-          toneClasses,
-          hover && 'scale-[1.03] shadow-md'
-        )}
-      >
-        {Icon && (
-          <span className={cn('w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0', iconWrapClasses)}>
-            <Icon size={14} strokeWidth={2.5} />
-          </span>
-        )}
-        <span className="text-[13px] md:text-sm font-bold text-center leading-snug whitespace-nowrap">{children}</span>
-      </div>
-      {tooltip && (
-        <AnimatePresence>
-          {hover && (
-            <motion.div
-              initial={{ opacity: 0, y: -4 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -4 }}
-              transition={{ duration: 0.18 }}
-              className="absolute left-1/2 -translate-x-1/2 top-full mt-2 w-56 text-center text-[11px] leading-snug text-[var(--on-surface)] bg-[var(--surface-2)] px-3 py-2 rounded-[var(--radius-sm)] shadow-lg z-30"
-            >
-              {tooltip}
-              <span className="absolute -top-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-[var(--surface-2)] rotate-45" />
-            </motion.div>
-          )}
-        </AnimatePresence>
-      )}
-    </div>
-  );
-}
-
-function CardShell({
-  icon: Icon,
-  title,
-  wide,
-  children,
-}: {
-  icon: IconType;
-  title: string;
-  wide?: boolean;
-  children: React.ReactNode;
-}) {
-  return (
-    <div
-      className={cn(
-        'w-full border border-[var(--rule)] bg-[var(--surface-glass)] backdrop-blur-md rounded-[var(--radius-md)] shadow-lg p-5 md:p-8',
-        wide ? 'max-w-5xl' : 'max-w-4xl'
-      )}
-    >
-      <div className="flex items-center gap-3 pb-4 mb-5 border-b border-[var(--rule)]">
-        <span className="w-9 h-9 rounded-[var(--radius-sm)] bg-[var(--accent-vivid)] text-[var(--on-accent)] flex items-center justify-center flex-shrink-0">
-          <Icon size={18} strokeWidth={2} />
-        </span>
-        <h3 className="text-[15px] md:text-lg font-extrabold tracking-tight text-[var(--on-surface)]">{title}</h3>
-      </div>
-      {children}
-    </div>
-  );
-}
-
-function StepItem({
-  num,
-  icon: Icon,
-  title,
-  sub,
-  active,
-  onClick,
-}: {
-  num: string;
-  icon: IconType;
-  title: string;
-  sub: string;
-  active: boolean;
-  onClick: () => void;
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className={cn(
-        'w-full md:flex-1 flex flex-col items-center text-center gap-2 p-3 md:p-4 rounded-2xl border transition-all duration-300 cursor-pointer',
-        active
-          ? 'border-[var(--accent-vivid)] bg-[var(--accent-wash)] md:scale-[1.03] shadow-md'
-          : 'border-transparent hover:bg-[var(--rule)]'
-      )}
-    >
-      <span
-        className={cn(
-          'w-10 h-10 md:w-11 md:h-11 rounded-full border-2 flex items-center justify-center transition-colors duration-300',
-          active
-            ? 'border-[var(--accent-vivid)] bg-[var(--accent-vivid)] text-[var(--on-accent)]'
-            : 'border-[var(--rule-strong)] text-[var(--on-surface)]'
-        )}
-      >
-        <Icon size={17} strokeWidth={2} />
-      </span>
-      <span className="text-[10px] font-black text-[var(--accent)] tracking-wider">{num}</span>
-      <span className="text-[13px] md:text-sm font-extrabold text-[var(--on-surface)]">{title}</span>
-      <span className="text-[11px] leading-snug text-[var(--muted)] max-w-[190px]">{sub}</span>
-    </button>
-  );
-}
-
-function StepArrow() {
-  return (
-    <div className="flex items-center justify-center py-1 md:py-0 md:px-1 flex-shrink-0">
-      <ArrowIcon size={18} className="text-[var(--accent-ring)] rotate-90 md:rotate-0" />
-    </div>
-  );
-}
-
-function RoleChip({ icon: Icon, label }: { icon: IconType; label: string }) {
-  const [hover, setHover] = useState(false);
-  return (
-    <div
-      className="relative flex flex-col items-center gap-2 p-2 md:p-3 rounded-2xl"
-      onMouseEnter={() => setHover(true)}
-      onMouseLeave={() => setHover(false)}
-    >
-      <span
-        className={cn(
-          'w-10 h-10 md:w-12 md:h-12 rounded-full border-2 flex items-center justify-center transition-all duration-300',
-          hover ? 'border-[var(--rule)] bg-[var(--rule)]' : 'border-[var(--rule-strong)]'
-        )}
-      >
-        <Icon size={18} strokeWidth={2} className={cn('transition-colors duration-300', hover ? 'text-[var(--muted)]' : 'text-[var(--muted)]')} />
-      </span>
-      <span
-        className={cn(
-          'text-[10px] md:text-[11px] font-bold text-center leading-tight transition-all duration-300',
-          hover ? 'text-[var(--muted)] line-through' : 'text-[var(--muted)]'
-        )}
-      >
-        {label}
-      </span>
-      <AnimatePresence>
-        {hover && (
-          <motion.span
-            initial={{ opacity: 0, y: 4, scale: 0.85 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 4, scale: 0.85 }}
-            className="absolute -top-1.5 right-0 text-[8.5px] font-black uppercase tracking-wide text-[var(--on-accent)] bg-[var(--accent-vivid)] px-1.5 py-0.5 rounded-full shadow"
-          >
-            Handled
-          </motion.span>
-        )}
-      </AnimatePresence>
-    </div>
-  );
-}
-
-function DayCell({
-  day,
-  icon: Icon,
-  type,
-  active,
-  onClick,
-}: {
-  day: string;
-  icon: IconType;
-  type: string;
-  active: boolean;
-  onClick: () => void;
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className={cn(
-        'flex flex-col items-stretch rounded-xl md:rounded-2xl overflow-hidden border transition-all duration-300 cursor-pointer',
-        active
-          ? 'border-[var(--accent-vivid)] shadow-md -translate-y-1'
-          : 'border-[var(--rule)] hover:-translate-y-0.5 hover:shadow-sm'
-      )}
-    >
-      <span
-        className={cn(
-          'text-[9px] md:text-[11px] font-black tracking-widest uppercase py-1.5 md:py-2 text-center transition-colors duration-300',
-          active
-            ? 'bg-[var(--accent-vivid)] text-[var(--on-accent)]'
-            : 'bg-[var(--surface-2)] text-[var(--on-surface)]'
-        )}
-      >
-        {day}
-      </span>
-      <span className="flex flex-col items-center gap-1.5 md:gap-2 py-3 md:py-4 px-1 bg-[var(--surface-glass)] backdrop-blur-md flex-1">
-        <span
-          className={cn(
-            'w-8 h-8 md:w-10 md:h-10 rounded-full border-2 flex items-center justify-center transition-colors duration-300',
-            active ? 'border-[var(--accent-vivid)] bg-[var(--accent-wash)]' : 'border-[var(--rule-strong)]'
-          )}
-        >
-          <Icon size={15} strokeWidth={2} className="text-[var(--on-surface)]" />
-        </span>
-        <span className="text-[9px] md:text-[11px] font-bold text-center leading-tight text-[var(--on-surface)]">{type}</span>
-      </span>
-    </button>
-  );
-}
-
-function LoopCircle({
-  label,
-  tone,
-  active,
-  onMouseEnter,
-  onMouseLeave,
-}: {
-  label: string;
-  tone: 'ink' | 'accent';
-  active: boolean;
-  onMouseEnter: () => void;
-  onMouseLeave: () => void;
-}) {
-  return (
-    <div
-      onMouseEnter={onMouseEnter}
-      onMouseLeave={onMouseLeave}
-      className={cn(
-        'w-24 h-24 md:w-36 md:h-36 rounded-full border-[3px] flex items-center justify-center flex-shrink-0 transition-transform duration-300 cursor-default',
-        tone === 'accent'
-          ? 'bg-[var(--accent-vivid)] border-[var(--accent-vivid)]'
-          : 'bg-[var(--surface)] border-[var(--on-surface)]',
-        active && 'scale-[1.06] shadow-lg'
-      )}
-    >
-      <span className={cn('text-sm md:text-xl font-extrabold tracking-tight', tone === 'accent' ? 'text-[var(--on-accent)]' : 'text-[var(--on-surface)]')}>{label}</span>
-    </div>
-  );
-}
-
-function LoopArt() {
-  return (
-    <svg viewBox="0 0 200 120" className="w-14 md:w-28 h-auto flex-shrink-0" fill="none" aria-hidden>
-      <path d="M4,44 C 60,10 140,10 196,44" stroke="var(--accent-vivid)" strokeWidth="2.5" strokeLinecap="round" />
-      <path d="M186,36 L197,45 L185,52" stroke="var(--accent-vivid)" strokeWidth="2.5" fill="none" strokeLinecap="round" strokeLinejoin="round" />
-      <path d="M196,76 C 140,110 60,110 4,76" stroke="var(--on-surface)" strokeWidth="2.5" strokeLinecap="round" />
-      <path d="M14,84 L3,75 L15,68" stroke="var(--on-surface)" strokeWidth="2.5" fill="none" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  );
-}
-
-function RingArt() {
-  return (
-    <svg viewBox="0 0 400 400" className="w-14 h-14 md:w-20 md:h-20" fill="none" aria-hidden>
-      <path d="M30,200 A170,170 0 0 1 370,200" stroke="var(--accent-vivid)" strokeWidth="14" strokeLinecap="round" />
-      <path d="M370,200 A170,170 0 0 1 30,200" stroke="var(--on-surface)" strokeWidth="14" strokeLinecap="round" />
-    </svg>
-  );
-}
-
-function Eyebrow({ children }: { children: React.ReactNode }) {
-  return <p className="text-[11px] md:text-xs font-bold tracking-[0.14em] uppercase text-[var(--accent)] mb-3">{children}</p>;
-}
-
-/** Small L-bracket accent in the deck's corners — a designed detail, not extra chrome. */
-function CornerAccent({ position }: { position: 'top-left' | 'bottom-right' }) {
-  const isTL = position === 'top-left';
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      fill="none"
-      aria-hidden
-      className={cn(
-        'pointer-events-none absolute w-5 h-5 md:w-6 md:h-6 z-20',
-        isTL ? 'top-4 left-4 md:top-5 md:left-5' : 'bottom-4 right-4 md:bottom-5 md:right-5 rotate-180'
-      )}
-    >
-      <path d="M2 9V2H9" stroke="var(--accent-vivid)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" opacity="0.55" />
-    </svg>
-  );
-}
-
-/* ── Slide 1 — The Input ──────────────────────────────────────────────── */
-function Slide1() {
-  return <InputSlide />;
-}
-
-/* ── Slide 6 — The System, Running ────────────────────────────────────────
-   Was slide 1. Moved here because a status readout only means something once
-   the four engines it is reporting on have each been introduced. */
-function SlidePipeline() {
-  return <PipelineSlide />;
-}
-
-/* ── Slide 2 — Two Systems. One Loop. ─────────────────────────────────────
-   No eyebrow. The title lives inside the canvas now, left-aligned to the first
-   track card, and the ~200px that the centred eyebrow and its gap were costing
-   went back to the diagram. See FrameworkFlowSlide.tsx. */
-function Slide2() {
-  return (
-    <motion.div
-      variants={containerVariants}
-      initial="hidden"
-      animate="visible"
-      className="w-full h-full flex flex-col items-center justify-center"
-    >
-      <motion.div variants={itemVariants} className="w-full">
-        <FrameworkFlowSlide />
-      </motion.div>
-    </motion.div>
-  );
-}
-
-/* ── Slide 4 — The Content System (orbit diagram) ─────────────────────── */
-function Slide4({ onOpenService }: { onOpenService: (id: string) => void }) {
-  return (
-    <motion.div
-      variants={containerVariants}
-      initial="hidden"
-      animate="visible"
-      className="w-full h-full flex flex-col items-center justify-center gap-2"
-    >
-      <motion.div variants={itemVariants} className="w-full">
-        <OrbitSlide onOpenService={onOpenService} />
-      </motion.div>
-    </motion.div>
-  );
-}
-
-/* Content Distribution (the sphere slide) was deleted. Its concentric rings,
-   orbital paths and processing sphere were decoration around an argument the
-   content slide already makes. The one thing worth keeping — the SMART ROUTING
-   junction and its three curved branches — was grafted into OrbitSlide, where
-   it replaced a straight orthogonal bus. */
-
-/* ── Slide 5 — The Outreach System (interactive OS) ───────────────────── */
-function Slide5() {
-  return (
-    <motion.div
-      variants={containerVariants}
-      initial="hidden"
-      animate="visible"
-      className="w-full h-full flex flex-col items-center justify-center"
-    >
-      <motion.div variants={itemVariants} className="w-full">
-        <OutreachOSSlide />
-      </motion.div>
-    </motion.div>
-  );
-}
-
-/* ── Slide 6 — Why It's One System ────────────────────────────────────── */
-function Slide6() {
-  return (
-    <motion.div
-      variants={containerVariants}
-      initial="hidden"
-      animate="visible"
-      className="w-full h-full flex flex-col items-center justify-center"
-    >
-      <motion.div variants={itemVariants} className="w-full">
-        <GrowthLoopSlide />
-      </motion.div>
-    </motion.div>
-  );
-}
-
-/* ── Slide 7.5 — The Compound ─────────────────────────────────────────── */
-function SlideCompound() {
-  return <CompoundSlide />;
-}
-
-/* ── Slide 7 — The Alternative ─────────────────────────────────────────────
-   Was "What This Replaces": a grey card of six circled icons under a headline
-   that claimed five, between two pills joined by dashed lines that connected
-   nothing. Both pills are now column headers and the connectors are gone. The
-   role list grew to seven — Content Strategist joins it now that SlideIn sells
-   ideation and scripting — and every role carries a price. See
-   AlternativeSlide.tsx. */
-function Slide7() {
-  return <AlternativeSlide />;
-}
-
-/* ── Slide 9 — The Close ──────────────────────────────────────────────── */
-function Slide9({ onRestart }: { onRestart: () => void }) {
-  return (
-    <motion.div
-      variants={containerVariants}
-      initial="hidden"
-      animate="visible"
-      className="w-full h-full flex flex-col items-center justify-center text-center gap-4 md:gap-5 px-2"
-      style={{ background: 'var(--color-paper-25)', color: 'var(--color-ink)' }}
-    >
-      {/* loop at rest */}
-      <motion.div variants={itemVariants}>
-        <svg viewBox="0 0 400 300" className="w-24 h-auto md:w-32" fill="none" aria-hidden>
-          <defs>
-            <filter id="closeGlow">
-              <feDropShadow dx="0" dy="0" stdDeviation="3" floodColor="var(--accent-vivid)" floodOpacity="0.6" />
-            </filter>
-          </defs>
-          <path
-            d="M 200 80 C 280 80, 280 220, 200 220 C 120 220, 120 80, 200 80"
-            fill="none"
-            stroke="var(--color-ink)"
-            strokeOpacity="0.2"
-            strokeWidth="1"
-          />
-          <circle r={3.5} fill="var(--accent-vivid)" filter="url(#closeGlow)">
-            <animateMotion
-              path="M 200 80 C 280 80, 280 220, 200 220 C 120 220, 120 80, 200 80"
-              dur="2s"
-              fill="freeze"
-              begin="0.3s"
-            />
-          </circle>
-        </svg>
-      </motion.div>
-
-      {/* headline */}
-      <motion.h2 variants={itemVariants} className="display-headline text-[clamp(1.7rem,3.8vw,2.9rem)] max-w-2xl" style={{ color: 'var(--color-ink)' }}>
-        Record once.<br />
-        Let <span style={{ color: 'var(--accent-vivid)' }}>momentum</span> do the rest.
-      </motion.h2>
-
-      {/* buttons */}
-      <motion.div variants={itemVariants} className="flex flex-wrap items-center justify-center gap-3 mt-2">
-        <Link href="/pricing">
-          <button
-            type="button"
-            className="inline-flex items-center gap-2 px-6 py-3 text-sm font-bold rounded-full cursor-pointer transition-all duration-300 shadow-md hover:shadow-lg hover:-translate-y-0.5"
-            style={{ background: 'var(--accent-vivid)', color: 'var(--on-accent)' }}
-          >
-            Talk to us
-            <ArrowIcon size={16} />
-          </button>
-        </Link>
-        <button
-          type="button"
-          onClick={onRestart}
-          className="inline-flex items-center gap-1.5 px-4 py-3 text-sm font-bold transition-colors duration-300 cursor-pointer hover:opacity-80"
-          style={{ color: 'var(--color-slate-600)' }}
-        >
-          <LoopIcon size={16} />
-          Start again
-        </button>
-      </motion.div>
-    </motion.div>
-  );
-}
-
-/* ── Carousel shell ────────────────────────────────────────────────────── */
-
-const SLIDE_META = [
-  { kicker: 'The Input', number: '01' },
-  { kicker: 'The Complete Framework', number: '02' },
-  { kicker: 'The Week', number: '03' },
-  { kicker: 'The Content System', number: '04' },
-  { kicker: 'The Outreach System', number: '05' },
-  { kicker: 'The System, Running', number: '06' },
-  { kicker: "Why It's One System", number: '07' },
-  { kicker: 'The Compound', number: '07.5' },
-  { kicker: 'The Alternative', number: '08' },
-  { kicker: 'The Close', number: '09' },
+const CHAPTERS: ChapterDef[] = [
+  {
+    id: 'input',
+    number: '01',
+    kicker: 'The Input',
+    lead: 'Everything downstream starts with one recording. That is the whole ask.',
+  },
+  {
+    /* NOT `framework` — that id belongs to the band, and the hero's primary CTA
+       plus its scroll cue both point at it. */
+    id: 'complete-framework',
+    number: '02',
+    kicker: 'The Complete Framework',
+    lead: 'Two systems, one loop. Content earns attention, outreach converts it.',
+  },
+  {
+    id: 'content',
+    number: '03',
+    kicker: 'The Content System',
+    lead: 'One asset in, routed out to every surface it belongs on.',
+  },
+  {
+    id: 'outreach',
+    number: '04',
+    kicker: 'The Outreach System',
+    lead: 'Research, write, send, sort. The pipeline runs whether or not you do.',
+  },
 ];
 
-/* ── THE THREAD ────────────────────────────────────────────────────────────
-   Slide 01 ends with a dot detaching from the rule under "45" and leaving the
-   frame to the right (see InputSlide.tsx). That dot is the recording entering
-   the system, and it is the single continuous idea the deck is built on — so
-   every slide after the first opens with the same dot arriving from the left.
+/* WHERE THE OTHER FIVE WENT
+   The Week, The System Running, Why It's One System, The Compound and The
+   Alternative now live on /solutions — the "Steps" page. The homepage answers
+   "what is this", and four chapters do that: what you give us, how the two
+   halves fit, and one chapter per half. The other five answer "what does a week
+   look like, what does it cost, and what happens over a year", which is a
+   second conversation and was making the front page a 12,000px commitment.
 
-   It is rendered here rather than inside each slide for one reason: nine
-   copies of the same eight lines is nine chances for one of them to drift.
-   Keyed on `index` so it replays on every slide change, including backwards —
-   the thread is the deck's spine, not a first-visit flourish. */
-function ThreadArrival({ index }: { index: number }) {
-  if (index === 0) return null;
+   They are RENUMBERED, not renumbered-and-cross-referenced: this page runs
+   01–04 and /solutions runs its own 01–05. A page that shows 01, 02, 04, 05
+   reads as a bug, and no external link depends on the old numbering. */
+
+/* ── The close ─────────────────────────────────────────────────────────────
+   Was slide 10 and a "start again" button that rewound the carousel. The page
+   has no state to rewind, so the loop art now simply draws itself and the
+   secondary action goes where the reader actually wants to go: back to the top
+   of the argument. Ink band — the only one on the page, and the reason the
+   ending lands. */
+function Close() {
+  const still = !!useReducedMotion();
   return (
-    <span key={index} className="deck-thread" aria-hidden>
-      <span className="deck-thread-dot" />
-    </span>
+    <Section tone="stage" pad="tall" seam className="text-center">
+      <div className="mx-auto flex max-w-[1400px] flex-col items-center gap-6 px-6 md:px-10">
+        <Rise>
+          <svg viewBox="0 0 400 300" className="h-auto w-24 md:w-32" fill="none" aria-hidden>
+            <defs>
+              <filter id="closeGlow">
+                <feDropShadow dx="0" dy="0" stdDeviation="3" floodColor="var(--accent-vivid)" floodOpacity="0.6" />
+              </filter>
+            </defs>
+            <path
+              d="M 200 80 C 280 80, 280 220, 200 220 C 120 220, 120 80, 200 80"
+              fill="none"
+              stroke="var(--on-surface)"
+              strokeOpacity="0.34"
+              strokeWidth="1.2"
+            />
+            {!still && (
+              <circle r={3.5} fill="var(--accent-vivid)" filter="url(#closeGlow)">
+                <animateMotion
+                  path="M 200 80 C 280 80, 280 220, 200 220 C 120 220, 120 80, 200 80"
+                  dur="5s"
+                  repeatCount="indefinite"
+                />
+              </circle>
+            )}
+          </svg>
+        </Rise>
+
+        <ScrollReveal
+          as="h2"
+          className="font-display-xl max-w-[16ch] text-[clamp(2.1rem,5.4vw,4.25rem)] text-[var(--on-surface)]"
+        >
+          Record once. Let momentum do the rest.
+        </ScrollReveal>
+
+        <Rise delay={0.1}>
+          <div className="mt-3 flex flex-wrap items-center justify-center gap-3">
+            <Link href="/pricing">
+              <button
+                type="button"
+                className="btn-premium inline-flex cursor-pointer items-center gap-2 rounded-full px-7 py-4 text-[15px] font-bold"
+                style={{ background: 'var(--accent-vivid)', color: 'var(--on-accent)' }}
+              >
+                Talk to us
+                <ArrowIcon size={16} />
+              </button>
+            </Link>
+            <a
+              href="#input"
+              className="inline-flex items-center gap-1.5 px-4 py-4 text-[15px] font-bold text-[var(--muted)] transition-colors duration-300 hover:text-[var(--on-surface)]"
+            >
+              Read it again
+            </a>
+          </div>
+        </Rise>
+      </div>
+    </Section>
   );
 }
 
-const slideVariants: Variants = {
-  enter: (dir: number) => ({ opacity: 0, x: dir > 0 ? 48 : -48, scale: 0.98, filter: 'blur(6px)' }),
-  center: { opacity: 1, x: 0, scale: 1, filter: 'blur(0px)', transition: { duration: 0.5, ease: EASE } },
-  exit: (dir: number) => ({ opacity: 0, x: dir > 0 ? -48 : 48, scale: 0.98, filter: 'blur(6px)', transition: { duration: 0.32, ease: EASE } }),
-};
-
+/* ── The deck ──────────────────────────────────────────────────────────── */
 export default function PitchDeck() {
-  const total = SLIDE_META.length;
-  const [index, setIndex] = useState(0);
-  const [direction, setDirection] = useState(1);
   const [modalOpen, setModalOpen] = useState(false);
   const [modalServiceId, setModalServiceId] = useState<string | undefined>(undefined);
-  const [inView, setInView] = useState(false);
-  const [isFullscreen, setIsFullscreen] = useState(false);
-  const sectionRef = useRef<HTMLElement>(null);
-  const deckRef = useRef<HTMLDivElement>(null);
-
-  const nextSlide = useCallback(() => {
-    setDirection(1);
-    setIndex((i) => (i + 1) % total);
-  }, [total]);
-
-  const prevSlide = useCallback(() => {
-    setDirection(-1);
-    setIndex((i) => (i - 1 + total) % total);
-  }, [total]);
-
-  const goTo = useCallback(
-    (i: number) => {
-      setDirection(i >= index ? 1 : -1);
-      setIndex(i);
-    },
-    [index]
-  );
-
-  // Only steer keyboard while the deck is substantially in view.
-  useEffect(() => {
-    const el = sectionRef.current;
-    if (!el) return;
-    const obs = new IntersectionObserver(([entry]) => setInView(entry.intersectionRatio > 0.5), { threshold: [0, 0.5, 1] });
-    obs.observe(el);
-    return () => obs.disconnect();
-  }, []);
-
-  useEffect(() => {
-    if (!inView) return;
-    const handler = (e: KeyboardEvent) => {
-      const tag = (e.target as HTMLElement)?.tagName;
-      if (tag === 'INPUT' || tag === 'TEXTAREA') return;
-      if (e.key === 'ArrowRight') {
-        e.preventDefault();
-        nextSlide();
-      } else if (e.key === 'ArrowLeft') {
-        e.preventDefault();
-        prevSlide();
-      }
-    };
-    window.addEventListener('keydown', handler);
-    return () => window.removeEventListener('keydown', handler);
-  }, [inView, nextSlide, prevSlide]);
-
-  const touchStartX = useRef<number | null>(null);
-  const onPointerDown = (e: React.PointerEvent) => {
-    touchStartX.current = e.clientX;
-  };
-  const onPointerUp = (e: React.PointerEvent) => {
-    if (touchStartX.current === null) return;
-    const dx = e.clientX - touchStartX.current;
-    if (dx > 60) prevSlide();
-    else if (dx < -60) nextSlide();
-    touchStartX.current = null;
-  };
 
   const openService = useCallback((id: string) => {
     setModalServiceId(id);
@@ -667,239 +178,53 @@ export default function PitchDeck() {
     setTimeout(() => setModalServiceId(undefined), 300);
   }, []);
 
-  const restartDeck = useCallback(() => {
-    setDirection(-1);
-    setIndex(0);
-  }, []);
-
-  const toggleFullscreen = useCallback(async () => {
-    if (!deckRef.current) return;
-    try {
-      if (!document.fullscreenElement) {
-        await deckRef.current.requestFullscreen();
-        setIsFullscreen(true);
-      } else {
-        await document.exitFullscreen();
-        setIsFullscreen(false);
-      }
-    } catch {
-      // Fullscreen API not supported or denied
-    }
-  }, []);
-
-  // Listen for fullscreen change events (e.g., pressing Escape)
-  useEffect(() => {
-    const handler = () => {
-      setIsFullscreen(!!document.fullscreenElement);
-    };
-    document.addEventListener('fullscreenchange', handler);
-    return () => document.removeEventListener('fullscreenchange', handler);
-  }, []);
-
-  const slides = useMemo(
+  /* Order matches CHAPTERS exactly. Kept as one array rather than a `render`
+     field on each chapter so the visuals and their copy stay separable — the
+     copy is edited far more often than the diagrams are. */
+  /* Order matches CHAPTERS exactly. Kept as one array rather than a `render`
+     field on each chapter so the visuals and their copy stay separable — the
+     copy is edited far more often than the diagrams are. */
+  const visuals = useMemo(
     () => [
-      <Slide1 key="s1" />,
-      <Slide2 key="s2" />,
-      <TheWeekSlide key="s-week" />,
-      <Slide4 key="s4" onOpenService={openService} />,
-      <Slide5 key="s5" />,
-      <SlidePipeline key="s-pipeline" />,
-      <Slide6 key="s6" />,
-      <SlideCompound key="s-compound" />,
-      <Slide7 key="s7" />,
-      <Slide9 key="s9" onRestart={restartDeck} />,
+      <InputSlide key="input" />,
+      <FrameworkFlowSlide key="framework" />,
+      <OrbitSlide key="orbit" onOpenService={openService} />,
+      <OutreachOSSlide key="outreach" />,
     ],
-    [openService, restartDeck]
+    [openService]
   );
 
   return (
-    /* THE signature band. graphite-900, positioned about a third of the way
-       down the page, with a lit seam at the join and a short bleed so it
-       emerges out of the hero rather than butting against it. Fullscreen
-       drops the padding and the bleed — there is no page to emerge from. */
-    <Section
-      id="framework"
-      ref={sectionRef}
-      tone="anchor"
-      pad={isFullscreen ? 'none' : 'base'}
-      seam={!isFullscreen}
-      bleed={!isFullscreen}
-    >
-      <div className={cn('mx-auto px-6 md:px-10', isFullscreen ? 'max-w-full px-4' : 'max-w-[1400px]')}>
-        <div
-          className={cn(
-            'relative',
-            !isFullscreen &&
-              'rounded-[calc(var(--radius-md)+1px)] p-px bg-gradient-to-br from-[var(--accent-ring)] via-[var(--rule)] to-[var(--rule)]'
-          )}
-        >
-          {!isFullscreen && (
-            <div
-              aria-hidden
-              className="pointer-events-none absolute -inset-6 md:-inset-10 -z-10 rounded-[var(--radius-md)] bg-[var(--accent-wash)] blur-3xl"
-            />
-          )}
-          <div
-            ref={deckRef}
-            className={cn(
-              'relative rounded-[var(--radius-md)] bg-[var(--surface-2)] shadow-[var(--shadow-float)] overflow-hidden',
-              isFullscreen && '!rounded-none !border-0 !shadow-none min-h-screen flex flex-col'
-            )}
+    <>
+      <Section id="framework" tone="base" pad="base" seam>
+        {/* ── The opening statement ───────────────────────────────────────
+            The one thing the carousel could never do: state the argument in
+            full before showing a single diagram. It inks in as you scroll. */}
+        <div className="mx-auto mb-[clamp(4rem,8vw,9rem)] max-w-[1400px] px-6 md:px-10">
+          <Rise>
+            <span className="font-label mb-6 block text-[var(--accent)]">The Framework</span>
+          </Rise>
+          <ScrollReveal
+            as="h2"
+            className="font-display-xl max-w-[20ch] text-[clamp(2rem,5vw,4rem)] text-[var(--on-surface)]"
           >
-            {!isFullscreen && <CornerAccent position="top-left" />}
-            {!isFullscreen && <CornerAccent position="bottom-right" />}
-            <div
-              aria-hidden
-              className="pointer-events-none absolute inset-0 z-30 opacity-[0.025]"
-              style={{
-                backgroundImage:
-                  "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E\")",
-              }}
-            />
-          {/* Top bar */}
-          <div className={cn('flex items-center justify-between gap-4 px-5 md:px-8 pt-5 pb-3', isFullscreen && 'px-6 pt-6 pb-4')}>
-            <AnimatePresence mode="wait">
-              <motion.span
-                key={SLIDE_META[index].kicker}
-                initial={{ opacity: 0, y: -6 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: 6 }}
-                transition={{ duration: 0.25 }}
-                className="text-[11px] md:text-xs font-bold uppercase tracking-[0.12em] text-[var(--muted)]"
-              >
-                {SLIDE_META[index].kicker}
-              </motion.span>
-            </AnimatePresence>
-            <div className="flex items-center gap-3">
-              <span className="text-[11px] md:text-xs font-bold text-[var(--muted)] tabular-nums">
-                {SLIDE_META[index].number} / 10
-              </span>
-              {/* Fullscreen toggle */}
-              <button
-                type="button"
-                onClick={toggleFullscreen}
-                aria-label={isFullscreen ? 'Exit fullscreen' : 'Enter fullscreen'}
-                className="w-7 h-7 rounded-full flex items-center justify-center text-[var(--muted)] hover:text-[var(--accent)] hover:bg-[var(--accent-wash)] transition-colors duration-200 cursor-pointer"
-              >
-                {isFullscreen ? <MinimizeIcon size={14} /> : <FullscreenIcon size={14} />}
-              </button>
-            </div>
-          </div>
-
-          {/* Progress segments — click any to jump */}
-          <div className="flex items-center gap-1.5 px-5 md:px-8 pb-4">
-            {SLIDE_META.map((_, i) => (
-              <button
-                key={i}
-                type="button"
-                onClick={() => goTo(i)}
-                aria-label={`Go to slide ${Number(SLIDE_META[i].number)}`}
-                className="relative h-1 flex-1 rounded-full overflow-hidden cursor-pointer bg-[var(--rule)]"
-              >
-                <motion.span
-                  className="absolute inset-y-0 left-0 rounded-full bg-[var(--accent-vivid)]"
-                  animate={{ width: i <= index ? '100%' : '0%', opacity: i < index ? 0.7 : 1 }}
-                  transition={{ duration: 0.3, ease: 'easeInOut' }}
-                />
-              </button>
-            ))}
-          </div>
-
-          {/* Stage */}
-          <div
-            data-deck-stage
-            className={cn(
-              'relative w-full px-1 overflow-hidden',
-              isFullscreen ? 'flex-1 flex items-center justify-center' : 'min-h-[680px] sm:min-h-[640px] md:min-h-[640px] lg:min-h-[660px]'
-            )}
-            onPointerDown={onPointerDown}
-            onPointerUp={onPointerUp}
-          >
-            <ThreadArrival index={index} />
-
-            <AnimatePresence custom={direction} mode="wait">
-              <motion.div
-                key={index}
-                data-deck-slide
-                custom={direction}
-                variants={slideVariants}
-                initial="enter"
-                animate="center"
-                exit="exit"
-                className={cn(
-                  'absolute inset-0 flex items-center justify-center overflow-hidden',
-                  isFullscreen ? 'p-6 sm:p-10 md:p-14 lg:p-20' : 'p-4 sm:p-6 md:p-8 lg:p-10'
-                )}
-              >
-                {slides[index]}
-              </motion.div>
-            </AnimatePresence>
-
-            {/* Nav arrows */}
-            <button
-              type="button"
-              onClick={prevSlide}
-              aria-label="Previous slide"
-              className={cn(
-                'absolute left-3 md:left-6 top-1/2 -translate-y-1/2 z-20 w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center bg-[var(--surface-glass)] backdrop-blur-md border border-[var(--rule)] shadow-sm hover:bg-[var(--surface)] hover:border-[var(--rule-strong)] hover:scale-105 hover:shadow-lg active:scale-95 transition-all duration-200 cursor-pointer',
-                isFullscreen && 'md:w-14 md:h-14'
-              )}
-            >
-              <ChevronLeft size={isFullscreen ? 24 : 20} className="text-[var(--on-surface)]" />
-            </button>
-            <button
-              type="button"
-              onClick={nextSlide}
-              aria-label="Next slide"
-              className={cn(
-                'absolute right-3 md:right-6 top-1/2 -translate-y-1/2 z-20 w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center bg-[var(--surface-glass)] backdrop-blur-md border border-[var(--rule)] shadow-sm hover:bg-[var(--surface)] hover:border-[var(--rule-strong)] hover:scale-105 hover:shadow-lg active:scale-95 transition-all duration-200 cursor-pointer',
-                isFullscreen && 'md:w-14 md:h-14'
-              )}
-            >
-              <ChevronRight size={isFullscreen ? 24 : 20} className="text-[var(--on-surface)]" />
-            </button>
-          </div>
-        </div>
+            You record once a week. Everything after that is ours.
+          </ScrollReveal>
+          <Rise delay={0.1}>
+            <p className="font-body mt-8 max-w-[52ch] text-[var(--muted)]">
+              Nine chapters, in order. Content and outreach as one loop, the week
+              it produces, the pipeline it fills, and what the same result costs
+              if you build it out of hires instead.
+            </p>
+          </Rise>
         </div>
 
+        <ChapterRun chapters={CHAPTERS} visuals={visuals} eyebrow="Framework" />
+      </Section>
 
-      </div>
+      <Close />
 
       <ServiceDetailModal open={modalOpen} onClose={closeModal} serviceId={modalServiceId} onChange={setModalServiceId} />
-
-      <style>{`
-        /* The arriving half of the thread. Enters from outside the stage's left
-           edge, crosses about a fifth of the frame and fades — it hands off to
-           the slide rather than competing with it. */
-        .deck-thread {
-          position: absolute;
-          left: 0;
-          top: 50%;
-          z-index: 15;
-          pointer-events: none;
-        }
-
-        @keyframes deck-thread-arrive {
-          0%   { transform: translate(-8vw, -50%) scale(1); opacity: 0; }
-          14%  { opacity: 1; }
-          62%  { opacity: 1; }
-          100% { transform: translate(22vw, -50%) scale(0.4); opacity: 0; }
-        }
-
-        .deck-thread-dot {
-          display: block;
-          width: 6px;
-          height: 6px;
-          border-radius: var(--radius-pill);
-          background: var(--accent-vivid);
-          box-shadow: 0 0 10px color-mix(in oklch, var(--accent-vivid) 70%, transparent);
-          animation: deck-thread-arrive calc(var(--dur-reveal) * 1.4) var(--ease-std) both;
-        }
-
-        @media (prefers-reduced-motion: reduce) {
-          .deck-thread-dot { animation: none; opacity: 0; }
-        }
-      `}</style>
-    </Section>
+    </>
   );
 }

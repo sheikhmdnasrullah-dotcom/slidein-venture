@@ -5,7 +5,7 @@ import { cn } from '@/lib/utils';
  * SECTION — the macro-contrast primitive
  * ---------------------------------------------------------------------------
  * One decision per section: how deep does this band sit in the page's rhythm?
- * The day/night theme then decides what that depth is actually made of.
+ * The tone layer then decides what that depth is actually made of.
  *
  * The tone classes live in app/styles/tone.css, not in the cva string. That is
  * deliberate. Every colour a tone re-points is then declared in one CSS file
@@ -27,15 +27,25 @@ import { cn } from '@/lib/utils';
 const section = cva('relative isolate w-full', {
   variants: {
     /**
-     * A position in the page's value rhythm, NOT a colour. `anchor` is the
-     * band that pulls hardest away from the page — graphite in night, one
-     * step into the paper ramp in day. The section never learns which.
+     * A position in the page's value rhythm, NOT a colour. Four of these step
+     * down the paper ramp; two are the ends of the page and are made of
+     * something else on purpose.
+     *
+     *   hero      brand orange, ink type. The opening band, used exactly once.
+     *   base      the page's own value. Most sections.
+     *   raised    one step in. A panel that reads as lifted off the page.
+     *   anchor    the signature band. Deck chapters live here.
+     *   terminal  the last paper band. The footer, a final CTA.
+     *   stage     ink. The closing statement and the close — the only place
+     *             the page stops being paper at the bottom end.
      */
     tone: {
+      hero: 'tone-hero',
       base: 'tone-base',
       raised: 'tone-raised',
       anchor: 'tone-anchor',
       terminal: 'tone-terminal',
+      stage: 'tone-stage',
     },
     pad: {
       none: '',

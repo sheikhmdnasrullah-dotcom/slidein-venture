@@ -43,9 +43,15 @@ const T = {
   liveDeep: 'oklch(0.430 0.120 149)',
   info: 'oklch(0.530 0.128 255)',
   signalDeep: 'oklch(0.542 0.163 42.28)',
+  signalDeeper: 'oklch(0.522 0.158 42.28)',
   infoDeep: 'oklch(0.460 0.110 255)',
   infoHi: 'oklch(0.790 0.085 255)',
   brandLift: 'oklch(0.760 0.170 42.28)',
+  /* The hero band. Apricot is the brand hue read at the light end — see the
+     note on --color-apricot-100 in app/styles/tokens.css for why it is chroma
+     0.055 and hue 60 rather than a tint of 42.28. */
+  apricot100: 'oklch(0.925 0.055 60)',
+  apricot200: 'oklch(0.895 0.068 58)',
 };
 
 /* [label, fg, bg, minimum, note] */
@@ -57,6 +63,18 @@ const CHECKS = [
   ['signal on paper-50', T.signal, T.paper50, 4.5, 'the only orange allowed for small text'],
   ['signal on paper-25', T.signal, T.paper25, 4.5],
   ['brand-hi on graphite-900', T.brandHi, T.graphite900, 4.5, 'orange on dark sections'],
+  /* ── HERO BAND ────────────────────────────────────────────────────────
+     The only coloured SURFACE on the site. It shipped as full-chroma
+     --color-brand for one release, which forced everything on it to ink and
+     left no orange to accent with; apricot is light enough that the ordinary
+     tone contract works, orange text included. These four are what .tone-hero
+     actually sets type in (app/styles/tone.css). */
+  ['ink on apricot (hero headline)', T.ink, T.apricot100, 4.5, 'the whole hero headline'],
+  ['slate-600 on apricot (hero --muted)', T.slate600, T.apricot100, 4.5, 'sub-copy, scroll cue, secondary CTA'],
+  ['signal-deeper on apricot (hero --accent)', T.signalDeeper, T.apricot100, 4.5, 'the rotating phrase and its drawn rule'],
+  ['ink on apricot-200 (hero well)', T.ink, T.apricot200, 4.5],
+  ['paper-25 on ink slab (hero CTA)', T.paper25, T.ink, 4.5, 'the primary button on the hero band'],
+
   ['brand on graphite-900', T.brand, T.graphite900, 4.5],
   ['paper-50 on graphite-900', T.paper50, T.graphite900, 4.5, 'body text on dark bands'],
   ['paper-50 on ink-deep', T.paper50, T.inkDeep, 4.5],
@@ -101,13 +119,23 @@ const CHECKS = [
      · --color-brand on paper is for DECORATIVE fills only — never text, never
        a UI affordance whose meaning is carried by colour alone
      · to use the full-chroma brand orange legibly, put it on a dark surface
-       (6.22:1 on graphite-900) — which is what Stage 3's macro contrast buys */
+       (6.22:1 on graphite-900) — which is what Stage 3's macro contrast buys
+     · or invert the relationship, which is what the hero band does: make the
+       orange the SURFACE and set ink on it. See the .tone-hero checks above. */
 const LIMITS = [
   ['brand on paper-50', T.brand, T.paper50, 'decorative fill only — never text'],
   ['brand on paper-25', T.brand, T.paper25, 'decorative fill only — never text'],
   ['brand-lift on paper-50', T.brandLift, T.paper50, 'gradient stop only — never text'],
   ['brand-lift on graphite-900', T.brandLift, T.graphite900, 'gradient stop only'],
   ['bone-400 (--faint) on paper-50', T.bone400, T.paper50, 'tertiary — never load-bearing text'],
+  /* The reason the hero's rotating phrase is ink and not paper. It is display
+     type, so 3:1 would be the bar, and paper-25 on brand does not clear even
+     that. Recorded here so nobody "fixes" the phrase back to white. */
+  /* Why the hero's rotating phrase reads --accent and not --accent-vivid: the
+     full-chroma brand orange is a decorative value on the apricot band exactly
+     as it is on paper. The drawn rule under the phrase reads --accent for the
+     same reason — at 2.38:1 it was a hairline nobody could see. */
+  ['brand on apricot (hero)', T.brand, T.apricot100, 'fills and strokes only — never text'],
 ];
 
 let failed = 0;

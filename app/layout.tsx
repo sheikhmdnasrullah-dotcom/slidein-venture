@@ -11,9 +11,9 @@ export const metadata: Metadata = {
   description: "Build custom agents, search across all your apps, and automate busywork. The AI workspace where teams get more done, faster.",
 };
 
-/* Both themes are real, so the browser is told about both rather than being
-   left to guess a form-control and scrollbar palette. The pre-paint script
-   narrows this to the resolved one on <html>. */
+/* One theme, so one colour. This is the paper the page is made of — it tells
+   the browser what to tint form controls, the scrollbar and mobile chrome
+   with, and it must track --color-paper-50 in app/styles/tokens.css. */
 export const viewport = {
   themeColor: "#f6f4f0",
 };
@@ -26,11 +26,11 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      /* data-theme is intentionally NOT set here. A server-rendered value would
-         be wrong for half the visitors and would have to be corrected after
-         hydration — a visible flash. The script below sets it before first
-         paint instead, and suppressHydrationWarning covers React noticing that
-         the attribute it did not render is present. */
+      /* Hero.tsx sets data-thread-departed on this element once the hero's
+         thread dot leaves its hairline, and that happens after hydration —
+         hence suppressHydrationWarning. There is no theme attribute and no
+         pre-paint script any more: the site has one theme, so nothing about
+         <html> depends on what the visitor prefers. */
       suppressHydrationWarning
       className={cn(
         "font-sans",

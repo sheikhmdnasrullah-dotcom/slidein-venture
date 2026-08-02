@@ -3,14 +3,18 @@
 /**
  * AMBIENT ENVIRONMENT — SlideIn Venture design language
  * ------------------------------------------------------
- * Site-wide layered background. Mounted once in the root layout,
- * fixed behind all content. Seven layers, all nearly invisible:
+ * The hero band's texture. NOT site-wide: it used to be fixed behind the whole
+ * document, and one wash running the full page flattened every band it crossed.
+ * It belongs to the band that is the light source. Six layers, all nearly
+ * invisible:
  *
- *   1 white base  2 paper grain  3 engineering dot grid
- *   4 drifting radial light  5 blueprint construction guides
- *   6 floating particles  7 cursor-following ambient light
+ *   1 paper grain  2 engineering dot grid  3 drifting radial light
+ *   4 blueprint construction guides  5 floating particles
+ *   6 cursor-following ambient light
  *
- * Everything pointer-events-none. Orange only as light, never blocks.
+ * Everything pointer-events-none, and every value reads the tone contract —
+ * which is what lets the same six layers sit on brand orange without a single
+ * per-theme branch. See the .tone-hero ambient overrides in app/styles/tone.css.
  */
 
 import { useEffect } from 'react';
@@ -110,7 +114,11 @@ export default function AmbientEnvironment() {
       {PARTICLES.map((p, i) => (
         <motion.span
           key={i}
-          className="absolute rounded-full bg-[var(--color-brand)]"
+          /* --accent-vivid, not --color-brand. This layer now lives inside the
+             hero, and the hero band IS brand orange — a brand-orange particle
+             on a brand-orange field is nothing at all. Reading the tone makes
+             them ink here and would make them orange on any paper band. */
+          className="absolute rounded-full bg-[var(--accent-vivid)]"
           style={{ left: p.l, top: p.t, width: p.s, height: p.s }}
           animate={{ y: [0, -p.dr, 0], opacity: [0, p.o, 0] }}
           transition={{ duration: 14 + i * 2, repeat: Infinity, ease: 'easeInOut', delay: p.d }}

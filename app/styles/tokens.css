@@ -25,6 +25,27 @@
   --color-bone-300:     oklch(0.868 0.012 82);   /* hairlines, dividers */
   --color-bone-400:     oklch(0.790 0.014 80);   /* disabled, placeholder */
 
+  /* ── APRICOT — the hero band, and nowhere else ──────────────────────────
+     The hero shipped as full-chroma --color-brand for one release. It read as
+     a splash rather than as a ground: at chroma 0.207 the field competes with
+     every element on it, the join under the floating nav becomes a hard stripe,
+     and the accent orange has nowhere left to go because the band already IS
+     the accent.
+
+     These are the same hue family read up at the light end — chroma 0.055
+     instead of 0.207. Unmistakably orange, quiet enough to be a surface. Hue
+     drifts to 60 rather than holding 42.28 on purpose: at this lightness the
+     brand hue reads pink, and 60 is where it stays apricot. Rule 1 governs the
+     ACCENT, which is still exactly 42.28 everywhere; this is a ground.
+
+     Measured on apricot-100 — see scripts/verify-contrast.mjs:
+       ink              15.52:1  ✓
+       slate-600         5.43:1  ✓ secondary text
+       signal-deeper     4.65:1  ✓ orange TEXT still clears AA here
+       brand             2.38:1  ✗ fills and strokes only, as everywhere */
+  --color-apricot-100:  oklch(0.925 0.055 60);   /* hero band */
+  --color-apricot-200:  oklch(0.895 0.068 58);   /* inset well on the hero */
+
   /* ── INK RAMP ──────────────────────────────────────────────────────────
      Never #000000 (Rule 2): ink-deep is the darkest value on the site. */
   --color-slate-500:    oklch(0.545 0.016 75);   /* 4.52:1 on paper-50 — AA */
@@ -125,9 +146,12 @@
      The inverse relationship is the whole game: display type is set TIGHT,
      body slightly OPEN, mono labels wide. A system where everything is 0 is
      a system where nobody made a decision. */
-  --tracking-display-xl:  -0.028em;   /* 48px+ — counters close up on their own */
-  --tracking-display-md:  -0.014em;   /* 28–48px */
-  --tracking-display-sm:  -0.008em;   /* 20–28px */
+  /* Tightened one step across the display ladder when the weights went fat.
+     Heavier strokes eat their own sidebearings, so a value that was correct at
+     340 leaves visible gaps at 700 and the line stops reading as one shape. */
+  --tracking-display-xl:  -0.034em;   /* 48px+ — counters close up on their own */
+  --tracking-display-md:  -0.020em;   /* 28–48px */
+  --tracking-display-sm:  -0.012em;   /* 20–28px */
   --tracking-body:         0.002em;   /* opens the small sizes back up */
   --tracking-label:        0.14em;    /* uppercase mono only */
   --tracking-label-wide:   0.2em;     /* isolated single-word labels */
@@ -142,11 +166,22 @@
 
   /* ── WEIGHT ──────────────────────────────────────────────────────────────
      Fraunces is variable, so these are real interpolated instances, not the
-     nine-step ladder. 340 at display size looks like 400 at body size —
-     large type carries more apparent weight per unit of stroke. */
-  --font-weight-display-xl: 340;
-  --font-weight-display-md: 380;
-  --font-weight-display-sm: 420;
+     nine-step ladder.
+
+     These used to be 340 / 380 / 420 — the reasoning being that large type
+     carries more apparent weight per unit of stroke, so display should be set
+     LIGHTER than body. That is true of a headline set in a text face. It is the
+     wrong call for this page, which now opens on a full-bleed orange band: a
+     340-weight serif on saturated orange reads as thin and unconfident, because
+     the field is doing half the shouting and the type has to match it.
+
+     So display goes fat. 700 at opsz 144 is Fraunces at its most didone — high
+     stroke contrast, real ink traps, closed counters — and it is the single
+     decision that carries the most of the page's character. The ladder still
+     descends, so a section heading never competes with the hero. */
+  --font-weight-display-xl: 700;
+  --font-weight-display-md: 600;
+  --font-weight-display-sm: 560;
   --font-weight-body:       400;
   --font-weight-body-md:    500;
   --font-weight-label:      500;
