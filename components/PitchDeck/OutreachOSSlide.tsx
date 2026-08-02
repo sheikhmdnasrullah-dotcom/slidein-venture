@@ -9,17 +9,19 @@
  *   ENGINE    the Manual Outreach Engine window — six intelligent modules
  *   OUTPUT    qualified conversations — intelligent filtering, alive
  *
- * Every module opens a Notion-style side panel with progressive disclosure:
- * overview → why it matters → what we do → mini flow → outcome.
- * White canvas, blueprint details, calm motion. Orange guides attention.
+ * Every module opens a Notion-style side panel with progressive disclosure.
  *
  * THREE-PART ANIMATION (Stage 2+)
  * Connectors are real SVG paths measured against the slide container.
  * Line draw + travelling pulse are scroll-scrubbed via GSAP ScrollTrigger.
  * Card pop-in uses discrete scroll thresholds with springy easing.
+ *
+ * STAGE 3 — PIN + ZOOM
+ * The slide pins when its top hits 75% viewport, stays pinned for 1500px
+ * of scroll, and the canvas scales up subtly during that window.
  */
 
-import { useRef, useEffect, useState } from 'react';
+import { useRef, useEffect, useState, useLayoutEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
@@ -72,11 +74,6 @@ type Module = {
   title: string;
   blurb: string;
   icon: IconKind;
-  /* Replaces the status dot that used to sit in each module's top-right. Some
-     of those dots were green and some were pale with nothing distinguishing
-     them, which is the worst state for a status light: it looks like it means
-     something. Either they all carry information or they all go. These carry
-     information, and they read down the grid as a funnel. */
   throughput: string;
   why: string;
   work: string[];
@@ -141,42 +138,7 @@ const INPUT_CHIPS = [
   { label: 'Ideal buyer', value: 'Founder / CMO' },
 ];
 
-/* ------------------------------- connectors -------------------------------
-   Turned ninety degrees with the rest of the slide: the stages stack, so the
-   wire between them runs down, not across. Same anatomy as before — a hairline
-   with a joint at each end and one travelling mark. */
-
-function Connector({ delay = 0 }: { delay?: number }) {
-  return (
-    <div className="relative flex h-14 w-full shrink-0 items-center justify-center md:h-16" aria-hidden>
-      <div className="relative h-full w-px bg-(--rule-strong)">
-        <span className="os-joint -top-[2.5px]" />
-        <span className="os-joint -bottom-[2.5px]" />
-        <motion.span
-          className="os-spark"
-          animate={{ top: ['0%', '96%'], opacity: [0, 1, 1, 0] }}
-          transition={{ duration: 1.8, repeat: Infinity, ease: 'easeInOut', delay, repeatDelay: 0.6 }}
-        />
-      </div>
-    </div>
-  );
-}
-
-/** One stage's marker in the column. The old slide put all three labels in a
- *  single row above the diagram, which only worked while the diagram was a
- *  row. Stacked, each label belongs to the block underneath it. */
-function StageLabel({ children }: { children: string }) {
-  return (
-    <p className="mb-3 flex items-center gap-2">
-      <span className="h-2.5 w-[2px] rounded-full bg-[color-mix(in_oklch,var(--accent-vivid)_80%,transparent)]" aria-hidden />
-      <span className="text-[8.5px] font-bold tracking-[0.22em] text-(--muted) uppercase">
-        {children.toUpperCase()}
-      </span>
-    </p>
-  );
-}
-
-/* ------------------------------ left panel -------------------------------- */
+/* ------------------------------ panels ------------------------------------ */
 
 function InputPanel({ innerRef }: { innerRef?: React.Ref<HTMLDivElement> }) {
   return (
@@ -188,8 +150,6 @@ function InputPanel({ innerRef }: { innerRef?: React.Ref<HTMLDivElement> }) {
       <h3 className="mt-1.5 text-[15px] font-extrabold leading-snug text-(--on-surface)">
         You tell us who you want to work with
       </h3>
-      {/* Three across now the panel is full width. Stacked, they left a column
-          of near-empty rows with the value hanging off the end of each. */}
       <div className="mt-3.5 grid grid-cols-1 gap-2 sm:grid-cols-3">
         {INPUT_CHIPS.map((c, i) => (
           <motion.div
@@ -212,15 +172,12 @@ function InputPanel({ innerRef }: { innerRef?: React.Ref<HTMLDivElement> }) {
   );
 }
 
-/* ------------------------------ engine window ----------------------------- */
-
 function EngineWindow({ innerRef, onOpen }: { innerRef?: React.Ref<HTMLDivElement>; onOpen: (i: number) => void }) {
   return (
     <motion.div
       ref={innerRef}
       className="flex-1 min-w-0 rounded-2xl border border-[var(--rule)] bg-[var(--surface)] shadow-[0_8px_24px_color-mix(in_oklch, var(--on-surface) 6%, transparent)] overflow-hidden"
     >
-      {/* title bar */}
       <div className="flex items-center gap-2.5 px-4 py-2.5 border-b border-[var(--rule)] bg-[var(--rule)]">
         <span className="flex gap-1.5" aria-hidden>
           <span className="w-2 h-2 rounded-full bg-[var(--rule)]" />
@@ -233,7 +190,6 @@ function EngineWindow({ innerRef, onOpen }: { innerRef?: React.Ref<HTMLDivElemen
           <span className="text-[7.5px] font-bold tracking-[0.16em] text-[var(--muted)] uppercase">Running</span>
         </span>
       </div>
-      {/* modules */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 p-4">
         {MODULES.map((m, i) => (
           <motion.button
@@ -242,11 +198,6 @@ function EngineWindow({ innerRef, onOpen }: { innerRef?: React.Ref<HTMLDivElemen
             onClick={() => onOpen(i)}
             initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, ease: EASE, delay: 0.65 + i * 0.09 }}
-            /* The bottom caption used to say "click any module to see inside".
-               A sentence explaining an affordance is a sign the affordance is
-               missing, so the sentence is gone and the card announces itself:
-               a real button chip at rest, an orange edge, a lift, and a rule
-               that draws along the bottom on hover. */
             className="group relative overflow-hidden text-left rounded-xl border border-[var(--rule)] bg-[var(--surface)] p-3 hover:border-[var(--accent-vivid)]/50 hover:bg-[var(--accent-vivid)]/[0.025] hover:shadow-[0_8px_20px_color-mix(in oklch, var(--accent-vivid) 10%, transparent)] hover:-translate-y-0.5 transition-all duration-300 cursor-pointer"
           >
             <div className="flex items-center gap-2">
@@ -258,8 +209,6 @@ function EngineWindow({ innerRef, onOpen }: { innerRef?: React.Ref<HTMLDivElemen
                 <span className="text-[7.5px] font-bold tracking-[0.14em] text-[var(--muted)] tabular-nums whitespace-nowrap">
                   {m.throughput}
                 </span>
-                {/* The affordance itself: a chip that already looks pressable
-                    before the pointer arrives. */}
                 <span className="flex h-4 w-4 items-center justify-center rounded-[5px] border border-[var(--rule-strong)] text-[var(--muted)] transition-colors duration-300 group-hover:border-[var(--accent-vivid)]/60 group-hover:bg-[var(--accent-vivid)]/10 group-hover:text-[var(--accent)]">
                   <svg width={8} height={8} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.6} strokeLinecap="round" strokeLinejoin="round" aria-hidden>
                     <path d="M7 17 17 7M9 7h8v8" />
@@ -280,14 +229,6 @@ function EngineWindow({ innerRef, onOpen }: { innerRef?: React.Ref<HTMLDivElemen
   );
 }
 
-/* ------------------------------ right panel ------------------------------- */
-
-/* `at` is the module's own beat in the slide's sequence. The two good replies
-   land first, in reading order; the out-of-office arrives LAST and is filtered
-   in place. That ordering is the joke — the slide shows you a reply, lets you
-   read it, then crosses it out in front of you. It is also the most credible
-   thing on the slide, because it admits the system catches junk. Do not
-   reorder these and do not let the strike render before the card is read. */
 const REPLIES = [
   { name: 'Interested — wants pricing', ok: true, at: 1.85 },
   { name: 'Out of office', ok: false, at: 2.55 },
@@ -305,9 +246,6 @@ function ReplyCard({ r }: { r: (typeof REPLIES)[number] }) {
           : { duration: 1.9, times: [0, 0.24, 0.62, 1], ease: EASE, delay: r.at }
       }
       className={cn(
-        /* The reply cards carry more elevation than anything else on the
-           slide. They are the end of the story and the eye has to finish
-           here, not on the module grid in the middle of it. */
         'relative flex items-center gap-2 rounded-lg border px-2.5 py-2',
         r.ok
           ? 'border-[var(--accent-vivid)]/35 bg-[var(--accent-vivid)]/[0.05] shadow-[0_6px_18px_color-mix(in oklch, var(--accent-vivid) 16%, transparent)]'
@@ -319,8 +257,6 @@ function ReplyCard({ r }: { r: (typeof REPLIES)[number] }) {
       </span>
       <span className={cn('relative text-[9px] font-bold leading-tight', r.ok ? 'text-[var(--on-surface)]' : 'text-[var(--muted)]')}>
         {r.name}
-        {/* The strike is drawn, not pre-rendered. It sweeps left to right once
-            the card has had a beat to be read. */}
         {!r.ok && (
           <motion.span
             aria-hidden
@@ -341,11 +277,7 @@ function OutputPanel({ innerRef }: { innerRef?: React.Ref<HTMLDivElement> }) {
       ref={innerRef}
       className="relative w-full shrink-0"
     >
-      {/* ambient glow */}
       <div aria-hidden className="pointer-events-none absolute -inset-5 rounded-[28px] bg-[var(--accent-vivid)]/[0.07] blur-2xl os-halo" />
-      {/* 1px orange border and the heaviest shadow on the canvas — the output
-          column used to sit at the same visual weight as the input column,
-          which left the six-module grid as the loudest object on the slide. */}
       <div className="relative rounded-2xl border border-[var(--accent-vivid)] bg-[var(--surface)] shadow-[0_20px_54px_color-mix(in oklch, var(--on-surface) 14%, transparent),0_0_0_4px_color-mix(in oklch, var(--accent-vivid) 7%, transparent)] p-4">
         <p className="text-[8.5px] font-bold tracking-[0.2em] text-[var(--accent)] uppercase">Output</p>
         <h3 className="mt-1.5 text-[13px] font-extrabold leading-snug text-[var(--on-surface)]">Qualified Conversations</h3>
@@ -354,16 +286,11 @@ function OutputPanel({ innerRef }: { innerRef?: React.Ref<HTMLDivElement> }) {
             <ReplyCard key={r.name} r={r} />
           ))}
         </div>
-        {/* filter divider */}
         <div className="my-3 flex items-center gap-2" aria-hidden>
           <span className="flex-1 h-px bg-[var(--rule)]" />
           <span className="text-[7px] font-bold tracking-[0.18em] text-[var(--muted)] uppercase">Filtered</span>
           <span className="flex-1 h-px bg-[var(--rule)]" />
         </div>
-        {/* The dark chip sat on --on-surface and painted its heading in
-            --on-surface too, so "Meeting booked" rendered ink-on-ink and was
-            invisible in the light theme. Text on this chip has to come from
-            the surface side of the palette, not the ink side. */}
         <div className="rounded-xl bg-[var(--on-surface)] px-3 py-2.5 flex items-center gap-2.5">
           <span className="w-2 h-2 rounded-full bg-[var(--color-live)] os-blink shrink-0" />
           <div>
@@ -373,6 +300,19 @@ function OutputPanel({ innerRef }: { innerRef?: React.Ref<HTMLDivElement> }) {
         </div>
       </div>
     </motion.div>
+  );
+}
+
+/* ------------------------------- stage label ------------------------------ */
+
+function StageLabel({ children }: { children: string }) {
+  return (
+    <p className="mb-3 flex items-center gap-2">
+      <span className="h-2.5 w-[2px] rounded-full bg-[color-mix(in_oklch,var(--accent-vivid)_80%,transparent)]" aria-hidden />
+      <span className="text-[8.5px] font-bold tracking-[0.22em] text-(--muted) uppercase">
+        {children.toUpperCase()}
+      </span>
+    </p>
   );
 }
 
@@ -387,9 +327,6 @@ function DetailPanel({ m, onClose }: { m: Module; onClose: () => void }) {
         onClick={onClose}
         className="fixed inset-0 z-40 cursor-pointer bg-[color-mix(in_oklch,var(--on-surface)_16%,transparent)] backdrop-blur-[2px]"
       />
-      {/* Fixed, not absolute. The engine column is now taller than the viewport,
-          and a drawer pinned to a 2,000px container is a drawer that starts
-          off-screen and ends off-screen. */}
       <motion.aside
         initial={{ x: '104%' }} animate={{ x: 0 }} exit={{ x: '104%' }}
         transition={{ duration: 0.45, ease: EASE }}
@@ -414,13 +351,11 @@ function DetailPanel({ m, onClose }: { m: Module; onClose: () => void }) {
         <div className="px-5 py-4 flex flex-col gap-4">
           <p className="text-[12px] leading-relaxed text-[var(--muted)]">{m.blurb}</p>
 
-          {/* why it matters — callout */}
           <div className="rounded-xl border-l-[3px] border-[var(--accent-vivid)] bg-[var(--accent-vivid)]/[0.05] px-3.5 py-3">
             <p className="text-[8px] font-black tracking-[0.16em] text-[var(--accent)] uppercase">Why it matters</p>
             <p className="mt-1 text-[11px] leading-relaxed text-[var(--on-surface)] font-medium">{m.why}</p>
           </div>
 
-          {/* what we do — checklist */}
           <div>
             <p className="text-[8px] font-black tracking-[0.16em] text-[var(--muted)] uppercase">What we actually do</p>
             <ul className="mt-2 flex flex-col gap-1.5">
@@ -435,7 +370,6 @@ function DetailPanel({ m, onClose }: { m: Module; onClose: () => void }) {
             </ul>
           </div>
 
-          {/* mini flow */}
           <div className="rounded-xl border border-[var(--rule)] bg-[var(--rule)] p-3">
             <p className="text-[8px] font-black tracking-[0.16em] text-[var(--muted)] uppercase">How it flows</p>
             <div className="mt-2.5 flex items-center flex-wrap gap-y-1.5">
@@ -457,7 +391,6 @@ function DetailPanel({ m, onClose }: { m: Module; onClose: () => void }) {
             </div>
           </div>
 
-          {/* outcome */}
           <div className="rounded-xl bg-[var(--on-surface)] px-4 py-3.5">
             <p className="text-[8px] font-black tracking-[0.16em] text-[var(--accent)] uppercase">Outcome</p>
             <p className="mt-1 text-[11.5px] leading-relaxed text-[var(--on-surface)] font-semibold">{m.outcome}</p>
@@ -478,45 +411,43 @@ export default function OutreachOSSlide() {
   const engineWindowRef = useRef<HTMLDivElement>(null);
   const outputPanelRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const slide = slideRef.current;
+    const canvas = canvasRef.current;
     const input = inputPanelRef.current;
     const engine = engineWindowRef.current;
     const output = outputPanelRef.current;
-    if (!slide || !input || !engine || !output) return;
 
-    if (typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    if (!slide || !canvas || !input || !engine || !output) return;
+
+    const reducedMotion = typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reducedMotion) {
       gsap.set([input, engine, output], { opacity: 1, y: 0, scale: 1 });
+      gsap.set(canvas, { scale: 1, opacity: 1 });
       return;
     }
 
-    const setInitial = () => {
-      gsap.set([input, engine, output], { opacity: 0, y: 24, scale: 0.96 });
-    };
-    setInitial();
+    gsap.set([input, engine, output], { opacity: 0, y: 28, scale: 0.97 });
+    gsap.set(canvas, { scale: 0.96, opacity: 0.9, transformOrigin: 'center top' });
 
-    const measure = () => {
-      const sr = slide.getBoundingClientRect();
-      const ir = input.getBoundingClientRect();
-      const er = engine.getBoundingClientRect();
-      const or = output.getBoundingClientRect();
-      const cx = sr.width / 2;
+    const sr = slide.getBoundingClientRect();
+    const ir = input.getBoundingClientRect();
+    const er = engine.getBoundingClientRect();
+    const or_ = output.getBoundingClientRect();
+    const cx = sr.width / 2;
 
-      const paths = [
-        { el: document.getElementById('os-conn-1'), from: ir.bottom - sr.top, to: er.top - sr.top },
-        { el: document.getElementById('os-conn-2'), from: er.bottom - sr.top, to: or.top - sr.top },
-      ] as const;
+    const paths = [
+      { el: document.getElementById('os-conn-1'), from: ir.bottom - sr.top, to: er.top - sr.top },
+      { el: document.getElementById('os-conn-2'), from: er.bottom - sr.top, to: or_.top - sr.top },
+    ];
 
-      paths.forEach(({ el, from, to }) => {
-        if (!el) return;
-        el.setAttribute('d', `M ${cx} ${from} V ${to}`);
-        const len = (el as unknown as SVGGeometryElement).getTotalLength();
-        el.style.strokeDasharray = `${len}`;
-        el.style.strokeDashoffset = `${len}`;
-      });
-    };
-
-    measure();
+    paths.forEach(({ el, from, to }) => {
+      if (!el) return;
+      el.setAttribute('d', `M ${cx} ${from} V ${to}`);
+      const len = (el as unknown as SVGGeometryElement).getTotalLength();
+      el.style.strokeDasharray = `${len}`;
+      el.style.strokeDashoffset = `${len}`;
+    });
 
     const conn1 = document.getElementById('os-conn-1');
     const pulse1 = document.getElementById('os-pulse-1');
@@ -552,95 +483,106 @@ export default function OutreachOSSlide() {
       },
     });
 
-    const popIn = (el: HTMLElement | null, startPct: number) =>
-      ScrollTrigger.create({
+    const show = (el: HTMLElement | null) =>
+      gsap.to(el, { opacity: 1, y: 0, scale: 1, duration: 0.55, ease: 'back.out(1.7)' });
+    const hide = (el: HTMLElement | null) =>
+      gsap.to(el, { opacity: 0, y: 28, scale: 0.97, duration: 0.3 });
+
+    const popIn = (el: HTMLElement | null, startPct: number) => {
+      const st = ScrollTrigger.create({
         trigger: slide,
         start: `top ${startPct}%`,
-        onEnter: () =>
-          gsap.to(el, { opacity: 1, y: 0, scale: 1, duration: 0.55, ease: 'back.out(1.7)' }),
-        onLeaveBack: () =>
-          gsap.to(el, { opacity: 0, y: 24, scale: 0.96, duration: 0.3 }),
+        onEnter: () => show(el),
+        onLeaveBack: () => hide(el),
       });
+      // If already past the start point when created, show immediately
+      const startY = (startPct / 100) * window.innerHeight;
+      if (slide.getBoundingClientRect().top <= startY) {
+        show(el);
+      }
+      return st;
+    };
 
     const stInput = popIn(input, 78);
     const stEngine = popIn(engine, 58);
     const stOutput = popIn(output, 38);
 
-    const onResize = () => measure();
-    window.addEventListener('resize', onResize);
+    const setScale = gsap.quickSetter(canvas, 'scale', '');
+    const setOpacity = gsap.quickSetter(canvas, 'opacity', '');
+
+    const zoom = ScrollTrigger.create({
+      trigger: slide,
+      start: 'top 75%',
+      end: '+=1500',
+      pin: true,
+      scrub: 1,
+      onUpdate: (self) => {
+        const p = self.progress;
+        setScale(0.96 + p * 0.04);
+        setOpacity(0.9 + p * 0.1);
+      },
+    });
+
+    ScrollTrigger.refresh();
 
     return () => {
       scrub.kill();
       stInput.kill();
       stEngine.kill();
       stOutput.kill();
-      window.removeEventListener('resize', onResize);
+      zoom.kill();
+      gsap.set([input, engine, output], { clearProps: 'all' });
+      gsap.set(canvas, { clearProps: 'all' });
     };
   }, []);
 
   return (
     <div ref={slideRef} className="relative w-full max-w-165">
-      {/* SVG connector overlay */}
-      <svg
-        className="absolute inset-0 h-full w-full pointer-events-none overflow-visible"
-        style={{ zIndex: 1 }}
-        aria-hidden
-      >
-        <path id="os-conn-1" d="" fill="none" stroke="var(--accent-vivid)" strokeOpacity={0.35} strokeWidth={1.5} strokeLinecap="round" />
-        <circle id="os-pulse-1" r={3.5} fill="var(--accent-vivid)" opacity={0} />
-        <path id="os-conn-2" d="" fill="none" stroke="var(--accent-vivid)" strokeOpacity={0.35} strokeWidth={1.5} strokeLinecap="round" />
-        <circle id="os-pulse-2" r={3.5} fill="var(--accent-vivid)" opacity={0} />
-      </svg>
-
-      {/* canvas */}
-      <div className="relative rounded-2xl p-1 sm:p-2">
-        {/* The centred eyebrow and centred headline are gone. The title sits
-            top left on the same axis as the input column, in the display
-            serif, the way every other slide in the deck now opens. */}
-        <motion.h2
-          initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, ease: EASE }}
-          className="relative font-display-md mb-8 text-[clamp(1.6rem,4vw,2.4rem)] text-(--on-surface)"
-        >
-          You tell us once.
-        </motion.h2>
-        {/* blueprint background */}
-        <div
+      <div ref={canvasRef} className="relative">
+        <svg
+          className="absolute inset-0 h-full w-full pointer-events-none overflow-visible"
+          style={{ zIndex: 1 }}
           aria-hidden
-          className="absolute inset-0 pointer-events-none opacity-70"
-          style={{ backgroundImage: 'radial-gradient(circle, color-mix(in oklch, var(--on-surface) 5%, transparent) 1px, transparent 1px)', backgroundSize: '26px 26px' }}
-        />
-        <div aria-hidden className="absolute inset-x-0 top-0 h-px bg-(--rule) pointer-events-none" />
+        >
+          <path id="os-conn-1" d="" fill="none" stroke="var(--accent-vivid)" strokeOpacity={0.35} strokeWidth={1.5} strokeLinecap="round" />
+          <circle id="os-pulse-1" r={3.5} fill="var(--accent-vivid)" opacity={0} />
+          <path id="os-conn-2" d="" fill="none" stroke="var(--accent-vivid)" strokeOpacity={0.35} strokeWidth={1.5} strokeLinecap="round" />
+          <circle id="os-pulse-2" r={3.5} fill="var(--accent-vivid)" opacity={0} />
+        </svg>
 
-        {/* One column at every breakpoint. The stages read down the page in the
-            same direction the page itself is read. */}
-        <div className="relative flex flex-col items-stretch">
-          <StageLabel>01 · Input</StageLabel>
-          <InputPanel innerRef={inputPanelRef} />
-          <div className="h-16 md:h-20" aria-hidden />
-          <StageLabel>02 · Engine</StageLabel>
-          <EngineWindow innerRef={engineWindowRef} onOpen={setActive} />
-          <div className="h-16 md:h-20" aria-hidden />
-          <StageLabel>03 · Output</StageLabel>
-          <OutputPanel innerRef={outputPanelRef} />
+        <div className="relative rounded-2xl p-1 sm:p-2">
+          <motion.h2
+            initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, ease: EASE }}
+            className="relative font-display-md mb-8 text-[clamp(1.6rem,4vw,2.4rem)] text-(--on-surface)"
+          >
+            You tell us once.
+          </motion.h2>
+          <div
+            aria-hidden
+            className="absolute inset-0 pointer-events-none opacity-70"
+            style={{ backgroundImage: 'radial-gradient(circle, color-mix(in oklch, var(--on-surface) 5%, transparent) 1px, transparent 1px)', backgroundSize: '26px 26px' }}
+          />
+          <div aria-hidden className="absolute inset-x-0 top-0 h-px bg-(--rule) pointer-events-none" />
+
+          <div className="relative flex flex-col items-stretch">
+            <StageLabel>01 · Input</StageLabel>
+            <InputPanel innerRef={inputPanelRef} />
+            <div className="h-16 md:h-20" aria-hidden />
+            <StageLabel>02 · Engine</StageLabel>
+            <EngineWindow innerRef={engineWindowRef} onOpen={setActive} />
+            <div className="h-16 md:h-20" aria-hidden />
+            <StageLabel>03 · Output</StageLabel>
+            <OutputPanel innerRef={outputPanelRef} />
+          </div>
+
+          <AnimatePresence>
+            {active !== null && <DetailPanel m={MODULES[active]} onClose={() => setActive(null)} />}
+          </AnimatePresence>
         </div>
-
-        {/* The bottom caption is gone. Its first half ("everything in the
-            middle happens without you") is what the three-column layout
-            already says; its second half ("click any module to see inside")
-            was a sentence standing in for an affordance, and the modules now
-            carry that affordance themselves — see EngineWindow. */}
-
-        {/* side panel */}
-        <AnimatePresence>
-          {active !== null && <DetailPanel m={MODULES[active]} onClose={() => setActive(null)} />}
-        </AnimatePresence>
       </div>
 
       <style>{`
-        /* The panel shell, stated once. Three panels used to carry the same
-           four arbitrary-value classes inline, two of which contained literal
-           spaces and were therefore silently split into junk class names. */
         .os-panel {
           border-radius: var(--radius-md);
           background: var(--surface);
