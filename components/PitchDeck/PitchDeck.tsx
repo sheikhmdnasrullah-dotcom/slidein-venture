@@ -67,18 +67,21 @@ const CHAPTERS: ChapterDef[] = [
     number: '02',
     kicker: 'The Complete Framework',
     lead: 'Two systems, one loop. Content earns attention, outreach converts it.',
+    flow: true,
   },
   {
     id: 'content',
     number: '03',
     kicker: 'The Content System',
     lead: 'One asset in, routed out to every surface it belongs on.',
+    flow: true,
   },
   {
     id: 'outreach',
     number: '04',
     kicker: 'The Outreach System',
     lead: 'Research, write, send, sort. The pipeline runs whether or not you do.',
+    flow: true,
   },
 ];
 

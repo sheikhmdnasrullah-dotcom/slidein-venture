@@ -132,21 +132,38 @@ const INPUT_CHIPS = [
   { label: 'Ideal buyer', value: 'Founder / CMO' },
 ];
 
-/* ------------------------------- connectors ------------------------------- */
+/* ------------------------------- connectors -------------------------------
+   Turned ninety degrees with the rest of the slide: the stages stack, so the
+   wire between them runs down, not across. Same anatomy as before — a hairline
+   with a joint at each end and one travelling mark. */
 
 function Connector({ delay = 0 }: { delay?: number }) {
   return (
-    <div className="hidden lg:flex flex-col items-center justify-center w-10 shrink-0 relative" aria-hidden>
-      <div className="relative w-full h-px bg-[var(--rule-strong)]">
-        <span className="absolute -left-0.5 -top-[2.5px] w-[6px] h-[6px] rounded-full bg-[var(--surface)] border border-[var(--rule-strong)]" />
-        <span className="absolute -right-0.5 -top-[2.5px] w-[6px] h-[6px] rounded-full bg-[var(--surface)] border border-[var(--rule-strong)]" />
+    <div className="relative flex h-14 w-full shrink-0 items-center justify-center md:h-16" aria-hidden>
+      <div className="relative h-full w-px bg-(--rule-strong)">
+        <span className="os-joint -top-[2.5px]" />
+        <span className="os-joint -bottom-[2.5px]" />
         <motion.span
-          className="absolute -top-[2px] w-[5px] h-[5px] rounded-full bg-[var(--accent-vivid)] shadow-[0_0_6px_color-mix(in oklch, var(--accent-vivid) 60%, transparent)]"
-          animate={{ left: ['0%', '96%'], opacity: [0, 1, 1, 0] }}
+          className="os-spark"
+          animate={{ top: ['0%', '96%'], opacity: [0, 1, 1, 0] }}
           transition={{ duration: 1.8, repeat: Infinity, ease: 'easeInOut', delay, repeatDelay: 0.6 }}
         />
       </div>
     </div>
+  );
+}
+
+/** One stage's marker in the column. The old slide put all three labels in a
+ *  single row above the diagram, which only worked while the diagram was a
+ *  row. Stacked, each label belongs to the block underneath it. */
+function StageLabel({ children }: { children: string }) {
+  return (
+    <p className="mb-3 flex items-center gap-2" aria-hidden>
+      <span className="h-2.5 w-[2px] rounded-full bg-[color-mix(in_oklch,var(--accent-vivid)_80%,transparent)]" />
+      <span className="text-[8.5px] font-bold tracking-[0.22em] text-(--muted) uppercase">
+        {children.toUpperCase()}
+      </span>
+    </p>
   );
 }
 
@@ -157,13 +174,15 @@ function InputPanel() {
     <motion.div
       initial={{ opacity: 0, x: -16 }} animate={{ opacity: 1, x: 0 }}
       transition={{ duration: 0.6, ease: EASE, delay: 0.1 }}
-      className="w-full lg:w-[218px] shrink-0 rounded-2xl border border-[var(--rule)] bg-[var(--surface)] shadow-[0_4px_14px_color-mix(in oklch, var(--on-surface) 6%, transparent)] p-4 relative"
+      className="os-panel relative w-full shrink-0 p-4"
     >
-      <p className="text-[8.5px] font-bold tracking-[0.2em] text-[var(--muted)] uppercase">Client Input</p>
-      <h3 className="mt-1.5 text-[13px] font-extrabold leading-snug text-[var(--on-surface)]">
+      <p className="text-[8.5px] font-bold tracking-[0.2em] text-(--muted) uppercase">Client Input</p>
+      <h3 className="mt-1.5 text-[15px] font-extrabold leading-snug text-(--on-surface)">
         You tell us who you want to work with
       </h3>
-      <div className="mt-3.5 flex flex-col gap-2">
+      {/* Three across now the panel is full width. Stacked, they left a column
+          of near-empty rows with the value hanging off the end of each. */}
+      <div className="mt-3.5 grid grid-cols-1 gap-2 sm:grid-cols-3">
         {INPUT_CHIPS.map((c, i) => (
           <motion.div
             key={c.label}
@@ -313,7 +332,7 @@ function OutputPanel() {
     <motion.div
       initial={{ opacity: 0, x: 16 }} animate={{ opacity: 1, x: 0 }}
       transition={{ duration: 0.6, ease: EASE, delay: 0.4 }}
-      className="w-full lg:w-[224px] shrink-0 relative"
+      className="relative w-full shrink-0"
     >
       {/* ambient glow */}
       <div aria-hidden className="pointer-events-none absolute -inset-5 rounded-[28px] bg-[var(--accent-vivid)]/[0.07] blur-2xl os-halo" />
@@ -359,12 +378,15 @@ function DetailPanel({ m, onClose }: { m: Module; onClose: () => void }) {
         initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
         transition={{ duration: 0.25 }}
         onClick={onClose}
-        className="absolute inset-0 z-30 bg-[var(--on-surface)]/[0.16] backdrop-blur-[2px] rounded-2xl cursor-pointer"
+        className="fixed inset-0 z-40 cursor-pointer bg-[color-mix(in_oklch,var(--on-surface)_16%,transparent)] backdrop-blur-[2px]"
       />
+      {/* Fixed, not absolute. The engine column is now taller than the viewport,
+          and a drawer pinned to a 2,000px container is a drawer that starts
+          off-screen and ends off-screen. */}
       <motion.aside
         initial={{ x: '104%' }} animate={{ x: 0 }} exit={{ x: '104%' }}
         transition={{ duration: 0.45, ease: EASE }}
-        className="absolute top-0 right-0 bottom-0 z-40 w-full max-w-[350px] bg-[var(--surface)] border-l border-[var(--rule)] shadow-[-24px_0_60px_color-mix(in oklch, var(--on-surface) 14%, transparent)] rounded-r-2xl overflow-y-auto"
+        className="os-drawer fixed top-0 right-0 bottom-0 z-50 w-full max-w-87.5 overflow-y-auto border-l border-(--rule) bg-(--surface)"
       >
         <div className="sticky top-0 bg-[var(--surface-glass)] backdrop-blur border-b border-[var(--rule)] px-5 py-3.5 flex items-center gap-3">
           <span className="w-8 h-8 rounded-lg bg-[var(--accent-vivid)]/10 text-[var(--accent)] flex items-center justify-center shrink-0">
@@ -445,16 +467,16 @@ export default function OutreachOSSlide() {
   const [active, setActive] = useState<number | null>(null);
 
   return (
-    <div className="relative w-full max-w-[1120px] mx-auto">
+    <div className="relative w-full max-w-165">
       {/* canvas */}
-      <div className="relative rounded-2xl p-4 lg:p-5 overflow-hidden">
+      <div className="relative rounded-2xl p-1 sm:p-2">
         {/* The centred eyebrow and centred headline are gone. The title sits
             top left on the same axis as the input column, in the display
             serif, the way every other slide in the deck now opens. */}
         <motion.h2
           initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, ease: EASE }}
-          className="relative font-display-md mb-5 text-[clamp(1.5rem,3.1vw,2.5rem)] text-[var(--on-surface)]"
+          className="relative font-display-md mb-8 text-[clamp(1.6rem,4vw,2.4rem)] text-(--on-surface)"
         >
           You tell us once.
         </motion.h2>
@@ -464,22 +486,18 @@ export default function OutreachOSSlide() {
           className="absolute inset-0 pointer-events-none opacity-70"
           style={{ backgroundImage: 'radial-gradient(circle, color-mix(in oklch, var(--on-surface) 5%, transparent) 1px, transparent 1px)', backgroundSize: '26px 26px' }}
         />
-        <div aria-hidden className="absolute inset-x-0 top-0 h-px bg-[var(--rule)] pointer-events-none" />
-        {/* section labels */}
-        <div aria-hidden className="relative hidden lg:flex items-center justify-between px-1 pb-3">
-          {['01 · Input', '02 · Engine', '03 · Output'].map((sLabel) => (
-            <span key={sLabel} className="flex items-center gap-2">
-              <span className="w-[2px] h-2.5 bg-[var(--accent-vivid)]/80 rounded-full" />
-              <span className="text-[8.5px] font-bold tracking-[0.22em] text-[var(--muted)] uppercase">{sLabel.toUpperCase()}</span>
-            </span>
-          ))}
-        </div>
+        <div aria-hidden className="absolute inset-x-0 top-0 h-px bg-(--rule) pointer-events-none" />
 
-        <div className="relative flex flex-col lg:flex-row items-stretch lg:items-center gap-3 lg:gap-0">
+        {/* One column at every breakpoint. The stages read down the page in the
+            same direction the page itself is read. */}
+        <div className="relative flex flex-col items-stretch">
+          <StageLabel>01 · Input</StageLabel>
           <InputPanel />
           <Connector delay={0.45} />
+          <StageLabel>02 · Engine</StageLabel>
           <EngineWindow onOpen={setActive} />
           <Connector delay={1.25} />
+          <StageLabel>03 · Output</StageLabel>
           <OutputPanel />
         </div>
 
@@ -496,6 +514,38 @@ export default function OutreachOSSlide() {
       </div>
 
       <style>{`
+        /* The panel shell, stated once. Three panels used to carry the same
+           four arbitrary-value classes inline, two of which contained literal
+           spaces and were therefore silently split into junk class names. */
+        .os-panel {
+          border-radius: var(--radius-md);
+          background: var(--surface);
+          border: 1px solid var(--rule);
+          box-shadow: 0 4px 14px color-mix(in oklch, var(--on-surface) 6%, transparent);
+        }
+        .os-drawer { box-shadow: -24px 0 60px color-mix(in oklch, var(--on-surface) 14%, transparent); }
+
+        .os-joint {
+          position: absolute;
+          left: 50%;
+          width: 6px;
+          height: 6px;
+          margin-left: -3px;
+          border-radius: var(--radius-pill);
+          background: var(--surface);
+          border: 1px solid var(--rule-strong);
+        }
+        .os-spark {
+          position: absolute;
+          left: 50%;
+          width: 5px;
+          height: 5px;
+          margin-left: -2.5px;
+          border-radius: var(--radius-pill);
+          background: var(--accent-vivid);
+          box-shadow: 0 0 6px color-mix(in oklch, var(--accent-vivid) 60%, transparent);
+        }
+
         .os-blink { animation: osBlink 2.2s ease-in-out infinite; }
         @keyframes osBlink { 0%,100% { opacity: 1; } 50% { opacity: .25; } }
         .os-halo { animation: osHalo 4.4s ease-in-out infinite; }

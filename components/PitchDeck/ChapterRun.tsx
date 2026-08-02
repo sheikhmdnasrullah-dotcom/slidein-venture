@@ -39,6 +39,20 @@ export type ChapterDef = {
   number: string;
   kicker: string;
   lead: string;
+  /**
+   * Opt out of the fixed canvas box and let the visual set its own height.
+   *
+   * CANVAS_MIN exists because the horizontal diagrams were fixed-viewBox SVG
+   * drawn for a 660px stage — give them anything else and the composition they
+   * were authored for is gone. A vertical diagram is the opposite case: it is
+   * DOM, it is two to three times taller than that box, and its height is
+   * whatever its own type sets to at the current breakpoint. Clipping it into
+   * a 660px frame with `overflow-hidden` would simply cut it off.
+   *
+   * Defaults to false, so /solutions and chapter 01 keep the stage geometry
+   * they were drawn against.
+   */
+  flow?: boolean;
 };
 
 /* ── Index rail ────────────────────────────────────────────────────────────
@@ -198,17 +212,25 @@ function Chapter({
           </div>
         </Rise>
 
-        {/* ── Canvas — no frame, see the file header ──────────────────── */}
+        {/* ── Canvas — no frame, see the file header ────────────────────
+            Two modes. The stage box (default) holds the fixed-viewBox
+            diagrams at the geometry they were drawn for. Flow mode lets a
+            vertical diagram set its own height; `min-h` is still reserved so
+            the deferred mount does not shift the page when it lands. */}
         <motion.div
-          className={cn('relative', CANVAS_MIN)}
+          className={cn('relative', def.flow ? 'min-h-140' : CANVAS_MIN)}
           initial={still ? false : { opacity: 0, y: 32 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: '0px 0px -10% 0px' }}
           transition={{ duration: 0.75, ease: EASE }}
         >
-          <div className="absolute inset-0 flex items-center justify-center overflow-hidden p-4 sm:p-6 md:p-8 lg:p-10">
-            {mounted ? children : null}
-          </div>
+          {def.flow ? (
+            <div className="flex justify-center">{mounted ? children : null}</div>
+          ) : (
+            <div className="absolute inset-0 flex items-center justify-center overflow-hidden p-4 sm:p-6 md:p-8 lg:p-10">
+              {mounted ? children : null}
+            </div>
+          )}
         </motion.div>
       </div>
 

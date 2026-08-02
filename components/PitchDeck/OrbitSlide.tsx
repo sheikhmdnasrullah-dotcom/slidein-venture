@@ -1,25 +1,39 @@
 'use client';
 
 /**
- * THE CONTENT SYSTEM — SlideIn Venture
- * -------------------------------------
- * A product-blueprint canvas, read left to right:
+ * CHAPTER 03 — THE CONTENT SYSTEM · ONE IN. NINE OUT.
+ * ---------------------------------------------------------------------------
+ * Read top to bottom:
  *
  *   01 ORIGIN      one orange focal card — "You Record Once a Week"
- *   02 PRODUCTION  six intelligent output modules (click → service modal)
- *   03 PUBLISH     grouped destinations (video / social / owned)
+ *   02 PRODUCTION  six output modules (click → service modal)
+ *   03 PUBLISH     grouped destinations (video & audio / social / owned)
  *
- * The Engine Visual has been removed. The flow goes directly:
- *   Record → Production Cards → Smart Routing → Destinations
+ * WHY IT TURNED NINETY DEGREES — see the header of FrameworkFlowSlide.tsx.
+ * Same move, same reason: cards in DOM, wires in one measured SVG overlay
+ * (flow/FlowCanvas.tsx), single column at every breakpoint.
  *
- * Layout is relaxed with more breathing room between nodes and wires.
+ * THE TWO GUTTERS
+ * A vertical column has two channels to run wire in, and this diagram uses
+ * both to keep three different relationships apart:
+ *
+ *   left,  above routing   the DISTRIBUTION bus — one recording reaching six
+ *                          modules that all run in parallel
+ *   right, above routing   the GATHER — six finished assets converging on one
+ *                          routing decision
+ *   left,  below routing   the FAN — one decision reaching nine destinations
+ *
+ * Wire that crosses a card is wire nobody can follow. Everything that has to
+ * travel more than one card's distance travels in a gutter.
  */
 
-import { motion } from 'framer-motion';
-
-const ORANGE = 'var(--accent-vivid)';
-const INK = 'var(--on-surface)';
-const EASE = [0.22, 1, 0.36, 1] as const;
+import { useCallback } from 'react';
+import FlowCanvas, {
+  useFlowNode,
+  type FlowNodes,
+  type FlowPath,
+  type FlowSize,
+} from '@/components/PitchDeck/flow/FlowCanvas';
 
 /* ----------------------------- brand assets ----------------------------- */
 
@@ -38,33 +52,6 @@ const LOGOS: Record<string, string> = {
   linkedin:
     'M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.225 0z',
 };
-
-/* ------------------------------- geometry --------------------------------
-   Three columns now (Engine removed). Canvas widened to 1400 with more
-   breathing room between each stage. Everything sits on one BASELINE.
-   Cards are taller and spaced further apart for a relaxed, airy feel. */
-
-const VB = { w: 1400, h: 660 };
-
-const BASELINE = 330;
-
-/* Origin card — the anchor, client's moment stays orange */
-const ORIGIN = { x: 80, y: BASELINE - 80, w: 240, h: 160 };
-
-/* Production cards start further right — direct jump from origin */
-const COL = { x: 520, w: 268, cardH: 68, gap: 18, top: 110 };
-const BUS1 = 492; // origin → production bus
-
-/* Smart routing junction and output groups */
-const JUNCTION = { x: 1100, y: BASELINE };
-
-const GROUP_X = 1168;
-const GROUP_W = 196;
-
-const O_CY = ORIGIN.y + ORIGIN.h / 2;
-
-const cardY = (i: number) => COL.top + i * (COL.cardH + COL.gap);
-const cardCY = (i: number) => cardY(i) + COL.cardH / 2;
 
 /* ------------------------------ pipeline data ----------------------------- */
 
@@ -86,14 +73,10 @@ const PIPELINE: Module[] = [
   { id: 'linkedin-posts', serviceId: 'c-social', title: 'LinkedIn Posts', desc: 'From what you actually said', turnaround: '4 HRS', icon: 'linkedin' },
 ];
 
-/* ── Output groups ────────────────────────────────────────────────────────── */
-
 type OutputGroup = {
   id: string;
   label: string;
   count: string;
-  y: number;
-  h: number;
   items: { name: string; brand: string; logo?: string; strokeIcon?: 'globe' | 'mail' }[];
 };
 
@@ -102,8 +85,6 @@ const OUTPUTS: OutputGroup[] = [
     id: 'video',
     label: 'Video & Audio',
     count: '03',
-    y: 120,
-    h: 130,
     items: [
       { name: 'YouTube', brand: '#FF0000', logo: LOGOS.youtube },
       { name: 'Spotify', brand: '#1ED760', logo: LOGOS.spotify },
@@ -114,8 +95,6 @@ const OUTPUTS: OutputGroup[] = [
     id: 'social',
     label: 'Social',
     count: '04',
-    y: BASELINE - 72,
-    h: 144,
     items: [
       { name: 'Instagram', brand: '#E4405F', logo: LOGOS.instagram },
       { name: 'LinkedIn', brand: '#0A66C2', logo: LOGOS.linkedin },
@@ -127,486 +106,497 @@ const OUTPUTS: OutputGroup[] = [
     id: 'owned',
     label: 'Owned',
     count: '02',
-    y: BASELINE + 88,
-    h: 120,
     items: [
-      { name: 'Website', brand: ORANGE, strokeIcon: 'globe' },
-      { name: 'Newsletter', brand: ORANGE, strokeIcon: 'mail' },
+      { name: 'Website', brand: 'var(--accent-vivid)', strokeIcon: 'globe' },
+      { name: 'Newsletter', brand: 'var(--accent-vivid)', strokeIcon: 'mail' },
     ],
   },
-];
-
-const GROUP_CY = (g: OutputGroup) => g.y + g.h / 2;
-
-/* Section labels — 3 columns only */
-const SECTIONS = [
-  { label: '01 · Origin', x: ORIGIN.x },
-  { label: '02 · Production', x: COL.x },
-  { label: '03 · Publish', x: GROUP_X },
 ];
 
 /* ------------------------------ tiny icons -------------------------------- */
 
 function ModuleGlyph({ kind }: { kind: Module['icon'] }) {
-  const stroke = { fill: 'none', stroke: 'currentColor', strokeWidth: 1.8, strokeLinecap: 'round', strokeLinejoin: 'round' } as const;
-  switch (kind) {
-    case 'notes':
-      return (
-        <g {...stroke}>
+  const s = { fill: 'none', stroke: 'currentColor', strokeWidth: 1.8, strokeLinecap: 'round', strokeLinejoin: 'round' } as const;
+  return (
+    <svg width={18} height={18} viewBox="0 0 24 24" aria-hidden>
+      {kind === 'notes' && (
+        <g {...s}>
           <rect x={4} y={3} width={16} height={18} rx={2.5} />
           <path d="M8 8h8M8 12h8M8 16h5" />
         </g>
-      );
-    case 'film':
-      return (
-        <g {...stroke}>
+      )}
+      {kind === 'film' && (
+        <g {...s}>
           <rect x={3} y={5} width={18} height={14} rx={2.5} />
           <path d="M7 5v14M17 5v14M3 9.5h4M3 14.5h4M17 9.5h4M17 14.5h4" />
         </g>
-      );
-    case 'image':
-      return (
-        <g {...stroke}>
+      )}
+      {kind === 'image' && (
+        <g {...s}>
           <rect x={3} y={4} width={18} height={16} rx={2.5} />
           <circle cx={8.7} cy={9.5} r={1.7} />
           <path d="m21 15.6-4.4-4.4L6 21" />
         </g>
-      );
-    case 'play':
-      return (
-        <g {...stroke}>
+      )}
+      {kind === 'play' && (
+        <g {...s}>
           <rect x={3} y={3} width={18} height={18} rx={4.5} />
           <path d="M10 8.6v6.8l5.6-3.4z" />
         </g>
-      );
-    case 'doc':
-      return (
-        <g {...stroke}>
+      )}
+      {kind === 'doc' && (
+        <g {...s}>
           <path d="M6 3h8l4 4v14H6z" />
           <path d="M14 3v4h4M9 12h6M9 16h6" />
         </g>
-      );
-    case 'linkedin':
-      return <path d={LOGOS.linkedin} fill="currentColor" transform="scale(0.9) translate(1.3 1.3)" />;
-  }
+      )}
+      {kind === 'linkedin' && <path d={LOGOS.linkedin} fill="currentColor" transform="scale(0.9) translate(1.3 1.3)" />}
+    </svg>
+  );
 }
 
 function ChipGlyph({ item }: { item: OutputGroup['items'][number] }) {
-  if (item.logo) return <path d={item.logo} fill="currentColor" />;
-  const stroke = { fill: 'none', stroke: 'currentColor', strokeWidth: 1.9, strokeLinecap: 'round', strokeLinejoin: 'round' } as const;
-  if (item.strokeIcon === 'globe')
-    return (
-      <g {...stroke}>
-        <circle cx={12} cy={12} r={10} />
-        <path d="M2 12h20" />
-        <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
-      </g>
-    );
+  const s = { fill: 'none', stroke: 'currentColor', strokeWidth: 1.9, strokeLinecap: 'round', strokeLinejoin: 'round' } as const;
   return (
-    <g {...stroke}>
-      <rect x={2} y={4} width={20} height={16} rx={2.5} />
-      <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
-    </g>
-  );
-}
-
-/* --------------------------- blueprint chrome ----------------------------- */
-
-function BlueprintChrome() {
-  return (
-    <g aria-hidden>
-      {/* ruler ticks along the top */}
-      {Array.from({ length: 32 }, (_, i) => ORIGIN.x + i * 42).map((x, i) => (
-        <line key={x} x1={x} y1={10} x2={x} y2={i % 5 === 0 ? 18 : 14} stroke={INK} strokeOpacity={0.07} strokeWidth={1} />
-      ))}
-      {/* zone separator guides — fewer, more breathing room */}
-      {[380, 840].map((x) => (
-        <line key={x} x1={x} y1={92} x2={x} y2={600} stroke={INK} strokeOpacity={0.04} strokeWidth={1} strokeDasharray="1 8" />
-      ))}
-      {/* corner crosshairs */}
-      {[
-        [1360, 40], [40, 620],
-      ].map(([x, y]) => (
-        <g key={`${x}-${y}`} stroke={INK} strokeOpacity={0.12} strokeWidth={1}>
-          <line x1={x - 5} y1={y} x2={x + 5} y2={y} />
-          <line x1={x} y1={y - 5} x2={x} y2={y + 5} />
+    <svg width={16} height={16} viewBox="0 0 24 24" aria-hidden>
+      {item.logo && <path d={item.logo} fill="currentColor" />}
+      {item.strokeIcon === 'globe' && (
+        <g {...s}>
+          <circle cx={12} cy={12} r={10} />
+          <path d="M2 12h20" />
+          <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
         </g>
-      ))}
-      {/* horizontal baseline */}
-      <line x1={40} y1={BASELINE} x2={1360} y2={BASELINE} stroke={INK} strokeOpacity={0.04} strokeWidth={1} strokeDasharray="1 9" />
-    </g>
-  );
-}
-
-function Title() {
-  return (
-    <motion.g
-      initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, ease: EASE }}
-    >
-      <text x={ORIGIN.x} y={68} className="bp-title">One in. Nine out.</text>
-    </motion.g>
-  );
-}
-
-function SectionLabels() {
-  return (
-    <g>
-      {SECTIONS.map((s) => (
-        <g key={s.label}>
-          <line x1={s.x + 1} y1={101} x2={s.x + 1} y2={110} stroke={ORANGE} strokeOpacity={0.8} strokeWidth={2} strokeLinecap="round" />
-          <text x={s.x + 9} y={109} className="bp-section">{s.label.toUpperCase()}</text>
+      )}
+      {item.strokeIcon === 'mail' && (
+        <g {...s}>
+          <rect x={2} y={4} width={20} height={16} rx={2.5} />
+          <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
         </g>
-      ))}
-    </g>
+      )}
+    </svg>
   );
 }
 
-/* ------------------------------- connectors ------------------------------- */
+/* ------------------------------- the wires -------------------------------- */
 
-/* Relaxed, wide Bezier curves from the production cards gathering to the junction */
-const gather = (fromY: number) => {
-  const dy = JUNCTION.y - fromY;
-  if (Math.abs(dy) < 1) return `M ${COL.x + COL.w} ${fromY} L ${JUNCTION.x - 8} ${JUNCTION.y}`;
-  // Wider control points for a more relaxed, gentle curve
-  const cp1x = COL.x + COL.w + 60;
-  const cp2x = JUNCTION.x - 70;
-  return `M ${COL.x + COL.w} ${fromY} C ${cp1x} ${fromY}, ${cp2x} ${JUNCTION.y - dy * 0.12}, ${JUNCTION.x - 6} ${JUNCTION.y - (dy > 0 ? 6 : -6)}`;
-};
+/** Out of a card's bottom edge, swung into a gutter, then straight down it.
+ *  One continuous path so a pulse can ride the whole run without a seam. */
+function intoGutter(fromX: number, fromY: number, gutterX: number, toY: number) {
+  const bend = 46;
+  return `M ${fromX.toFixed(1)} ${fromY.toFixed(1)} C ${fromX.toFixed(1)} ${(fromY + bend).toFixed(1)}, ${gutterX.toFixed(1)} ${(fromY + 8).toFixed(1)}, ${gutterX.toFixed(1)} ${(fromY + bend).toFixed(1)} V ${toY.toFixed(1)}`;
+}
 
-/* Relaxed fan branches from the junction to output groups */
-const branch = (toY: number) => {
-  const dy = toY - JUNCTION.y;
-  if (Math.abs(dy) < 1) return `M ${JUNCTION.x + 8} ${JUNCTION.y} L ${GROUP_X} ${toY}`;
-  const lift = dy > 0 ? 7 : -7;
-  // Wider control points for gentle, airy arcs
-  const cp1x = JUNCTION.x + 60;
-  const cp2x = GROUP_X - 60;
-  return `M ${JUNCTION.x + 6} ${JUNCTION.y + lift} C ${cp1x} ${JUNCTION.y + dy * 0.22}, ${cp2x} ${toY}, ${GROUP_X} ${toY}`;
-};
+/** Out of a gutter, up into a card's bottom edge — the gather's last move. */
+function outOfGutter(gutterX: number, fromY: number, toX: number, toY: number) {
+  const bend = 46;
+  return `M ${gutterX.toFixed(1)} ${fromY.toFixed(1)} V ${(toY - bend).toFixed(1)} C ${gutterX.toFixed(1)} ${(toY - 8).toFixed(1)}, ${toX.toFixed(1)} ${(toY - bend).toFixed(1)}, ${toX.toFixed(1)} ${toY.toFixed(1)}`;
+}
 
-function Connectors() {
+const stub = (x1: number, y: number, x2: number) =>
+  `M ${x1.toFixed(1)} ${y.toFixed(1)} H ${x2.toFixed(1)}`;
+
+function contentPaths(n: FlowNodes, size: FlowSize): FlowPath[] {
+  const out: FlowPath[] = [];
+  const origin = n.origin;
+  const routing = n.routing;
+  const first = n[`m-${PIPELINE[0].id}`];
+  const last = n[`m-${PIPELINE[PIPELINE.length - 1].id}`];
+  if (!origin || !first || !last) return out;
+
+  const pad = first.left;
+  const gL = Math.max(6, pad * 0.45);
+  const gR = size.w - Math.max(6, pad * 0.45);
+
+  /* left gutter — one recording reaching six modules in parallel */
+  out.push({ id: 'bus-in', d: intoGutter(origin.cx, origin.bottom, gL, last.cy) });
+  PIPELINE.forEach((m) => {
+    const c = n[`m-${m.id}`];
+    if (c) out.push({ id: `feed-${m.id}`, d: stub(gL, c.cy, c.left), opacity: 0.12 });
+  });
+
+  if (!routing) return out;
+
+  /* right gutter — six finished assets converging on one routing decision */
+  out.push({ id: 'gather', d: outOfGutter(gR, first.cy, routing.cx, routing.top) });
+  PIPELINE.forEach((m) => {
+    const c = n[`m-${m.id}`];
+    if (c) out.push({ id: `gather-${m.id}`, d: stub(c.right, c.cy, gR), opacity: 0.12 });
+  });
+
+  /* left gutter again, below routing — one decision reaching nine places */
+  const groups = OUTPUTS.map((g) => n[`g-${g.id}`]).filter(Boolean);
+  const lastGroup = groups[groups.length - 1];
+  if (lastGroup) {
+    out.push({ id: 'fan', d: intoGutter(routing.cx, routing.bottom, gL, lastGroup.cy), hot: true });
+    OUTPUTS.forEach((g) => {
+      const c = n[`g-${g.id}`];
+      if (c) out.push({ id: `fan-${g.id}`, d: stub(gL, c.cy, c.left), hot: true, opacity: 0.28, width: 1.3 });
+    });
+  }
+
+  return out;
+}
+
+/* --------------------------------- parts ---------------------------------- */
+
+function StageLabel({ children }: { children: string }) {
   return (
-    <g aria-hidden>
-      {/* origin → production bus: single wide cubic curve */}
-      <motion.path
-        d={`M ${ORIGIN.x + ORIGIN.w} ${O_CY} C ${ORIGIN.x + ORIGIN.w + 80} ${O_CY}, ${BUS1 - 60} ${cardCY(2)}, ${BUS1} ${cardCY(2)}`}
-        fill="none" stroke={INK} strokeOpacity={0.15} strokeWidth={1.4}
-        initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ duration: 0.8, ease: 'easeOut', delay: 0.5 }}
-      />
-
-      {/* vertical bus connecting all card entry points */}
-      <motion.line
-        x1={BUS1} y1={cardCY(0)} x2={BUS1} y2={cardCY(5)}
-        stroke={INK} strokeOpacity={0.10} strokeWidth={1.2}
-        initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ duration: 0.7, ease: 'easeOut', delay: 0.9 }}
-      />
-
-      {/* bus → each production card */}
-      {PIPELINE.map((m, i) => (
-        <motion.line
-          key={`b1-${m.id}`}
-          x1={BUS1} y1={cardCY(i)} x2={COL.x} y2={cardCY(i)}
-          stroke={INK} strokeOpacity={0.12} strokeWidth={1.2}
-          initial={{ pathLength: 0 }} animate={{ pathLength: 1 }}
-          transition={{ duration: 0.3, ease: 'easeOut', delay: 1.1 + i * 0.08 }}
-        />
-      ))}
-
-      {/* production → junction: relaxed gather curves */}
-      {PIPELINE.map((m, i) => (
-        <motion.path
-          key={`b2-${m.id}`}
-          d={gather(cardCY(i))} fill="none"
-          stroke={INK} strokeOpacity={0.11} strokeWidth={1.1}
-          initial={{ pathLength: 0 }} animate={{ pathLength: 1 }}
-          transition={{ duration: 0.55, ease: 'easeOut', delay: 1.5 + i * 0.06 }}
-        />
-      ))}
-
-      {/* junction fan-out: relaxed arc branches */}
-      {OUTPUTS.map((g, i) => (
-        <motion.path
-          key={`b3-${g.id}`}
-          d={branch(GROUP_CY(g))} fill="none"
-          stroke={ORANGE} strokeOpacity={0.30} strokeWidth={1.5}
-          initial={{ pathLength: 0 }} animate={{ pathLength: 1 }}
-          transition={{ duration: 0.55, ease: 'easeOut', delay: 2.0 + i * 0.10 }}
-        />
-      ))}
-
-      {/* routing junction node */}
-      <motion.g
-        initial={{ opacity: 0, scale: 0.6 }} animate={{ opacity: 1, scale: 1 }}
-        style={{ transformBox: 'fill-box', transformOrigin: 'center' }}
-        transition={{ duration: 0.5, ease: EASE, delay: 1.9 }}
-      >
-        <circle cx={JUNCTION.x} cy={JUNCTION.y} r={14} fill="var(--surface)" stroke={ORANGE} strokeOpacity={0.38}
-          strokeWidth={1.2} strokeDasharray="3 4" className="bp-spin" />
-        <circle cx={JUNCTION.x} cy={JUNCTION.y} r={5} fill={ORANGE} className="bp-glow" />
-        <text x={JUNCTION.x} y={JUNCTION.y + 36} textAnchor="middle" className="bp-stage">SMART ROUTING</text>
-      </motion.g>
-
-      {/* connector joints */}
-      <g fill="var(--surface)" stroke={INK} strokeOpacity={0.25} strokeWidth={1}>
-        <circle cx={ORIGIN.x + ORIGIN.w} cy={O_CY} r={2.8} />
-        <circle cx={BUS1} cy={cardCY(2)} r={2.8} />
-        {PIPELINE.map((m, i) => (
-          <circle key={`j1-${m.id}`} cx={BUS1} cy={cardCY(i)} r={2.2} />
-        ))}
-        {OUTPUTS.map((g) => (
-          <circle key={`j2-${g.id}`} cx={GROUP_X} cy={GROUP_CY(g)} r={2.6} />
-        ))}
-      </g>
-
-      {/* flowing data particles */}
-      <motion.g initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 2.2, duration: 0.8 }}>
-        {/* particle: origin → bus */}
-        <circle r={2.6} fill={ORANGE} className="bp-glow">
-          <animateMotion dur="2.8s" repeatCount="indefinite"
-            path={`M ${ORIGIN.x + ORIGIN.w} ${O_CY} C ${ORIGIN.x + ORIGIN.w + 80} ${O_CY}, ${BUS1 - 60} ${cardCY(2)}, ${BUS1} ${cardCY(2)}`} />
-        </circle>
-        {/* particles: bus → cards */}
-        {[0, 2, 4].map((i, k) => (
-          <circle key={`p1-${i}`} r={2.2} fill={ORANGE} className="bp-glow">
-            <animateMotion
-              dur={`${3.2 + k * 0.5}s`} begin={`${k * 0.9}s`} repeatCount="indefinite"
-              path={`M ${BUS1} ${cardCY(i)} L ${COL.x} ${cardCY(i)}`}
-            />
-          </circle>
-        ))}
-        {/* particles: gather */}
-        {[1, 3, 5].map((i, k) => (
-          <circle key={`p2-${i}`} r={2} fill={ORANGE} fillOpacity={0.85} className="bp-glow">
-            <animateMotion
-              dur={`${3.6 + k * 0.4}s`} begin={`${0.6 + k * 0.9}s`} repeatCount="indefinite"
-              path={gather(cardCY(i))}
-            />
-          </circle>
-        ))}
-        {/* particles: fan-out branches */}
-        {OUTPUTS.map((g, k) => (
-          <circle key={`p3-${g.id}`} r={2.2} fill={ORANGE} className="bp-glow">
-            <animateMotion
-              dur={`${2.8 + k * 0.35}s`} begin={`${1.2 + k * 0.7}s`} repeatCount="indefinite"
-              path={branch(GROUP_CY(g))}
-            />
-          </circle>
-        ))}
-      </motion.g>
-    </g>
+    <p className="cs-stage">
+      <span className="cs-stage-tick" aria-hidden />
+      {children.toUpperCase()}
+    </p>
   );
 }
-
-/* ---------------------------- footnote ------------------------------------ */
-
-function Footnote() {
-  return (
-    <motion.g initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.8, delay: 2.6 }} aria-hidden>
-      <line x1={ORIGIN.x} y1={620} x2={ORIGIN.x + 22} y2={620} stroke={ORANGE} strokeOpacity={0.7} strokeWidth={1.5} strokeLinecap="round" />
-      <text x={ORIGIN.x + 32} y={623} className="bp-foot">HUMAN REVIEWED. EVERY PIECE.</text>
-    </motion.g>
-  );
-}
-
-/* ------------------------------ origin card ------------------------------- */
 
 function OriginCard() {
   return (
-    <motion.g
-      initial={{ opacity: 0, x: -16 }} animate={{ opacity: 1, x: 0 }}
-      transition={{ duration: 0.7, ease: EASE, delay: 0.15 }}
-    >
-      <rect
-        x={ORIGIN.x} y={ORIGIN.y} width={ORIGIN.w} height={ORIGIN.h} rx={22}
-        fill="url(#bpOrigin)" filter="url(#bpOriginShadow)"
-      />
-      <rect x={ORIGIN.x} y={ORIGIN.y} width={ORIGIN.w} height={ORIGIN.h} rx={22} fill="none" stroke="var(--on-accent)" strokeOpacity={0.22} strokeWidth={1} />
-      {/* mic icon chip */}
-      <circle cx={ORIGIN.x + 38} cy={ORIGIN.y + 40} r={19} fill="color-mix(in oklch, var(--on-accent) 16%, transparent)" stroke="color-mix(in oklch, var(--on-accent) 30%, transparent)" strokeWidth={1} />
-      <g fill="none" stroke="var(--on-accent)" strokeWidth={1.9} strokeLinecap="round" strokeLinejoin="round"
-        transform={`translate(${ORIGIN.x + 38 - 9} ${ORIGIN.y + 40 - 9}) scale(0.75)`}>
-        <rect x={9} y={2} width={6} height={12} rx={3} />
-        <path d="M5 10v1a7 7 0 0 0 14 0v-1M12 18v4" />
-      </g>
-      {/* REC dot */}
-      <circle cx={ORIGIN.x + ORIGIN.w - 28} cy={ORIGIN.y + 28} r={4.5} fill="var(--on-accent)" className="bp-rec" />
-      <text x={ORIGIN.x + ORIGIN.w - 38} y={ORIGIN.y + 33} textAnchor="end" className="bp-rec-label">REC</text>
-      <text x={ORIGIN.x + 24} y={ORIGIN.y + 96} className="bp-origin-t1">You Record</text>
-      <text x={ORIGIN.x + 24} y={ORIGIN.y + 122} className="bp-origin-t1">Once a Week</text>
-      <text x={ORIGIN.x + 24} y={ORIGIN.y + ORIGIN.h - 10} className="bp-origin-t2" opacity={0.75}>ONE LONG-FORM SESSION · 45 MIN</text>
-    </motion.g>
+    <div ref={useFlowNode('origin')} data-flow-node="origin" className="cs-origin">
+      <div className="flex items-start gap-4">
+        <span className="cs-origin-chip" aria-hidden>
+          <svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.9} strokeLinecap="round" strokeLinejoin="round">
+            <rect x={9} y={2} width={6} height={12} rx={3} />
+            <path d="M5 10v1a7 7 0 0 0 14 0v-1M12 18v4" />
+          </svg>
+        </span>
+        <div className="min-w-0 flex-1">
+          <p className="cs-origin-title">You Record Once a Week</p>
+          <p className="cs-origin-meta">ONE LONG-FORM SESSION · 45 MIN</p>
+        </div>
+        <span className="cs-rec">
+          <span className="cs-rec-dot" aria-hidden />
+          REC
+        </span>
+      </div>
+    </div>
   );
 }
 
-/* ---------------------------- production module --------------------------- */
-
-function ProductionModule({
-  m, i, onOpen,
-}: { m: Module; i: number; onOpen: (id: string) => void }) {
-  const y = cardY(i);
+function ProductionModule({ m, onOpen }: { m: Module; onOpen: (id: string) => void }) {
   return (
-    <motion.g
-      className="bp-mod"
-      initial={{ opacity: 0, x: 14 }} animate={{ opacity: 1, x: 0 }}
-      transition={{ duration: 0.55, ease: EASE, delay: 1.2 + i * 0.10 }}
+    <button
+      ref={useFlowNode(`m-${m.id}`)}
+      data-flow-node={`m-${m.id}`}
+      type="button"
       onClick={() => onOpen(m.serviceId)}
-      role="button"
-      tabIndex={0}
-      onKeyDown={(e) => {
-        if (e.key === 'Enter' || e.key === ' ') onOpen(m.serviceId);
-      }}
+      className="cs-mod group"
     >
-      <rect className="bp-mod-bg" x={COL.x} y={y} width={COL.w} height={COL.cardH} rx={16}
-        fill="var(--surface)" stroke={INK} strokeOpacity={0.11} filter="url(#bpCard)" />
-      {/* icon chip */}
-      <rect className="bp-mod-chip" x={COL.x + 14} y={y + 14} width={40} height={40} rx={10} fill="color-mix(in oklch, var(--on-surface) 3.5%, transparent)" />
-      <g className="bp-mod-icon" transform={`translate(${COL.x + 14 + 9} ${y + 14 + 9}) scale(0.75)`}>
+      <span className="cs-mod-chip" aria-hidden>
         <ModuleGlyph kind={m.icon} />
-      </g>
-      <text x={COL.x + 68} y={y + 30} className="bp-mod-title">{m.title}</text>
-      <text x={COL.x + 68} y={y + 50} className="bp-mod-desc">{m.desc}</text>
-      {/* status */}
-      <circle cx={COL.x + COL.w - 62} cy={y + 24} r={2.6} fill={ORANGE} className="bp-blink" style={{ animationDelay: `${i * 0.4}s` }} />
-      <text x={COL.x + COL.w - 54} y={y + 27.5} className="bp-mod-status">{m.turnaround}</text>
-      {/* open hint */}
-      <g className="bp-mod-arrow" fill="none" stroke={INK} strokeOpacity={0.3} strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round">
-        <path d={`M ${COL.x + COL.w - 28} ${y + 44} l 5 5 m 0 -5 v 5 h -5`} transform={`rotate(-90 ${COL.x + COL.w - 25} ${y + 46})`} />
-      </g>
-    </motion.g>
+      </span>
+      <span className="min-w-0 flex-1 text-left">
+        <span className="cs-mod-title">{m.title}</span>
+        <span className="cs-mod-desc">{m.desc}</span>
+      </span>
+      <span className="cs-mod-meta">
+        <span className="cs-blink cs-mod-dot" aria-hidden />
+        {m.turnaround}
+      </span>
+      <span className="cs-mod-open" aria-hidden>
+        <svg width={9} height={9} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.6} strokeLinecap="round" strokeLinejoin="round">
+          <path d="M7 17 17 7M9 7h8v8" />
+        </svg>
+      </span>
+    </button>
   );
 }
 
-/* ------------------------------ output groups ----------------------------- */
-
-function OutputGroupCard({ g, i }: { g: OutputGroup; i: number }) {
-  const n = g.items.length;
-  const gap = n === 4 ? 46 : n === 3 ? 60 : 72;
-  const startX = GROUP_X + (GROUP_W - (n - 1) * gap) / 2;
-  const chipCY = g.y + g.h / 2 + 12;
+function RoutingNode() {
   return (
-    <motion.g
-      className="bp-group"
-      initial={{ opacity: 0, x: 14 }} animate={{ opacity: 1, x: 0 }}
-      transition={{ duration: 0.6, ease: EASE, delay: 2.0 + i * 0.12 }}
-    >
-      <rect x={GROUP_X} y={g.y} width={GROUP_W} height={g.h} rx={18}
-        fill="color-mix(in oklch, var(--on-surface) 1.4%, transparent)" stroke={INK} strokeOpacity={0.09} strokeDasharray="3 5" />
-      <circle cx={GROUP_X + 18} cy={g.y + 22} r={2.8} fill={ORANGE} />
-      <text x={GROUP_X + 30} y={g.y + 26} className="bp-group-title">{g.label.toUpperCase()}</text>
-      <text x={GROUP_X + GROUP_W - 16} y={g.y + 26} textAnchor="end" className="bp-group-count">{g.count}</text>
-      {g.items.map((item, k) => {
-        const cx = startX + k * gap;
-        return (
-          <g key={item.name} className="bp-chip" style={{ ['--brand' as string]: item.brand }}>
-            <circle cx={cx} cy={chipCY} r={18} fill="var(--surface)" stroke={INK} strokeOpacity={0.11} filter="url(#bpCard)" />
-            <g className="bp-chip-glyph" transform={`translate(${cx - 8} ${chipCY - 8}) scale(0.667)`}>
+    /* The label sits BESIDE the node, not under it. Under it is exactly where
+       the fan leaves for the left gutter, and a caption with a wire drawn
+       through it reads as a rendering bug. */
+    <div className="relative flex items-center justify-center py-14">
+      <span ref={useFlowNode('routing')} data-flow-node="routing" className="cs-junction" aria-hidden>
+        <span className="cs-junction-ring" />
+        <span className="cs-junction-core" />
+      </span>
+      {/* Absolute, so the node itself stays exactly on the column's centre
+          line — every wire in this diagram is aimed at that line. */}
+      <span className="cs-junction-label absolute left-1/2 ml-5 whitespace-nowrap">SMART ROUTING</span>
+    </div>
+  );
+}
+
+function OutputGroupCard({ g }: { g: OutputGroup }) {
+  return (
+    <div ref={useFlowNode(`g-${g.id}`)} data-flow-node={`g-${g.id}`} className="cs-group">
+      <div className="mb-3 flex items-center gap-2">
+        <span className="cs-group-tick" aria-hidden />
+        <span className="cs-group-title">{g.label.toUpperCase()}</span>
+        <span className="cs-group-count">{g.count}</span>
+      </div>
+      <div className="flex flex-wrap items-start gap-x-5 gap-y-3">
+        {g.items.map((item) => (
+          <span key={item.name} className="cs-chip" style={{ ['--brand' as string]: item.brand }}>
+            <span className="cs-chip-ring" aria-hidden>
               <ChipGlyph item={item} />
-            </g>
-            <text x={cx} y={chipCY + 33} textAnchor="middle" className="bp-chip-label">{item.name}</text>
-          </g>
-        );
-      })}
-    </motion.g>
+            </span>
+            <span className="cs-chip-label">{item.name}</span>
+          </span>
+        ))}
+      </div>
+    </div>
   );
 }
 
 /* --------------------------------- slide ---------------------------------- */
 
 export default function OrbitSlide({ onOpenService }: { onOpenService: (id: string) => void }) {
+  const paths = useCallback((n: FlowNodes, size: FlowSize) => contentPaths(n, size), []);
+
   return (
-    <div className="w-full flex flex-col items-center">
-      <div className="relative w-full max-w-[1200px]">
-        <svg
-          viewBox={`0 0 ${VB.w} ${VB.h}`}
-          className="block h-auto w-full"
-          role="img"
-          aria-label="One in, nine out. You record once a week and SlideIn produces show notes, an edited episode, a thumbnail, short clips, full articles and LinkedIn posts — then smart routing sends them to nine destinations across video and audio, social, and owned channels."
-        >
-          <defs>
-            <pattern id="bpDots" width="28" height="28" patternUnits="userSpaceOnUse">
-              <circle cx="1" cy="1" r="1" fill="color-mix(in oklch, var(--on-surface) 4.5%, transparent)" />
-            </pattern>
-            <linearGradient id="bpOrigin" x1="0" y1="0" x2="1" y2="1">
-              <stop offset="0%" stopColor="var(--color-brand-lift)" />
-              <stop offset="55%" stopColor={ORANGE} />
-              <stop offset="100%" stopColor="var(--color-ember)" />
-            </linearGradient>
-            <filter id="bpOriginShadow" x="-40%" y="-40%" width="180%" height="180%">
-              <feDropShadow dx="0" dy="14" stdDeviation="18" floodColor="var(--color-ember)" floodOpacity="0.28" />
-            </filter>
-            <filter id="bpCard" x="-30%" y="-30%" width="160%" height="160%">
-              <feDropShadow dx="0" dy="4" stdDeviation="7" floodColor={INK} floodOpacity="0.07" />
-            </filter>
-          </defs>
+    <div className="cs w-full max-w-165">
+      <h3 className="font-display-md mb-8 text-[clamp(1.6rem,4vw,2.4rem)] text-(--on-surface)">
+        One in. Nine out.
+      </h3>
 
-          {/* canvas texture */}
-          <rect width={VB.w} height={VB.h} fill="url(#bpDots)" opacity={0.7} />
-          <BlueprintChrome />
-          <Title />
-          <SectionLabels />
+      <FlowCanvas paths={paths} stackClassName="px-8 sm:px-12 md:px-14">
+        <StageLabel>01 · Origin</StageLabel>
+        <OriginCard />
 
-          <Connectors />
-          <OriginCard />
-          {PIPELINE.map((m, i) => (
-            <ProductionModule key={m.id} m={m} i={i} onOpen={onOpenService} />
+        <div className="mt-19">
+          <StageLabel>02 · Production</StageLabel>
+          <div className="flex flex-col gap-3">
+            {PIPELINE.map((m) => (
+              <ProductionModule key={m.id} m={m} onOpen={onOpenService} />
+            ))}
+          </div>
+        </div>
+
+        <RoutingNode />
+
+        <StageLabel>03 · Publish</StageLabel>
+        <div className="flex flex-col gap-4">
+          {OUTPUTS.map((g) => (
+            <OutputGroupCard key={g.id} g={g} />
           ))}
-          {OUTPUTS.map((g, i) => (
-            <OutputGroupCard key={g.id} g={g} i={i} />
-          ))}
-          <Footnote />
-        </svg>
-      </div>
+        </div>
 
-      {/* scoped styles */}
+        <p className="cs-foot">
+          <span className="cs-foot-rule" aria-hidden />
+          HUMAN REVIEWED. EVERY PIECE.
+        </p>
+      </FlowCanvas>
+
       <style>{`
-        .bp-title {
-          font-family: var(--font-display);
-          font-size: 42px;
-          font-weight: var(--font-weight-display-md);
-          letter-spacing: var(--tracking-display-md);
-          fill: ${INK};
-          font-variation-settings: 'opsz' var(--opsz-display-md), 'SOFT' 8, 'WONK' 0;
+        /* ── stage labels ───────────────────────────────────────────────── */
+        .cs .cs-stage {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          margin-bottom: 14px;
+          font-size: 9.5px;
+          font-weight: 700;
+          letter-spacing: .22em;
+          color: color-mix(in oklch, var(--on-surface) 38%, transparent);
+        }
+        .cs .cs-stage-tick {
+          width: 2px;
+          height: 10px;
+          border-radius: var(--radius-pill);
+          background: color-mix(in oklch, var(--accent-vivid) 80%, transparent);
         }
 
-        .bp-section { font-size: 9.5px; letter-spacing: .22em; fill: color-mix(in oklch, var(--on-surface) 38%, transparent); font-weight: 700; }
-        .bp-foot { font-size: 9px; letter-spacing: .2em; fill: color-mix(in oklch, var(--on-surface) 42%, transparent); font-weight: 700; }
-        .bp-stage { font-size: 8px; letter-spacing: .2em; fill: color-mix(in oklch, var(--on-surface) 40%, transparent); font-weight: 700; }
+        /* ── the origin ─────────────────────────────────────────────────── */
+        .cs .cs-origin {
+          position: relative;
+          border-radius: var(--radius-md);
+          padding: 20px;
+          background: linear-gradient(135deg, var(--color-brand-lift), var(--accent-vivid) 55%, var(--color-ember));
+          box-shadow: 0 14px 30px color-mix(in oklch, var(--color-ember) 26%, transparent);
+          border: 1px solid color-mix(in oklch, var(--on-accent) 22%, transparent);
+        }
+        .cs .cs-origin-chip {
+          display: grid;
+          place-items: center;
+          flex: none;
+          width: 42px;
+          height: 42px;
+          border-radius: var(--radius-pill);
+          background: color-mix(in oklch, var(--on-accent) 16%, transparent);
+          border: 1px solid color-mix(in oklch, var(--on-accent) 30%, transparent);
+          color: var(--on-accent);
+        }
+        .cs .cs-origin-title {
+          font-size: clamp(1.05rem, 3vw, 1.35rem);
+          font-weight: 800;
+          letter-spacing: -0.01em;
+          color: var(--on-accent);
+        }
+        .cs .cs-origin-meta {
+          margin-top: 6px;
+          font-size: 8.5px;
+          font-weight: 600;
+          letter-spacing: .18em;
+          color: color-mix(in oklch, var(--on-accent) 78%, transparent);
+        }
+        .cs .cs-rec {
+          display: inline-flex;
+          align-items: center;
+          gap: 6px;
+          flex: none;
+          font-size: 8px;
+          font-weight: 700;
+          letter-spacing: .2em;
+          color: color-mix(in oklch, var(--on-accent) 80%, transparent);
+        }
+        .cs .cs-rec-dot {
+          width: 7px;
+          height: 7px;
+          border-radius: var(--radius-pill);
+          background: var(--on-accent);
+          animation: csRec 1.8s ease-in-out infinite;
+        }
 
-        .bp-origin-t1 { font-size: 21px; font-weight: 800; fill: var(--on-accent); letter-spacing: -0.01em; }
-        .bp-origin-t2 { font-size: 8.5px; font-weight: 600; fill: var(--on-accent); letter-spacing: .18em; }
-        .bp-rec-label { font-size: 8px; font-weight: 700; fill: color-mix(in oklch, var(--on-accent) 80%, transparent); letter-spacing: .2em; }
+        /* ── production modules ─────────────────────────────────────────── */
+        .cs .cs-mod {
+          position: relative;
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          width: 100%;
+          padding: 12px 14px;
+          border-radius: var(--radius-md);
+          background: var(--surface);
+          border: 1px solid color-mix(in oklch, var(--on-surface) 11%, transparent);
+          box-shadow: 0 4px 12px color-mix(in oklch, var(--on-surface) 6%, transparent);
+          cursor: pointer;
+          transition: border-color var(--dur-base) var(--ease-expo),
+                      box-shadow var(--dur-base) var(--ease-expo),
+                      transform var(--dur-base) var(--ease-expo);
+        }
+        .cs .cs-mod:hover {
+          border-color: color-mix(in oklch, var(--accent-vivid) 55%, transparent);
+          box-shadow: 0 8px 20px color-mix(in oklch, var(--accent-vivid) 10%, transparent);
+          transform: translateY(-2px);
+        }
+        .cs .cs-mod-chip {
+          display: grid;
+          place-items: center;
+          flex: none;
+          width: 38px;
+          height: 38px;
+          border-radius: 11px;
+          background: color-mix(in oklch, var(--on-surface) 3.5%, transparent);
+          color: color-mix(in oklch, var(--on-surface) 70%, transparent);
+          transition: background var(--dur-base) var(--ease-expo), color var(--dur-base) var(--ease-expo);
+        }
+        .cs .cs-mod:hover .cs-mod-chip { background: color-mix(in oklch, var(--accent-vivid) 9%, transparent); color: var(--accent-vivid); }
+        .cs .cs-mod-title { display: block; font-size: 13.5px; font-weight: 800; color: var(--on-surface); }
+        .cs .cs-mod-desc { display: block; margin-top: 2px; font-size: 10.5px; font-weight: 500; color: color-mix(in oklch, var(--on-surface) 45%, transparent); }
+        .cs .cs-mod-meta {
+          display: inline-flex;
+          align-items: center;
+          gap: 6px;
+          flex: none;
+          font-size: 8px;
+          font-weight: 700;
+          letter-spacing: .16em;
+          font-variant-numeric: tabular-nums;
+          color: color-mix(in oklch, var(--on-surface) 35%, transparent);
+        }
+        .cs .cs-mod-dot { width: 5px; height: 5px; border-radius: var(--radius-pill); background: var(--accent-vivid); }
+        .cs .cs-mod-open {
+          display: grid;
+          place-items: center;
+          flex: none;
+          width: 18px;
+          height: 18px;
+          border-radius: 6px;
+          border: 1px solid var(--rule-strong);
+          color: color-mix(in oklch, var(--on-surface) 40%, transparent);
+          transition: all var(--dur-base) var(--ease-expo);
+        }
+        .cs .cs-mod:hover .cs-mod-open {
+          border-color: color-mix(in oklch, var(--accent-vivid) 60%, transparent);
+          background: color-mix(in oklch, var(--accent-vivid) 10%, transparent);
+          color: var(--accent-vivid);
+        }
 
-        .bp-mod { cursor: pointer; }
-        .bp-mod-bg, .bp-mod-chip, .bp-mod-icon, .bp-mod-arrow { transition: all .3s cubic-bezier(.22,1,.36,1); }
-        .bp-mod-icon { color: color-mix(in oklch, var(--on-surface) 70%, transparent); }
-        .bp-mod:hover .bp-mod-bg { stroke: ${ORANGE}; stroke-opacity: .55; }
-        .bp-mod:hover .bp-mod-chip { fill: color-mix(in oklch, var(--accent-vivid) 9%, transparent); }
-        .bp-mod:hover .bp-mod-icon { color: ${ORANGE}; }
-        .bp-mod:hover .bp-mod-arrow { stroke: ${ORANGE}; stroke-opacity: .8; }
-        .bp-mod-title { font-size: 13px; font-weight: 800; fill: ${INK}; }
-        .bp-mod-desc { font-size: 10px; fill: color-mix(in oklch, var(--on-surface) 45%, transparent); font-weight: 500; }
-        .bp-mod-status { font-size: 8px; letter-spacing: .16em; fill: color-mix(in oklch, var(--on-surface) 35%, transparent); font-weight: 700; }
+        /* ── routing junction ───────────────────────────────────────────── */
+        .cs .cs-junction { position: relative; display: grid; place-items: center; width: 28px; height: 28px; }
+        .cs .cs-junction-ring {
+          position: absolute;
+          inset: 0;
+          border-radius: var(--radius-pill);
+          border: 1px dashed color-mix(in oklch, var(--accent-vivid) 38%, transparent);
+          background: var(--surface);
+          animation: csSpin 14s linear infinite;
+        }
+        .cs .cs-junction-core {
+          position: relative;
+          width: 10px;
+          height: 10px;
+          border-radius: var(--radius-pill);
+          background: var(--accent-vivid);
+          filter: drop-shadow(0 0 3px color-mix(in oklch, var(--accent-vivid) 55%, transparent));
+        }
+        .cs .cs-junction-label {
+          font-size: 8px;
+          font-weight: 700;
+          letter-spacing: .2em;
+          color: color-mix(in oklch, var(--on-surface) 40%, transparent);
+        }
 
-        .bp-group-title { font-size: 9.5px; letter-spacing: .2em; fill: color-mix(in oklch, var(--on-surface) 55%, transparent); font-weight: 800; }
-        .bp-group-count { font-size: 9.5px; letter-spacing: .12em; fill: color-mix(in oklch, var(--on-surface) 25%, transparent); font-weight: 700; }
-        .bp-chip-glyph { color: color-mix(in oklch, var(--on-surface) 60%, transparent); transition: color .3s ease; }
-        .bp-chip { cursor: default; }
-        .bp-chip:hover .bp-chip-glyph { color: var(--brand); }
-        .bp-chip > circle { transition: transform .3s cubic-bezier(.22,1,.36,1); transform-box: fill-box; transform-origin: center; }
-        .bp-chip:hover > circle { transform: scale(1.1); }
-        .bp-chip-label { font-size: 8.5px; fill: color-mix(in oklch, var(--on-surface) 50%, transparent); font-weight: 600; letter-spacing: .03em; }
+        /* ── destination groups ─────────────────────────────────────────── */
+        .cs .cs-group {
+          border-radius: var(--radius-md);
+          padding: 16px 18px;
+          background: color-mix(in oklch, var(--on-surface) 1.4%, transparent);
+          border: 1px dashed color-mix(in oklch, var(--on-surface) 12%, transparent);
+        }
+        .cs .cs-group-tick { width: 6px; height: 6px; border-radius: var(--radius-pill); background: var(--accent-vivid); }
+        .cs .cs-group-title { font-size: 9.5px; font-weight: 800; letter-spacing: .2em; color: color-mix(in oklch, var(--on-surface) 55%, transparent); }
+        .cs .cs-group-count {
+          margin-left: auto;
+          font-size: 9.5px;
+          font-weight: 700;
+          letter-spacing: .12em;
+          font-variant-numeric: tabular-nums;
+          color: color-mix(in oklch, var(--on-surface) 25%, transparent);
+        }
+        .cs .cs-chip { display: inline-flex; flex-direction: column; align-items: center; gap: 6px; width: 62px; }
+        .cs .cs-chip-ring {
+          display: grid;
+          place-items: center;
+          width: 38px;
+          height: 38px;
+          border-radius: var(--radius-pill);
+          background: var(--surface);
+          border: 1px solid color-mix(in oklch, var(--on-surface) 11%, transparent);
+          box-shadow: 0 4px 10px color-mix(in oklch, var(--on-surface) 6%, transparent);
+          color: color-mix(in oklch, var(--on-surface) 60%, transparent);
+          transition: transform var(--dur-base) var(--ease-expo), color var(--dur-base) var(--ease-expo);
+        }
+        .cs .cs-chip:hover .cs-chip-ring { transform: scale(1.1); color: var(--brand); }
+        .cs .cs-chip-label {
+          font-size: 8.5px;
+          font-weight: 600;
+          letter-spacing: .03em;
+          text-align: center;
+          color: color-mix(in oklch, var(--on-surface) 50%, transparent);
+        }
 
-        .bp-glow { filter: drop-shadow(0 0 3px color-mix(in oklch, var(--accent-vivid) 55%, transparent)); }
-        .bp-spin { transform-box: fill-box; transform-origin: center; animation: bpSpin 14s linear infinite; }
-        @keyframes bpSpin { to { transform: rotate(360deg); } }
-        .bp-rec { transform-box: fill-box; transform-origin: center; animation: bpRec 1.8s ease-in-out infinite; }
-        @keyframes bpRec { 0%,100% { opacity: 1; } 50% { opacity: .3; } }
-        .bp-blink { animation: bpBlink 2.2s ease-in-out infinite; }
-        @keyframes bpBlink { 0%,100% { opacity: 1; } 50% { opacity: .25; } }
+        /* ── footnote ───────────────────────────────────────────────────── */
+        .cs .cs-foot {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          margin-top: 28px;
+          font-size: 9px;
+          font-weight: 700;
+          letter-spacing: .2em;
+          color: color-mix(in oklch, var(--on-surface) 42%, transparent);
+        }
+        .cs .cs-foot-rule { width: 22px; height: 1.5px; border-radius: var(--radius-pill); background: color-mix(in oklch, var(--accent-vivid) 70%, transparent); }
+
+        .cs .cs-blink { animation: csBlink 2.2s ease-in-out infinite; }
+        @keyframes csBlink { 0%,100% { opacity: 1; } 50% { opacity: .25; } }
+        @keyframes csRec { 0%,100% { opacity: 1; } 50% { opacity: .3; } }
+        @keyframes csSpin { to { transform: rotate(360deg); } }
 
         @media (prefers-reduced-motion: reduce) {
-          .bp-spin, .bp-rec, .bp-blink { animation: none; }
+          .cs .cs-blink, .cs .cs-rec-dot, .cs .cs-junction-ring { animation: none; }
         }
       `}</style>
     </div>
