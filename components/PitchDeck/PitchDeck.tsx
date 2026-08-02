@@ -32,10 +32,11 @@ import FrameworkFlowSlide from '@/components/PitchDeck/FrameworkFlowSlide';
 import OrbitSlide from '@/components/PitchDeck/OrbitSlide';
 import OutreachOSSlide from '@/components/PitchDeck/OutreachOSSlide';
 import GrowthLoopSlide from '@/components/PitchDeck/GrowthLoopSlide';
-import WeeklyCalendarSlide from '@/components/PitchDeck/WeeklyCalendarSlide';
 import PipelineSlide from '@/components/PitchDeck/PipelineSlide';
 import InputSlide from '@/components/PitchDeck/InputSlide';
 import TheWeekSlide from '@/components/PitchDeck/TheWeekSlide';
+import AlternativeSlide from '@/components/PitchDeck/AlternativeSlide';
+import CompoundSlide from '@/components/PitchDeck/CompoundSlide';
 
 const EASE = [0.16, 1, 0.3, 1] as const;
 
@@ -465,113 +466,85 @@ function Slide6() {
   );
 }
 
-/* ── Slide 7 — What This Replaces ─────────────────────────────────────── */
-const REPLACED_ROLES: { icon: IconType; label: string }[] = [
-  { icon: EpisodeIcon, label: 'Video Editor' },
-  { icon: PodcastIcon, label: 'Podcast Producer' },
-  { icon: WriteIcon, label: 'Copywriter' },
-  { icon: ArticleIcon, label: 'Social Manager' },
-  { icon: ResearchIcon, label: 'Lead Researcher' },
-  { icon: SendIcon, label: 'Outreach Specialist' },
-];
-
-function Slide7() {
-  return (
-    <motion.div
-      variants={containerVariants}
-      initial="hidden"
-      animate="visible"
-      className="w-full h-full flex flex-col items-center justify-center gap-0.5"
-    >
-      <motion.div variants={itemVariants}>
-        <Eyebrow>What This Replaces</Eyebrow>
-      </motion.div>
-      <motion.div variants={itemVariants} className="w-full flex justify-center">
-        <Pill icon={AgencyIcon}>What It Takes To Do This Any Other Way</Pill>
-      </motion.div>
-      <Connector />
-      <motion.div variants={itemVariants} className="w-full flex justify-center">
-        <CardShell icon={AgencyIcon} title="Five People, Never Talking to Each Other" wide>
-          <div className="grid grid-cols-3 sm:grid-cols-6 gap-2 md:gap-4">
-            {REPLACED_ROLES.map((r) => (
-              <RoleChip key={r.label} icon={r.icon} label={r.label} />
-            ))}
-          </div>
-        </CardShell>
-      </motion.div>
-      <Connector />
-      <motion.div variants={itemVariants} className="w-full flex justify-center">
-        <Pill icon={LoopIcon} tone="accent">
-          One Loop. Zero Coordination.
-        </Pill>
-      </motion.div>
-    </motion.div>
-  );
+/* ── Slide 7.5 — The Compound ─────────────────────────────────────────── */
+function SlideCompound() {
+  return <CompoundSlide />;
 }
 
-/* ── Slide 8 — The Weekly Output ──────────────────────────────────────── */
-const WEEK: { day: string; label: string; icon: IconType; type: string }[] = [
-  { day: 'MON', label: 'Monday', icon: LinkedInIcon, type: 'LinkedIn Post' },
-  { day: 'TUE', label: 'Tuesday', icon: ClipIcon, type: 'Short Clip' },
-  { day: 'WED', label: 'Wednesday', icon: YoutubeIcon, type: 'YouTube Short' },
-  { day: 'THU', label: 'Thursday', icon: LinkedInIcon, type: 'LinkedIn Post' },
-  { day: 'FRI', label: 'Friday', icon: ArticleIcon, type: 'Full Article' },
-  { day: 'SAT', label: 'Saturday', icon: PodcastIcon, type: 'Podcast Episode' },
-  { day: 'SUN', label: 'Sunday', icon: LinkedInIcon, type: 'LinkedIn Post' },
-];
-
-function Slide8() {
-  return (
-    <motion.div
-      variants={containerVariants}
-      initial="hidden"
-      animate="visible"
-      className="w-full h-full flex flex-col items-center justify-center"
-    >
-      <motion.div variants={itemVariants} className="w-full">
-        <WeeklyCalendarSlide />
-      </motion.div>
-    </motion.div>
-  );
+/* ── Slide 7 — The Alternative ─────────────────────────────────────────────
+   Was "What This Replaces": a grey card of six circled icons under a headline
+   that claimed five, between two pills joined by dashed lines that connected
+   nothing. Both pills are now column headers and the connectors are gone. The
+   role list grew to seven — Content Strategist joins it now that SlideIn sells
+   ideation and scripting — and every role carries a price. See
+   AlternativeSlide.tsx. */
+function Slide7() {
+  return <AlternativeSlide />;
 }
 
 /* ── Slide 9 — The Close ──────────────────────────────────────────────── */
-function Slide9({ onSeeFramework }: { onSeeFramework: () => void }) {
+function Slide9({ onRestart }: { onRestart: () => void }) {
   return (
     <motion.div
       variants={containerVariants}
       initial="hidden"
       animate="visible"
       className="w-full h-full flex flex-col items-center justify-center text-center gap-4 md:gap-5 px-2"
+      style={{ background: 'var(--color-paper-25)', color: 'var(--color-ink)' }}
     >
+      {/* loop at rest */}
       <motion.div variants={itemVariants}>
-        <RingArt />
+        <svg viewBox="0 0 400 300" className="w-24 h-auto md:w-32" fill="none" aria-hidden>
+          <defs>
+            <filter id="closeGlow">
+              <feDropShadow dx="0" dy="0" stdDeviation="3" floodColor="var(--accent-vivid)" floodOpacity="0.6" />
+            </filter>
+          </defs>
+          <path
+            d="M 200 80 C 280 80, 280 220, 200 220 C 120 220, 120 80, 200 80"
+            fill="none"
+            stroke="var(--color-ink)"
+            strokeOpacity="0.2"
+            strokeWidth="1"
+          />
+          <circle r={3.5} fill="var(--accent-vivid)" filter="url(#closeGlow)">
+            <animateMotion
+              path="M 200 80 C 280 80, 280 220, 200 220 C 120 220, 120 80, 200 80"
+              dur="2s"
+              fill="freeze"
+              begin="0.3s"
+            />
+          </circle>
+        </svg>
       </motion.div>
-      <motion.p variants={itemVariants} className="text-[11px] md:text-xs font-bold tracking-[0.2em] uppercase text-[var(--accent)]">
-        The Founder Momentum Playbook
-      </motion.p>
-      <motion.h2 variants={itemVariants} className="display-headline text-[clamp(1.7rem,3.8vw,2.9rem)] text-[var(--on-surface)] max-w-2xl">
-        Record once. Let <span className="text-[var(--accent)]">momentum</span> do the rest.
+
+      {/* headline */}
+      <motion.h2 variants={itemVariants} className="display-headline text-[clamp(1.7rem,3.8vw,2.9rem)] max-w-2xl" style={{ color: 'var(--color-ink)' }}>
+        Record once.<br />
+        Let <span style={{ color: 'var(--accent-vivid)' }}>momentum</span> do the rest.
       </motion.h2>
-      <motion.p variants={itemVariants} className="text-base md:text-lg text-[var(--muted)] max-w-xl leading-relaxed">
-        Content published. The right people reaching out. Every single week, without you touching either.
-      </motion.p>
+
+      {/* buttons */}
       <motion.div variants={itemVariants} className="flex flex-wrap items-center justify-center gap-3 mt-2">
+        <Link href="/pricing">
+          <button
+            type="button"
+            className="inline-flex items-center gap-2 px-6 py-3 text-sm font-bold rounded-full cursor-pointer transition-all duration-300 shadow-md hover:shadow-lg hover:-translate-y-0.5"
+            style={{ background: 'var(--accent-vivid)', color: 'var(--on-accent)' }}
+          >
+            Talk to us
+            <ArrowIcon size={16} />
+          </button>
+        </Link>
         <button
           type="button"
-          onClick={onSeeFramework}
-          className="inline-flex items-center gap-2 px-6 py-3 text-sm font-bold text-[var(--on-accent)] bg-[var(--accent-vivid)] rounded-full hover:bg-[var(--surface-2)] hover:text-[var(--on-surface)] transition-all duration-300 shadow-md hover:shadow-lg hover:-translate-y-0.5 cursor-pointer"
+          onClick={onRestart}
+          className="inline-flex items-center gap-1.5 px-4 py-3 text-sm font-bold transition-colors duration-300 cursor-pointer hover:opacity-80"
+          style={{ color: 'var(--color-slate-600)' }}
         >
-          See The Full Framework
-          <ChevronRight size={16} className="rotate-90" />
+          <LoopIcon size={16} />
+          Start again
         </button>
-        <Link
-          href="/pricing"
-          className="inline-flex items-center gap-1.5 px-4 py-3 text-sm font-bold text-[var(--muted)] hover:text-[var(--on-surface)] transition-colors duration-300"
-        >
-          Talk to us
-          <ArrowIcon size={16} />
-        </Link>
       </motion.div>
     </motion.div>
   );
@@ -580,20 +553,17 @@ function Slide9({ onSeeFramework }: { onSeeFramework: () => void }) {
 /* ── Carousel shell ────────────────────────────────────────────────────── */
 
 const SLIDE_META = [
-  { kicker: 'The Input' },
-  { kicker: 'The Complete Framework' },
-  { kicker: 'The Week' },
-  { kicker: 'The Content System' },
-  { kicker: 'The Outreach System' },
-  { kicker: 'The System, Running' },
-  { kicker: "Why It's One System" },
-  { kicker: 'What This Replaces' },
-  { kicker: 'The Weekly Output' },
-  { kicker: 'The Close' },
+  { kicker: 'The Input', number: '01' },
+  { kicker: 'The Complete Framework', number: '02' },
+  { kicker: 'The Week', number: '03' },
+  { kicker: 'The Content System', number: '04' },
+  { kicker: 'The Outreach System', number: '05' },
+  { kicker: 'The System, Running', number: '06' },
+  { kicker: "Why It's One System", number: '07' },
+  { kicker: 'The Compound', number: '07.5' },
+  { kicker: 'The Alternative', number: '08' },
+  { kicker: 'The Close', number: '09' },
 ];
-
-/** Two-digit slide numbering. `0{n}` was hardcoded and broke at ten slides. */
-const pad = (n: number) => String(n).padStart(2, '0');
 
 /* ── THE THREAD ────────────────────────────────────────────────────────────
    Slide 01 ends with a dot detaching from the rule under "45" and leaving the
@@ -697,8 +667,9 @@ export default function PitchDeck() {
     setTimeout(() => setModalServiceId(undefined), 300);
   }, []);
 
-  const scrollToFramework = useCallback(() => {
-    document.getElementById('framework')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  const restartDeck = useCallback(() => {
+    setDirection(-1);
+    setIndex(0);
   }, []);
 
   const toggleFullscreen = useCallback(async () => {
@@ -734,11 +705,11 @@ export default function PitchDeck() {
       <Slide5 key="s5" />,
       <SlidePipeline key="s-pipeline" />,
       <Slide6 key="s6" />,
+      <SlideCompound key="s-compound" />,
       <Slide7 key="s7" />,
-      <Slide8 key="s8" />,
-      <Slide9 key="s9" onSeeFramework={scrollToFramework} />,
+      <Slide9 key="s9" onRestart={restartDeck} />,
     ],
-    [openService, scrollToFramework]
+    [openService, restartDeck]
   );
 
   return (
@@ -801,7 +772,7 @@ export default function PitchDeck() {
             </AnimatePresence>
             <div className="flex items-center gap-3">
               <span className="text-[11px] md:text-xs font-bold text-[var(--muted)] tabular-nums">
-                {pad(index + 1)} / {pad(total)}
+                {SLIDE_META[index].number} / 10
               </span>
               {/* Fullscreen toggle */}
               <button
@@ -822,7 +793,7 @@ export default function PitchDeck() {
                 key={i}
                 type="button"
                 onClick={() => goTo(i)}
-                aria-label={`Go to slide ${i + 1}`}
+                aria-label={`Go to slide ${Number(SLIDE_META[i].number)}`}
                 className="relative h-1 flex-1 rounded-full overflow-hidden cursor-pointer bg-[var(--rule)]"
               >
                 <motion.span

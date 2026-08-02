@@ -534,7 +534,7 @@ export default function FrameworkFlowSlide() {
         viewBox={`0 0 ${VB.w} ${VB.h}`}
         className="block h-auto w-full"
         role="img"
-        aria-label="Two systems, one loop. A content system (SlideIn writes the ideation and script, you record once, then content production and multi-platform presence) and an outreach system (you discuss your ICP, SlideIn researches your ideal client, then manual outreach and qualified conversations) converge into one outcome — more clients, faster, across six hands-off stages."
+        aria-label="Two systems, one loop. A content system (SlideIn writes the ideation and script, you record once, then content production and multi-platform presence) and an outreach system (SlideIn researches your ideal client, you tell us once, then manual outreach and qualified conversations) converge into one outcome — more clients, faster, across six hands-off stages."
       >
         <defs>
           <pattern id="fwDots" width="26" height="26" patternUnits="userSpaceOnUse">

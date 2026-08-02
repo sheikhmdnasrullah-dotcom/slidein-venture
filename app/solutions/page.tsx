@@ -8,6 +8,7 @@ import { buttonVariants } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { ArrowRight01Icon as ChevronRight, CheckmarkCircle01Icon as CheckCircle2, ArrowRight02Icon as ArrowRight, PlayIcon as Play, SparklesIcon as Sparkles, FlashIcon as Zap, GlobeIcon as Globe, Chart01Icon as BarChart3, Shield01Icon as Shield, RocketIcon as Rocket, GroupLayersIcon as Layers, Flowchart01Icon as Workflow } from 'hugeicons-react';
 import DistributionSlide from '@/components/PitchDeck/DistributionSlide';
+import TheWeekSlide from '@/components/PitchDeck/TheWeekSlide';
 
 /* Two names for one orange, and the split is load-bearing:
    --accent       the instance that clears 4.5:1 as TEXT on the current band
@@ -498,6 +499,13 @@ export default function SolutionsPage() {
               </motion.div>
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* ── Calendar Preview ─────────────────────────────────────────── */}
+      <section className="py-24">
+        <div className="max-w-[1100px] mx-auto px-6 md:px-10">
+          <TheWeekSlide />
         </div>
       </section>
 

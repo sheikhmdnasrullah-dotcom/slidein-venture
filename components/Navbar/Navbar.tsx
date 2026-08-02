@@ -4,7 +4,6 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import LetsTalkButton from './LetsTalkButton';
-import { LogoWordmark } from '@/components/Brand/Logo';
 import ThemeToggle from '@/components/Theme/ThemeToggle';
 
 const navLinks = [
@@ -54,18 +53,20 @@ export default function Navbar() {
           animate={{ y: 0, opacity: 1, scale: scrolled ? 0.955 : 1 }}
           transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
         >
-          {/* ── Logo Pill ──────────────────────────────────────────────── */}
+          {/* ── Home Pill ──────────────────────────────────────────────── */}
           <Link
             href="/"
-            className="group flex h-[48px] flex-shrink-0 items-center rounded-full px-5 transition-all duration-300 hover:bg-[var(--surface)]"
+            className="group flex h-[48px] flex-shrink-0 items-center rounded-full px-6 transition-all duration-300 hover:bg-[var(--surface)]"
             style={{
               background: 'var(--surface-glass)',
               border: '1px solid var(--rule)',
               boxShadow: 'var(--shadow-contact)',
             }}
-            aria-label="SlideIn Venture"
+            aria-label="Home"
           >
-            <LogoWordmark size="20px" />
+            <span className="text-[15px] font-[700] tracking-[0.03em] text-[var(--on-surface)] group-hover:text-[var(--accent)] transition-colors">
+              Home
+            </span>
           </Link>
 
           {/* ── Desktop Nav Links ─────────────────────────────────────── */}
