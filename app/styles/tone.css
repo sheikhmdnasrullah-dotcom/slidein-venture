@@ -161,96 +161,19 @@ html {
    numbers would have made it the flattest band on the page.
    ───────────────────────────────────────────────────────────────────────── */
 
-:root[data-theme='night'],
-:root[data-theme='night'] .tone-base {
-  --surface:       var(--color-graphite-800);
-  --surface-2:     var(--color-ink);
-  --on-surface:    var(--color-paper-50);
-  --muted:         var(--color-ash-300);
-  --faint:         color-mix(in oklch, var(--color-paper-50) 45%, transparent);
-  --rule:          color-mix(in oklch, var(--color-paper-25) 10%, transparent);
-  --rule-strong:   color-mix(in oklch, var(--color-paper-25) 18%, transparent);
-  --accent:        var(--color-brand-hi);
-  --accent-vivid:  var(--color-brand-hi);
-  --accent-wash:   color-mix(in oklch, var(--color-brand-hi) 10%, transparent);
-  --accent-ring:   color-mix(in oklch, var(--color-brand-hi) 45%, transparent);
-  --on-accent:     var(--color-ink);
-  --surface-glass: color-mix(in oklch, var(--color-graphite-800) 72%, transparent);
-  --gloss:         color-mix(in oklch, var(--color-paper-25) 7%, transparent);
-  --status-live:   var(--color-live-hi);
-  --status-info:   var(--color-info-hi);
-  --scrim:         color-mix(in oklch, var(--color-ink-deep) 78%, transparent);
-  --letterbox:     var(--color-ink-deep);
-  --bleed-to:      var(--color-graphite-900);
-  --page-fill:     var(--color-graphite-900);
-}
 
-:root[data-theme='night'] .tone-base {
-  background-color: var(--color-graphite-900);
-  color: var(--on-surface);
-}
 
-:root[data-theme='night'] .tone-raised {
-  --surface:       var(--color-graphite-700);
-  --surface-2:     var(--color-graphite-900);
-  --on-surface:    var(--color-paper-50);
-  --muted:         var(--color-ash-300);
-  --faint:         color-mix(in oklch, var(--color-paper-50) 45%, transparent);
-  --rule:          color-mix(in oklch, var(--color-paper-25) 12%, transparent);
-  --rule-strong:   color-mix(in oklch, var(--color-paper-25) 20%, transparent);
-  --accent:        var(--color-brand-hi);
-  --accent-vivid:  var(--color-brand-hi);
-  --accent-wash:   color-mix(in oklch, var(--color-brand-hi) 12%, transparent);
-  --accent-ring:   color-mix(in oklch, var(--color-brand-hi) 45%, transparent);
-  --on-accent:     var(--color-ink);
-  --surface-glass: color-mix(in oklch, var(--color-graphite-700) 72%, transparent);
-  --gloss:         color-mix(in oklch, var(--color-paper-25) 8%, transparent);
-  --status-live:   var(--color-live-hi);
-  --status-info:   var(--color-info-hi);
 
-  background-color: var(--color-graphite-800);
-  color: var(--on-surface);
 
-  --bleed-to: var(--color-graphite-800);
-}
 
-:root[data-theme='night'] .tone-anchor,
-:root[data-theme='night'] .tone-terminal {
-  --surface:       var(--color-graphite-800);
-  --surface-2:     var(--color-ink);
-  --on-surface:    var(--color-paper-25);
-  --muted:         var(--color-ash-400);
-  --faint:         color-mix(in oklch, var(--color-paper-25) 40%, transparent);
-  --rule:          color-mix(in oklch, var(--color-paper-25) 8%, transparent);
-  --rule-strong:   color-mix(in oklch, var(--color-paper-25) 16%, transparent);
-  --accent:        var(--color-brand-hi);
-  --accent-vivid:  var(--color-brand-hi);
-  --accent-wash:   color-mix(in oklch, var(--color-brand-hi) 10%, transparent);
-  --accent-ring:   color-mix(in oklch, var(--color-brand-hi) 45%, transparent);
-  --on-accent:     var(--color-ink-deep);
-  --surface-glass: color-mix(in oklch, var(--color-graphite-800) 72%, transparent);
-  --gloss:         color-mix(in oklch, var(--color-paper-25) 5%, transparent);
-  --status-live:   var(--color-live-hi);
-  --status-info:   var(--color-info-hi);
 
-  background-color: var(--color-ink-deep);
-  color: var(--on-surface);
 
-  --bleed-to: var(--color-ink-deep);
-}
 
 /* Night's anchor and terminal were both ink-deep, which merged the footer into
    the deck band into one 1,000px slab. The page now descends to its darkest at
    the anchor and settles one step back up at the footer — the same shape a
    piece of music has, and the reason the join is legible without a border. */
-:root[data-theme='night'] .tone-terminal {
-  --surface: var(--color-graphite-800);
-  --surface-2: var(--color-ink-deep);
 
-  background-color: var(--color-ink);
-
-  --bleed-to: var(--color-ink);
-}
 
 /* ─────────────────────────────────────────────────────────────────────────
    HERO — the one band with a gradient. It is the light source, so it holds
@@ -266,14 +189,7 @@ html {
   );
 }
 
-:root[data-theme='night'] .tone-hero {
-  background-image: linear-gradient(
-    to bottom,
-    var(--color-graphite-800) 0%,
-    var(--color-graphite-800) 22%,
-    var(--color-graphite-900) 100%
-  );
-}
+
 
 /* ═══ SEAM ════════════════════════════════════════════════════════════════
    A 1px optical line at the join between two bands, fading out at both ends
@@ -299,15 +215,7 @@ html {
   pointer-events: none;
 }
 
-:root[data-theme='night'] .seam-top::before {
-  background: linear-gradient(
-    to right,
-    transparent,
-    var(--color-seam) 20%,
-    var(--color-seam) 80%,
-    transparent
-  );
-}
+
 
 /* ═══ BLEED ═══════════════════════════════════════════════════════════════
    A short run-up above a band so it appears to emerge out of the one above

@@ -5,7 +5,6 @@ import Navbar from "@/components/Navbar/Navbar";
 
 import { displayFace, bodyFace, monoFace } from "./fonts";
 import { cn } from "@/lib/utils";
-import { THEME_BOOTSTRAP } from "@/components/Theme/theme";
 
 export const metadata: Metadata = {
   title: "SlideIn Venture — The AI workspace that works for you",
@@ -16,10 +15,7 @@ export const metadata: Metadata = {
    left to guess a form-control and scrollbar palette. The pre-paint script
    narrows this to the resolved one on <html>. */
 export const viewport = {
-  themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#f6f4f0" },
-    { media: "(prefers-color-scheme: dark)", color: "#16120d" },
-  ],
+  themeColor: "#f6f4f0",
 };
 
 export default function RootLayout({
@@ -44,7 +40,6 @@ export default function RootLayout({
       )}
     >
       <head>
-        <script dangerouslySetInnerHTML={{ __html: THEME_BOOTSTRAP }} />
       </head>
       {/* Roles come from the CSS layer (body { font-family: var(--font-sans) }),
           not from a face className here — that is what keeps a single place
