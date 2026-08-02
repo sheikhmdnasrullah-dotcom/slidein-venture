@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { buttonVariants } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { ArrowRight01Icon as ChevronRight, CheckmarkCircle01Icon as CheckCircle2, ArrowRight02Icon as ArrowRight, PlayIcon as Play, SparklesIcon as Sparkles, FlashIcon as Zap, GlobeIcon as Globe, Chart01Icon as BarChart3, Shield01Icon as Shield, RocketIcon as Rocket, GroupLayersIcon as Layers, Flowchart01Icon as Workflow } from 'hugeicons-react';
+import DistributionSlide from '@/components/PitchDeck/DistributionSlide';
 
 /* Two names for one orange, and the split is load-bearing:
    --accent       the instance that clears 4.5:1 as TEXT on the current band
@@ -318,6 +319,31 @@ export default function SolutionsPage() {
               </div>
             </div>
           </motion.div>
+        </div>
+      </section>
+
+      {/* ── Distribution Visual ──────────────────────────────────────── */}
+      <section className="py-24 bg-[var(--surface-2)] overflow-hidden border-y border-[var(--rule)]">
+        <div className="max-w-[1400px] mx-auto px-6 md:px-10">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: '-60px' }}
+            transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+            className="text-center mb-12"
+          >
+            <h2 className="section-headline text-[clamp(2rem,4vw,3rem)] text-[var(--on-surface)] mb-4">
+              Publishing, automated
+            </h2>
+            <p className="body-copy text-base text-[var(--muted)] max-w-[600px] mx-auto">
+              Smart routing puts your content everywhere it needs to be.
+            </p>
+          </motion.div>
+          <div className="w-full flex justify-center">
+            <div className="w-full max-w-[1200px]">
+              <DistributionSlide />
+            </div>
+          </div>
         </div>
       </section>
 
