@@ -3,7 +3,7 @@
 /**
  * THE OUTREACH SYSTEM — SlideIn Venture
  * --------------------------------------
- * A visual operating system, read left to right:
+ * A visual operating system, read top to bottom:
  *
  *   INPUT     one premium card — who you want to work with
  *   ENGINE    the Manual Outreach Engine window — six intelligent modules
@@ -12,11 +12,20 @@
  * Every module opens a Notion-style side panel with progressive disclosure:
  * overview → why it matters → what we do → mini flow → outcome.
  * White canvas, blueprint details, calm motion. Orange guides attention.
+ *
+ * THREE-PART ANIMATION (Stage 2+)
+ * Connectors are real SVG paths measured against the slide container.
+ * Line draw + travelling pulse are scroll-scrubbed via GSAP ScrollTrigger.
+ * Card pop-in uses discrete scroll thresholds with springy easing.
  */
 
-import { useState } from 'react';
+import { useRef, useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { cn } from '@/lib/utils';
+
+gsap.registerPlugin(ScrollTrigger);
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 
@@ -158,8 +167,8 @@ function Connector({ delay = 0 }: { delay?: number }) {
  *  row. Stacked, each label belongs to the block underneath it. */
 function StageLabel({ children }: { children: string }) {
   return (
-    <p className="mb-3 flex items-center gap-2" aria-hidden>
-      <span className="h-2.5 w-[2px] rounded-full bg-[color-mix(in_oklch,var(--accent-vivid)_80%,transparent)]" />
+    <p className="mb-3 flex items-center gap-2">
+      <span className="h-2.5 w-[2px] rounded-full bg-[color-mix(in_oklch,var(--accent-vivid)_80%,transparent)]" aria-hidden />
       <span className="text-[8.5px] font-bold tracking-[0.22em] text-(--muted) uppercase">
         {children.toUpperCase()}
       </span>
@@ -169,11 +178,10 @@ function StageLabel({ children }: { children: string }) {
 
 /* ------------------------------ left panel -------------------------------- */
 
-function InputPanel() {
+function InputPanel({ innerRef }: { innerRef?: React.Ref<HTMLDivElement> }) {
   return (
     <motion.div
-      initial={{ opacity: 0, x: -16 }} animate={{ opacity: 1, x: 0 }}
-      transition={{ duration: 0.6, ease: EASE, delay: 0.1 }}
+      ref={innerRef}
       className="os-panel relative w-full shrink-0 p-4"
     >
       <p className="text-[8.5px] font-bold tracking-[0.2em] text-(--muted) uppercase">Client Input</p>
@@ -186,7 +194,8 @@ function InputPanel() {
         {INPUT_CHIPS.map((c, i) => (
           <motion.div
             key={c.label}
-            initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.45, ease: EASE, delay: 0.35 + i * 0.12 }}
             className="rounded-xl border border-[var(--rule)] bg-[var(--rule)] px-3 py-2"
           >
@@ -205,12 +214,11 @@ function InputPanel() {
 
 /* ------------------------------ engine window ----------------------------- */
 
-function EngineWindow({ onOpen }: { onOpen: (i: number) => void }) {
+function EngineWindow({ innerRef, onOpen }: { innerRef?: React.Ref<HTMLDivElement>; onOpen: (i: number) => void }) {
   return (
     <motion.div
-      initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.7, ease: EASE, delay: 0.25 }}
-      className="flex-1 min-w-0 rounded-2xl border border-[var(--rule)] bg-[var(--surface)] shadow-[0_8px_24px_color-mix(in oklch, var(--on-surface) 6%, transparent)] overflow-hidden"
+      ref={innerRef}
+      className="flex-1 min-w-0 rounded-2xl border border-[var(--rule)] bg-[var(--surface)] shadow-[0_8px_24px_color-mix(in_oklch, var(--on-surface) 6%, transparent)] overflow-hidden"
     >
       {/* title bar */}
       <div className="flex items-center gap-2.5 px-4 py-2.5 border-b border-[var(--rule)] bg-[var(--rule)]">
@@ -226,7 +234,7 @@ function EngineWindow({ onOpen }: { onOpen: (i: number) => void }) {
         </span>
       </div>
       {/* modules */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 p-3">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 p-4">
         {MODULES.map((m, i) => (
           <motion.button
             key={m.num}
@@ -327,11 +335,10 @@ function ReplyCard({ r }: { r: (typeof REPLIES)[number] }) {
   );
 }
 
-function OutputPanel() {
+function OutputPanel({ innerRef }: { innerRef?: React.Ref<HTMLDivElement> }) {
   return (
     <motion.div
-      initial={{ opacity: 0, x: 16 }} animate={{ opacity: 1, x: 0 }}
-      transition={{ duration: 0.6, ease: EASE, delay: 0.4 }}
+      ref={innerRef}
       className="relative w-full shrink-0"
     >
       {/* ambient glow */}
@@ -465,9 +472,126 @@ function DetailPanel({ m, onClose }: { m: Module; onClose: () => void }) {
 
 export default function OutreachOSSlide() {
   const [active, setActive] = useState<number | null>(null);
+  const slideRef = useRef<HTMLDivElement>(null);
+  const canvasRef = useRef<HTMLDivElement>(null);
+  const inputPanelRef = useRef<HTMLDivElement>(null);
+  const engineWindowRef = useRef<HTMLDivElement>(null);
+  const outputPanelRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const slide = slideRef.current;
+    const input = inputPanelRef.current;
+    const engine = engineWindowRef.current;
+    const output = outputPanelRef.current;
+    if (!slide || !input || !engine || !output) return;
+
+    if (typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      gsap.set([input, engine, output], { opacity: 1, y: 0, scale: 1 });
+      return;
+    }
+
+    const setInitial = () => {
+      gsap.set([input, engine, output], { opacity: 0, y: 24, scale: 0.96 });
+    };
+    setInitial();
+
+    const measure = () => {
+      const sr = slide.getBoundingClientRect();
+      const ir = input.getBoundingClientRect();
+      const er = engine.getBoundingClientRect();
+      const or = output.getBoundingClientRect();
+      const cx = sr.width / 2;
+
+      const paths = [
+        { el: document.getElementById('os-conn-1'), from: ir.bottom - sr.top, to: er.top - sr.top },
+        { el: document.getElementById('os-conn-2'), from: er.bottom - sr.top, to: or.top - sr.top },
+      ] as const;
+
+      paths.forEach(({ el, from, to }) => {
+        if (!el) return;
+        el.setAttribute('d', `M ${cx} ${from} V ${to}`);
+        const len = (el as unknown as SVGGeometryElement).getTotalLength();
+        el.style.strokeDasharray = `${len}`;
+        el.style.strokeDashoffset = `${len}`;
+      });
+    };
+
+    measure();
+
+    const conn1 = document.getElementById('os-conn-1');
+    const pulse1 = document.getElementById('os-pulse-1');
+    const conn2 = document.getElementById('os-conn-2');
+    const pulse2 = document.getElementById('os-pulse-2');
+
+    const scrub = ScrollTrigger.create({
+      trigger: slide,
+      start: 'top 80%',
+      end: 'bottom 20%',
+      scrub: 1,
+      onUpdate: (self) => {
+        const p = self.progress;
+        const p1 = Math.min(1, p * 2);
+        const p2 = Math.max(0, Math.min(1, (p - 0.45) * 2));
+
+        if (conn1 && pulse1) {
+          const len = (conn1 as unknown as SVGGeometryElement).getTotalLength();
+          conn1.style.strokeDashoffset = `${len * (1 - p1)}`;
+          const pt = (conn1 as unknown as SVGGeometryElement).getPointAtLength(len * p1);
+          pulse1.setAttribute('cx', `${pt.x}`);
+          pulse1.setAttribute('cy', `${pt.y}`);
+          pulse1.setAttribute('opacity', p1 > 0.01 && p1 < 0.99 ? '1' : '0');
+        }
+        if (conn2 && pulse2) {
+          const len = (conn2 as unknown as SVGGeometryElement).getTotalLength();
+          conn2.style.strokeDashoffset = `${len * (1 - p2)}`;
+          const pt = (conn2 as unknown as SVGGeometryElement).getPointAtLength(len * p2);
+          pulse2.setAttribute('cx', `${pt.x}`);
+          pulse2.setAttribute('cy', `${pt.y}`);
+          pulse2.setAttribute('opacity', p2 > 0.01 && p2 < 0.99 ? '1' : '0');
+        }
+      },
+    });
+
+    const popIn = (el: HTMLElement | null, startPct: number) =>
+      ScrollTrigger.create({
+        trigger: slide,
+        start: `top ${startPct}%`,
+        onEnter: () =>
+          gsap.to(el, { opacity: 1, y: 0, scale: 1, duration: 0.55, ease: 'back.out(1.7)' }),
+        onLeaveBack: () =>
+          gsap.to(el, { opacity: 0, y: 24, scale: 0.96, duration: 0.3 }),
+      });
+
+    const stInput = popIn(input, 78);
+    const stEngine = popIn(engine, 58);
+    const stOutput = popIn(output, 38);
+
+    const onResize = () => measure();
+    window.addEventListener('resize', onResize);
+
+    return () => {
+      scrub.kill();
+      stInput.kill();
+      stEngine.kill();
+      stOutput.kill();
+      window.removeEventListener('resize', onResize);
+    };
+  }, []);
 
   return (
-    <div className="relative w-full max-w-165">
+    <div ref={slideRef} className="relative w-full max-w-165">
+      {/* SVG connector overlay */}
+      <svg
+        className="absolute inset-0 h-full w-full pointer-events-none overflow-visible"
+        style={{ zIndex: 1 }}
+        aria-hidden
+      >
+        <path id="os-conn-1" d="" fill="none" stroke="var(--accent-vivid)" strokeOpacity={0.35} strokeWidth={1.5} strokeLinecap="round" />
+        <circle id="os-pulse-1" r={3.5} fill="var(--accent-vivid)" opacity={0} />
+        <path id="os-conn-2" d="" fill="none" stroke="var(--accent-vivid)" strokeOpacity={0.35} strokeWidth={1.5} strokeLinecap="round" />
+        <circle id="os-pulse-2" r={3.5} fill="var(--accent-vivid)" opacity={0} />
+      </svg>
+
       {/* canvas */}
       <div className="relative rounded-2xl p-1 sm:p-2">
         {/* The centred eyebrow and centred headline are gone. The title sits
@@ -492,13 +616,13 @@ export default function OutreachOSSlide() {
             same direction the page itself is read. */}
         <div className="relative flex flex-col items-stretch">
           <StageLabel>01 · Input</StageLabel>
-          <InputPanel />
-          <Connector delay={0.45} />
+          <InputPanel innerRef={inputPanelRef} />
+          <div className="h-16 md:h-20" aria-hidden />
           <StageLabel>02 · Engine</StageLabel>
-          <EngineWindow onOpen={setActive} />
-          <Connector delay={1.25} />
+          <EngineWindow innerRef={engineWindowRef} onOpen={setActive} />
+          <div className="h-16 md:h-20" aria-hidden />
           <StageLabel>03 · Output</StageLabel>
-          <OutputPanel />
+          <OutputPanel innerRef={outputPanelRef} />
         </div>
 
         {/* The bottom caption is gone. Its first half ("everything in the

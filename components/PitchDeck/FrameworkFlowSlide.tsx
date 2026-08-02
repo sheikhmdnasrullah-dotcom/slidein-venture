@@ -264,14 +264,16 @@ function SplitCard({ def }: { def: { id: string; rows: [SplitRow, SplitRow] } })
   );
 }
 
-/** Where the two systems meet. A real element rather than a drawn circle, so
- *  the wires have something measured to terminate on. */
+/** Where the two systems meet. A horizontal bar rather than a dot, so the
+ *  merge reads as a junction point — both tracks feed into the same place
+ *  before the outcome card. */
 function Junction() {
   return (
-    <div className="flex h-24 items-center justify-center md:h-28">
-      <span ref={useFlowNode('junction')} data-flow-node="junction" className="vf-junction" aria-hidden>
+    <div className="flex items-center justify-center py-6">
+      <span ref={useFlowNode('junction')} data-flow-node="junction" className="vf-junction-bar" aria-hidden>
         <span className="vf-junction-ring" />
         <span className="vf-junction-core" />
+        <span className="vf-junction-label">MERGE</span>
       </span>
     </div>
   );
@@ -288,7 +290,7 @@ function Outcome() {
     <div
       ref={useFlowNode('outcome')}
       data-flow-node="outcome"
-      className="vf-outcome -ml-8 sm:-ml-12 md:-ml-16"
+      className="vf-outcome"
     >
       <span className="vf-halo" aria-hidden />
       <div className="relative flex flex-wrap items-center gap-x-5 gap-y-4 px-5 py-5 md:px-7 md:py-6">
@@ -332,7 +334,7 @@ export default function FrameworkFlowSlide() {
         </div>
 
         {/* ── SYS-02 · OUTREACH ────────────────────────────────────────── */}
-        <div className="mt-19">
+        <div className="mt-24">
           <SysLabel id="SYS-02 · OUTREACH" note="Starts conversations while content compounds." />
           <div className="flex flex-col gap-13">
             <SplitCard def={OUTREACH_INPUT} />
@@ -463,15 +465,19 @@ export default function FrameworkFlowSlide() {
         .vf .vf-sys:hover .vf-sys-note { opacity: 1; }
         .vf .vf-sys:hover .vf-sys-id { color: color-mix(in oklch, var(--on-surface) 52%, transparent); }
 
-        /* ── junction ───────────────────────────────────────────────────── */
-        .vf .vf-junction { position: relative; display: grid; place-items: center; width: 26px; height: 26px; }
-        .vf .vf-junction-ring {
-          position: absolute;
-          inset: 0;
+         /* ── junction ───────────────────────────────────────────────────── */
+        .vf .vf-junction-bar {
+          position: relative;
+          display: inline-flex;
+          align-items: center;
+          gap: 10px;
+          padding: 8px 18px;
           border-radius: var(--radius-pill);
-          border: 1px dashed color-mix(in oklch, var(--accent-vivid) 40%, transparent);
           background: var(--surface);
-          animation: vfSpin 14s linear infinite;
+          border: 1px dashed color-mix(in oklch, var(--accent-vivid) 40%, transparent);
+        }
+        .vf .vf-junction-ring {
+          display: none;
         }
         .vf .vf-junction-core {
           position: relative;
@@ -480,6 +486,12 @@ export default function FrameworkFlowSlide() {
           border-radius: var(--radius-pill);
           background: var(--accent-vivid);
           filter: drop-shadow(0 0 3px color-mix(in oklch, var(--accent-vivid) 55%, transparent));
+        }
+        .vf .vf-junction-label {
+          font-size: 8px;
+          font-weight: 800;
+          letter-spacing: .22em;
+          color: color-mix(in oklch, var(--on-surface) 38%, transparent);
         }
 
         /* ── the outcome ────────────────────────────────────────────────── */

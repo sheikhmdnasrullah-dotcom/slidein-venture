@@ -112,7 +112,7 @@ function ContactPanel({
   onPointerLeave: () => void;
 }) {
   return (
-    <div className="fixed inset-0 z-[1100] flex items-center justify-center p-4 sm:p-6">
+    <div className="fixed inset-0 z-[990] flex items-center justify-center p-4 sm:p-6">
       {/* ── Scrim ─────────────────────────────────────────────────────────
           The blur is the point: it is what turns a popup into a focus. --scrim
           rather than a literal, so the wash is the same veil every modal on the

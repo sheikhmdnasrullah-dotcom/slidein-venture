@@ -305,14 +305,14 @@ function RoutingNode() {
     /* The label sits BESIDE the node, not under it. Under it is exactly where
        the fan leaves for the left gutter, and a caption with a wire drawn
        through it reads as a rendering bug. */
-    <div className="relative flex items-center justify-center py-14">
+    <div className="relative flex items-center justify-center py-16 md:py-20">
       <span ref={useFlowNode('routing')} data-flow-node="routing" className="cs-junction" aria-hidden>
         <span className="cs-junction-ring" />
         <span className="cs-junction-core" />
       </span>
       {/* Absolute, so the node itself stays exactly on the column's centre
           line — every wire in this diagram is aimed at that line. */}
-      <span className="cs-junction-label absolute left-1/2 ml-5 whitespace-nowrap">SMART ROUTING</span>
+      <span className="cs-junction-label absolute left-1/2 ml-6 whitespace-nowrap">SMART ROUTING</span>
     </div>
   );
 }
@@ -354,9 +354,9 @@ export default function OrbitSlide({ onOpenService }: { onOpenService: (id: stri
         <StageLabel>01 · Origin</StageLabel>
         <OriginCard />
 
-        <div className="mt-19">
+        <div className="mt-20">
           <StageLabel>02 · Production</StageLabel>
-          <div className="flex flex-col gap-3">
+          <div className="flex flex-col gap-4">
             {PIPELINE.map((m) => (
               <ProductionModule key={m.id} m={m} onOpen={onOpenService} />
             ))}
@@ -365,11 +365,13 @@ export default function OrbitSlide({ onOpenService }: { onOpenService: (id: stri
 
         <RoutingNode />
 
-        <StageLabel>03 · Publish</StageLabel>
-        <div className="flex flex-col gap-4">
-          {OUTPUTS.map((g) => (
-            <OutputGroupCard key={g.id} g={g} />
-          ))}
+        <div className="mt-20">
+          <StageLabel>03 · Publish</StageLabel>
+          <div className="flex flex-col gap-4">
+            {OUTPUTS.map((g) => (
+              <OutputGroupCard key={g.id} g={g} />
+            ))}
+          </div>
         </div>
 
         <p className="cs-foot">
