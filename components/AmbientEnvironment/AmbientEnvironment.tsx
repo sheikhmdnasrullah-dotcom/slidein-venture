@@ -8,9 +8,9 @@
  * It belongs to the band that is the light source. Six layers, all nearly
  * invisible:
  *
- *   1 paper grain  2 engineering dot grid  3 drifting radial light
- *   4 blueprint construction guides  5 floating particles
- *   6 cursor-following ambient light
+ *   1 paper grain  2 engineering dot grid  3 geometric mesh  4 drifting radial light
+ *   5 blueprint construction guides  6 floating particles
+ *   7 cursor-following ambient light
  *
  * Everything pointer-events-none, and every value reads the tone contract —
  * which is what lets the same six layers sit on brand orange without a single
@@ -19,12 +19,6 @@
 
 import { useEffect } from 'react';
 import { motion, useMotionValue, useSpring } from 'framer-motion';
-
-/* Stamped by next.config.ts from `git rev-parse --short=7 HEAD`. Empty when git
-   is unavailable, and the label is skipped entirely rather than falling back to
-   a made-up version string. The corner chrome either reports the real build or
-   it says nothing. */
-const BUILD_SHA = process.env.NEXT_PUBLIC_BUILD_SHA ?? '';
 
 const PARTICLES = [
   { l: '8%', t: '18%', s: 3, d: 0, dr: 18, o: 0.14 },
@@ -73,6 +67,15 @@ export default function AmbientEnvironment() {
           WebkitMaskImage: 'radial-gradient(ellipse 90% 80% at 50% 40%, black 40%, transparent 100%)',
         }}
       />
+      {/* 3 — geometric mesh */}
+      <div
+        className="absolute inset-0 opacity-[0.03]"
+        style={{
+          backgroundImage:
+            'linear-gradient(var(--color-rule) 1px, transparent 1px), linear-gradient(90deg, var(--color-rule) 1px, transparent 1px)',
+          backgroundSize: '40px 40px',
+        }}
+      />
       {/* 4 — drifting radial light.
              A single ambient source only reads as lighting if it lights the
              thing that matters. Both lobes are pulled up and left so the warm
@@ -100,11 +103,6 @@ export default function AmbientEnvironment() {
         <div className="relative h-full">
           <div className="absolute inset-y-0 left-0 w-px border-l border-dashed border-[var(--rule)]" />
           <div className="absolute inset-y-0 right-0 w-px border-r border-dashed border-[var(--rule)]" />
-          {BUILD_SHA && (
-            <span className="absolute left-2 top-3 select-none font-mono text-[8px] tracking-[0.2em] text-[var(--muted)]">
-              SIV · {BUILD_SHA}
-            </span>
-          )}
           {[...Array(14)].map((_, i) => (
             <span key={i} className="absolute left-0 h-px w-1.5 bg-[var(--rule)]" style={{ top: `${(i + 1) * 7}%` }} />
           ))}
