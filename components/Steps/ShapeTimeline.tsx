@@ -87,24 +87,32 @@ const T = {
 
 type Beat = { delay: number; duration: number };
 
-/* The two variant shapes the whole drawing is built from. Under reduced motion
-   the shown state is identical and the transition collapses to nothing, so the
-   parent still resolves its children and the drawing simply appears. */
+/* The two variant shapes the whole drawing is built from.
+ *
+ * REDUCED MOTION CHANGES THE TRANSITION, NEVER THE INITIAL STATE, and that
+ * split is deliberate. `useReducedMotion()` cannot know the preference during
+ * server rendering, so branching the `hidden` variant on it makes the server
+ * emit one set of inline styles and the client hydrate with another — React
+ * reports a hydration mismatch and refuses to patch it. Only the transition
+ * depends on the preference, and a transition is never serialised into HTML.
+ *
+ * So under reduced motion the drawing still starts hidden and still waits for
+ * the viewport; it simply arrives in one frame instead of over 1.78 seconds,
+ * which is what the preference actually asks for. */
 function grow(axis: 'x' | 'y', beat: Beat, still: boolean): Variants {
   const key = axis === 'x' ? 'scaleX' : 'scaleY';
-  const base = { [key]: 1 as number };
   return {
-    hidden: { ...base, ...(still ? {} : { [key]: 0 }) },
+    hidden: { [key]: 0 },
     shown: {
-      ...base,
+      [key]: 1,
       transition: still ? { duration: 0 } : { ...beat, ease: EASE },
     },
-  } as Variants;
+  };
 }
 
 function fade(beat: Beat, still: boolean): Variants {
   return {
-    hidden: { opacity: still ? 1 : 0 },
+    hidden: { opacity: 0 },
     shown: {
       opacity: 1,
       transition: still ? { duration: 0 } : { ...beat, ease: EASE },
@@ -136,7 +144,12 @@ const VIEWPORT = { once: true, margin: '0px 0px -15% 0px' } as const;
    The cross connector has to span from the content track down into the
    outreach band, and a connector that crosses a grid gap is a connector that
    has to be re measured on every resize. */
-const H = { plot: 336, axis: 0, content: 132, band: 236, bandH: 52 };
+/* The content-to-band gap is 148px and that number is set by the connector's
+   LABEL, not by the connector. The label is 43 characters of widely tracked
+   mono, it wraps to three lines in the width available beside the line, and at
+   the original 104px gap its third line printed on top of the band. Type first,
+   geometry second. */
+const H = { plot: 392, axis: 0, content: 132, band: 280, bandH: 52 };
 
 function Horizontal({ still }: { still: boolean }) {
   const bandWidth =
@@ -295,10 +308,14 @@ function Horizontal({ still }: { still: boolean }) {
             }}
             variants={grow('y', T.cross, still)}
           />
+          {/* Hung from the TOP of the connector rather than centred on it. A
+              centred label moves whenever the gap changes and lands on the band
+              the moment the copy gains a line; hung from the top it grows
+              downward into the space that was measured for it. */}
           <motion.span
             className="absolute block max-w-[26ch] pl-3"
             style={{
-              top: H.content + (H.band - H.content) / 2 - 10,
+              top: H.content + 16,
               left: pct(CROSS_CONNECTOR.fromWeek),
             }}
             variants={fade(T.crossLabel, still)}
@@ -318,11 +335,28 @@ function Horizontal({ still }: { still: boolean }) {
    left, the two tracks become two columns, and the connector still crosses
    between them. Rows are a fixed height so the band can span two of them and
    the connector can be placed by arithmetic rather than by measurement. */
-const V = { row: 96, pad: 30, gutter: 34 };
+const V = { row: 96, pad: 30, gutter: 34, crossGap: 112, bandInset: 24 };
 
 function Vertical({ still }: { still: boolean }) {
-  const height = V.pad * 2 + V.row * (WEEKS.length - 1);
-  const y = (week: number) => V.pad + week * V.row;
+  const height = V.pad * 2 + V.row * (WEEKS.length - 1) + V.crossGap;
+
+  /**
+   * Row positions, with one deliberate irregularity: an extra 112px between
+   * week 1 and week 2.
+   *
+   * The connector and its 43 characters of label have to live somewhere, and on
+   * a 390px screen there is no somewhere. The first version put the line exactly
+   * on the week 1 row and the label under it on an even grid, which produced two
+   * collisions at once: the line struck through "EP 01 LIVE" like a deletion,
+   * and the label printed over the week 2 row.
+   *
+   * So the grid opens a gap at the join instead. The connector crosses inside
+   * that gap, clear of both rows, and the label fills it in the content column
+   * while the outreach band continues past it on the right. An uneven row is a
+   * cheaper price than a diagram that reads as struck through.
+   */
+  const y = (week: number) =>
+    V.pad + week * V.row + (week >= 2 ? V.crossGap : 0);
 
   const contentByWeek = new Map(CONTENT_TRACK.nodes.map((n) => [n.week, n]));
   const outreachByWeek = new Map(OUTREACH_TRACK.nodes.map((n) => [n.week, n]));
@@ -401,11 +435,21 @@ function Vertical({ still }: { still: boolean }) {
         {/* Outreach column */}
         <div className="relative">
           <motion.div
-            className="absolute left-2 right-0 flex items-center overflow-hidden rounded-[var(--radius-sm)] border border-[var(--rule-strong)] bg-[var(--surface-2)] px-3"
+            /* Top aligned, not centred. Centred put the band's label at the
+               exact height the connector crosses at, so the orange line read as
+               a strikethrough over the words "IN PARALLEL" — the one phrase in
+               the drawing that must not look cancelled. */
+            className="absolute left-2 right-0 flex items-start overflow-hidden rounded-[var(--radius-sm)] border border-[var(--rule-strong)] bg-[var(--surface-2)] px-3 pt-3"
+            /* Stops short of the week 2 row rather than landing on it. The band
+               genuinely spans weeks 0 to 2, but its bottom edge drawn exactly
+               on the row put a filled rectangle underneath the "first sends"
+               dot and its label. */
             style={{
               top: y(OUTREACH_TRACK.band.from),
               height:
-                (OUTREACH_TRACK.band.to - OUTREACH_TRACK.band.from) * V.row,
+                y(OUTREACH_TRACK.band.to) -
+                y(OUTREACH_TRACK.band.from) -
+                V.bandInset,
               transformOrigin: 'top',
             }}
             variants={grow('y', T.band, still)}
@@ -440,10 +484,13 @@ function Vertical({ still }: { still: boolean }) {
 
         {/* The connector, now horizontal, crossing from the content column into
             the outreach column at week 1. Still the only orange element. */}
+        {/* Both sit INSIDE the gap opened after week 1, not on the row. The
+            label is held to the content column's width so it cannot run under
+            the band on the right. */}
         <motion.span
           className="absolute block h-px bg-[var(--accent-vivid)]"
           style={{
-            top: y(CROSS_CONNECTOR.fromWeek),
+            top: y(CROSS_CONNECTOR.fromWeek) + 34,
             left: V.gutter,
             right: 0,
             transformOrigin: 'left',
@@ -451,8 +498,8 @@ function Vertical({ still }: { still: boolean }) {
           variants={grow('x', T.cross, still)}
         />
         <motion.span
-          className="absolute block max-w-[24ch]"
-          style={{ top: y(CROSS_CONNECTOR.fromWeek) + 10, left: V.gutter }}
+          className="absolute block max-w-[18ch]"
+          style={{ top: y(CROSS_CONNECTOR.fromWeek) + 44, left: V.gutter }}
           variants={fade(T.crossLabel, still)}
         >
           <MonoLabel className="text-[var(--accent)]">
