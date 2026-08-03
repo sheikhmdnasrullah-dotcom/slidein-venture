@@ -10,6 +10,7 @@ export * from './content-pipeline';
 export * from './outreach-phases';
 export * from './benchmarks';
 export * from './page-copy';
+export * from './timeline';
 
 import {
   CLIENT_PIPELINE_STEPS,

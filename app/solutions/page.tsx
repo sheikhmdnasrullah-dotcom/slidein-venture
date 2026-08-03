@@ -15,6 +15,7 @@ import CompoundSlide from '@/components/PitchDeck/CompoundSlide';
 import AlternativeSlide from '@/components/PitchDeck/AlternativeSlide';
 import ChapterRun, { type ChapterDef } from '@/components/PitchDeck/ChapterRun';
 import ScrollReveal, { Rise } from '@/components/PitchDeck/ScrollReveal';
+import VideoEmbedModal from '@/components/VideoModal/VideoEmbedModal';
 
 /* Two names for one orange, and the split is load-bearing:
    --accent       the instance that clears 4.5:1 as TEXT on the current band
@@ -206,6 +207,44 @@ const workflowSteps = [
   },
 ];
 
+const podcastEdits = [
+  { id: 'p1', title: 'Podcast Edit 01', url: 'https://youtu.be/kWw5P7IqfKU?si=GvFfWS5c8fgqwFpW' },
+  { id: 'p2', title: 'Podcast Edit 02', url: 'https://youtu.be/Jq--0pSIiwk?si=Fe-keX8eS1d8GqZb' },
+  { id: 'p3', title: 'Podcast Edit 03', url: 'https://youtu.be/JmpK396sDoY?si=ehxI2cy-dVvfFfAx' },
+  { id: 'p4', title: 'Podcast Edit 04', url: 'https://youtu.be/_qUNzwRWdDc?si=B8d7blWbyecCblCk' },
+  { id: 'p5', title: 'Podcast Edit 05', url: 'https://youtu.be/mpf8zpSkbxg?si=peC0xlrKymj_3--d' },
+  { id: 'p6', title: 'Podcast Edit 06', url: 'https://youtu.be/HhNAsraWyvA?si=AZw1TtK8G9GnRYSC' },
+];
+
+const guestAppearances = [
+  { name: 'Callum', url: 'https://vimeo.com/1167002467?fl=ip&fe=ec', platform: 'Vimeo', guest: 'Jono Carrol' },
+  { name: 'Jeff', url: 'https://vimeo.com/1167000278?fl=ip&fe=ec', platform: 'Vimeo', guest: 'Pilot' },
+  { name: 'Callum', url: 'https://vimeo.com/1167001646?fl=ip&fe=ec', platform: 'Vimeo', guest: 'Raja Zahoor' },
+  { name: 'Callum', url: 'https://youtube.com/shorts/QfKsH8sp1RI', platform: 'YouTube', guest: 'Kelly Marie' },
+  { name: 'Callum', url: 'https://youtube.com/shorts/g_D2BvQIAkw?feature=share', platform: 'YouTube', guest: 'Harry Sharpe' },
+];
+
+const reelEdits = [
+  { id: 'r1', title: 'Reel Edit 01', url: 'https://youtube.com/shorts/YIOb6yP-Vqg?feature=share' },
+  { id: 'r2', title: 'Reel Edit 02', url: 'https://youtube.com/shorts/YIOb6yP-Vqg' },
+  { id: 'r3', title: 'Reel Edit 03', url: 'https://youtube.com/shorts/Q04ktHx09sY?feature=share' },
+  { id: 'r4', title: 'Reel Edit 04', url: 'https://youtube.com/shorts/NdlODkhmZQI?feature=share' },
+  { id: 'r5', title: 'Reel Edit 05', url: 'https://youtube.com/shorts/6_-dpyy9NPc?feature=share' },
+  { id: 'r6', title: 'Reel Edit 06', url: 'https://youtube.com/shorts/RuQZjz2qgoI?feature=share' },
+  { id: 'r7', title: 'Reel Edit 07', url: 'https://youtube.com/shorts/_KvU5e1Y3Mk?feature=share' },
+  { id: 'r8', title: 'Reel Edit 08', url: 'https://youtube.com/shorts/QfKsH8sp1RI?feature=share' },
+  { id: 'r9', title: 'Reel Edit 09', url: 'https://youtube.com/shorts/y78HsXO4MOM?feature=share' },
+  { id: 'r10', title: 'Reel Edit 10', url: 'https://youtube.com/shorts/uviaSTc5bAo?feature=share' },
+  { id: 'r11', title: 'Reel Edit 11', url: 'https://youtube.com/shorts/R8cuivdgUFk?feature=share' },
+  { id: 'r12', title: 'Reel Edit 12', url: 'https://youtube.com/shorts/ZtdZl419cys?feature=share' },
+  { id: 'r13', title: 'Reel Edit 13', url: 'https://youtube.com/shorts/lRVlu8G-3Vo?feature=share' },
+  { id: 'r14', title: 'Reel Edit 14', url: 'https://youtube.com/shorts/u-lQqR65Ox0?feature=share' },
+  { id: 'r15', title: 'Reel Edit 15', url: 'https://youtube.com/shorts/vgvHQRCwPq0?feature=share' },
+  { id: 'r16', title: 'Reel Edit 16', url: 'https://youtube.com/shorts/_zX8pe1S96g?feature=share' },
+  { id: 'r17', title: 'Reel Edit 17', url: 'https://youtube.com/shorts/YIOb6yP-Vqg?feature=share' },
+  { id: 'r18', title: 'Reel Edit 18', url: 'https://youtube.com/shorts/g_D2BvQIAkw?feature=share' },
+];
+
 /* ── THE STEPS ─────────────────────────────────────────────────────────────
    These five were the back half of the homepage deck. They moved here because
    they answer a different question: the homepage says what the system IS, and
@@ -254,6 +293,7 @@ const STEP_CHAPTERS: ChapterDef[] = [
 
 export default function SolutionsPage() {
   const [activeFeature, setActiveFeature] = useState(features[0].id);
+  const [videoUrl, setVideoUrl] = useState<string | null>(null);
 
   return (
     <div className="min-h-screen">
@@ -592,6 +632,101 @@ export default function SolutionsPage() {
         />
       </section>
 
+      {/* ── Portfolio / Video Showcase ─────────────────────────────────── */}
+      <section className="py-24 bg-[var(--surface-2)] border-y border-[var(--rule)]">
+        <div className="max-w-[1200px] mx-auto px-6 md:px-10">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: '-60px' }}
+            transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+            className="text-center mb-16"
+          >
+            <h2 className="section-headline text-[clamp(2rem,4vw,3rem)] text-[var(--on-surface)] mb-4">
+              Our work
+            </h2>
+            <p className="body-copy text-base text-[var(--muted)] max-w-[600px] mx-auto">
+              Podcast edits, guest appearances, and reel edits — crafted with the same polish we bring to every client project.
+            </p>
+          </motion.div>
+
+          {/* Podcast Edits */}
+          <div className="mb-20">
+            <Rise>
+              <span className="font-label mb-4 block text-[var(--accent)]">Podcast Edits</span>
+              <h3 className="font-display-md text-[clamp(1.5rem,3vw,2.25rem)] text-[var(--on-surface)] mb-8">
+                Full podcast productions
+              </h3>
+            </Rise>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {podcastEdits.map((video, index) => (
+                <motion.div
+                  key={video.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: '-40px' }}
+                  transition={{ duration: 0.5, delay: index * 0.05, ease: [0.16, 1, 0.3, 1] }}
+                >
+                  <VideoCard title={video.title} onClick={() => setVideoUrl(video.url)} />
+                </motion.div>
+              ))}
+            </div>
+          </div>
+
+          {/* Guest Appearances */}
+          <div className="mb-20">
+            <Rise>
+              <span className="font-label mb-4 block text-[var(--accent)]">Guest Appearances</span>
+              <h3 className="font-display-md text-[clamp(1.5rem,3vw,2.25rem)] text-[var(--on-surface)] mb-8">
+                Conversations worth watching
+              </h3>
+            </Rise>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {guestAppearances.map((item, index) => (
+                <motion.div
+                  key={`${item.name}-${item.guest}`}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: '-40px' }}
+                  transition={{ duration: 0.5, delay: index * 0.05, ease: [0.16, 1, 0.3, 1] }}
+                >
+                  <VideoCard
+                    title={`${item.name} — ${item.guest}`}
+                    subtitle={item.platform}
+                    onClick={() => setVideoUrl(item.url)}
+                  />
+                </motion.div>
+              ))}
+            </div>
+          </div>
+
+          {/* Reel Edits */}
+          <div>
+            <Rise>
+              <span className="font-label mb-4 block text-[var(--accent)]">Reel Edits</span>
+              <h3 className="font-display-md text-[clamp(1.5rem,3vw,2.25rem)] text-[var(--on-surface)] mb-8">
+                Short-form cuts
+              </h3>
+            </Rise>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {reelEdits.map((video, index) => (
+                <motion.div
+                  key={video.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: '-40px' }}
+                  transition={{ duration: 0.5, delay: index * 0.03, ease: [0.16, 1, 0.3, 1] }}
+                >
+                  <VideoCard title={video.title} onClick={() => setVideoUrl(video.url)} />
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <VideoEmbedModal open={!!videoUrl} onClose={() => setVideoUrl(null)} url={videoUrl || ''} />
+
       {/* ── CTA Section ─────────────────────────────────────────────── */}
       <section className="py-24">
         <div className="max-w-[800px] mx-auto px-6 md:px-10 text-center">
@@ -638,5 +773,30 @@ export default function SolutionsPage() {
         </div>
       </section>
     </div>
+  );
+}
+
+function VideoCard({ title, subtitle, onClick }: { title: string; subtitle?: string; onClick: () => void }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className="group relative w-full aspect-video rounded-2xl border border-[var(--rule)] bg-[var(--surface)] overflow-hidden cursor-pointer text-left shadow-[0_4px_14px_color-mix(in oklch, var(--on-surface) 6%, transparent)] hover:shadow-[0_14px_36px_color-mix(in oklch, var(--on-surface) 12%, transparent)] hover:border-[var(--accent-vivid)]/40 transition-all duration-300"
+    >
+      <div className="absolute inset-0 bg-gradient-to-br from-transparent to-color-mix(in oklch, var(--accent-vivid) 4%, transparent) opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+
+      <div className="absolute inset-0 flex items-center justify-center">
+        <span className="flex h-12 w-12 items-center justify-center rounded-full bg-[var(--surface)] border border-[var(--rule)] text-[var(--muted)] group-hover:border-[var(--accent-vivid)] group-hover:text-[var(--accent-vivid)] transition-colors duration-300 shadow-[0_6px_18px_color-mix(in oklch, var(--on-surface) 14%, transparent)]">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+            <path d="M8 5v14l11-7z" />
+          </svg>
+        </span>
+      </div>
+
+      <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-[var(--on-surface)]/80 to-transparent p-4">
+        <p className="text-[11px] font-[700] text-[var(--surface)] leading-snug line-clamp-2">{title}</p>
+        {subtitle && <p className="text-[9px] font-[600] uppercase tracking-[0.14em] text-[var(--surface)]/70 mt-1">{subtitle}</p>}
+      </div>
+    </button>
   );
 }
