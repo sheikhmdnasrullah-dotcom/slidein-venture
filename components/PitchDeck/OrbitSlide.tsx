@@ -27,13 +27,14 @@
  * travel more than one card's distance travels in a gutter.
  */
 
-import { useCallback } from 'react';
+import { useCallback, useRef } from 'react';
 import FlowCanvas, {
   useFlowNode,
   type FlowNodes,
   type FlowPath,
   type FlowSize,
 } from '@/components/PitchDeck/flow/FlowCanvas';
+import { useFlowSequence, type Wire, type Pop } from '@/components/PitchDeck/flow/useFlowSequence';
 
 /* ----------------------------- brand assets ----------------------------- */
 
@@ -341,11 +342,65 @@ function OutputGroupCard({ g }: { g: OutputGroup }) {
 
 /* --------------------------------- slide ---------------------------------- */
 
+/* ------------------------------ choreography ------------------------------
+   Module-level for stable identity — `useFlowSequence` takes these as effect
+   dependencies.
+
+   Three movements, matching the three wire channels described in the header:
+   the recording reaches six modules in parallel, the six converge on one
+   routing decision, and that decision fans out to nine destinations. The
+   parallel stretches are deliberately overlapping windows rather than a strict
+   queue — six wires drawing one after another reads as a loading bar, and the
+   point of this middle section is that the work happens at once. */
+
+const FEED_FROM = 0.16;
+const GATHER_FROM = 0.42;
+const FAN_FROM = 0.72;
+
+const WIRES: Wire[] = [
+  { id: 'bus-in', from: 0.04, to: 0.18 },
+  ...PIPELINE.map((m, i) => ({
+    id: `feed-${m.id}`,
+    from: FEED_FROM + i * 0.022,
+    to: FEED_FROM + i * 0.022 + 0.07,
+  })),
+  ...PIPELINE.map((m, i) => ({
+    id: `gather-${m.id}`,
+    from: GATHER_FROM + i * 0.022,
+    to: GATHER_FROM + i * 0.022 + 0.07,
+  })),
+  { id: 'gather', from: 0.52, to: 0.64 },
+  { id: 'fan', from: 0.66, to: 0.78 },
+  ...OUTPUTS.map((g, i) => ({
+    id: `fan-${g.id}`,
+    from: FAN_FROM + i * 0.04,
+    to: FAN_FROM + i * 0.04 + 0.07,
+  })),
+];
+
+const POPS: Pop[] = [
+  { id: 'origin', at: 0.01 },
+  /* Each module lands as its own feed wire reaches it. */
+  ...PIPELINE.map((m, i) => ({ id: `m-${m.id}`, at: FEED_FROM + i * 0.022 + 0.07 })),
+  { id: 'routing', at: 0.64 },
+  ...OUTPUTS.map((g, i) => ({ id: `g-${g.id}`, at: FAN_FROM + i * 0.04 + 0.07 })),
+];
+
 export default function OrbitSlide({ onOpenService }: { onOpenService: (id: string) => void }) {
+  const rootRef = useRef<HTMLDivElement>(null);
   const paths = useCallback((n: FlowNodes, size: FlowSize) => contentPaths(n, size), []);
 
+  useFlowSequence({
+    root: rootRef,
+    scope: rootRef,
+    wires: WIRES,
+    pops: POPS,
+    start: 'top 88%',
+    end: 'bottom 60%',
+  });
+
   return (
-    <div className="cs w-full max-w-165">
+    <div ref={rootRef} className="cs w-full max-w-165">
       <h3 className="font-display-md mb-8 text-[clamp(1.6rem,4vw,2.4rem)] text-(--on-surface)">
         One in. Nine out.
       </h3>

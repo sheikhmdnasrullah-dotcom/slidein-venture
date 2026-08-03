@@ -200,7 +200,13 @@ function Chapter({
       ([entry]) => {
         if (entry.isIntersecting) setMounted(true);
       },
-      { rootMargin: '30% 0px 30% 0px' }
+      /* 55%, not 30%. Mounting a whole vertical diagram is one large React
+         render, and at 4x CPU throttle that measured as a 152ms long task and a
+         200ms worst frame — landing exactly as the chapter came into view, so
+         the hitch was visible. Half a viewport of extra lead time moves the
+         cost off the moment of arrival. Height is reserved either way, so
+         nothing shifts. */
+      { rootMargin: '55% 0px 55% 0px' }
     );
     obs.observe(el);
     return () => obs.disconnect();

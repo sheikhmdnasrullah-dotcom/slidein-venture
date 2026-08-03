@@ -3,13 +3,18 @@
 /**
  * OUTCOME ANCHOR — "More Clients, Faster"
  * ---------------------------------------------------------------------------
- * Stage 3+ of the outreach narrative. While the outreach diagram is pinned and
- * zoomed, a persistent outcome chip docks to the bottom-right of the viewport
- * and a tether line is redrawn every animation frame from the active element
- * (the module card the reader is looking at, or the Output panel by default)
- * to the chip. When the pin window ends going forward, the chip pops into an
- * emphasized payoff state; it un-docks on leave-back so scrolling up cleanly
- * un-animates.
+ * The outreach narrative’s persistent outcome. While the outreach diagram is
+ * being read, an outcome chip docks to the bottom-right of the viewport
+ * and a tether line is redrawn every animation frame from the active element to
+ * the chip. "Active" is supplied by the caller as a function — see
+ * OutreachOSSlide, where it resolves to the hovered module card, or failing
+ * that the tethered element nearest the middle of the VIEWPORT. Anything
+ * off-screen is skipped, because a tether whose origin is 900px below the fold
+ * draws nothing anyone can see.
+ *
+ * At the end of the diagram, going forward, the chip pops into an emphasized
+ * payoff state, holds it for a beat, then retires. It un-docks on leave-back so
+ * scrolling up cleanly un-animates.
  *
  * COMMUNICATION
  * A tiny event bus (`anchorBus`) sits in this file so the slide can drive the
@@ -52,6 +57,20 @@ export const anchorBus = {
     listeners.forEach((l) => l(e));
   },
 };
+
+/* ── Has the reader been through the systems? ──────────────────────────────
+   Stage 6's return-to-overview payoff needs one bit of memory: the master
+   framework's outcome card only earns its emphasized state once the reader has
+   actually been down through the detail and come back. Module scope, not React
+   state, because the two components that care are in different chapters, mount
+   and unmount independently on scroll (see ChapterRun's mount gate), and this
+   must survive that. Deliberately not persisted — it resets on reload, which is
+   correct: a fresh visit has not read anything yet. */
+let deckSeen = false;
+export const markDeckSeen = () => {
+  deckSeen = true;
+};
+export const hasDeckBeenSeen = () => deckSeen;
 
 /* ── The anchored outcome chip ───────────────────────────────────────────── */
 

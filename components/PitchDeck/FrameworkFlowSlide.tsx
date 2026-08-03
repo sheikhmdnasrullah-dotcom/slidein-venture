@@ -33,7 +33,11 @@
  * belong to is the point: content keeps going while outreach works.
  */
 
-import { useCallback } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
+import { useReducedMotion } from 'framer-motion';
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { anchorBus, hasDeckBeenSeen } from '@/components/PitchDeck/OutcomeAnchor';
 import FlowCanvas, {
   useFlowNode,
   drop,
@@ -41,6 +45,7 @@ import FlowCanvas, {
   type FlowNodes,
   type FlowPath,
 } from '@/components/PitchDeck/flow/FlowCanvas';
+import { useFlowSequence, type Wire, type Pop } from '@/components/PitchDeck/flow/useFlowSequence';
 
 /* ------------------------------- icon set -------------------------------- */
 
@@ -314,11 +319,111 @@ function Outcome() {
 
 /* --------------------------------- slide ----------------------------------- */
 
+/* ------------------------------ choreography ------------------------------
+   Module-level so the arrays keep a stable identity across renders —
+   `useFlowSequence` takes them as effect dependencies.
+
+   The reading order is the argument: the content track builds top to bottom,
+   the outreach track builds beneath it, then both merge and the outcome lands
+   last. Each card's threshold sits exactly where its connector arrives, so the
+   wire hands off to the bounce rather than the two playing over each other. */
+
+const WIRES: Wire[] = [
+  { id: 'c-input~c-production', from: 0.04, to: 0.13 },
+  { id: 'c-production~c-presence', from: 0.15, to: 0.24 },
+  { id: 'o-input~o-outreach', from: 0.36, to: 0.45 },
+  { id: 'o-outreach~o-convos', from: 0.47, to: 0.56 },
+  /* The two merges run together — they are one gesture, not two events. */
+  { id: 'merge-content', from: 0.62, to: 0.76 },
+  { id: 'o-convos~junction', from: 0.66, to: 0.76 },
+  { id: 'junction~outcome', from: 0.82, to: 0.9 },
+];
+
+const POPS: Pop[] = [
+  { id: 'c-input', at: 0.01 },
+  { id: 'c-production', at: 0.13 },
+  { id: 'c-presence', at: 0.24 },
+  { id: 'o-input', at: 0.32 },
+  { id: 'o-outreach', at: 0.45 },
+  { id: 'o-convos', at: 0.56 },
+  { id: 'junction', at: 0.77 },
+  { id: 'outcome', at: 0.9 },
+];
+
 export default function FrameworkFlowSlide() {
+  const rootRef = useRef<HTMLDivElement>(null);
+  const still = !!useReducedMotion();
   const paths = useCallback((n: FlowNodes) => framePaths(n), []);
 
+  useFlowSequence({
+    root: rootRef,
+    scope: rootRef,
+    wires: WIRES,
+    pops: POPS,
+    start: 'top 88%',
+    end: 'bottom 60%',
+  });
+
+  /* ── Stage 6 — the return-to-overview payoff ──────────────────────────────
+     "More Clients, Faster" sits at the bottom of this chapter, two chapters
+     above the detail. Once the reader has been down through the content and
+     outreach systems and comes back up to the whole map, the card takes an
+     emphasized resting state — this is the thing the two systems were adding
+     up to, and it should look different on the way back than it did on the way
+     down.
+
+     Gated on `hasDeckBeenSeen()`, so a first-time downward pass gets the plain
+     card and the emphasis is genuinely earned rather than being the default.
+
+     The scale is animated by GSAP, not CSS. `useFlowSequence` also writes
+     `transform` on this element for its pop-in, and two owners of one property
+     is the bug that flattened the module cards' bounce — so everything
+     transform-shaped goes through GSAP and CSS keeps the border, shadow and
+     halo, which it owns alone. */
+  useEffect(() => {
+    const root = rootRef.current;
+    if (!root) return;
+    const card = root.querySelector<HTMLElement>('[data-flow-node="outcome"]');
+    if (!card) return;
+
+    if (still) {
+      if (hasDeckBeenSeen()) card.setAttribute('data-payoff', '');
+      return;
+    }
+
+    gsap.registerPlugin(ScrollTrigger);
+
+    const emphasise = () => {
+      if (!hasDeckBeenSeen()) return;
+      /* The chip and the card are the same object in two places. If the chip is
+         still docked when the card comes back into view, it un-docks into it. */
+      anchorBus.emit({ type: 'undock' });
+      card.setAttribute('data-payoff', '');
+      gsap.to(card, { scale: 1.03, duration: 0.6, ease: 'back.out(1.4)', overwrite: 'auto' });
+    };
+
+    const relax = () => {
+      card.removeAttribute('data-payoff');
+      gsap.to(card, { scale: 1, duration: 0.3, overwrite: 'auto' });
+    };
+
+    const st = ScrollTrigger.create({
+      trigger: card,
+      start: 'top 90%',
+      end: 'bottom 10%',
+      onEnter: emphasise, // a second downward read
+      onEnterBack: emphasise, // the actual return-to-overview
+      onLeaveBack: relax,
+    });
+
+    return () => {
+      st.kill();
+      card.removeAttribute('data-payoff');
+    };
+  }, [still]);
+
   return (
-    <div className="vf w-full max-w-165">
+    <div ref={rootRef} className="vf w-full max-w-165">
       <h3 className="font-display-md mb-8 text-[clamp(1.6rem,4vw,2.4rem)] text-(--on-surface)">
         Two systems. One loop.
       </h3>
@@ -346,6 +451,12 @@ export default function FrameworkFlowSlide() {
 
         <Junction />
         <Outcome />
+
+        {/* The beat. The payoff needs scroll distance after it with nothing
+            else moving — the brief asks for it explicitly, and the card cannot
+            read as an arrival if the next chapter's heading is already on
+            screen beside it. */}
+        <div className="h-24 md:h-32" aria-hidden />
       </FlowCanvas>
 
       <style>{`
@@ -503,6 +614,22 @@ export default function FrameworkFlowSlide() {
           box-shadow: 0 14px 34px color-mix(in oklch, var(--color-ember) 18%, transparent),
                       0 0 0 4px color-mix(in oklch, var(--accent-vivid) 7%, transparent);
         }
+        /* ── stage 6: the earned resting state ────────────────────────────
+           Set only after the reader has been through both systems and come
+           back — see the payoff effect in the component. Colour, border and
+           shadow only: the scale belongs to GSAP, which also owns transform on
+           this element for its pop-in. Two owners of one property is the bug
+           that flattened the module cards' bounce. */
+        .vf .vf-outcome[data-payoff] {
+          border-color: var(--accent-vivid);
+          box-shadow: 0 22px 52px color-mix(in oklch, var(--color-ember) 30%, transparent),
+                      0 0 0 6px color-mix(in oklch, var(--accent-vivid) 12%, transparent);
+        }
+        .vf .vf-outcome-title,
+        .vf .vf-outcome-sub,
+        .vf .vf-outcome-live { transition: color var(--dur-slow) var(--ease-expo); }
+        .vf .vf-outcome[data-payoff] .vf-outcome-sub { color: color-mix(in oklch, var(--on-surface) 70%, transparent); }
+
         .vf .vf-halo {
           position: absolute;
           inset: -18px;
@@ -511,6 +638,10 @@ export default function FrameworkFlowSlide() {
           filter: blur(10px);
           pointer-events: none;
           animation: vfHalo 4.4s ease-in-out infinite;
+          transition: background var(--dur-slow) var(--ease-expo);
+        }
+        .vf .vf-outcome[data-payoff] .vf-halo {
+          background: radial-gradient(circle, color-mix(in oklch, var(--accent-vivid) 24%, transparent), transparent 72%);
         }
         .vf .vf-outcome-chip {
           display: grid;

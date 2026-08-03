@@ -11,24 +11,44 @@
  *
  * Every module opens a Notion-style side panel with progressive disclosure.
  *
- * THREE-PART ANIMATION (Stage 2+)
- * Connectors are real SVG paths measured against the slide container.
- * Line draw + travelling pulse are scroll-scrubbed via GSAP ScrollTrigger.
- * Card pop-in uses discrete scroll thresholds with springy easing.
+ * THREE-PART ANIMATION
+ * Connectors are real SVG paths, measured off live DOM by flow/FlowCanvas and
+ * choreographed by flow/useFlowSequence: line draw and travelling pulse are
+ * scrubbed 1:1 against scroll, card pop-in is a discrete springy trigger on its
+ * own clock. Scrolling up un-draws and un-pops, by construction.
  *
- * STAGE 3 — PIN + ZOOM
- * The slide pins when its top hits 75% viewport, stays pinned for 1500px
- * of scroll, and the canvas scales up subtly during that window.
+ * THERE IS NO PIN, AND THAT IS DELIBERATE
+ * An earlier revision pinned this slide (`pin: true`, `start: 'top 75%'`,
+ * `end: '+=1500'`). The slide is ~2,000px tall in a ~900px viewport, and a
+ * pinned element taller than the viewport freezes with only its top screenful
+ * visible — so the whole diagram sat below the fold, unreachable, for the
+ * entire 1,500px pin window. Measured at the end of that window the viewport
+ * was blank paper with the heading clipped at the bottom edge.
+ *
+ * The brief's own fallback applies: the plain sequential reveal. The diagram is
+ * already vertical, so scroll direction and diagram direction agree and native
+ * scrolling IS the zoom. The anchor mechanic below is unaffected — it never
+ * needed the pin, only a progress value. Do not reintroduce `pin: true` here
+ * without first making the pinned content fit the viewport.
  */
 
-import { useRef, useEffect, useState, useLayoutEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { useRef, useEffect, useState, useCallback } from 'react';
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { cn } from '@/lib/utils';
-import { anchorBus } from '@/components/PitchDeck/OutcomeAnchor';
+import { anchorBus, markDeckSeen } from '@/components/PitchDeck/OutcomeAnchor';
+import FlowCanvas, {
+  useFlowNode,
+  drop,
+  type FlowNodes,
+  type FlowPath,
+} from '@/components/PitchDeck/flow/FlowCanvas';
+import { useFlowSequence, type Wire, type Pop } from '@/components/PitchDeck/flow/useFlowSequence';
 
-gsap.registerPlugin(ScrollTrigger);
+/* registerPlugin is called inside the effect below, not here. This file carries
+   'use client', but a client component's module scope still evaluates during
+   SSR, and plugin registration is a browser-only concern. */
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 
@@ -141,43 +161,84 @@ const INPUT_CHIPS = [
 
 /* ------------------------------ panels ------------------------------------ */
 
-function InputPanel({ innerRef }: { innerRef?: React.Ref<HTMLDivElement> }) {
+/* The panels register themselves with the enclosing FlowCanvas instead of
+   taking a ref prop. That is what lets the connectors be measured off live
+   DOM — the previous revision measured them once, by hand, AFTER gsap had
+   already displaced every panel by y:28 and scale:0.97, so every wire was
+   anchored to a position no panel was actually in. */
+function InputPanel() {
   return (
-    <motion.div
-      ref={innerRef}
-      className="os-panel relative w-full shrink-0 p-4"
-    >
+    <div ref={useFlowNode('input')} data-flow-node="input" className="os-panel relative w-full shrink-0 p-4">
       <p className="text-[8.5px] font-bold tracking-[0.2em] text-(--muted) uppercase">Client Input</p>
       <h3 className="mt-1.5 text-[15px] font-extrabold leading-snug text-(--on-surface)">
         You tell us who you want to work with
       </h3>
+      {/* No mount-keyed entrance on the chips any more: the panel's own pop-in
+          is scroll-driven now, and a mount animation inside it would play
+          while the panel is still sitting at opacity 0. */}
       <div className="mt-3.5 grid grid-cols-1 gap-2 sm:grid-cols-3">
-        {INPUT_CHIPS.map((c, i) => (
-          <motion.div
+        {INPUT_CHIPS.map((c) => (
+          <div
             key={c.label}
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.45, ease: EASE, delay: 0.35 + i * 0.12 }}
             className="rounded-xl border border-[var(--rule)] bg-[var(--rule)] px-3 py-2"
           >
             <p className="text-[8px] font-bold tracking-[0.14em] text-[var(--muted)] uppercase">{c.label}</p>
             <p className="text-[11px] font-bold text-[var(--on-surface)] mt-0.5">{c.value}</p>
-          </motion.div>
+          </div>
         ))}
       </div>
       <div className="mt-3.5 flex items-center gap-1.5">
         <span className="w-1.5 h-1.5 rounded-full bg-[var(--accent-vivid)] os-blink" />
         <span className="text-[8px] font-bold tracking-[0.16em] text-[var(--muted)] uppercase">Told us once · That&apos;s it</span>
       </div>
-    </motion.div>
+    </div>
   );
 }
 
-function EngineWindow({ innerRef, onOpen }: { innerRef?: React.Ref<HTMLDivElement>; onOpen: (i: number) => void }) {
+/** One engine module. Its own component rather than a `.map` body because it
+ *  calls `useFlowNode` — a hook, and hooks cannot be called in a loop. */
+function ModuleCard({ m, onOpen }: { m: Module; onOpen: () => void }) {
   return (
-    <motion.div
-      ref={innerRef}
-      className="flex-1 min-w-0 rounded-2xl border border-[var(--rule)] bg-[var(--surface)] shadow-[0_8px_24px_color-mix(in_oklch, var(--on-surface) 6%, transparent)] overflow-hidden"
+    <button
+      ref={useFlowNode(`m-${m.num}`)}
+      data-flow-node={`m-${m.num}`}
+      type="button"
+      data-module-card
+      onClick={onOpen}
+      className="os-module group relative cursor-pointer overflow-hidden rounded-xl border border-(--rule) bg-(--surface) p-3 text-left"
+    >
+      <div className="flex items-center gap-2">
+        <span className="w-7 h-7 rounded-lg bg-[var(--rule)] flex items-center justify-center text-[var(--muted)] group-hover:bg-[var(--accent-vivid)]/10 group-hover:text-[var(--accent)] transition-colors duration-300">
+          <Icon kind={m.icon} size={14} />
+        </span>
+        <span className="text-[8px] font-black tracking-[0.14em] text-[var(--accent)]">{m.num}</span>
+        <span className="ml-auto flex items-center gap-1.5">
+          <span className="text-[7.5px] font-bold tracking-[0.14em] text-[var(--muted)] tabular-nums whitespace-nowrap">
+            {m.throughput}
+          </span>
+          <span className="flex h-4 w-4 items-center justify-center rounded-[5px] border border-[var(--rule-strong)] text-[var(--muted)] transition-colors duration-300 group-hover:border-[var(--accent-vivid)]/60 group-hover:bg-[var(--accent-vivid)]/10 group-hover:text-[var(--accent)]">
+            <svg width={8} height={8} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.6} strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+              <path d="M7 17 17 7M9 7h8v8" />
+            </svg>
+          </span>
+        </span>
+      </div>
+      <p className="mt-2 text-[11.5px] font-extrabold text-[var(--on-surface)] leading-tight">{m.title}</p>
+      <p className="mt-1 text-[9.5px] leading-snug text-[var(--muted)]">{m.blurb}</p>
+      <span
+        aria-hidden
+        className="pointer-events-none absolute inset-x-0 bottom-0 h-px origin-left scale-x-0 bg-[var(--accent-vivid)] transition-transform duration-300 ease-out group-hover:scale-x-100"
+      />
+    </button>
+  );
+}
+
+function EngineWindow({ onOpen }: { onOpen: (i: number) => void }) {
+  return (
+    <div
+      ref={useFlowNode('engine')}
+      data-flow-node="engine"
+      className="os-panel os-engine w-full min-w-0 overflow-hidden"
     >
       <div className="flex items-center gap-2.5 px-4 py-2.5 border-b border-[var(--rule)] bg-[var(--rule)]">
         <span className="flex gap-1.5" aria-hidden>
@@ -191,43 +252,15 @@ function EngineWindow({ innerRef, onOpen }: { innerRef?: React.Ref<HTMLDivElemen
           <span className="text-[7.5px] font-bold tracking-[0.16em] text-[var(--muted)] uppercase">Running</span>
         </span>
       </div>
+      {/* The 2-across pairing survives the vertical restructure — the brief
+          allows it, and six single-file cards would add ~500px of column for
+          no extra clarity. */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 p-4">
         {MODULES.map((m, i) => (
-          <motion.button
-            key={m.num}
-            type="button"
-            data-module-card
-            onClick={() => onOpen(i)}
-            initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, ease: EASE, delay: 0.65 + i * 0.09 }}
-            className="group relative overflow-hidden text-left rounded-xl border border-[var(--rule)] bg-[var(--surface)] p-3 hover:border-[var(--accent-vivid)]/50 hover:bg-[var(--accent-vivid)]/[0.025] hover:shadow-[0_8px_20px_color-mix(in oklch, var(--accent-vivid) 10%, transparent)] hover:-translate-y-0.5 transition-all duration-300 cursor-pointer"
-          >
-            <div className="flex items-center gap-2">
-              <span className="w-7 h-7 rounded-lg bg-[var(--rule)] flex items-center justify-center text-[var(--muted)] group-hover:bg-[var(--accent-vivid)]/10 group-hover:text-[var(--accent)] transition-colors duration-300">
-                <Icon kind={m.icon} size={14} />
-              </span>
-              <span className="text-[8px] font-black tracking-[0.14em] text-[var(--accent)]">{m.num}</span>
-              <span className="ml-auto flex items-center gap-1.5">
-                <span className="text-[7.5px] font-bold tracking-[0.14em] text-[var(--muted)] tabular-nums whitespace-nowrap">
-                  {m.throughput}
-                </span>
-                <span className="flex h-4 w-4 items-center justify-center rounded-[5px] border border-[var(--rule-strong)] text-[var(--muted)] transition-colors duration-300 group-hover:border-[var(--accent-vivid)]/60 group-hover:bg-[var(--accent-vivid)]/10 group-hover:text-[var(--accent)]">
-                  <svg width={8} height={8} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.6} strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-                    <path d="M7 17 17 7M9 7h8v8" />
-                  </svg>
-                </span>
-              </span>
-            </div>
-            <p className="mt-2 text-[11.5px] font-extrabold text-[var(--on-surface)] leading-tight">{m.title}</p>
-            <p className="mt-1 text-[9.5px] leading-snug text-[var(--muted)]">{m.blurb}</p>
-            <span
-              aria-hidden
-              className="pointer-events-none absolute inset-x-0 bottom-0 h-px origin-left scale-x-0 bg-[var(--accent-vivid)] transition-transform duration-300 ease-out group-hover:scale-x-100"
-            />
-          </motion.button>
+          <ModuleCard key={m.num} m={m} onOpen={() => onOpen(i)} />
         ))}
       </div>
-    </motion.div>
+    </div>
   );
 }
 
@@ -239,18 +272,24 @@ const REPLIES = [
 
 function ReplyCard({ r }: { r: (typeof REPLIES)[number] }) {
   return (
+    /* whileInView, not animate. Keyed to mount, this whole choreography — the
+       two good replies landing, then the out-of-office arriving and being
+       struck through — played out at 1.85–2.55s while the Output panel was
+       still sitting at opacity 0 waiting for its scroll threshold. The joke
+       only works if someone is watching it. */
     <motion.div
       initial={{ opacity: 0, y: 10 }}
-      animate={r.ok ? { opacity: 1, y: 0 } : { opacity: [0, 1, 1, 0.45], y: [10, 0, 0, 0] }}
+      whileInView={r.ok ? { opacity: 1, y: 0 } : { opacity: [0, 1, 1, 0.45], y: [10, 0, 0, 0] }}
+      viewport={{ once: true, margin: '0px 0px -15% 0px' }}
       transition={
         r.ok
-          ? { duration: 0.5, ease: EASE, delay: r.at }
-          : { duration: 1.9, times: [0, 0.24, 0.62, 1], ease: EASE, delay: r.at }
+          ? { duration: 0.5, ease: EASE, delay: r.at - 1.8 }
+          : { duration: 1.9, times: [0, 0.24, 0.62, 1], ease: EASE, delay: r.at - 1.8 }
       }
       className={cn(
         'relative flex items-center gap-2 rounded-lg border px-2.5 py-2',
         r.ok
-          ? 'border-[var(--accent-vivid)]/35 bg-[var(--accent-vivid)]/[0.05] shadow-[0_6px_18px_color-mix(in oklch, var(--accent-vivid) 16%, transparent)]'
+          ? 'os-reply-ok border-[var(--accent-vivid)]/35 bg-[var(--accent-vivid)]/[0.05]'
           : 'border-[var(--rule)] bg-[var(--rule)]'
       )}
     >
@@ -264,8 +303,9 @@ function ReplyCard({ r }: { r: (typeof REPLIES)[number] }) {
             aria-hidden
             className="pointer-events-none absolute inset-x-0 top-1/2 h-px origin-left bg-current"
             initial={{ scaleX: 0 }}
-            animate={{ scaleX: 1 }}
-            transition={{ duration: 0.34, ease: EASE, delay: r.at + 0.62 }}
+            whileInView={{ scaleX: 1 }}
+            viewport={{ once: true, margin: '0px 0px -15% 0px' }}
+            transition={{ duration: 0.34, ease: EASE, delay: r.at - 1.8 + 0.62 }}
           />
         )}
       </span>
@@ -273,14 +313,11 @@ function ReplyCard({ r }: { r: (typeof REPLIES)[number] }) {
   );
 }
 
-function OutputPanel({ innerRef }: { innerRef?: React.Ref<HTMLDivElement> }) {
+function OutputPanel() {
   return (
-    <motion.div
-      ref={innerRef}
-      className="relative w-full shrink-0"
-    >
+    <div ref={useFlowNode('output')} data-flow-node="output" className="relative w-full shrink-0">
       <div aria-hidden className="pointer-events-none absolute -inset-5 rounded-[28px] bg-[var(--accent-vivid)]/[0.07] blur-2xl os-halo" />
-      <div className="relative rounded-2xl border border-[var(--accent-vivid)] bg-[var(--surface)] shadow-[0_20px_54px_color-mix(in oklch, var(--on-surface) 14%, transparent),0_0_0_4px_color-mix(in oklch, var(--accent-vivid) 7%, transparent)] p-4">
+      <div className="os-output relative rounded-2xl border border-[var(--accent-vivid)] bg-[var(--surface)] p-4">
         <p className="text-[8.5px] font-bold tracking-[0.2em] text-[var(--accent)] uppercase">Output</p>
         <h3 className="mt-1.5 text-[13px] font-extrabold leading-snug text-[var(--on-surface)]">Qualified Conversations</h3>
         <div className="mt-3 flex flex-col gap-1.5">
@@ -301,7 +338,7 @@ function OutputPanel({ innerRef }: { innerRef?: React.Ref<HTMLDivElement> }) {
           </div>
         </div>
       </div>
-    </motion.div>
+    </div>
   );
 }
 
@@ -403,263 +440,250 @@ function DetailPanel({ m, onClose }: { m: Module; onClose: () => void }) {
   );
 }
 
-/* --------------------------------- slide ---------------------------------- */
+/* ------------------------------ choreography ------------------------------
+   Module-level constants so the arrays keep a stable identity across renders —
+   `useFlowSequence` takes them as effect dependencies.
+
+   The windows are authored so a card lands as its connector reaches it, which
+   is the whole point of splitting scrubbed motion from triggered motion: the
+   wire arrives on the scrubber's clock, the card bounces on its own. */
+
+const WIRES: Wire[] = [
+  { id: 'input~engine', from: 0.08, to: 0.32 },
+  { id: 'engine~output', from: 0.6, to: 0.86 },
+];
+
+const POPS: Pop[] = [
+  { id: 'input', at: 0.02 },
+  { id: 'engine', at: 0.32 }, // exactly where wire 1 lands
+  ...MODULES.map((m, i) => ({ id: `m-${m.num}`, at: 0.38 + i * 0.035 })),
+  { id: 'output', at: 0.86 }, // exactly where wire 2 lands
+];
+
+/* Both connectors run straight down the column's centre line, from one panel's
+   bottom edge to the next panel's top edge. `drop` builds a single `V` command,
+   so `getTotalLength()` describes the whole run and the pulse can ride it end
+   to end without a seam. */
+function outreachPaths(n: FlowNodes): FlowPath[] {
+  const out: FlowPath[] = [];
+  const link = (a: string, b: string) => {
+    const from = n[a];
+    const to = n[b];
+    if (!from || !to) return;
+    out.push({ id: `${a}~${b}`, d: drop(from.cx, from.bottom, to.top), hot: true, width: 1.5, opacity: 0.35 });
+  };
+  link('input', 'engine');
+  link('engine', 'output');
+  return out;
+}
 
 export default function OutreachOSSlide() {
   const [active, setActive] = useState<number | null>(null);
+  const still = !!useReducedMotion();
+
   const slideRef = useRef<HTMLDivElement>(null);
-  const canvasRef = useRef<HTMLDivElement>(null);
-  const inputPanelRef = useRef<HTMLDivElement>(null);
-  const engineWindowRef = useRef<HTMLDivElement>(null);
-  const outputPanelRef = useRef<HTMLDivElement>(null);
-  const activeCardRef = useRef<HTMLElement | null>(null);
+  const hoveredCardRef = useRef<HTMLElement | null>(null);
 
-  useLayoutEffect(() => {
+  const paths = useCallback((n: FlowNodes) => outreachPaths(n), []);
+
+  /* ── 1, 2 and 3: line draw, travelling pulse, springy pop-in ───────────── */
+  useFlowSequence({
+    root: slideRef,
+    scope: slideRef,
+    wires: WIRES,
+    pops: POPS,
+    start: 'top 85%',
+    end: 'bottom 55%',
+  });
+
+  /* ── The outcome anchor: dock, tether, payoff ──────────────────────────────
+     Driven by the slide's own scroll progress. This never needed the pin that
+     used to wrap it — it only ever needed a number between 0 and 1. */
+  useEffect(() => {
     const slide = slideRef.current;
-    const canvas = canvasRef.current;
-    const input = inputPanelRef.current;
-    const engine = engineWindowRef.current;
-    const output = outputPanelRef.current;
+    if (!slide) return;
 
-    if (!slide || !canvas || !input || !engine || !output) return;
+    /* OutcomeAnchor renders nothing under reduced motion or below sm, so there
+       is no point driving it — the slide shows its inline outcome card
+       instead (see the render below). */
+    if (still) return;
+    if (!window.matchMedia('(min-width: 640px)').matches) return;
 
-    const reducedMotion = typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (reducedMotion) {
-      gsap.set([input, engine, output], { opacity: 1, y: 0, scale: 1 });
-      gsap.set(canvas, { scale: 1, opacity: 1 });
-      return;
-    }
+    gsap.registerPlugin(ScrollTrigger);
 
-    gsap.set([input, engine, output], { opacity: 0, y: 28, scale: 0.97 });
-    gsap.set(canvas, { scale: 0.96, opacity: 0.9, transformOrigin: 'center top' });
+    /* THE TETHER'S SOURCE IS WHATEVER IS ACTUALLY ON SCREEN.
+       The previous revision defaulted to the Output panel, which during the
+       reveal sits ~1,800px below the fold — the measured tether ran from
+       y=1802 inside a 900px-tall fixed overlay, so all but the last stub was
+       off-screen. The source is now the tethered element nearest the middle of
+       the VIEWPORT, skipping anything not currently visible. A hovered or
+       focused module card wins, because that is a deliberate act of attention. */
+    const getSource = (): DOMRect | null => {
+      const hovered = hoveredCardRef.current;
+      if (hovered?.isConnected) {
+        const hr = hovered.getBoundingClientRect();
+        if (hr.bottom > 0 && hr.top < window.innerHeight) return hr;
+      }
+      const mid = window.innerHeight / 2;
+      let best: DOMRect | null = null;
+      let bestDist = Infinity;
+      slide.querySelectorAll<HTMLElement>('[data-flow-node]').forEach((el) => {
+        const r = el.getBoundingClientRect();
+        if (r.bottom < 0 || r.top > window.innerHeight) return; // off-screen
+        const d = Math.abs(r.top + r.height / 2 - mid);
+        if (d < bestDist) {
+          bestDist = d;
+          best = r;
+        }
+      });
+      return best;
+    };
 
-    const sr = slide.getBoundingClientRect();
-    const ir = input.getBoundingClientRect();
-    const er = engine.getBoundingClientRect();
-    const or_ = output.getBoundingClientRect();
-    const cx = sr.width / 2;
+    type Phase = 'idle' | 'docked' | 'payoff';
+    let phase: Phase = 'idle';
+    /* The payoff is a beat, not a resting state. Without this the chip and its
+       tether stayed pinned over the closing ink band and the footer for the
+       rest of the session, which turns the punchline into furniture. It takes
+       its bow, then leaves; scrolling back up re-docks it. */
+    let retired = false;
+    let timer: number | undefined;
+    const clearTimer = () => {
+      if (timer !== undefined) {
+        window.clearTimeout(timer);
+        timer = undefined;
+      }
+    };
 
-    const paths = [
-      { el: document.getElementById('os-conn-1'), from: ir.bottom - sr.top, to: er.top - sr.top },
-      { el: document.getElementById('os-conn-2'), from: er.bottom - sr.top, to: or_.top - sr.top },
-    ];
+    const go = (next: Phase) => {
+      if (next === phase) return;
+      phase = next;
+      clearTimer();
+      if (next === 'idle') {
+        anchorBus.emit({ type: 'undock' });
+      } else if (next === 'docked') {
+        anchorBus.emit({ type: 'dock', source: getSource });
+      } else {
+        anchorBus.emit({ type: 'payoff' });
+        /* Reaching the end of the outreach system is what unlocks the master
+           framework's return-to-overview payoff (stage 6). */
+        markDeckSeen();
+        timer = window.setTimeout(() => {
+          retired = true;
+          phase = 'idle';
+          anchorBus.emit({ type: 'undock' });
+        }, 1800);
+      }
+    };
 
-    paths.forEach(({ el, from, to }) => {
-      if (!el) return;
-      el.setAttribute('d', `M ${cx} ${from} V ${to}`);
-      const len = (el as unknown as SVGGeometryElement).getTotalLength();
-      el.style.strokeDasharray = `${len}`;
-      el.style.strokeDashoffset = `${len}`;
-    });
-
-    const conn1 = document.getElementById('os-conn-1');
-    const pulse1 = document.getElementById('os-pulse-1');
-    const conn2 = document.getElementById('os-conn-2');
-    const pulse2 = document.getElementById('os-pulse-2');
-
-    const scrub = ScrollTrigger.create({
+    const st = ScrollTrigger.create({
       trigger: slide,
-      start: 'top 80%',
-      end: 'bottom 20%',
-      scrub: 1,
+      start: 'top 72%',
+      end: 'bottom 45%',
       onUpdate: (self) => {
         const p = self.progress;
-        const p1 = Math.min(1, p * 2);
-        const p2 = Math.max(0, Math.min(1, (p - 0.45) * 2));
-
-        if (conn1 && pulse1) {
-          const len = (conn1 as unknown as SVGGeometryElement).getTotalLength();
-          conn1.style.strokeDashoffset = `${len * (1 - p1)}`;
-          const pt = (conn1 as unknown as SVGGeometryElement).getPointAtLength(len * p1);
-          pulse1.setAttribute('cx', `${pt.x}`);
-          pulse1.setAttribute('cy', `${pt.y}`);
-          pulse1.setAttribute('opacity', p1 > 0.01 && p1 < 0.99 ? '1' : '0');
-        }
-        if (conn2 && pulse2) {
-          const len = (conn2 as unknown as SVGGeometryElement).getTotalLength();
-          conn2.style.strokeDashoffset = `${len * (1 - p2)}`;
-          const pt = (conn2 as unknown as SVGGeometryElement).getPointAtLength(len * p2);
-          pulse2.setAttribute('cx', `${pt.x}`);
-          pulse2.setAttribute('cy', `${pt.y}`);
-          pulse2.setAttribute('opacity', p2 > 0.01 && p2 < 0.99 ? '1' : '0');
-        }
+        /* Coming back up far enough re-arms the payoff, so it can land again
+           on a second pass instead of being spent for good. */
+        if (p < 0.9) retired = false;
+        if (p <= 0.001) go('idle');
+        else if (p >= 0.985) {
+          if (!retired) go('payoff');
+        } else go('docked');
+      },
+      /* Past the end of the diagram entirely, the chip has said its piece. */
+      onLeave: () => {
+        if (!retired) go('payoff');
+      },
+      onLeaveBack: () => {
+        retired = false;
+        go('idle');
       },
     });
 
-    const show = (el: HTMLElement | null) =>
-      gsap.to(el, { opacity: 1, y: 0, scale: 1, duration: 0.55, ease: 'back.out(1.7)' });
-    const hide = (el: HTMLElement | null) =>
-      gsap.to(el, { opacity: 0, y: 28, scale: 0.97, duration: 0.3 });
-
-    const popIn = (el: HTMLElement | null, startPct: number) => {
-      const st = ScrollTrigger.create({
-        trigger: slide,
-        start: `top ${startPct}%`,
-        onEnter: () => show(el),
-        onLeaveBack: () => hide(el),
-      });
-      // If already past the start point when created, show immediately
-      const startY = (startPct / 100) * window.innerHeight;
-      if (slide.getBoundingClientRect().top <= startY) {
-        show(el);
-      }
-      return st;
+    /* `pointerover` / `pointerout`, not `pointerenter` / `pointerleave`.
+       The enter/leave pair does not bubble and fires once for the container,
+       so moving between two module cards inside the engine never re-targeted
+       the tether — it stayed stuck on whichever card happened to be under the
+       cursor when the pointer first crossed the engine's edge. */
+    const onOver = (e: Event) => {
+      const t = e.target;
+      if (!(t instanceof HTMLElement)) return;
+      const card = t.closest('[data-module-card]');
+      hoveredCardRef.current = card instanceof HTMLElement ? card : null;
     };
-
-    const stInput = popIn(input, 78);
-    const stEngine = popIn(engine, 58);
-    const stOutput = popIn(output, 38);
-
-    const setScale = gsap.quickSetter(canvas, 'scale', '');
-    const setOpacity = gsap.quickSetter(canvas, 'opacity', '');
-
-    /* ── Stage 3+ — outcome anchor dock / tether / payoff ─────────────── */
-    let zoom: ScrollTrigger | null = null;
-    let undock: ScrollTrigger | null = null;
-    let removeTargetListeners: (() => void) | null = null;
-    /* Pin + zoom is motion-heavy: keep the plain sequential reveal below 640px */
-    const wide = window.matchMedia('(min-width: 640px)').matches;
-
-    if (wide) {
-      /* Live tether source: the hovered/focused module card, or the Output
-         panel by default. `getSource` reads the ref on every frame so the
-         rAF loop in OutcomeAnchor re-targets without extra events. */
-      const getSource = (): DOMRect | null => {
-        const card = activeCardRef.current;
-        if (card && card.isConnected) return card.getBoundingClientRect();
-        return output ? output.getBoundingClientRect() : null;
-      };
-
-      let didPayoff = false;
-
-      zoom = ScrollTrigger.create({
-        trigger: slide,
-        start: 'top 75%',
-        end: '+=1500',
-        pin: true,
-        scrub: 1,
-        onEnter: () => {
-          didPayoff = false;
-          anchorBus.emit({ type: 'dock', source: getSource });
-        },
-        onLeaveBack: () => {
-          didPayoff = false;
-          anchorBus.emit({ type: 'undock' });
-        },
-        onUpdate: (self) => {
-          const p = self.progress;
-          setScale(0.96 + p * 0.04);
-          setOpacity(0.9 + p * 0.1);
-          /* The payoff lands once, at the end of the zoom, going forward */
-          if (p >= 1 && !didPayoff && self.direction === 1) {
-            didPayoff = true;
-            anchorBus.emit({ type: 'payoff' });
-          }
-        },
-      });
-
-      /* Once the chapter has scrolled fully past, let the chip go */
-      undock = ScrollTrigger.create({
-        trigger: slide,
-        start: 'bottom top',
-        onEnter: () => anchorBus.emit({ type: 'undock' }),
-      });
-
-      /* hover / focus on a module card re-targets the tether's source */
-      const handleTarget = (e: PointerEvent | FocusEvent) => {
-        const t = e.target;
-        if (!(t instanceof HTMLElement)) return;
-        const card = t.closest('[data-module-card]');
-        if (card instanceof HTMLElement) activeCardRef.current = card;
-      };
-      const handleTargetLeave = () => {
-        activeCardRef.current = null;
-      };
-      engine.addEventListener('pointerenter', handleTarget);
-      engine.addEventListener('focusin', handleTarget);
-      engine.addEventListener('pointerleave', handleTargetLeave);
-      removeTargetListeners = () => {
-        engine.removeEventListener('pointerenter', handleTarget);
-        engine.removeEventListener('focusin', handleTarget);
-        engine.removeEventListener('pointerleave', handleTargetLeave);
-      };
-    }
-
-    ScrollTrigger.refresh();
+    const onOut = (e: PointerEvent) => {
+      if (!e.relatedTarget || !(e.relatedTarget instanceof Node) || !slide.contains(e.relatedTarget)) {
+        hoveredCardRef.current = null;
+      }
+    };
+    slide.addEventListener('pointerover', onOver);
+    slide.addEventListener('focusin', onOver);
+    slide.addEventListener('pointerout', onOut as EventListener);
 
     return () => {
-      scrub.kill();
-      stInput.kill();
-      stEngine.kill();
-      stOutput.kill();
-      zoom?.kill();
-      undock?.kill();
-      removeTargetListeners?.();
+      slide.removeEventListener('pointerover', onOver);
+      slide.removeEventListener('focusin', onOver);
+      slide.removeEventListener('pointerout', onOut as EventListener);
+      clearTimer();
+      st.kill();
       anchorBus.emit({ type: 'undock' });
-      gsap.set([input, engine, output], { clearProps: 'all' });
-      gsap.set(canvas, { clearProps: 'all' });
     };
-  }, []);
+  }, [still]);
 
   return (
     <div ref={slideRef} className="relative w-full max-w-165">
-      <div ref={canvasRef} className="relative">
-        <svg
-          className="absolute inset-0 h-full w-full pointer-events-none overflow-visible"
-          style={{ zIndex: 1 }}
-          aria-hidden
+      <div className="relative rounded-2xl p-1 sm:p-2">
+        <motion.h2
+          initial={{ opacity: 0, y: 10 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '0px 0px -10% 0px' }}
+          transition={{ duration: 0.5, ease: EASE }}
+          className="relative font-display-md mb-8 text-[clamp(1.6rem,4vw,2.4rem)] text-(--on-surface)"
         >
-          <path id="os-conn-1" d="" fill="none" stroke="var(--accent-vivid)" strokeOpacity={0.35} strokeWidth={1.5} strokeLinecap="round" />
-          <circle id="os-pulse-1" r={3.5} fill="var(--accent-vivid)" opacity={0} />
-          <path id="os-conn-2" d="" fill="none" stroke="var(--accent-vivid)" strokeOpacity={0.35} strokeWidth={1.5} strokeLinecap="round" />
-          <circle id="os-pulse-2" r={3.5} fill="var(--accent-vivid)" opacity={0} />
-        </svg>
+          You tell us once.
+        </motion.h2>
 
-        <div className="relative rounded-2xl p-1 sm:p-2">
-          <motion.h2
-            initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, ease: EASE }}
-            className="relative font-display-md mb-8 text-[clamp(1.6rem,4vw,2.4rem)] text-(--on-surface)"
-          >
-            You tell us once.
-          </motion.h2>
+        <div
+          aria-hidden
+          className="absolute inset-0 pointer-events-none opacity-70"
+          style={{ backgroundImage: 'radial-gradient(circle, color-mix(in oklch, var(--on-surface) 5%, transparent) 1px, transparent 1px)', backgroundSize: '26px 26px' }}
+        />
+        <div aria-hidden className="absolute inset-x-0 top-0 h-px bg-(--rule) pointer-events-none" />
+
+        <FlowCanvas paths={paths} className="relative">
+          <StageLabel>01 · Input</StageLabel>
+          <InputPanel />
+          <div className="h-16 md:h-20" aria-hidden />
+          <StageLabel>02 · Engine</StageLabel>
+          <EngineWindow onOpen={setActive} />
+          <div className="h-16 md:h-20" aria-hidden />
+          <StageLabel>03 · Output</StageLabel>
+          <OutputPanel />
+
+          {/* Inline outcome. The docked chip is not rendered below sm, nor
+              under reduced motion, so in both cases the payoff has to read as
+              a plain card at the end of the diagram instead. `still` is a
+              runtime check, which is why this is not a pure `sm:hidden`. */}
           <div
-            aria-hidden
-            className="absolute inset-0 pointer-events-none opacity-70"
-            style={{ backgroundImage: 'radial-gradient(circle, color-mix(in oklch, var(--on-surface) 5%, transparent) 1px, transparent 1px)', backgroundSize: '26px 26px' }}
-          />
-          <div aria-hidden className="absolute inset-x-0 top-0 h-px bg-(--rule) pointer-events-none" />
-
-          <div className="relative flex flex-col items-stretch">
-            <StageLabel>01 · Input</StageLabel>
-            <InputPanel innerRef={inputPanelRef} />
-            <div className="h-16 md:h-20" aria-hidden />
-            <StageLabel>02 · Engine</StageLabel>
-            <EngineWindow innerRef={engineWindowRef} onOpen={setActive} />
-            <div className="h-16 md:h-20" aria-hidden />
-            <StageLabel>03 · Output</StageLabel>
-            <OutputPanel innerRef={outputPanelRef} />
-
-            {/* Inline outcome — below sm the docked OutcomeAnchor chip is
-                not rendered (mobile fallback), so the payoff reads as a
-                plain card at the diagram end instead. */}
-            <div className="mt-3 rounded-2xl border border-[var(--accent-vivid)] bg-[var(--accent-vivid)]/[0.05] px-4 py-3.5 sm:hidden">
-              <div className="flex items-center gap-2.5">
-                <span className="w-2 h-2 rounded-full bg-[var(--accent-vivid)] shrink-0" />
-                <p className="text-[13px] font-extrabold tracking-tight text-[var(--on-surface)]">
-                  More Clients, Faster
-                </p>
-              </div>
-              <p className="mt-1 text-[10.5px] leading-snug text-[var(--muted)] font-medium">
-                Content earns attention, outreach converts it — one loop, run for you.
+            className={cn(
+              'mt-3 rounded-2xl border border-[var(--accent-vivid)] bg-[var(--accent-vivid)]/[0.05] px-4 py-3.5',
+              still ? '' : 'sm:hidden'
+            )}
+          >
+            <div className="flex items-center gap-2.5">
+              <span className="w-2 h-2 rounded-full bg-[var(--accent-vivid)] shrink-0" />
+              <p className="text-[13px] font-extrabold tracking-tight text-[var(--on-surface)]">
+                More Clients, Faster
               </p>
             </div>
+            <p className="mt-1 text-[10.5px] leading-snug text-[var(--muted)] font-medium">
+              Content earns attention, outreach converts it — one loop, run for you.
+            </p>
           </div>
+        </FlowCanvas>
 
-          <AnimatePresence>
-            {active !== null && <DetailPanel m={MODULES[active]} onClose={() => setActive(null)} />}
-          </AnimatePresence>
-        </div>
+        <AnimatePresence>
+          {active !== null && <DetailPanel m={MODULES[active]} onClose={() => setActive(null)} />}
+        </AnimatePresence>
       </div>
 
       <style>{`
@@ -669,27 +693,44 @@ export default function OutreachOSSlide() {
           border: 1px solid var(--rule);
           box-shadow: 0 4px 14px color-mix(in oklch, var(--on-surface) 6%, transparent);
         }
+        .os-engine { box-shadow: 0 8px 24px color-mix(in oklch, var(--on-surface) 6%, transparent); }
         .os-drawer { box-shadow: -24px 0 60px color-mix(in oklch, var(--on-surface) 14%, transparent); }
 
-        .os-joint {
-          position: absolute;
-          left: 50%;
-          width: 6px;
-          height: 6px;
-          margin-left: -3px;
-          border-radius: var(--radius-pill);
-          background: var(--surface);
-          border: 1px solid var(--rule-strong);
+        /* The last two shadows that had never rendered. Tailwind splits a class
+           attribute on whitespace, so shadow-[0_20px_54px_color-mix(in oklch,
+           ...)] was being torn into four junk class names and silently dropped.
+           The output panel is the end of the story and carries the heaviest
+           elevation on the slide — it had none of it. */
+        .os-output {
+          box-shadow: 0 20px 54px color-mix(in oklch, var(--on-surface) 14%, transparent),
+                      0 0 0 4px color-mix(in oklch, var(--accent-vivid) 7%, transparent);
         }
-        .os-spark {
-          position: absolute;
-          left: 50%;
-          width: 5px;
-          height: 5px;
-          margin-left: -2.5px;
-          border-radius: var(--radius-pill);
-          background: var(--accent-vivid);
-          box-shadow: 0 0 6px color-mix(in oklch, var(--accent-vivid) 60%, transparent);
+        .os-reply-ok { box-shadow: 0 6px 18px color-mix(in oklch, var(--accent-vivid) 16%, transparent); }
+
+        /* Was four Tailwind arbitrary values carrying literal spaces, e.g.
+           shadow-[0_8px_20px_color-mix(in oklch, ...)] — the class attribute
+           splits on those spaces, so none of these shadows had ever rendered.
+
+           TRANSITION ONLY WHAT GSAP DOES NOT OWN. These cards carried
+           transition-all duration-300, and GSAP pops them with back.out(1.7)
+           on opacity and scale — so every per-frame write GSAP made was then
+           re-eased over 300ms by CSS, which flattens an overshoot into a slow
+           fade. Colour and shadow are CSS's; transform and opacity are GSAP's.
+           The hover lift is gone with it: GSAP writes transform inline, and
+           inline beats a stylesheet rule, so the translateY never applied once
+           the pop-in had run. The shadow carries the lift now.
+
+           (No backticks in here — this whole block is a JS template literal,
+           and a stray backtick terminates it.) */
+        .os-module {
+          transition: border-color var(--dur-base) var(--ease-expo),
+                      background-color var(--dur-base) var(--ease-expo),
+                      box-shadow var(--dur-base) var(--ease-expo);
+        }
+        .os-module:hover {
+          border-color: color-mix(in oklch, var(--accent-vivid) 50%, transparent);
+          background-color: color-mix(in oklch, var(--accent-vivid) 2.5%, var(--surface));
+          box-shadow: 0 10px 24px color-mix(in oklch, var(--accent-vivid) 14%, transparent);
         }
 
         .os-blink { animation: osBlink 2.2s ease-in-out infinite; }
