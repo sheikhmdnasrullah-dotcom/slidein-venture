@@ -51,6 +51,7 @@ import ChapterRun, { type ChapterDef } from '@/components/PitchDeck/ChapterRun';
 import FrameworkFlowSlide from '@/components/PitchDeck/FrameworkFlowSlide';
 import OrbitSlide from '@/components/PitchDeck/OrbitSlide';
 import OutreachOSSlide from '@/components/PitchDeck/OutreachOSSlide';
+import OutcomeAnchor from '@/components/PitchDeck/OutcomeAnchor';
 import InputSlide from '@/components/PitchDeck/InputSlide';
 
 const CHAPTERS: ChapterDef[] = [
@@ -226,6 +227,12 @@ export default function PitchDeck() {
       </Section>
 
       <Close />
+
+      {/* Stage 3+ — persistent "More Clients, Faster" outcome chip, tethered
+          to the active outreach module while that diagram is pinned. Rendered
+          here (not inside ChapterRun) so the fixed overlay survives deferred
+          chapter mounting and never remounts. */}
+      <OutcomeAnchor />
 
       <ServiceDetailModal open={modalOpen} onClose={closeModal} serviceId={modalServiceId} onChange={setModalServiceId} />
     </>

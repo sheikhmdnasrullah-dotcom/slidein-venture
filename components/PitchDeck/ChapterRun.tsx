@@ -55,6 +55,19 @@ export type ChapterDef = {
   flow?: boolean;
 };
 
+/* RAIL LINKS ARE PLAIN ANCHORS, DELIBERATELY
+   A previous revision pinned the outreach chapter. A pin traps native anchor
+   jumps, so rail clicks ran a disable-pins / scroll / re-enable dance. It did
+   not work, for two compounding reasons: `pinned` was never declared, and even
+   with the declaration, disabling a pin reverts its spacer and changes the
+   document height — so the synchronous `scrollIntoView` aimed at a layout that
+   had already moved. Measured result: scrollY 5093 → 5093, the page did not
+   move at all, which is precisely the "don't trap the user" failure.
+
+   Nothing pins any more (see OutreachOSSlide). A plain `href` is both correct
+   and unbreakable. Do not reintroduce a click handler here unless a pin that
+   genuinely needs one comes back. */
+
 /* ── Index rail ────────────────────────────────────────────────────────────
    Fixed, left, xl and up. One tick per chapter: the active one grows and goes
    orange, the rest are hairlines. The chapter name is hover-only — including
@@ -80,7 +93,11 @@ function IndexRail({
           const on = active === c.id;
           return (
             <li key={c.id}>
-              <a href={`#${c.id}`} className="group flex items-center gap-3" aria-current={on ? 'true' : undefined}>
+              <a
+                href={`#${c.id}`}
+                className="group flex items-center gap-3"
+                aria-current={on ? 'true' : undefined}
+              >
                 <span
                   className={cn(
                     'block h-px transition-all duration-500',

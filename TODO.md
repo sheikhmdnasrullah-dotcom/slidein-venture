@@ -1,8 +1,14 @@
-# Task: Flip outreach input rows on Slide 2 (FrameworkFlowSlide)
+# PitchDeck — Stage 3+ Build (Outcome Anchor, Tether, Payoff)
 
-## Steps
-- [x] 1. Edit `components/PitchDeck/FrameworkFlowSlide.tsx` — `BOT_INPUT`:
-  - Top row: "We Discuss Your ICP" (orange client-highlight moved here)
-  - Bottom row: "Ideal Client Research" (plain)
-- [x] 2. Update the SVG `aria-label` in the same file to match the new row labels.
-- [x] 3. Verify the change runs cleanly (lint/typecheck).
+Scope confirmed: **Option B** — build the stage 3+ sequence on the already-vertical
+Outreach diagram only. `FrameworkFlowSlide` and `DistributionSlide` stay horizontal.
+
+- [x] Confirm scope (Option B) with user
+- [x] Read deck architecture (`PitchDeck`, `ChapterRun`, `OutreachOSSlide`, slides)
+- [x] Confirm stack (GSAP 3.15 + ScrollTrigger present; no new deps)
+- [x] Create `components/PitchDeck/OutcomeAnchor.tsx` (chip + tether + store)
+- [x] Wire `OutreachOSSlide` dock / tether / payoff lifecycle into the stage-3 pin window
+- [x] Gate pin-zoom to ≥ 640px; add mobile sequential fallback + inline outcome card
+- [x] Add IndexRail nav-click escape (disable / re-enable ScrollTriggers during jump)
+- [x] Mount `<OutcomeAnchor />` once at the `PitchDeck` root
+- [ ] Verify: `npx tsc --noEmit` + `npx playwright test tests/deck.spec.ts` + manual scroll check

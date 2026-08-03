@@ -26,6 +26,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { cn } from '@/lib/utils';
+import { anchorBus } from '@/components/PitchDeck/OutcomeAnchor';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -195,6 +196,7 @@ function EngineWindow({ innerRef, onOpen }: { innerRef?: React.Ref<HTMLDivElemen
           <motion.button
             key={m.num}
             type="button"
+            data-module-card
             onClick={() => onOpen(i)}
             initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, ease: EASE, delay: 0.65 + i * 0.09 }}
@@ -410,6 +412,7 @@ export default function OutreachOSSlide() {
   const inputPanelRef = useRef<HTMLDivElement>(null);
   const engineWindowRef = useRef<HTMLDivElement>(null);
   const outputPanelRef = useRef<HTMLDivElement>(null);
+  const activeCardRef = useRef<HTMLElement | null>(null);
 
   useLayoutEffect(() => {
     const slide = slideRef.current;
@@ -510,18 +513,77 @@ export default function OutreachOSSlide() {
     const setScale = gsap.quickSetter(canvas, 'scale', '');
     const setOpacity = gsap.quickSetter(canvas, 'opacity', '');
 
-    const zoom = ScrollTrigger.create({
-      trigger: slide,
-      start: 'top 75%',
-      end: '+=1500',
-      pin: true,
-      scrub: 1,
-      onUpdate: (self) => {
-        const p = self.progress;
-        setScale(0.96 + p * 0.04);
-        setOpacity(0.9 + p * 0.1);
-      },
-    });
+    /* ── Stage 3+ — outcome anchor dock / tether / payoff ─────────────── */
+    let zoom: ScrollTrigger | null = null;
+    let undock: ScrollTrigger | null = null;
+    let removeTargetListeners: (() => void) | null = null;
+    /* Pin + zoom is motion-heavy: keep the plain sequential reveal below 640px */
+    const wide = window.matchMedia('(min-width: 640px)').matches;
+
+    if (wide) {
+      /* Live tether source: the hovered/focused module card, or the Output
+         panel by default. `getSource` reads the ref on every frame so the
+         rAF loop in OutcomeAnchor re-targets without extra events. */
+      const getSource = (): DOMRect | null => {
+        const card = activeCardRef.current;
+        if (card && card.isConnected) return card.getBoundingClientRect();
+        return output ? output.getBoundingClientRect() : null;
+      };
+
+      let didPayoff = false;
+
+      zoom = ScrollTrigger.create({
+        trigger: slide,
+        start: 'top 75%',
+        end: '+=1500',
+        pin: true,
+        scrub: 1,
+        onEnter: () => {
+          didPayoff = false;
+          anchorBus.emit({ type: 'dock', source: getSource });
+        },
+        onLeaveBack: () => {
+          didPayoff = false;
+          anchorBus.emit({ type: 'undock' });
+        },
+        onUpdate: (self) => {
+          const p = self.progress;
+          setScale(0.96 + p * 0.04);
+          setOpacity(0.9 + p * 0.1);
+          /* The payoff lands once, at the end of the zoom, going forward */
+          if (p >= 1 && !didPayoff && self.direction === 1) {
+            didPayoff = true;
+            anchorBus.emit({ type: 'payoff' });
+          }
+        },
+      });
+
+      /* Once the chapter has scrolled fully past, let the chip go */
+      undock = ScrollTrigger.create({
+        trigger: slide,
+        start: 'bottom top',
+        onEnter: () => anchorBus.emit({ type: 'undock' }),
+      });
+
+      /* hover / focus on a module card re-targets the tether's source */
+      const handleTarget = (e: PointerEvent | FocusEvent) => {
+        const t = e.target;
+        if (!(t instanceof HTMLElement)) return;
+        const card = t.closest('[data-module-card]');
+        if (card instanceof HTMLElement) activeCardRef.current = card;
+      };
+      const handleTargetLeave = () => {
+        activeCardRef.current = null;
+      };
+      engine.addEventListener('pointerenter', handleTarget);
+      engine.addEventListener('focusin', handleTarget);
+      engine.addEventListener('pointerleave', handleTargetLeave);
+      removeTargetListeners = () => {
+        engine.removeEventListener('pointerenter', handleTarget);
+        engine.removeEventListener('focusin', handleTarget);
+        engine.removeEventListener('pointerleave', handleTargetLeave);
+      };
+    }
 
     ScrollTrigger.refresh();
 
@@ -530,7 +592,10 @@ export default function OutreachOSSlide() {
       stInput.kill();
       stEngine.kill();
       stOutput.kill();
-      zoom.kill();
+      zoom?.kill();
+      undock?.kill();
+      removeTargetListeners?.();
+      anchorBus.emit({ type: 'undock' });
       gsap.set([input, engine, output], { clearProps: 'all' });
       gsap.set(canvas, { clearProps: 'all' });
     };
@@ -574,6 +639,21 @@ export default function OutreachOSSlide() {
             <div className="h-16 md:h-20" aria-hidden />
             <StageLabel>03 · Output</StageLabel>
             <OutputPanel innerRef={outputPanelRef} />
+
+            {/* Inline outcome — below sm the docked OutcomeAnchor chip is
+                not rendered (mobile fallback), so the payoff reads as a
+                plain card at the diagram end instead. */}
+            <div className="mt-3 rounded-2xl border border-[var(--accent-vivid)] bg-[var(--accent-vivid)]/[0.05] px-4 py-3.5 sm:hidden">
+              <div className="flex items-center gap-2.5">
+                <span className="w-2 h-2 rounded-full bg-[var(--accent-vivid)] shrink-0" />
+                <p className="text-[13px] font-extrabold tracking-tight text-[var(--on-surface)]">
+                  More Clients, Faster
+                </p>
+              </div>
+              <p className="mt-1 text-[10.5px] leading-snug text-[var(--muted)] font-medium">
+                Content earns attention, outreach converts it — one loop, run for you.
+              </p>
+            </div>
           </div>
 
           <AnimatePresence>
