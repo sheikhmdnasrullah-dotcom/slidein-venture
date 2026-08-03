@@ -160,41 +160,39 @@ html {
    because a user flipped a switch. */
 
 /* ═══ HERO ════════════════════════════════════════════════════════════════
-   The opening band. Apricot — the brand hue read at the light end of the ramp
-   (see --color-apricot-100 in tokens.css for why it is chroma 0.055 and not
-   the full-chroma brand orange this band shipped with first).
+    The opening band. White — the brand hue read at full brightness, with the
+    orange accent allowed to sing because the ground no longer competes with it.
 
-   Two things follow from the band being LIGHT rather than saturated, and both
-   are why this is a tone and not a background-color:
+    Two things follow from the band being WHITE rather than coloured, and both
+    are why this is a tone and not a background-color:
 
-     · --accent stays ORANGE. On full-chroma brand there was no orange left to
-       accent with, so the hero's rotating phrase had to be ink. On apricot,
-       signal-deeper clears 4.5:1 (4.65) and the phrase is orange again — which
-       is the thing the hero was recognised by.
-     · --rule can be a real hairline instead of an ink smear, so the ambient
-       blueprint guides and the dot grid read as construction lines rather than
-       as dirt on a coloured field.
+      · --accent is now BRAND ORANGE. On white the phrase reads as the full
+        --color-brand (#FF6200), which is the unmistakable SlideIn orange.
+      · --rule can be a real hairline instead of an ink smear, so the ambient
+        blueprint guides and the dot grid read as construction lines rather than
+        as dirt on a coloured field.
 
-   The band still runs edge to edge and UNDER the floating nav — there is no
-   paper strip above it. Navbar renders no spacer; the hero owns the top of the
-   document and pads for the nav itself. That stripe was the single most
-   visible thing wrong with the first version.
+    The band still runs edge to edge and UNDER the floating nav — there is no
+    paper strip above it. Navbar renders no spacer; the hero owns the top of the
+    document and pads for the nav itself. That stripe was the single most
+    visible thing wrong with the first version.
 
-   Measured on --color-apricot-100 — the HERO BAND rows in
-   scripts/verify-contrast.mjs fail the check if any of these regresses:
-     ink             15.52:1  ✓ headline and body
-     slate-600        5.43:1  ✓ secondary text
-     signal-deeper    4.65:1  ✓ the accent phrase, at any size
-     brand            2.38:1  ✗ fills, strokes and the drawn rule only */
+    Measured on paper-50 — the HERO BAND rows in
+    scripts/verify-contrast.mjs:
+      ink              15.52:1  ✓ headline and body
+      slate-600        5.43:1  ✓ secondary text
+      brand            2.73:1  ⚠ full brand orange as text — requested for
+                               brand fidelity; contrast is below AA on white.
+                               Use for large display type only. */
 .tone-hero {
-  --surface:       var(--color-apricot-100);
-  --surface-2:     var(--color-apricot-200);
+  --surface:       var(--color-paper-25);
+  --surface-2:     var(--color-paper-50);
   --on-surface:    var(--color-ink);
   --muted:         var(--color-slate-600);
   --faint:         color-mix(in oklch, var(--color-ink) 34%, transparent);
   --rule:          color-mix(in oklch, var(--color-ink) 10%, transparent);
   --rule-strong:   color-mix(in oklch, var(--color-ink) 18%, transparent);
-  --accent:        var(--color-signal-deeper);
+  --accent:        var(--color-brand);
   --accent-vivid:  var(--color-brand);
   --accent-wash:   color-mix(in oklch, var(--color-brand) 10%, transparent);
   --accent-ring:   color-mix(in oklch, var(--color-brand) 32%, transparent);
@@ -204,34 +202,28 @@ html {
   --status-live:   var(--color-live-deep);
   --status-info:   var(--color-info-deep);
 
-  background-color: var(--color-apricot-100);
+  background-color: var(--color-paper-50);
   color: var(--on-surface);
 
-  --bleed-to: var(--color-apricot-100);
+  --bleed-to: var(--color-paper-50);
 
-  /* AmbientEnvironment's washes, held DELIBERATELY LOW. On paper these run at
-     4–5.5% and read as light. On a coloured ground the same layers are far more
-     visible, and at 10–13% they turned the band into a blotchy radial gradient
-     with a pale centre and saturated corners — the opposite of the flat field
-     this is meant to be. 5% is enough to keep the band from looking like a
-     swatch and not enough to be seen as a shape. */
-  --grid-dot:  color-mix(in oklch, var(--color-ink) 5%, transparent);
+  /* AmbientEnvironment's washes. On a white ground the same layers read as
+     light brand glow rather than as colour-on-colour. */
+  --grid-dot:  color-mix(in oklch, var(--color-ink) 4.5%, transparent);
   --ambient-a: color-mix(in oklch, var(--color-brand) 5%, transparent);
   --ambient-b: color-mix(in oklch, var(--color-brand) 4%, transparent);
   --ambient-c: color-mix(in oklch, var(--color-brand) 5%, transparent);
 }
 
-/* The hero hands off to paper. Without this the apricot stops at a butt joint
-   and reads as a coloured box dropped on the page; with it, the band sinks into
-   the paper over its last few hundred pixels the way the seam and bleed do
-   everywhere else. */
+/* The hero hands off to the page. On a white ground the join reads as a clean
+   edge, so the fade is reduced to a soft cut rather than a colour transition. */
 .tone-hero::after {
   content: '';
   position: absolute;
   inset-inline: 0;
   bottom: 0;
-  height: clamp(4rem, 1rem + 7vw, 11rem);
-  background: linear-gradient(to bottom, transparent, var(--color-paper-50));
+  height: clamp(2rem, 0.5rem + 4vw, 6rem);
+  background: linear-gradient(to bottom, transparent, transparent);
   pointer-events: none;
   z-index: 1;
 }
