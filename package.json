@@ -4,6 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "next dev & npx next-video sync -w",
+    "sanitise": "node scripts/sanitise-steps.mjs",
+    "prebuild": "node scripts/sanitise-steps.mjs",
     "build": "next build",
     "start": "next start",
     "lint": "eslint"
