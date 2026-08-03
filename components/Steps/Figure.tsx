@@ -27,7 +27,7 @@ import { DisclosureMark, DisclosureTrigger, Tier3 } from './Disclosure';
 
 export function SourceTag({ children }: { children: string }) {
   return (
-    <span className="font-label rounded-[var(--radius-sm)] border border-[var(--rule)] px-1.5 py-0.5 text-[var(--faint)]">
+    <span className="font-label rounded-[var(--radius-sm)] border border-[var(--rule)] px-1.5 py-0.5 text-[var(--muted)]">
       {children}
     </span>
   );

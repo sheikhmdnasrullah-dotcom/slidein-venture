@@ -48,7 +48,7 @@ export default function LeadCard({ className }: { className?: string }) {
             <span
               className={cn(
                 'font-body',
-                row.matched ? 'text-[var(--on-surface)]' : 'text-[var(--faint)]',
+                row.matched ? 'text-[var(--on-surface)]' : 'text-[var(--muted)]',
               )}
             >
               {row.label}

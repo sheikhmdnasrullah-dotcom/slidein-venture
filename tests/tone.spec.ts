@@ -19,7 +19,7 @@ import { test, expect } from '@playwright/test';
  * fact a broken test.
  */
 
-const ROUTES = ['/', '/solutions', '/pricing'];
+const ROUTES = ['/', '/solutions', '/pricing', '/steps'];
 const THEMES = ['day', 'night'] as const;
 
 function srgbToLin(v: number) {

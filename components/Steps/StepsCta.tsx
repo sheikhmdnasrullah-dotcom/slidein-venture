@@ -45,8 +45,18 @@ export default function StepsCta({ className }: { className?: string }) {
             href={CTA.primary.href}
             target="_blank"
             rel="noopener noreferrer"
-            className="btn-premium inline-flex cursor-pointer items-center gap-2 rounded-[var(--radius-pill)] bg-[var(--accent-vivid)] px-8 py-4 text-[var(--on-accent)]"
+            /* An INK slab, not an orange one, and that is a contrast decision
+               rather than a style one. Paper on full chroma brand orange
+               measures 2.82:1, which fails AA for a 16px label — the same trap
+               the design system warns about for `--accent-vivid` as text, in
+               the other direction. The site's documented primary is an ink slab
+               anyway; the orange stays on the dot, where it is a fill. */
+            className="btn-premium group inline-flex cursor-pointer items-center gap-3 rounded-[var(--radius-pill)] bg-[var(--on-surface)] px-8 py-4 text-[var(--surface)]"
           >
+            <span
+              aria-hidden
+              className="block h-1.5 w-1.5 rounded-full bg-[var(--accent-vivid)]"
+            />
             <span className="font-body-lead">{CTA.primary.label}</span>
             <ArrowRight02Icon size={18} strokeWidth={2} />
           </a>

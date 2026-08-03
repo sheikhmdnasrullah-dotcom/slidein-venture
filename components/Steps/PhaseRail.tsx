@@ -105,7 +105,7 @@ function PhaseCard({
             'font-label transition-opacity duration-300',
             isOpen
               ? 'text-[var(--accent)] opacity-100'
-              : 'text-[var(--faint)] opacity-0 group-hover:opacity-100',
+              : 'text-[var(--muted)] opacity-0 group-hover:opacity-100',
           )}
         >
           {isOpen ? 'CLOSE' : 'OPEN'}

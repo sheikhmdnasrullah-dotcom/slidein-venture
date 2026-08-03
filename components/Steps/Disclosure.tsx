@@ -182,7 +182,11 @@ export function StepIndex({
     <MonoLabel
       className={cn(
         'tnum shrink-0',
-        accent ? 'text-[var(--accent)]' : 'text-[var(--faint)]',
+        /* --muted, not --faint. `--faint` reaches 1.76:1 on paper and the
+           design system is explicit that it is not a text tier: it is for
+           icons, ticks and disabled affordances held to the 3:1 bar. A step
+           index is text a reader is meant to read. */
+        accent ? 'text-[var(--accent)]' : 'text-[var(--muted)]',
       )}
     >
       {children}
