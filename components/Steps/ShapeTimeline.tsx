@@ -100,14 +100,13 @@ type Beat = { delay: number; duration: number };
  * the viewport; it simply arrives in one frame instead of over 1.78 seconds,
  * which is what the preference actually asks for. */
 function grow(axis: 'x' | 'y', beat: Beat, still: boolean): Variants {
-  const key = axis === 'x' ? 'scaleX' : 'scaleY';
-  return {
-    hidden: { [key]: 0 },
-    shown: {
-      [key]: 1,
-      transition: still ? { duration: 0 } : { ...beat, ease: EASE },
-    },
-  };
+  /* Written out per axis rather than with a computed `[key]`. A computed key
+     widens the variant to a string index signature, which no longer satisfies
+     Framer's Variant type and takes the whole file's typecheck with it. */
+  const transition = still ? { duration: 0 } : { ...beat, ease: EASE };
+  return axis === 'x'
+    ? { hidden: { scaleX: 0 }, shown: { scaleX: 1, transition } }
+    : { hidden: { scaleY: 0 }, shown: { scaleY: 1, transition } };
 }
 
 function fade(beat: Beat, still: boolean): Variants {

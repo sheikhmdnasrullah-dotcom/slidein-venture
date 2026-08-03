@@ -8,13 +8,6 @@ import { buttonVariants } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { ArrowRight01Icon as ChevronRight, CheckmarkCircle01Icon as CheckCircle2, ArrowRight02Icon as ArrowRight, PlayIcon as Play, SparklesIcon as Sparkles, FlashIcon as Zap, GlobeIcon as Globe, Chart01Icon as BarChart3, Shield01Icon as Shield, RocketIcon as Rocket, GroupLayersIcon as Layers, Flowchart01Icon as Workflow } from 'hugeicons-react';
 import DistributionSlide from '@/components/PitchDeck/DistributionSlide';
-import TheWeekSlide from '@/components/PitchDeck/TheWeekSlide';
-import PipelineSlide from '@/components/PitchDeck/PipelineSlide';
-import GrowthLoopSlide from '@/components/PitchDeck/GrowthLoopSlide';
-import CompoundSlide from '@/components/PitchDeck/CompoundSlide';
-import AlternativeSlide from '@/components/PitchDeck/AlternativeSlide';
-import ChapterRun, { type ChapterDef } from '@/components/PitchDeck/ChapterRun';
-import ScrollReveal, { Rise } from '@/components/PitchDeck/ScrollReveal';
 
 /* Two names for one orange, and the split is load-bearing:
    --accent       the instance that clears 4.5:1 as TEXT on the current band
@@ -203,52 +196,6 @@ const workflowSteps = [
     title: 'Convert',
     description: 'Sit back as qualified leads book calls, engage with your content, and become clients.',
     icon: <Rocket size={24} strokeWidth={2} style={{ color: RED_TEXT }} />,
-  },
-];
-
-/* ── THE STEPS ─────────────────────────────────────────────────────────────
-   These five were the back half of the homepage deck. They moved here because
-   they answer a different question: the homepage says what the system IS, and
-   these say what a week of it looks like, what it produces, why the two halves
-   have to be one purchase, what a year of it compounds to, and what the same
-   result costs assembled out of hires.
-
-   Numbered 01–05 in their own right. They used to be 03 and 06–08 of a
-   nine-chapter homepage run, and carrying those numbers onto a page that starts
-   at 03 would read as a bug. Nothing links to the old numbering.
-
-   The visuals are the original slide components, untouched — same files the
-   homepage renders, same geometry, via the shared ChapterRun. */
-const STEP_CHAPTERS: ChapterDef[] = [
-  {
-    id: 'the-week',
-    number: '01',
-    kicker: 'The Week',
-    lead: 'What actually lands, day by day, from that single recording.',
-  },
-  {
-    id: 'running',
-    number: '02',
-    kicker: 'The System, Running',
-    lead: 'A live readout of the four engines once they are all turning.',
-  },
-  {
-    id: 'one-system',
-    number: '03',
-    kicker: "Why It's One System",
-    lead: 'Content and outreach feed each other. Split them and both get worse.',
-  },
-  {
-    id: 'compound',
-    number: '04',
-    kicker: 'The Compound',
-    lead: 'The part that only shows up in month six.',
-  },
-  {
-    id: 'alternative',
-    number: '05',
-    kicker: 'The Alternative',
-    lead: 'Seven roles, seven salaries, seven people to manage. Or this.',
   },
 ];
 
@@ -555,42 +502,14 @@ export default function SolutionsPage() {
       </section>
 
       {/* ── The Steps ────────────────────────────────────────────────────
-          Was a bare <TheWeekSlide /> in a 1100px box with no heading. It is now
-          the head of a five-chapter run: the back half of the old homepage
-          deck, read by scrolling, in the same treatment the homepage uses. */}
-      <section className="py-24">
-        <div className="mx-auto mb-[clamp(4rem,8vw,9rem)] max-w-[1400px] px-6 md:px-10">
-          <Rise>
-            <span className="font-label mb-6 block text-[var(--accent)]">The Steps</span>
-          </Rise>
-          <ScrollReveal
-            as="h2"
-            className="font-display-xl max-w-[20ch] text-[clamp(2rem,5vw,4rem)] text-[var(--on-surface)]"
-          >
-            One recording in. A week of output, and a year of compounding.
-          </ScrollReveal>
-          <Rise delay={0.1}>
-            <p className="font-body mt-8 max-w-[52ch] text-[var(--muted)]">
-              Five chapters, in order. The week the system produces, the pipeline
-              it fills, why the two halves are one purchase, what a year of it
-              adds up to, and what the same result costs if you hire for it
-              instead.
-            </p>
-          </Rise>
-        </div>
+          MOVED to /steps. The five chapter run that used to close this page is
+          now the last section of /steps, which is where the site's Steps
+          navigation points and where the argument belongs: after the reader has
+          been through the 28 steps of how the work is actually done.
 
-        <ChapterRun
-          chapters={STEP_CHAPTERS}
-          visuals={[
-            <TheWeekSlide key="week" />,
-            <PipelineSlide key="pipeline" />,
-            <GrowthLoopSlide key="loop" />,
-            <CompoundSlide key="compound" />,
-            <AlternativeSlide key="alternative" />,
-          ]}
-          eyebrow="Steps"
-        />
-      </section>
+          Its copy lives in content/steps/deck-chapters.ts and it renders from
+          components/Steps/DeckChapters.tsx. The slide components themselves are
+          untouched. Do not re add it here. */}
 
       {/* ── CTA Section ─────────────────────────────────────────────── */}
       <section className="py-24">

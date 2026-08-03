@@ -130,6 +130,42 @@ export const FIGURES: Figure[] = [
       'Six, because the thumbnail is the single highest leverage asset in the set and one option is not a choice.',
   },
 
+  /* The other four outputs of the fan. They are here rather than typed into
+     artifacts.ts because the rule is that every number on the page comes from
+     this file with a label attached, and "1 article" is a number. */
+  {
+    id: 'transcript-per-episode',
+    value: '1',
+    label: 'CLEANED TRANSCRIPT',
+    sourceLabel: 'TARGET',
+    detail:
+      'Full transcript, cleaned of filler and corrected for names and technical terms, which is also what the show notes and the article are written from.',
+  },
+  {
+    id: 'shownotes-per-episode',
+    value: '1',
+    label: 'TIMESTAMPED SHOW NOTES',
+    sourceLabel: 'TARGET',
+    detail:
+      'Chapter level timestamps with a line for each, so a listener can find the part they came for and a search engine can index it.',
+  },
+  {
+    id: 'article-per-episode',
+    value: '1',
+    label: 'LONG FORM ARTICLE',
+    sourceLabel: 'TARGET',
+    detail:
+      'Written from the transcript rather than pasted from it. Roughly 1,500 words, structured as an article, not as a tidied conversation.',
+  },
+  {
+    id: 'posts-per-episode',
+    value: '4',
+    label: 'LINKEDIN POSTS',
+    sourceLabel: 'TARGET',
+    detail:
+      'Four angles from one episode, scheduled across the week rather than dropped on the day, so the episode keeps arriving after it stops being new.',
+  },
+
   /* ── The strongest sentence in section 02 ─────────────────────────────── */
   {
     id: 'foundation-failure',

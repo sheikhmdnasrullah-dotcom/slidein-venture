@@ -4,6 +4,14 @@ import SectionHead from '@/components/Steps/SectionHead';
 import StepsHero from '@/components/Steps/StepsHero';
 import StepsNav from '@/components/Steps/StepsNav';
 import ShapeTimeline from '@/components/Steps/ShapeTimeline';
+import ContentActs from '@/components/Steps/ContentActs';
+import ActThree from '@/components/Steps/ActThree';
+import WhyColdEmail from '@/components/Steps/WhyColdEmail';
+import PhaseRail from '@/components/Steps/PhaseRail';
+import YourPart from '@/components/Steps/YourPart';
+import StepsCta from '@/components/Steps/StepsCta';
+import DeckChapters from '@/components/Steps/DeckChapters';
+import { DisclosureProvider } from '@/components/Steps/Disclosure';
 import { META, SECTIONS } from '@/content/steps';
 
 /**
@@ -30,15 +38,18 @@ import { META, SECTIONS } from '@/content/steps';
  *   04 your part base       paper-50, back to the page's own value for the
  *                           payoff, which should feel like daylight after the
  *                           densest band on the site.
+ *   05 chapters raised      paper-100, the five chapter run
  *   cta         terminal    paper-200, the last band
  *
  * Every band carries its own `seam` where it meets a band of a different
  * value, and the two ink bands `bleed` so they emerge rather than start.
  *
- * WHAT IS NOT HERE YET
- * The five section bodies. They arrive one stage at a time and mount inside
- * these bands; the heads, anchors, rhythm and navigation are complete and
- * correct now, so each one drops in without touching this file's structure.
+ * SECTION 05 WAS SOMEWHERE ELSE
+ * The five chapter run at the end used to close /solutions, which is where the
+ * navigation's Steps link pointed before this page existed. It is an argument
+ * rather than a mechanism, so it reads correctly only after the 28 steps above
+ * it. /solutions keeps everything else it had and is now reachable only by
+ * direct link.
  */
 
 export const metadata: Metadata = {
@@ -50,6 +61,9 @@ const [shape, content, whyEmail, outreach, yourPart] = SECTIONS;
 
 export default function StepsPage() {
   return (
+    /* One provider for the whole page, because the tier 3 rule is "one open at
+       a time" page wide rather than per section. See Disclosure.tsx. */
+    <DisclosureProvider>
     <div id="top">
       {/* ── Hero ───────────────────────────────────────────────────────── */}
       <Section tone="hero" pad="base" className="pt-[calc(96px+clamp(3rem,6vw,6rem))]">
@@ -71,25 +85,42 @@ export default function StepsPage() {
       {/* ── 01 · CONTENT PRODUCTION ────────────────────────────────────── */}
       <Section id={content.id} tone="base" pad="tall" seam className="scroll-mt-[120px]">
         <SectionHead {...content} />
+        <ContentActs className="mt-16 md:mt-24" />
+        <ActThree className="mt-[clamp(5rem,10vw,9rem)]" />
       </Section>
 
       {/* ── 02 · WHY COLD EMAIL ────────────────────────────────────────── */}
       <Section id={whyEmail.id} tone="raised" pad="base" seam className="scroll-mt-[120px]">
         <SectionHead {...whyEmail} />
+        <WhyColdEmail className="mt-16 md:mt-20" />
       </Section>
 
       {/* ── 03 · COLD OUTREACH ─────────────────────────────────────────── */}
       <Section id={outreach.id} tone="stage" pad="tall" seam bleed className="scroll-mt-[120px]">
         <SectionHead {...outreach} />
+        <PhaseRail className="mt-10 md:mt-14" />
       </Section>
 
       {/* ── 04 · YOUR PART ─────────────────────────────────────────────── */}
       <Section id={yourPart.id} tone="base" pad="tall" seam className="scroll-mt-[120px]">
         <SectionHead {...yourPart} />
+        <YourPart className="mt-16 md:mt-20" />
+      </Section>
+
+      {/* ── 05 · THE WEEK, AND THE YEAR ──────────────────────────────────
+          The five chapter run that used to close /solutions, which is where the
+          nav's Steps link pointed. It reads as the answer to "and then what",
+          so it belongs after the mechanism rather than before it. It brings its
+          own heading and its own index rail — see DeckChapters. */}
+      <Section id="chapters" tone="raised" pad="tall" seam className="scroll-mt-[120px]">
+        <DeckChapters />
       </Section>
 
       {/* ── CTA ────────────────────────────────────────────────────────── */}
-      <Section tone="terminal" pad="base" seam />
+      <Section tone="terminal" pad="base" seam>
+        <StepsCta />
+      </Section>
     </div>
+    </DisclosureProvider>
   );
 }

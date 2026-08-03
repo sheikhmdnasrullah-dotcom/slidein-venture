@@ -11,6 +11,8 @@ export * from './outreach-phases';
 export * from './benchmarks';
 export * from './page-copy';
 export * from './timeline';
+export * from './artifacts';
+export * from './deck-chapters';
 
 import {
   CLIENT_PIPELINE_STEPS,

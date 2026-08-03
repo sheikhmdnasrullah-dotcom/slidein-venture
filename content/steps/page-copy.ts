@@ -98,6 +98,34 @@ export const SECTIONS: {
 ];
 
 /**
+ * Section 02, compressed.
+ *
+ * Four columns of paragraphs became four columns of one number and four words.
+ * Same argument, a tenth of the ink, and the paragraph each number stands for
+ * is one click away rather than deleted.
+ *
+ * The order is deliberate: the channel exists, it scales, it is selective, and
+ * nobody can price you out of it. The fourth is the one that used to say
+ * "it has been working since 1971", which is the date of the first email ever
+ * sent rather than the first cold email, and was a filler line either way.
+ */
+export const WHY_EMAIL = {
+  figureIds: [
+    'inbox-checks',
+    'scale-multiple',
+    'qualification-bar',
+    'platform-risk',
+  ],
+  /* The strongest sentence in the section, and the only prose in it. The
+     number in it carries its source label like every other number here. */
+  footer: {
+    lead: '95%',
+    figureId: 'foundation-failure',
+    rest: 'of cold email campaigns fail because they skip the foundation. We do not.',
+  },
+};
+
+/**
  * The three things the client touches. Deliberately set large with enormous
  * space between them: this is the emotional payoff of a very long technical
  * page, and crowding it undoes the point.
@@ -109,8 +137,25 @@ export const YOUR_PART = [
 ];
 
 export const CTA = {
+  /* The question mark version, "Ready to see this system in action for your
+     business?", reads soft at the end of a page this technical. A page that has
+     just shown you a DNS rejection code should not close by asking whether you
+     are ready. */
   headline: 'See this running on your business.',
-  primary: { label: 'Book a strategy call', href: '/contact' },
+  /**
+   * The Notion scheduling link, which is the real booking surface this site
+   * already uses. It is NOT `/contact`: that route does not exist yet, and the
+   * rule in docs/site-architecture.md is that a link ships only when its route
+   * does.
+   *
+   * This URL is also in components/BookingCalendar/BookingCalendar.tsx. If one
+   * changes, change both.
+   */
+  primary: {
+    label: 'Book a strategy call',
+    href: 'https://calendar.notion.so/meet/nasrullah_tanim/schedule',
+    external: true,
+  },
   secondary: { label: 'Back to the top', href: '#top' },
   /**
    * Wired to real data or deleted. It is currently null, which renders nothing.

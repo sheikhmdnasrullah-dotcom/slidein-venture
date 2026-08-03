@@ -134,7 +134,7 @@ export const OUTREACH_PHASES: OutreachPhase[] = [
     index: 'PHASE 02',
     name: 'The Fuel',
     subtitle: 'Finding and verifying leads',
-    dayRange: 'DAYS 1 TO 10 · IN PARALLEL',
+    dayRange: 'DAYS 1 TO 10',
     summary:
       'A list built against stated criteria, verified by a person, with the intelligence that makes an email worth reading attached to each lead.',
     proof: 'lead-card',
@@ -339,6 +339,20 @@ export const AI_DISCLOSURE = {
   after: 'fuel',
   body: 'Yes, we use AI. For research, for drafting, for scale. A person reads every email before it sends, and a person answers every reply. The AI never talks to your prospect unsupervised.',
 } as const;
+
+/**
+ * Phases 1 and 2 run at the same time as each other.
+ *
+ * That fact was buried in a technical detail line in the source material, which
+ * is the smallest text on the page, and it is the answer to the only objection
+ * the outreach section raises on its own: that nothing happens for seventeen
+ * days. The rail draws it as a bracket over the first two cards, visible before
+ * anything is expanded.
+ */
+export const PARALLEL_BRACKET = {
+  spans: ['fortress', 'fuel'],
+  label: 'IN PARALLEL',
+};
 
 export const OUTREACH_STEP_COUNT = OUTREACH_PHASES.reduce(
   (n, phase) => n + phase.steps.length,

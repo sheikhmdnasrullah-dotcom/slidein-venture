@@ -6,7 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import LetsTalkButton from './LetsTalkButton';
 
 const navLinks = [
-  { label: 'Steps', href: '/solutions' },
+  { label: 'Steps', href: '/steps' },
   { label: 'Portfolio', href: '/portfolio' },
   { label: 'Pricing', href: '/pricing' },
 ];
