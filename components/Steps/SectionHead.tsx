@@ -11,6 +11,18 @@ import type { SectionId } from '@/content/steps';
  * two pages read as one site rather than two projects.
  *
  * It holds no copy of its own. Every string arrives from content/steps/.
+ *
+ * `chromeOnly` exists for section 00. That band is a single drawing whose whole
+ * job is the squint test — two horizontal masses and one vertical orange line,
+ * and nothing else registering — and a display headline above it is a third
+ * mass competing with the argument. So 00 gets the index rule and nothing
+ * visible after it.
+ *
+ * The heading and the lead do not disappear in that mode, they go to
+ * `sr-only`. The document still needs an <h2> in its outline, and a drawing
+ * this load bearing needs a text alternative: the lead IS the alternative,
+ * which is why it reads as a sentence about the timeline rather than as a
+ * caption.
  */
 export function SectionHead({
   id,
@@ -18,6 +30,7 @@ export function SectionHead({
   eyebrow,
   title,
   lead,
+  chromeOnly = false,
   className,
 }: {
   id: SectionId;
@@ -25,6 +38,7 @@ export function SectionHead({
   eyebrow: string;
   title: string;
   lead: string;
+  chromeOnly?: boolean;
   className?: string;
 }) {
   return (
@@ -33,6 +47,12 @@ export function SectionHead({
         <SectionRule index={index} label={eyebrow} coordinate={id.toUpperCase()} />
       </Rise>
 
+      {chromeOnly ? (
+        <div className="sr-only">
+          <h2>{title}</h2>
+          <p>{lead}</p>
+        </div>
+      ) : (
       <Rise delay={0.06}>
         <div className="mt-8 flex flex-col gap-4 md:mt-10 md:flex-row md:items-end md:justify-between md:gap-10">
           {/* 46% of the canvas, not a ch measure. A ch is measured on the zero
@@ -46,6 +66,7 @@ export function SectionHead({
           </p>
         </div>
       </Rise>
+      )}
     </div>
   );
 }

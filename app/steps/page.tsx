@@ -3,6 +3,7 @@ import Section from '@/components/Section';
 import SectionHead from '@/components/Steps/SectionHead';
 import StepsHero from '@/components/Steps/StepsHero';
 import StepsNav from '@/components/Steps/StepsNav';
+import ShapeTimeline from '@/components/Steps/ShapeTimeline';
 import { META, SECTIONS } from '@/content/steps';
 
 /**
@@ -59,9 +60,12 @@ export default function StepsPage() {
           stuck to the top by the time the reader is inside a section. */}
       <StepsNav />
 
-      {/* ── 00 · THE SHAPE ─────────────────────────────────────────────── */}
+      {/* ── 00 · THE SHAPE ───────────────────────────────────────────────
+          `chromeOnly`: the index rule and then the drawing. No headline on the
+          canvas — see the note in SectionHead. */}
       <Section id={shape.id} tone="stage" pad="tall" seam bleed className="scroll-mt-[120px]">
-        <SectionHead {...shape} />
+        <SectionHead {...shape} chromeOnly />
+        <ShapeTimeline className="mt-14 md:mt-20" />
       </Section>
 
       {/* ── 01 · CONTENT PRODUCTION ────────────────────────────────────── */}
