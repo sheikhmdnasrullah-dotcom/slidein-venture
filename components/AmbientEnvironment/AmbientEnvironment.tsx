@@ -69,11 +69,35 @@ export default function AmbientEnvironment() {
       />
       {/* 3 — geometric mesh */}
       <div
-        className="absolute inset-0 opacity-[0.03]"
+        className="absolute inset-0 opacity-[0.04]"
         style={{
           backgroundImage:
-            'linear-gradient(var(--color-rule) 1px, transparent 1px), linear-gradient(90deg, var(--color-rule) 1px, transparent 1px)',
+            'linear-gradient(var(--rule) 1px, transparent 1px), linear-gradient(90deg, var(--rule) 1px, transparent 1px)',
           backgroundSize: '40px 40px',
+        }}
+      />
+      {/* 3b — diagonal crosshatch */}
+      <div
+        className="absolute inset-0 opacity-[0.025]"
+        style={{
+          backgroundImage:
+            'linear-gradient(45deg, var(--rule) 1px, transparent 1px), linear-gradient(-45deg, var(--rule) 1px, transparent 1px)',
+          backgroundSize: '80px 80px',
+        }}
+      />
+      {/* 3c — large geometric arcs */}
+      <div
+        className="absolute -right-[20%] -top-[10%] h-[70%] w-[70%] opacity-[0.04]"
+        style={{
+          border: '1px solid var(--rule)',
+          borderRadius: '50%',
+        }}
+      />
+      <div
+        className="absolute -left-[10%] -bottom-[15%] h-[50%] w-[50%] opacity-[0.03]"
+        style={{
+          border: '1px solid var(--rule)',
+          borderRadius: '50%',
         }}
       />
       {/* 4 — drifting radial light.
