@@ -291,7 +291,7 @@ function ScrollCue({ still, onDepart }: { still: boolean; onDepart: () => void }
   return (
     <div className="relative pb-10 pt-8">
       <a
-        href="#framework"
+        href="/steps#framework"
         className="group inline-flex items-center gap-3 text-[var(--muted)] transition-colors duration-300 hover:text-[var(--on-surface)]"
       >
         {/* The rest slot. The travelling dot animates INTO this box, so the
@@ -429,7 +429,7 @@ export default function Hero() {
                 glow. Orange stays an accent — never the surface. */}
             <Magnetic disabled={still} className="block w-full sm:inline-block sm:w-auto">
               <a
-                href="#framework"
+                href="/steps#framework"
                 className="btn-premium group flex w-full cursor-pointer items-center justify-center gap-2.5 rounded-2xl px-7 py-4 text-[15px] font-medium text-paper-25 sm:inline-flex sm:w-auto"
                 style={{
                   background: 'linear-gradient(180deg,var(--color-graphite-800) 0%,var(--color-ink) 100%)',

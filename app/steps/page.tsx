@@ -11,6 +11,7 @@ import PhaseRail from '@/components/Steps/PhaseRail';
 import YourPart from '@/components/Steps/YourPart';
 import StepsCta from '@/components/Steps/StepsCta';
 import DeckChapters from '@/components/Steps/DeckChapters';
+import PitchDeck from '@/components/PitchDeck/PitchDeck';
 import { DisclosureProvider } from '@/components/Steps/Disclosure';
 import { META, SECTIONS } from '@/content/steps';
 
@@ -120,6 +121,9 @@ export default function StepsPage() {
       <Section tone="terminal" pad="base" seam>
         <StepsCta />
       </Section>
+
+      {/* ── FRAMEWORK (moved from homepage) ───────────────────────────── */}
+      <PitchDeck />
     </div>
     </DisclosureProvider>
   );

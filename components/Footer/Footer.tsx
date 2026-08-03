@@ -11,7 +11,7 @@ import { LogoWordmark } from '@/components/Brand/Logo';
 const LIVE_LINKS = [
   { label: 'Solutions', href: '/solutions' },
   { label: 'Pricing', href: '/pricing' },
-  { label: 'The Framework', href: '/#framework' },
+  { label: 'The Framework', href: '/steps#framework' },
 ];
 
 export default function Footer() {
