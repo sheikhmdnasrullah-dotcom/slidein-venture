@@ -177,10 +177,5 @@ const WORDS = [
 export function frameworkTallyLine(): string {
   const yours =
     WORDS[FRAMEWORK_CLIENT_NODE_COUNT] ?? String(FRAMEWORK_CLIENT_NODE_COUNT);
-  return (
-    FRAMEWORK_NODE_COUNT +
-    ' moving parts. ' +
-    yours.toLowerCase() +
-    ' of them are yours.'
-  );
+  return FRAMEWORK_NODE_COUNT + ' moving parts. ' + yours + ' of them are yours.';
 }

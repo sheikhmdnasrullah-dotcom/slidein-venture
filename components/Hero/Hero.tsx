@@ -290,8 +290,13 @@ function ScrollCue({ still, onDepart }: { still: boolean; onDepart: () => void }
 
   return (
     <div className="relative pb-10 pt-8">
+      {/* Same page, not /steps. The label is the word "Scroll" and the shape of
+          the framework now sits in the next band down; sending a scroll cue to
+          another route is the one thing it must not do. The primary CTA still
+          goes to /steps#framework, which is the same drawing with all
+          seventeen service nodes in it. */}
       <a
-        href="/steps#framework"
+        href="#framework"
         className="group inline-flex items-center gap-3 text-[var(--muted)] transition-colors duration-300 hover:text-[var(--on-surface)]"
       >
         {/* The rest slot. The travelling dot animates INTO this box, so the

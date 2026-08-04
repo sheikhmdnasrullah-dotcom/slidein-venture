@@ -27,8 +27,21 @@ export function MonoLabel({
 }) {
   return (
     /* Size, case and tracking come from the .font-label role in
-       app/styles/type.css — never restate them here. */
-    <span className={cn('font-label font-label-wide text-[var(--muted)]', className)}>
+       app/styles/type.css — never restate them here.
+
+       THE TWO ROLE CLASSES ARE CONCATENATED, NOT PASSED THROUGH `cn`.
+       `cn` is clsx + twMerge, and twMerge classifies both `font-label` and
+       `font-label-wide` as the font-family group, so it keeps the last one and
+       DROPS `font-label`. That silently removed the mono face, the --text-micro
+       size and the uppercase from every label on the site — labels were
+       rendering as 16px body text with wide tracking, which reads as an
+       intentional style and is why it survived this long.
+
+       Only the caller's overrides go through `cn`, which is what it is for:
+       `text-[var(--accent)]` still beats the default `text-[var(--muted)]`. */
+    <span
+      className={`font-label font-label-wide ${cn('text-[var(--muted)]', className)}`}
+    >
       {children}
     </span>
   );

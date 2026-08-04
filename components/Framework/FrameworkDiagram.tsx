@@ -308,21 +308,25 @@ function Track({
           ))}
         </ul>
 
-        {/* ── Output ────────────────────────────────────────────────────── */}
-        <motion.div
-          className={cn(
-            'mt-auto w-full rounded-[var(--radius-md)] border border-[var(--rule-strong)] bg-[var(--surface-2)] px-6 py-6',
-            'pt-10',
-            right && 'md:text-right',
-          )}
-          style={{ marginTop: 'auto' }}
-          variants={fade(T.output, still)}
-        >
-          <p className="font-body-lead text-[length:var(--text-lg)] text-[var(--on-surface)]">
-            {track.output.label}
-          </p>
-          <MonoLabel className="mt-4 block">{track.output.metric}</MonoLabel>
-        </motion.div>
+        {/* ── Output ──────────────────────────────────────────────────────
+            `mt-auto` on the WRAPPER, with a floor under it. Auto alone lets the
+            gap collapse to nothing in whichever column is taller, which reads
+            as the last service card and the output being the same object. The
+            padding is the floor; the auto is what levels the two columns. */}
+        <div className="mt-auto w-full pt-14">
+          <motion.div
+            className={cn(
+              'w-full rounded-[var(--radius-md)] border border-[var(--rule-strong)] bg-[var(--surface-2)] px-6 py-6',
+              right && 'md:text-right',
+            )}
+            variants={fade(T.output, still)}
+          >
+            <p className="font-body-lead text-[length:var(--text-lg)] text-[var(--on-surface)]">
+              {track.output.label}
+            </p>
+            <MonoLabel className="mt-4 block">{track.output.metric}</MonoLabel>
+          </motion.div>
+        </div>
       </div>
     </div>
   );

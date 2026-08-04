@@ -12,8 +12,11 @@ import YourPart from '@/components/Steps/YourPart';
 import StepsCta from '@/components/Steps/StepsCta';
 import DeckChapters from '@/components/Steps/DeckChapters';
 import PitchDeck from '@/components/PitchDeck/PitchDeck';
+import FrameworkHead from '@/components/Framework/FrameworkHead';
+import FrameworkDiagram from '@/components/Framework/FrameworkDiagram';
 import { DisclosureProvider } from '@/components/Steps/Disclosure';
 import { META, SECTIONS } from '@/content/steps';
+import { frameworkTallyLine } from '@/content/framework';
 
 /**
  * /steps — EVERYTHING THAT HAPPENS AFTER YOU SAY YES
@@ -74,6 +77,35 @@ export default function StepsPage() {
       {/* The switch sits between the hero and the first band so it is already
           stuck to the top by the time the reader is inside a section. */}
       <StepsNav />
+
+      {/* ── THE COMPLETE FRAMEWORK ───────────────────────────────────────
+          The whole page as one drawing, before the page starts. It carries no
+          section index: the five bands below are numbered 00 to 05 and this
+          sits above 00, so numbering it would mean renumbering all of them.
+          It is the contents page, not a chapter.
+
+          `base` — the page's own value, paper-50. NOT paper-100: section 00
+          directly below is `stage`, which on this site is a paper-100 panel,
+          and two adjacent bands at the same value is no rhythm at all. This
+          band is the lighter one so the step down into 00 still reads.
+
+          `id="framework"` is what the homepage hero's CTA and the footer's
+          "The Framework" link both resolve to. Neither had a target before. */}
+      <Section
+        id="framework"
+        tone="base"
+        pad="tall"
+        seam
+        className="scroll-mt-[120px]"
+      >
+        <FrameworkHead
+          eyebrow="Every moving part"
+          title="The Complete Framework"
+          lead={`${frameworkTallyLine()} Everything below is this same picture, one step at a time.`}
+          coordinate="Framework"
+        />
+        <FrameworkDiagram variant="complete" className="mt-16 md:mt-24" />
+      </Section>
 
       {/* ── 00 · THE SHAPE ───────────────────────────────────────────────
           `chromeOnly`: the index rule and then the drawing. No headline on the
