@@ -85,9 +85,9 @@ export default function ProcessFlowChart({ className }: { className?: string }) 
   const [expanded, setExpanded] = useState(false);
   const [activeBranch, setActiveBranch] = useState<BranchId | null>(null);
   const [hoveredNode, setHoveredNode] = useState<string | null>(null);
-  const [planningOpen, setPlanningOpen] = useState(false);
+const [planningOpen, setPlanningOpen] = useState(false);
   const [executionOpen, setExecutionOpen] = useState(false);
-const [postOpen, setPostOpen] = useState(false);
+  const [postOpen, setPostOpen] = useState(false);
   const [distributionOpen, setDistributionOpen] = useState(false);
 
   const toggleExpand = () => setExpanded((prev) => !prev);
@@ -216,9 +216,10 @@ const [postOpen, setPostOpen] = useState(false);
               {BRANCHES.map((branch, branchIndex) => (
                 <div key={branch.id} className="flex flex-col gap-3">
                   {branch.nodes.map((node, nodeIndex) => {
-                    const isPlanning = node.id === 'planning';
+const isPlanning = node.id === 'planning';
                     const isExecution = node.id === 'execution';
                     const isPost = node.id === 'post';
+                    const isDistribution = node.id === 'distribution';
                     const showChildren = (isPlanning && planningOpen) || (isExecution && executionOpen) || (isPost && postOpen);
 
                     return (
@@ -254,11 +255,12 @@ const [postOpen, setPostOpen] = useState(false);
                               />
                             </span>
 
-                            <button
-                              onClick={(isPlanning || isExecution || isPost) ? () => {
+<button
+                              onClick={(isPlanning || isExecution || isPost || isDistribution) ? () => {
                                 if (isPlanning) togglePlanning();
                                 if (isExecution) toggleExecution();
                                 if (isPost) togglePost();
+                                if (isDistribution) setDistributionOpen(true);
                               } : undefined}
                               className="flex-1 font-body text-left text-[15px] text-[var(--on-surface)] transition-colors duration-300"
                             >
@@ -386,7 +388,8 @@ const [postOpen, setPostOpen] = useState(false);
         </AnimatePresence>
       </div>
     </div>
-    <PostProductionModal open={postOpen} onClose={() => setPostOpen(false)} />
+<PostProductionModal open={postOpen} onClose={() => setPostOpen(false)} />
+    <DistributionModal open={distributionOpen} onClose={() => setDistributionOpen(false)} />
     </>
   );
 }
