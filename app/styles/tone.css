@@ -229,34 +229,35 @@ html {
 }
 
 /* ═══ STAGE ═══════════════════════════════════════════════════════════════
-   The deepest band on the site, and the only ink one. It exists for the two
-   places the page has to stop being paper: the closing statement and the
-   final call. Not a theme — a destination.
+    The signature band on the steps page. Day mode — a light raised surface
+    instead of ink. It exists for the two places the page needs visual weight
+    without leaving paper: the opening thesis and the outreach section.
 
-   ink-deep, not #000 (Rule 2). Orange reads --color-brand-hi here, which is
-   the same hue 42.28 at the lightness that clears AA on it (6.47:1). */
+    On a light ground this reads as a panel, not a hole. Orange reads brand-hi
+    here, which is the same hue 42.28 at the lightness that clears AA on it
+    (6.47:1). */
 .tone-stage {
-  --surface:       var(--color-graphite-900);
-  --surface-2:     var(--color-graphite-800);
-  --on-surface:    var(--color-paper-25);
-  --muted:         var(--color-ash-400);
-  --faint:         color-mix(in oklch, var(--color-paper-25) 30%, transparent);
-  --rule:          color-mix(in oklch, var(--color-paper-25) 10%, transparent);
-  --rule-strong:   color-mix(in oklch, var(--color-paper-25) 18%, transparent);
-  --accent:        var(--color-brand-hi);
+  --surface:       var(--color-paper-25);
+  --surface-2:     var(--color-paper-200);
+  --on-surface:    var(--color-ink);
+  --muted:         var(--color-slate-600);
+  --faint:         color-mix(in oklch, var(--color-ink) 34%, transparent);
+  --rule:          color-mix(in oklch, var(--color-ink) 10%, transparent);
+  --rule-strong:   color-mix(in oklch, var(--color-ink) 18%, transparent);
+  --accent:        var(--color-brand);
   --accent-vivid:  var(--color-brand);
-  --accent-wash:   color-mix(in oklch, var(--color-brand) 12%, transparent);
-  --accent-ring:   color-mix(in oklch, var(--color-brand) 40%, transparent);
+  --accent-wash:   color-mix(in oklch, var(--color-brand) 10%, transparent);
+  --accent-ring:   color-mix(in oklch, var(--color-brand) 32%, transparent);
   --on-accent:     var(--color-paper-25);
-  --surface-glass: color-mix(in oklch, var(--color-graphite-900) 70%, transparent);
-  --gloss:         color-mix(in oklch, var(--color-paper-25) 7%, transparent);
-  --status-live:   var(--color-live-hi);
-  --status-info:   var(--color-info-hi);
+  --surface-glass: color-mix(in oklch, var(--color-paper-25) 70%, transparent);
+  --gloss:         color-mix(in oklch, var(--color-paper-25) 42%, transparent);
+  --status-live:   var(--color-live-deep);
+  --status-info:   var(--color-info-deep);
 
-  background-color: var(--color-ink-deep);
+  background-color: var(--color-paper-100);
   color: var(--on-surface);
 
-  --bleed-to: var(--color-ink-deep);
+  --bleed-to: var(--color-paper-100);
 }
 
 /* ═══ SEAM ════════════════════════════════════════════════════════════════
