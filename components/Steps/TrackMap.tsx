@@ -130,16 +130,20 @@ function draw(delay: number, duration: number, still: boolean): Variants {
 }
 
 /* ─── The client moment ────────────────────────────────────────────────────
-   The one filled object on each rail. `--accent-vivid` because this is a fill
-   and not type; the label on top of it reads `--on-accent`, which is the pair
-   that clears contrast on a solid orange. Never `--accent` for a fill and never
-   `--accent-vivid` for the text.
+   The two most important objects on the page, because they are the only two
+   the buyer is responsible for. In the draft one of these was the fourth node
+   in a vertical stack on the far left and the other floated at the top right
+   connected to a bracket. They are the same kind of object, so they are now
+   drawn identically, in matched positions, at the head of their own rail.
 
-   It sits at the far LEFT of the rail, before the first phase card, because it
-   is the thing that starts the track. In the draft one of these was the fourth
-   node in a vertical stack and the other floated at the top right connected to
-   a bracket. They are the same kind of object and they are now drawn the same
-   way in matched positions. */
+   IT IS NOT FILLED WITH --accent-vivid, THOUGH IT IS THE NODE THAT WANTS TO BE.
+   Text on a solid brand fill measures 2.73:1 and fails at any size — see Rule 1
+   in the token layer and the same decision in FrameworkDiagram's outcome node.
+   The treatment is the accent wash, the accent ring, and the display face,
+   which is the loudest object on the rail while every string on it clears AA.
+
+   The one genuinely saturated element is the bar down the left edge. That is a
+   fill with nothing on it, so full chroma is correct there and only there. */
 function ClientMoment({
   label,
   frequency,
@@ -157,16 +161,19 @@ function ClientMoment({
     <motion.div
       variants={fadeUp(delay, T.moment.duration, still)}
       className={cn(
-        'relative flex shrink-0 flex-col justify-center gap-1.5 rounded-[var(--radius-md)] bg-[var(--accent-vivid)] px-5 py-4',
+        'relative flex shrink-0 flex-col justify-center gap-2 overflow-hidden rounded-[var(--radius-md)]',
+        'border border-[var(--accent-ring)] bg-[var(--accent-wash)] py-4 pl-6 pr-5',
         className,
       )}
     >
-      <span className="font-body-lead text-[clamp(0.9375rem,1.1vw,1.0625rem)] leading-tight text-[var(--on-accent)]">
+      <span
+        aria-hidden
+        className="absolute inset-y-0 left-0 block w-1 bg-[var(--accent-vivid)]"
+      />
+      <span className="font-display-sm text-[clamp(1.0625rem,1.3vw,1.25rem)] leading-tight text-[var(--accent)]">
         {label}
       </span>
-      <span className="font-label font-label-wide text-[var(--on-accent)] opacity-80">
-        {frequency}
-      </span>
+      <MonoLabel className="text-[var(--accent)]">{frequency}</MonoLabel>
     </motion.div>
   );
 }

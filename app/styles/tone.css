@@ -233,9 +233,18 @@ html {
     instead of ink. It exists for the two places the page needs visual weight
     without leaving paper: the opening thesis and the outreach section.
 
-    On a light ground this reads as a panel, not a hole. Orange reads brand-hi
-    here, which is the same hue 42.28 at the lightness that clears AA on it
-    (6.47:1). */
+    On a light ground this reads as a panel, not a hole.
+
+    --accent IS NOT --color-brand HERE, AND THAT IS THE WHOLE CONTRACT.
+    The comment above this block used to say orange reads brand-hi here, "the
+    lightness that clears AA on it (6.47:1)". That was true while this band was
+    ink. Day mode turned the ground into paper-100 and the accent was left
+    pointing at the full chroma brand, which reaches 2.55:1 on it and fails as
+    text at every size — the exact trap Rule 1 in the token layer describes.
+    `--accent` means "the orange that clears 4.5:1 AS TEXT on this band", so on
+    a paper-100 ground it is signal-deeper, the same value tone-raised uses on
+    the same ground. --accent-vivid is untouched: fills and strokes still get
+    the full chroma brand, which is what it is for. */
 .tone-stage {
   --surface:       var(--color-paper-25);
   --surface-2:     var(--color-paper-200);
@@ -244,7 +253,7 @@ html {
   --faint:         color-mix(in oklch, var(--color-ink) 34%, transparent);
   --rule:          color-mix(in oklch, var(--color-ink) 10%, transparent);
   --rule-strong:   color-mix(in oklch, var(--color-ink) 18%, transparent);
-  --accent:        var(--color-brand);
+  --accent:        var(--color-signal-deeper);
   --accent-vivid:  var(--color-brand);
   --accent-wash:   color-mix(in oklch, var(--color-brand) 10%, transparent);
   --accent-ring:   color-mix(in oklch, var(--color-brand) 32%, transparent);

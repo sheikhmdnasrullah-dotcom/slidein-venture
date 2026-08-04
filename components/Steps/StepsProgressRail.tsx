@@ -44,14 +44,20 @@ export default function StepsProgressRail() {
   const [visible, setVisible] = useState(false);
 
   /**
-   * One observer over every element that declares itself a phase anchor. The
-   * content phases declare it on their band head and the outreach phases on
-   * their card, so the rail needs no knowledge of how either half is laid out.
+   * The current phase is the LAST one whose head has passed the reading line,
+   * a third of the way down the viewport. Every element that declares itself a
+   * phase anchor takes part: the content phases declare it on their band head
+   * and the outreach phases on their card, so the rail needs no knowledge of
+   * how either half is laid out.
    *
-   * The band is `-18%` from the top and `-72%` from the bottom, which leaves a
-   * 10% strip just under the sticky nav. A phase is "current" when its head
-   * crosses that strip. A full height root would report four phases at once on
-   * a tall viewport and the tick would flicker between them on every frame.
+   * WHY THIS IS A SCROLL HANDLER AND NOT AN INTERSECTION OBSERVER
+   * An observer answers "is this element inside a band right now", which leaves
+   * a dead zone: a phase whose steps are three screens tall has its head far
+   * above any band you can define, so nothing is current and every tick goes
+   * dark in the middle of the section the rail exists to track. A threshold
+   * comparison has no dead zone — some phase is always the last one passed —
+   * and it costs one `getBoundingClientRect` per anchor per frame, on eight
+   * elements, inside a rAF.
    */
   useEffect(() => {
     const anchors = Array.from(
@@ -59,27 +65,57 @@ export default function StepsProgressRail() {
     );
     if (!anchors.length) return;
 
-    const seen = new Map<string, boolean>();
+    let frame = 0;
 
-    const observer = new IntersectionObserver(
-      (entries) => {
-        for (const entry of entries) {
-          const id = entry.target.getAttribute('data-phase-anchor');
-          if (id) seen.set(id, entry.isIntersecting);
-        }
-        /* Document order, not observer callback order: the callback reports
-           only what changed, so the last entry in the batch is not necessarily
-           the lowest phase on the page. */
-        const current = anchors
-          .map((el) => el.getAttribute('data-phase-anchor'))
-          .filter((id): id is string => !!id && seen.get(id) === true);
-        if (current.length) setActiveId(current[current.length - 1]);
-      },
-      { rootMargin: '-18% 0px -72% 0px', threshold: 0 },
-    );
+    const measure = () => {
+      frame = 0;
+      const line = window.innerHeight * 0.34;
 
-    for (const el of anchors) observer.observe(el);
-    return () => observer.disconnect();
+      const passed = anchors
+        .map((el) => ({ el, top: el.getBoundingClientRect().top }))
+        .filter((a) => a.top <= line);
+
+      if (!passed.length) {
+        setActiveId(null);
+        return;
+      }
+
+      /* THE TWO HALVES OF THE PAGE ARE LAID OUT DIFFERENTLY AND THIS IS WHERE
+         IT SHOWS. The four content phases are stacked bands, so "the last one
+         whose head is above the line" is exactly right. The four outreach
+         phases are a ROW of cards at the same height, so the same rule always
+         reports the rightmost one, and the rail claimed the reader was on The
+         Launch the moment the rail scrolled into view.
+
+         So: take everything at the same height as the last one passed, and
+         within that group prefer the phase that is actually open — PhaseRail
+         opens from `#phase-<id>` — falling back to the first in document
+         order. One rule, correct for a column of one and for a row of four. */
+      const lastTop = passed[passed.length - 1].top;
+      const row = passed.filter((a) => Math.abs(a.top - lastTop) < 24);
+
+      const openId = window.location.hash.replace('#phase-', '');
+      const open = row.find(
+        (a) => a.el.getAttribute('data-phase-anchor') === openId,
+      );
+
+      setActiveId((open ?? row[0]).el.getAttribute('data-phase-anchor'));
+    };
+
+    const onScroll = () => {
+      if (!frame) frame = requestAnimationFrame(measure);
+    };
+
+    measure();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll);
+    window.addEventListener('hashchange', onScroll);
+    return () => {
+      if (frame) cancelAnimationFrame(frame);
+      window.removeEventListener('scroll', onScroll);
+      window.removeEventListener('resize', onScroll);
+      window.removeEventListener('hashchange', onScroll);
+    };
   }, []);
 
   /* The rail is only useful while the reader is inside the twenty eight steps.
@@ -100,9 +136,17 @@ export default function StepsProgressRail() {
     <nav
       aria-label="Phase progress"
       className={cn(
-        'fixed left-[max(1rem,calc((100vw-1400px)/2-9rem))] top-1/2 z-40 hidden w-[9.5rem] -translate-y-1/2',
+        /* Positioned against the CONTENT edge, not the viewport edge: the page
+           is a centred 1400px measure, so the gutter is
+           `(100vw - 1400px) / 2`. The rail is 9.5rem wide and wants 1.5rem of
+           air, which means it only fits once that gutter clears 11rem — a
+           1752px viewport. Below that it is not displayed at all rather than
+           squeezed, because the failure mode of squeezing it is a floating
+           panel sitting on top of the section headline. */
+        'fixed left-[calc((100vw-1400px)/2-11rem)] top-1/2 z-40 hidden w-[9.5rem] -translate-y-1/2',
         'rounded-[var(--radius-md)] border border-[var(--rule)] bg-[var(--surface)] p-4',
-        'transition-opacity duration-500 [transition-timing-function:var(--ease-expo)] xl:block',
+        'transition-opacity duration-500 [transition-timing-function:var(--ease-expo)]',
+        '[@media(min-width:1760px)]:block',
         visible ? 'opacity-100' : 'pointer-events-none opacity-0',
       )}
     >
@@ -120,7 +164,7 @@ export default function StepsProgressRail() {
                   <a
                     href={phase.anchor}
                     aria-current={on ? 'true' : undefined}
-                    className="group flex items-center gap-2 py-0.5"
+                    className="group flex items-start gap-2 py-0.5"
                   >
                     {/* The tick is the state. It grows and inks rather than
                         changing colour alone, so the rail still reads in
@@ -128,15 +172,18 @@ export default function StepsProgressRail() {
                     <span
                       aria-hidden
                       className={cn(
-                        'block h-px shrink-0 transition-all duration-300 [transition-timing-function:var(--ease-expo)]',
+                        'mt-[0.55em] block h-px shrink-0 self-start transition-all duration-300 [transition-timing-function:var(--ease-expo)]',
                         on
                           ? 'w-4 bg-[var(--accent-vivid)]'
                           : 'w-2 bg-[var(--rule-strong)] group-hover:w-3',
                       )}
                     />
+                    {/* Wraps rather than truncates. "POST-PRODU…" and
+                        "THE FORTRE…" are not names, and a table of contents
+                        whose entries you cannot read is a decoration. */}
                     <MonoLabel
                       className={cn(
-                        'truncate transition-colors duration-300',
+                        'leading-tight transition-colors duration-300',
                         on
                           ? 'text-[var(--on-surface)]'
                           : 'group-hover:text-[var(--on-surface)]',

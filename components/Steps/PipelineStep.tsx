@@ -189,20 +189,26 @@ export function PhaseHeader({
       className={cn('scroll-mt-[168px]', className)}
     >
       <div className="flex items-center gap-4">
-        <MonoLabel className="tnum text-[var(--on-surface)]">
-          {index} — {name.toUpperCase()}
-        </MonoLabel>
+        <MonoLabel className="tnum text-[var(--on-surface)]">{index}</MonoLabel>
         <span className="h-px flex-1 bg-[var(--rule)]" aria-hidden />
         <MonoLabel className="tnum">
-          {stepCount} {stepCount === 1 ? 'STEP' : 'STEPS'}
+          {stepCount} {stepCount === 1 ? 'STEP' : 'STEPS'} · {duration}
         </MonoLabel>
       </div>
 
-      <div className="mt-5 flex flex-col gap-3 md:flex-row md:items-end md:justify-between md:gap-10">
-        <h3 className="font-display-sm text-[clamp(1.375rem,2.4vw,2rem)] text-[var(--on-surface)]">
-          {summary}
+      {/* The same two column head the section bands use — display name on the
+          left, its lead on the right. A phase is one level below a section, so
+          it is set one step down: `display-sm` against the section's
+          `display-md`, and the summary is body copy rather than a second
+          headline. The first version set the summary in display serif and the
+          band read as two competing headlines stacked. */}
+      <div className="mt-6 flex flex-col gap-4 md:flex-row md:items-end md:justify-between md:gap-10">
+        <h3 className="font-display-sm text-[clamp(1.5rem,2.4vw,2rem)] text-[var(--on-surface)] md:max-w-[38%]">
+          {name}
         </h3>
-        <MonoLabel className="tnum shrink-0 md:pb-1">{duration}</MonoLabel>
+        <p className="font-body max-w-[54ch] text-[var(--muted)] md:pb-1 md:text-right">
+          {summary}
+        </p>
       </div>
     </div>
   );
