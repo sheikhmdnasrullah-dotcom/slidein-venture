@@ -17,7 +17,7 @@ import FrameworkHead from '@/components/Framework/FrameworkHead';
 import FrameworkDiagram from '@/components/Framework/FrameworkDiagram';
 import { DisclosureProvider } from '@/components/Steps/Disclosure';
 import { META, SECTIONS } from '@/content/steps';
-import { frameworkTallyLine } from '@/content/framework';
+import InteractiveFlowChart from '@/components/Steps/InteractiveFlowChart';
 
 /**
  * /steps — EVERYTHING THAT HAPPENS AFTER YOU SAY YES
@@ -103,13 +103,7 @@ export default function StepsPage() {
         seam
         className="scroll-mt-[120px]"
       >
-        <FrameworkHead
-          eyebrow="Every moving part"
-          title="The Complete Framework"
-          lead={`${frameworkTallyLine()} Everything below is this same picture, one step at a time.`}
-          coordinate="Framework"
-        />
-        <FrameworkDiagram variant="complete" className="mt-16 md:mt-24" />
+        <InteractiveFlowChart />
       </Section>
 
       {/* ── 00 · THE SHAPE ───────────────────────────────────────────────
