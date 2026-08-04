@@ -38,11 +38,7 @@ const BRANCHES: Branch[] = [
           { id: 'script-runsheet', label: 'Script and Runsheet', number: '03' },
         ],
       },
-      {
-        id: 'execution',
-        label: 'Execution',
-        children: [{ id: 'you-record', label: '04 You Record', number: '04' }],
-      },
+      { id: 'execution', label: 'Execution', children: [{ id: 'you-record', label: '04 You Record', number: '04' }] },
       {
         id: 'post',
         label: 'Post-production',
@@ -112,7 +108,10 @@ export default function ProcessFlowChart({ className }: { className?: string }) 
         transition={{ duration: 0.5, ease: EASE }}
         className="mb-10 text-center"
       >
-        <h2 className="mx-auto max-w-[20ch] text-[clamp(1.75rem,3.5vw,2.75rem)] text-[var(--on-surface)]" style={{ fontFamily: 'Georgia, "Times New Roman", serif' }}>
+        <h2
+          className="mx-auto max-w-[20ch] text-[clamp(1.75rem,3.5vw,2.75rem)] text-[var(--on-surface)]"
+          style={{ fontFamily: 'Georgia, "Times New Roman", serif' }}
+        >
           The Complete Step by Step Process
         </h2>
       </motion.div>
@@ -204,9 +203,7 @@ export default function ProcessFlowChart({ className }: { className?: string }) 
                             <span className="font-label text-[10px] tracking-[0.15em] text-[var(--muted)]">
                               {child.number || `0${i + 1}`}
                             </span>
-                            <span className="font-body text-[13px] text-[var(--on-surface)]">
-                              {child.label}
-                            </span>
+                            <span className="font-body text-[13px] text-[var(--on-surface)]">{child.label}</span>
                           </motion.div>
                         ))}
                       </motion.div>
@@ -230,9 +227,7 @@ export default function ProcessFlowChart({ className }: { className?: string }) 
                             transition={{ duration: 0.25, delay: i * 0.05, ease: EASE }}
                             className="flex items-center gap-3 rounded-lg border border-[var(--rule)] bg-[var(--surface)] px-4 py-2.5"
                           >
-                            <span className="font-body text-[13px] text-[var(--on-surface)]">
-                              {child.label}
-                            </span>
+                            <span className="font-body text-[13px] text-[var(--on-surface)]">{child.label}</span>
                           </motion.div>
                         ))}
                       </motion.div>
@@ -259,9 +254,7 @@ export default function ProcessFlowChart({ className }: { className?: string }) 
                             <span className="font-label text-[10px] tracking-[0.15em] text-[var(--muted)]">
                               {child.number || `0${i + 1}`}
                             </span>
-                            <span className="font-body text-[13px] text-[var(--on-surface)]">
-                              {child.label}
-                            </span>
+                            <span className="font-body text-[13px] text-[var(--on-surface)]">{child.label}</span>
                           </motion.div>
                         ))}
                       </motion.div>
