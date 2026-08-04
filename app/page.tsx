@@ -1,7 +1,7 @@
 import Hero from "@/components/Hero/Hero";
 import Section from "@/components/Section";
 import FrameworkHead from "@/components/Framework/FrameworkHead";
-import FrameworkDiagram from "@/components/Framework/FrameworkDiagram";
+import FrameworkWeave from "@/components/Framework/FrameworkWeave";
 
 /**
  * HOME — the hero, then the shape of the business.
@@ -14,10 +14,18 @@ import FrameworkDiagram from "@/components/Framework/FrameworkDiagram";
  * type in --accent in four places (the two YOU tags and the two cross link
  * statements). `raised` re-points it to signal-deeper, which clears AA.
  *
- * The SHAPE variant, not the complete one. Seven objects: origin, two inputs,
- * two track headers, two outputs, the cross link, the outcome. The seventeen
- * service nodes live at the top of /steps, which is what the hero's primary
- * CTA points at. One drawing, two levels of detail, one visual system.
+ * THE WEAVE, NOT THE DIAGRAM. This band used to render FrameworkDiagram's
+ * `shape` variant — rounded cards on right-angle connectors, which is the
+ * default output shape of every diagramming tool and reads as one before a
+ * single label is read. FrameworkWeave states the same seven things (origin,
+ * two inputs, two stages, two outputs, the cross link, the outcome, the tally)
+ * as two threads that physically braid into one cord, which is the literal
+ * picture of "two systems, one loop" instead of a caption claiming it.
+ *
+ * FrameworkDiagram is NOT deleted: `variant="complete"` still draws all
+ * seventeen service nodes at the top of /steps, which is where the hero's
+ * primary CTA points. Both read content/framework.ts, so the two cannot
+ * describe different businesses.
  */
 export default function Home() {
   return (
@@ -37,7 +45,7 @@ export default function Home() {
           title="The Framework"
           coordinate="01 · Framework"
         />
-        <FrameworkDiagram variant="shape" className="mt-16 md:mt-24" />
+        <FrameworkWeave className="mt-24 md:mt-32" />
       </Section>
     </>
   );
