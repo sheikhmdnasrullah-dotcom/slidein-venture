@@ -39,7 +39,9 @@ const BRANCHES: Branch[] = [
           { id: 'script-runsheet', label: 'Script and Runsheet' },
         ],
       },
-      { id: 'execution', label: 'Execution' },
+      { id: 'execution', label: 'Execution', children: [
+          { id: 'you-record', label: '04 You Record' },
+        ] },
       { id: 'post', label: 'Post-production' },
       { id: 'distribution', label: 'Distribution' },
     ],
@@ -104,9 +106,11 @@ export default function ProcessFlowChart({ className }: { className?: string }) 
   const [activeBranch, setActiveBranch] = useState<BranchId | null>(null);
   const [hoveredNode, setHoveredNode] = useState<string | null>(null);
   const [planningOpen, setPlanningOpen] = useState(false);
+  const [executionOpen, setExecutionOpen] = useState(false);
 
   const toggleExpand = () => setExpanded((prev) => !prev);
   const togglePlanning = () => setPlanningOpen((prev) => !prev);
+  const toggleExecution = () => setExecutionOpen((prev) => !prev);
 
   return (
     <div className={cn('mx-auto max-w-[1200px] px-6 md:px-10', className)}>
@@ -229,7 +233,8 @@ export default function ProcessFlowChart({ className }: { className?: string }) 
                 <div key={branch.id} className="flex flex-col gap-3">
                   {branch.nodes.map((node, nodeIndex) => {
                     const isPlanning = node.id === 'planning';
-                    const showChildren = isPlanning && planningOpen;
+                    const isExecution = node.id === 'execution';
+                    const showChildren = (isPlanning && planningOpen) || (isExecution && executionOpen);
 
                     return (
                       <div key={node.id}>
@@ -265,7 +270,10 @@ export default function ProcessFlowChart({ className }: { className?: string }) 
                             </span>
 
                             <button
-                              onClick={isPlanning ? togglePlanning : undefined}
+                              onClick={(isPlanning || isExecution) ? () => {
+                                if (isPlanning) togglePlanning();
+                                if (isExecution) toggleExecution();
+                              } : undefined}
                               className="flex-1 font-body text-left text-[15px] text-[var(--on-surface)] transition-colors duration-300"
                             >
                               {node.label}
@@ -278,9 +286,9 @@ export default function ProcessFlowChart({ className }: { className?: string }) 
                                 color: hoveredNode === node.id ? 'var(--on-accent)' : 'var(--muted)',
                               }}
                             >
-                              {isPlanning ? (
+                              {(isPlanning || isExecution) ? (
                                 <motion.svg
-                                  animate={{ rotate: planningOpen ? 45 : 0 }}
+                                  animate={{ rotate: (isPlanning && planningOpen) || (isExecution && executionOpen) ? 45 : 0 }}
                                   transition={{ duration: 0.2 }}
                                   width="14"
                                   height="14"
@@ -299,9 +307,8 @@ export default function ProcessFlowChart({ className }: { className?: string }) 
                           </div>
                         </motion.div>
 
-                        {/* Planning children */}
-                        <AnimatePresence>
-                          {showChildren && node.children && (
+                        {(isPlanning && planningOpen && node.children) && (
+                          <AnimatePresence>
                             <motion.div
                               initial={{ opacity: 0, height: 0 }}
                               animate={{ opacity: 1, height: 'auto' }}
@@ -326,8 +333,37 @@ export default function ProcessFlowChart({ className }: { className?: string }) 
                                 </motion.div>
                               ))}
                             </motion.div>
-                          )}
-                        </AnimatePresence>
+                          </AnimatePresence>
+                        )}
+
+                        {isExecution && executionOpen && node.children && (
+                          <AnimatePresence>
+                            <motion.div
+                              initial={{ opacity: 0, height: 0 }}
+                              animate={{ opacity: 1, height: 'auto' }}
+                              exit={{ opacity: 0, height: 0 }}
+                              transition={{ duration: 0.3, ease: EASE }}
+                              className="ml-8 mt-2 flex flex-col gap-2 border-l-2 border-[var(--rule-strong)] pl-4"
+                            >
+                              {node.children.map((child, i) => (
+                                <motion.div
+                                  key={child.id}
+                                  initial={{ opacity: 0, x: -8 }}
+                                  animate={{ opacity: 1, x: 0 }}
+                                  transition={{ duration: 0.25, delay: i * 0.06, ease: EASE }}
+                                  className="flex items-center gap-3 rounded-lg border border-[var(--rule)] bg-[var(--surface)] px-4 py-3"
+                                >
+                                  <span className="font-label text-[10px] tracking-[0.15em] text-[var(--muted)]">
+                                    0{i + 1}
+                                  </span>
+                                  <span className="font-body text-[13px] text-[var(--on-surface)]">
+                                    {child.label}
+                                  </span>
+                                </motion.div>
+                              ))}
+                            </motion.div>
+                          </AnimatePresence>
+                        )}
                       </div>
                     );
                   })}
