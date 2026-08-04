@@ -1,37 +1,10 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
-import { motion, useScroll, useTransform, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import DistributionSlide from '@/components/PitchDeck/DistributionSlide';
-import DashboardApproval from '@/components/Steps/proofs/DashboardApproval';
 
 const EASE = [0.16, 1, 0.3, 1] as const;
-
-/** Scrolling-reveal: fades and lifts children into view as the slide scrolls. */
-function Reveal({
-  index,
-  total,
-  children,
-}: {
-  index: number;
-  total: number;
-  children: React.ReactNode;
-}) {
-  const ref = useRef<HTMLDivElement>(null);
-  const { scrollYProgress } = useScroll({
-    target: ref,
-    offset: ['start end', 'start 0.7'],
-  });
-
-  const opacity = useTransform(scrollYProgress, [0, 0.3 + index * 0.1], [0, 1]);
-  const y = useTransform(scrollYProgress, [0, 0.3 + index * 0.1], [28, 0]);
-
-  return (
-    <motion.div ref={ref} style={{ opacity, y }}>
-      {children}
-    </motion.div>
-  );
-}
 
 interface DistributionModalProps {
   open: boolean;
@@ -102,35 +75,15 @@ export default function DistributionModal({ open, onClose }: DistributionModalPr
               </button>
             </div>
 
+            {/* One picture: the delivered assets and where each one goes. The
+                approval dashboard used to sit below this diagram as a second
+                visual saying the same thing — it is now the left half of it. */}
             <div className="px-4 pb-12 pt-2 md:px-8 md:pb-10">
-              {/* The distribution system — record once, publish everywhere */}
-              <Reveal index={0} total={3}>
-                <DistributionSlide />
-              </Reveal>
-
-              {/* Bridge: the diagram above is what the dashboard below approves */}
-              <Reveal index={1} total={3}>
-                <div className="mx-auto mt-12 flex max-w-[600px] flex-col items-center gap-3 text-center md:mt-16">
-                  <div className="h-px w-24 bg-[var(--rule)]" />
-                  <span className="font-label text-[10px] tracking-[0.2em] text-[var(--accent)] uppercase">
-                    Delivered · Awaiting your approval
-                  </span>
-                  <h3 className="font-display-sm text-[clamp(1.25rem,2.5vw,1.75rem)] text-[var(--on-surface)]">
-                    Every asset, every destination, one dashboard
-                  </h3>
-                  <p className="font-body text-sm leading-relaxed text-[var(--muted)]">
-                    The system above routes each piece to its home. Below is what lands on your dashboard,
-                    ready to approve and schedule in one click.
-                  </p>
-                </div>
-              </Reveal>
-
-              {/* The distribution section from the steps page, merged in */}
-              <Reveal index={2} total={3}>
-                <div className="mx-auto mt-8 max-w-[720px] md:mt-10">
-                  <DashboardApproval />
-                </div>
-              </Reveal>
+              <DistributionSlide />
+              <p className="mx-auto mt-6 max-w-[560px] text-center font-body text-sm leading-relaxed text-[var(--muted)]">
+                Point at any asset to see where it lands. Approve the set and every
+                piece goes out on schedule.
+              </p>
             </div>
           </motion.div>
         </motion.div>

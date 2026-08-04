@@ -124,13 +124,18 @@ export const MOMENT_BAR = {
 };
 
 /* ── Content, step 10 · the dashboard ─────────────────────────────────── */
+/* `cluster` names which destination group on the distribution diagram this row
+   is routed to (video | social | owned). The table view ignores it; the merged
+   distribution slide uses it to light up the card a row actually ships to, so
+   the mapping lives with the row instead of being re-derived from the prose in
+   `destination`. */
 export const DASHBOARD_ROWS = [
-  { asset: 'EP 14 · FULL EPISODE', destination: 'YouTube, Spotify, Apple', state: 'READY' },
-  { asset: 'HIGHLIGHT · 0:41 TO 1:52', destination: 'Shorts, Reels, TikTok', state: 'READY' },
-  { asset: 'CLIPS · 6 OF 6', destination: 'Shorts, Reels, TikTok', state: 'READY' },
-  { asset: 'THUMBNAILS · 6 OF 6', destination: 'YouTube', state: 'PICK ONE' },
-  { asset: 'ARTICLE · 1,640 WORDS', destination: 'Blog', state: 'READY' },
-  { asset: 'POSTS · 4 OF 4', destination: 'LinkedIn', state: 'READY' },
+  { asset: 'EP 14 · FULL EPISODE', destination: 'YouTube, Spotify, Apple', state: 'READY', cluster: 'video' },
+  { asset: 'HIGHLIGHT · 0:41 TO 1:52', destination: 'Shorts, Reels, TikTok', state: 'READY', cluster: 'social' },
+  { asset: 'CLIPS · 6 OF 6', destination: 'Shorts, Reels, TikTok', state: 'READY', cluster: 'social' },
+  { asset: 'THUMBNAILS · 6 OF 6', destination: 'YouTube', state: 'PICK ONE', cluster: 'video' },
+  { asset: 'ARTICLE · 1,640 WORDS', destination: 'Blog', state: 'READY', cluster: 'owned' },
+  { asset: 'POSTS · 4 OF 4', destination: 'LinkedIn', state: 'READY', cluster: 'social' },
 ];
 
 export const DASHBOARD_ACTION = 'APPROVE ALL AND SCHEDULE';
