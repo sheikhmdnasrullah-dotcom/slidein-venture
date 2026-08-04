@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import PostProductionModal from './PostProductionModal';
 import DistributionModal from './DistributionModal';
+import OutreachSlideModal from './OutreachSlideModal';
 
 const EASE = [0.16, 1, 0.3, 1] as const;
 
@@ -88,7 +89,16 @@ export default function ProcessFlowChart({ className }: { className?: string }) 
 const [planningOpen, setPlanningOpen] = useState(false);
   const [executionOpen, setExecutionOpen] = useState(false);
   const [postOpen, setPostOpen] = useState(false);
-  const [distributionOpen, setDistributionOpen] = useState(false);
+const [distributionOpen, setDistributionOpen] = useState(false);
+  const [outreachPhaseId, setOutreachPhaseId] = useState<string | null>(null);
+
+const openOutreach = (id: string) => {
+    /* The infrastructure node maps to the steps "fortress" phase; the rest
+       share their ids directly. */
+    const phaseId = id === 'infrastructure' ? 'fortress' : id;
+    setOutreachPhaseId(phaseId);
+  };
+  const closeOutreach = () => setOutreachPhaseId(null);
 
   const toggleExpand = () => setExpanded((prev) => !prev);
   const togglePlanning = () => setPlanningOpen((prev) => !prev);
@@ -256,11 +266,12 @@ const isPlanning = node.id === 'planning';
                             </span>
 
 <button
-                              onClick={(isPlanning || isExecution || isPost || isDistribution) ? () => {
+onClick={(isPlanning || isExecution || isPost || isDistribution || branch.id === 'outreach') ? () => {
                                 if (isPlanning) togglePlanning();
                                 if (isExecution) toggleExecution();
                                 if (isPost) togglePost();
                                 if (isDistribution) setDistributionOpen(true);
+                                if (branch.id === 'outreach') openOutreach(node.id);
                               } : undefined}
                               className="flex-1 font-body text-left text-[15px] text-[var(--on-surface)] transition-colors duration-300"
                             >
@@ -390,6 +401,7 @@ const isPlanning = node.id === 'planning';
     </div>
 <PostProductionModal open={postOpen} onClose={() => setPostOpen(false)} />
     <DistributionModal open={distributionOpen} onClose={() => setDistributionOpen(false)} />
+    <OutreachSlideModal open={outreachPhaseId !== null} phaseId={outreachPhaseId} onClose={closeOutreach} />
     </>
   );
 }

@@ -1,21 +1,8 @@
 'use client';
 
-/**
- * CONTENT DISTRIBUTION — SlideIn Venture
- * ---------------------------------------
- * A three-layer content operating system visualization:
- *   Layer 1  Content Engine (living processing core)
- *   Layer 2  Processing ring (AI + human automation)
- *   Layer 3  Destination clusters with intelligent routing
- *
- * Brand marks are official simple-icons path data (YouTube, Spotify,
- * Apple Podcasts, Instagram, TikTok, X) + official LinkedIn brand path.
- * Monochrome at rest, brand color on hover.
- */
-
 import { motion } from 'framer-motion';
 
-/* ----------------------------- brand assets ----------------------------- */
+const EASE = [0.16, 1, 0.3, 1] as const;
 
 const LOGOS: Record<string, string> = {
   youtube:
@@ -33,166 +20,100 @@ const LOGOS: Record<string, string> = {
     'M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.225 0z',
 };
 
-/* ------------------------------- geometry -------------------------------- */
-
-const E = { x: 520, y: 415 }; // engine center
-
-type Item = {
-  name: string;
-  brand: string;
-  logo?: string; // filled brand path (24x24)
-  strokeIcon?: 'globe' | 'mail'; // owned-channel line icons
-};
-
-type Cluster = {
-  id: string;
-  title: string;
-  count: string;
-  x: number;
-  y: number;
-  w: number;
-  h: number;
-  entryY: number;
-  branch: string; // routing path from junction to card port
-  items: Item[];
-};
-
-const JUNCTION = { x: 830, y: 415 };
-
-const CLUSTERS: Cluster[] = [
+const NODES = [
   {
-    id: 'video',
     title: 'Video & Audio',
-    count: '03',
-    x: 1010, y: 105, w: 330, h: 172, entryY: 191,
-    branch: 'M 838 407 C 938 380, 872 191, 1006 191',
-    items: [
-  /* The `brand` values below are third-party marks (YouTube red, Spotify green,
-     Apple Podcasts purple, Instagram, LinkedIn). They are fixed by their owners
-     and are the one exemption from the palette — a tokenised YouTube red would
-     not be YouTube red. Everything else in this file speaks the tone contract. */
-      { name: 'YouTube', brand: '#FF0000', logo: LOGOS.youtube },
-      { name: 'Spotify', brand: '#1ED760', logo: LOGOS.spotify },
-      { name: 'Apple Podcasts', brand: '#9933CC', logo: LOGOS.applepodcasts },
+    platforms: [
+      { name: 'YouTube', logo: LOGOS.youtube, brand: '#FF0000' },
+      { name: 'Spotify', logo: LOGOS.spotify, brand: '#1ED760' },
+      { name: 'Apple Podcasts', logo: LOGOS.applepodcasts, brand: '#9933CC' },
     ],
   },
   {
-    id: 'social',
     title: 'Social Distribution',
-    count: '04',
-    x: 1046, y: 332, w: 350, h: 172, entryY: 418,
-    branch: 'M 844 416 C 918 418, 952 418, 1042 418',
-    items: [
-      { name: 'Instagram', brand: '#E4405F', logo: LOGOS.instagram },
-      { name: 'TikTok', brand: 'var(--on-surface)', logo: LOGOS.tiktok },
-      { name: 'LinkedIn', brand: '#0A66C2', logo: LOGOS.linkedin },
-      { name: 'X', brand: 'var(--on-surface)', logo: LOGOS.x },
+    platforms: [
+      { name: 'Instagram', logo: LOGOS.instagram, brand: '#E4405F' },
+      { name: 'TikTok', logo: LOGOS.tiktok, brand: 'var(--on-surface)' },
+      { name: 'LinkedIn', logo: LOGOS.linkedin, brand: '#0A66C2' },
+      { name: 'X', logo: LOGOS.x, brand: 'var(--on-surface)' },
     ],
   },
   {
-    id: 'owned',
     title: 'Owned Channels',
-    count: '02',
-    x: 1010, y: 560, w: 300, h: 172, entryY: 646,
-    branch: 'M 838 423 C 938 452, 872 646, 1006 646',
-    items: [
-      { name: 'Website', brand: 'var(--accent-vivid)', strokeIcon: 'globe' },
-      { name: 'Newsletter', brand: 'var(--accent-vivid)', strokeIcon: 'mail' },
+    platforms: [
+      { name: 'Website', logo: undefined, brand: 'var(--accent-vivid)', strokeIcon: 'globe' as const },
+      { name: 'Newsletter', logo: undefined, brand: 'var(--accent-vivid)', strokeIcon: 'mail' as const },
     ],
   },
 ];
 
-const RING_NODES = [
-  { x: E.x, y: E.y - 168, label: 'TRANSCRIBE', lx: 0, ly: -14 },
-  { x: E.x - 145, y: E.y + 84, label: 'REPURPOSE', lx: -58, ly: 4 },
-  { x: E.x + 145, y: E.y - 84, label: 'SCHEDULE', lx: 56, ly: -4 },
+const ASSET_ITEMS = [
+  'ASSET',
+  'EP 14 · FULL EPISODE',
+  'HIGHLIGHT · 0:41 TO 1:52',
+  'CLIPS · 6 OF 6',
+  'THUMBNAILS · 6 OF 6',
+  'ARTICLE · 1,640 WORDS',
+  'POSTS · 4 OF 4',
 ];
-
-const EASE = [0.22, 1, 0.36, 1] as const;
-
-/* ------------------------------ sub-pieces -------------------------------- */
 
 function StrokeIcon({ kind }: { kind: 'globe' | 'mail' }) {
-  if (kind === 'globe')
+  if (kind === 'globe') {
     return (
-      <g fill="none" stroke="currentColor" strokeWidth={1.9} strokeLinecap="round" strokeLinejoin="round">
+      <g fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
         <circle cx={12} cy={12} r={10} />
         <path d="M2 12h20" />
         <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
       </g>
     );
+  }
   return (
-    <g fill="none" stroke="currentColor" strokeWidth={1.9} strokeLinecap="round" strokeLinejoin="round">
+    <g fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
       <rect x={2} y={4} width={20} height={16} rx={2.5} />
       <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
     </g>
   );
 }
 
-function PlatformIcon({
-  cx, cy, r, item,
-}: { cx: number; cy: number; r: number; item: Item }) {
-  const s = ((r * 2 - 16) / 24).toFixed(4); // glyph fits with 8px padding
-  const off = (24 * Number(s)) / 2;
-  return (
-    <g className="cd-icon" style={{ ['--brand' as string]: item.brand }}>
-      <circle cx={cx} cy={cy} r={r} fill="var(--surface)" stroke="var(--rule)" strokeWidth={1} filter="url(#cdSoft)" />
-      <g className="cd-glyph" transform={`translate(${cx - off} ${cy - off}) scale(${s})`}>
-        {item.logo ? <path d={item.logo} fill="currentColor" /> : <StrokeIcon kind={item.strokeIcon!} />}
-      </g>
-      <text x={cx} y={cy + r + 17} textAnchor="middle" className="cd-item-label">
-        {item.name}
-      </text>
-    </g>
-  );
-}
+function PlatformIcon({ item, size = 28 }: { item: { name: string; logo?: string; brand: string; strokeIcon?: 'globe' | 'mail' }; size?: number }) {
+  const s = ((size - 8) / 24);
 
-function ClusterCard({ c, i }: { c: Cluster; i: number }) {
-  const n = c.items.length;
-  const iconR = n === 4 ? 21 : 23;
-  const gap = n === 4 ? 84 : n === 3 ? 104 : 120;
-  const start = c.x + (c.w - (n - 1) * gap) / 2;
-  const cy = c.y + 96;
   return (
-    <motion.g
-      className="cd-cluster"
-      initial={{ opacity: 0, y: 18 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.7, ease: EASE, delay: 1.7 + i * 0.14 }}
+    <div
+      className="flex items-center justify-center rounded-full border border-[var(--rule)] bg-[var(--surface)] transition-all hover:scale-110"
+      style={{
+        width: size,
+        height: size,
+        ['--brand' as string]: item.brand,
+      }}
     >
-      <rect x={c.x} y={c.y} width={c.w} height={c.h} rx={20}
-        fill="var(--surface-glass)" stroke="var(--rule)" strokeWidth={1} filter="url(#cdCard)" />
-      <rect x={c.x} y={c.y} width={c.w} height={c.h} rx={20} fill="url(#cdGlass)" pointerEvents="none" />
-      {/* cable port on the left edge */}
-      <circle cx={c.x} cy={c.entryY} r={4} fill="var(--accent-vivid)" filter="url(#cdGlow)" />
-      <circle cx={c.x} cy={c.entryY} r={8} fill="none" stroke="var(--accent-vivid)" strokeOpacity={0.3} strokeWidth={1} />
-      {/* header */}
-      <circle cx={c.x + 26} cy={c.y + 31} r={3.2} fill="var(--accent-vivid)" />
-      <text x={c.x + 38} y={c.y + 35} className="cd-cluster-title">{c.title.toUpperCase()}</text>
-      <text x={c.x + c.w - 24} y={c.y + 35} textAnchor="end" className="cd-cluster-count">{c.count}</text>
-      <line x1={c.x + 24} y1={c.y + 50} x2={c.x + c.w - 24} y2={c.y + 50} stroke="var(--rule)" strokeWidth={1} />
-      {c.items.map((it, k) => (
-        <PlatformIcon key={it.name} cx={start + k * gap} cy={cy} r={iconR} item={it} />
-      ))}
-    </motion.g>
+      {item.logo ? (
+        <svg width={size - 6} height={size - 6} viewBox="0 0 24 24" className="text-[var(--on-surface)] transition-colors hover:text-[var(--brand)]">
+          <path d={item.logo} fill="currentColor" />
+        </svg>
+      ) : (
+        <svg width={size - 6} height={size - 6} viewBox="0 0 24 24" className="text-[var(--accent-vivid)]">
+          <StrokeIcon kind={item.strokeIcon!} />
+        </svg>
+      )}
+    </div>
   );
 }
-
-/* ------------------------------ main slide -------------------------------- */
 
 export default function DistributionSlide() {
   return (
-    <section className="relative mx-auto w-full max-w-[920px] overflow-hidden rounded-[28px] bg-[var(--surface)] font-sans antialiased shadow-[var(--shadow-float)]">
+    <div className="relative mx-auto w-full max-w-[920px] overflow-hidden rounded-[28px] border border-[var(--rule)] bg-[var(--surface)] font-sans antialiased">
       {/* corner ticks */}
       <span className="pointer-events-none absolute left-5 top-5 h-3 w-3 border-l-2 border-t-2 border-[var(--accent-vivid)]/70" />
       <span className="pointer-events-none absolute bottom-5 right-5 h-3 w-3 border-b-2 border-r-2 border-[var(--accent-vivid)]/70" />
 
-      {/* header */}
-      <div className="relative z-10 flex items-end justify-between px-8 pt-5 md:px-12">
+      <div className="relative z-10 px-8 pt-6 md:px-12 md:pt-8">
+        {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 14 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, ease: EASE }}
+          className="mb-8"
         >
           <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-[var(--accent)]">
             04 — Content Distribution
@@ -204,276 +125,53 @@ export default function DistributionSlide() {
             </span>
           </h2>
         </motion.div>
-        <motion.div
-          initial={{ opacity: 0, y: 14 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, ease: EASE, delay: 0.15 }}
-          className="hidden items-center gap-2 rounded-full border border-[var(--rule)] bg-[var(--surface-glass)] px-4 py-2 backdrop-blur md:flex"
-        >
-          <span className="relative flex h-2 w-2">
-            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[var(--accent-vivid)] opacity-60" />
-            <span className="relative inline-flex h-2 w-2 rounded-full bg-[var(--accent-vivid)]" />
-          </span>
-          <span className="text-[11px] font-medium uppercase tracking-[0.18em] text-[var(--muted)]">
-            Live system
-          </span>
-        </motion.div>
-      </div>
 
-      {/* ------------------------------ canvas ------------------------------ */}
-      <div className="relative">
-        <svg viewBox="0 80 1440 675" className="block h-auto w-full" role="img"
-          aria-label="Content distribution system: one recording flows through the content engine, is processed by AI and humans, then routes automatically to video, social and owned channels.">
-          <defs>
-            <radialGradient id="cdAmbient" cx="50%" cy="50%" r="50%">
-              <stop offset="0%" stopColor="var(--accent-vivid)" stopOpacity="0.14" />
-              <stop offset="55%" stopColor="var(--accent-vivid)" stopOpacity="0.05" />
-              <stop offset="100%" stopColor="var(--accent-vivid)" stopOpacity="0" />
-            </radialGradient>
-            <radialGradient id="cdCore" cx="36%" cy="30%" r="80%">
-              <stop offset="0%" stopColor="var(--color-brand-pale)" />
-              <stop offset="45%" stopColor="var(--color-brand-lift)" />
-              <stop offset="100%" stopColor="var(--color-ember)" />
-            </radialGradient>
-            <radialGradient id="cdHalo" cx="50%" cy="50%" r="50%">
-              <stop offset="0%" stopColor="var(--color-brand-lift)" stopOpacity="0.55" />
-              <stop offset="100%" stopColor="var(--color-brand-lift)" stopOpacity="0" />
-            </radialGradient>
-            <linearGradient id="cdGlass" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="var(--gloss)" stopOpacity="0.55" />
-              <stop offset="100%" stopColor="var(--gloss)" stopOpacity="0" />
-            </linearGradient>
-            <linearGradient id="cdCable" x1="0" y1="0" x2="1" y2="0">
-              <stop offset="0%" stopColor="var(--accent-vivid)" stopOpacity="0.55" />
-              <stop offset="100%" stopColor="var(--accent-vivid)" stopOpacity="0.14" />
-            </linearGradient>
-            <linearGradient id="cdArc" x1="0" y1="0" x2="1" y2="1">
-              <stop offset="0%" stopColor="var(--accent-vivid)" stopOpacity="0.65" />
-              <stop offset="100%" stopColor="var(--color-brand-pale)" stopOpacity="0.1" />
-            </linearGradient>
-            <pattern id="cdDots" width="26" height="26" patternUnits="userSpaceOnUse">
-              <circle cx="1.2" cy="1.2" r="1.2" fill="var(--rule)" />
-            </pattern>
-            <radialGradient id="cdDotFade" cx="42%" cy="50%" r="60%">
-              <stop offset="0%" stopColor="var(--gloss)" stopOpacity="0.75" />
-              <stop offset="70%" stopColor="var(--gloss)" stopOpacity="0.25" />
-              <stop offset="100%" stopColor="var(--gloss)" stopOpacity="0" />
-            </radialGradient>
-            <mask id="cdDotMask">
-              <rect width="1440" height="810" fill="url(#cdDotFade)" />
-            </mask>
-            <filter id="cdSoft" x="-40%" y="-40%" width="180%" height="180%">
-              <feDropShadow dx="0" dy="3" stdDeviation="5" floodColor="var(--color-ember)" floodOpacity="0.16" />
-            </filter>
-            <filter id="cdCard" x="-20%" y="-20%" width="140%" height="140%">
-              <feDropShadow dx="0" dy="14" stdDeviation="18" floodColor="var(--color-ember)" floodOpacity="0.10" />
-            </filter>
-            <filter id="cdGlow" x="-150%" y="-150%" width="400%" height="400%">
-              <feGaussianBlur stdDeviation="2.2" result="b" />
-              <feMerge><feMergeNode in="b" /><feMergeNode in="SourceGraphic" /></feMerge>
-            </filter>
-            <filter id="cdEngineShadow" x="-60%" y="-60%" width="220%" height="220%">
-              <feDropShadow dx="0" dy="18" stdDeviation="24" floodColor="var(--color-ember)" floodOpacity="0.35" />
-            </filter>
-          </defs>
+        {/* Asset list through three nodes */}
+        <div className="flex flex-col gap-6">
+          {NODES.map((node, nodeIndex) => (
+            <motion.div
+              key={node.title}
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.2 + nodeIndex * 0.15, ease: EASE }}
+              className="flex flex-col gap-3"
+            >
+              {/* Node label */}
+              <div className="flex items-center gap-3">
+                <span className="h-px w-8 bg-[var(--accent-vivid)]" />
+                <span className="font-label text-[10px] tracking-[0.22em] text-[var(--accent)] uppercase">
+                  {node.title}
+                </span>
+              </div>
 
-          {/* --------------------------- background --------------------------- */}
-          <rect width="1440" height="810" fill="url(#cdDots)" mask="url(#cdDotMask)" opacity="0.55" />
-          <circle cx={E.x} cy={E.y} r={430} fill="url(#cdAmbient)" />
-          <circle cx={E.x} cy={E.y} r={262} fill="none" stroke="var(--rule)" strokeOpacity="0.55" strokeWidth="1" />
-          <circle cx={E.x} cy={E.y} r={430} fill="none" stroke="var(--rule)" strokeOpacity="0.35" strokeWidth="1" />
-          <line x1="60" y1={E.y} x2="1380" y2={E.y} stroke="var(--rule)" strokeOpacity="0.35" strokeWidth="1" strokeDasharray="1 8" />
+              {/* Asset items flowing through */}
+              <div className="flex flex-col gap-2 pl-4">
+                {ASSET_ITEMS.slice(
+                  nodeIndex * 2,
+                  nodeIndex === 0 ? 3 : nodeIndex === 1 ? 3 : ASSET_ITEMS.length
+                ).map((item, i) => (
+                  <motion.div
+                    key={`${nodeIndex}-${item}`}
+                    initial={{ opacity: 0, x: -8 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.4, delay: 0.3 + nodeIndex * 0.15 + i * 0.05, ease: EASE }}
+                    className="font-body text-sm tracking-tight text-[var(--on-surface)]"
+                  >
+                    {item}
+                  </motion.div>
+                ))}
+              </div>
 
-          {/* --------------------- routing cables (layer 3) -------------------- */}
-          {/* input: record → engine */}
-          <motion.path
-            id="cd-in" d="M 196 415 C 300 415, 356 415, 424 415"
-            fill="none" stroke="url(#cdCable)" strokeWidth={2}
-            initial={{ pathLength: 0, opacity: 0 }} animate={{ pathLength: 1, opacity: 1 }}
-            transition={{ duration: 0.6, ease: 'easeOut', delay: 0.9 }}
-          />
-          {/* trunk: engine → junction */}
-          <motion.path
-            id="cd-trunk" d="M 612 415 C 690 415, 748 415, 816 415"
-            fill="none" stroke="url(#cdCable)" strokeWidth={2.5}
-            initial={{ pathLength: 0, opacity: 0 }} animate={{ pathLength: 1, opacity: 1 }}
-            transition={{ duration: 0.6, ease: 'easeOut', delay: 1.2 }}
-          />
-          {CLUSTERS.map((c, i) => (
-            <g key={c.id}>
-              {/* soft glow underlay */}
-              <path d={c.branch} fill="none" stroke="var(--accent-vivid)" strokeOpacity={0.07} strokeWidth={7} />
-              <motion.path
-                id={`cd-branch-${c.id}`} d={c.branch}
-                fill="none" stroke="url(#cdCable)" strokeWidth={1.8}
-                initial={{ pathLength: 0, opacity: 0 }} animate={{ pathLength: 1, opacity: 1 }}
-                transition={{ duration: 0.7, ease: 'easeOut', delay: 1.45 + i * 0.12 }}
-              />
-              {/* flowing energy overlay */}
-              <path className="cd-flow" d={c.branch} fill="none" stroke="var(--accent-vivid)" strokeOpacity={0.5} strokeWidth={1.8} />
-            </g>
+              {/* Platform icons */}
+              <div className="flex items-center gap-3 pl-4 pt-1">
+                {node.platforms.map((platform) => (
+                  <PlatformIcon key={platform.name} item={platform} />
+                ))}
+              </div>
+            </motion.div>
           ))}
-          <path className="cd-flow" d="M 196 415 C 300 415, 356 415, 424 415" fill="none" stroke="var(--accent-vivid)" strokeOpacity={0.45} strokeWidth={2} />
-          <path className="cd-flow" d="M 612 415 C 690 415, 748 415, 816 415" fill="none" stroke="var(--accent-vivid)" strokeOpacity={0.55} strokeWidth={2.2} />
-
-          {/* traveling particles */}
-          <motion.g initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 2.3, duration: 0.8 }}>
-            {CLUSTERS.map((c, i) => (
-              <g key={c.id}>
-                <circle r={3.2} fill="var(--color-brand-lift)" filter="url(#cdGlow)">
-                  <animateMotion dur={`${2.6 + i * 0.4}s`} begin={`${i * 0.9}s`} repeatCount="indefinite" path={c.branch} />
-                </circle>
-                <circle r={2} fill="var(--color-brand-pale)" filter="url(#cdGlow)">
-                  <animateMotion dur={`${2.6 + i * 0.4}s`} begin={`${1.3 + i * 0.9}s`} repeatCount="indefinite" path={c.branch} />
-                </circle>
-              </g>
-            ))}
-            <circle r={3} fill="var(--color-brand-lift)" filter="url(#cdGlow)">
-              <animateMotion dur="2.2s" repeatCount="indefinite" path="M 196 415 C 300 415, 356 415, 424 415" />
-            </circle>
-            <circle r={3.4} fill="var(--color-brand-lift)" filter="url(#cdGlow)">
-              <animateMotion dur="1.8s" repeatCount="indefinite" path="M 612 415 C 690 415, 748 415, 816 415" />
-            </circle>
-          </motion.g>
-
-          {/* ------------------------ record node (input) ---------------------- */}
-          <motion.g
-            initial={{ opacity: 0, x: -14 }} animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.7, ease: EASE, delay: 0.65 }}
-          >
-            <circle cx={160} cy={415} r={34} fill="var(--surface)" stroke="var(--rule)" strokeWidth={1} filter="url(#cdSoft)" />
-            <circle cx={160} cy={415} r={10} fill="var(--accent-vivid)" className="cd-rec" />
-            <circle cx={160} cy={415} r={17} fill="none" stroke="var(--accent-vivid)" strokeOpacity={0.35} strokeWidth={1.5} className="cd-rec-ring" />
-            <text x={160} y={475} textAnchor="middle" className="cd-stage">RECORD ONCE</text>
-            <text x={160} y={492} textAnchor="middle" className="cd-substage">one long-form session</text>
-          </motion.g>
-
-          {/* -------------------- processing ring (layer 2) -------------------- */}
-          <motion.g initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 1, delay: 0.55 }}>
-            <circle className="cd-ring-slow" cx={E.x} cy={E.y} r={134} fill="none"
-              stroke="var(--accent-vivid)" strokeOpacity={0.28} strokeWidth={1.2} strokeDasharray="1 7" strokeLinecap="round" />
-            <circle className="cd-ring-fast" cx={E.x} cy={E.y} r={168} fill="none"
-              stroke="url(#cdArc)" strokeWidth={2.4} strokeDasharray="72 46 148 64 96 104" strokeLinecap="round" />
-            {/* orbiting particles */}
-            <circle r={3} fill="var(--accent-vivid)" filter="url(#cdGlow)">
-              <animateMotion dur="9s" repeatCount="indefinite"
-                path={`M ${E.x + 151} ${E.y} a 151 151 0 1 1 -302 0 a 151 151 0 1 1 302 0`} />
-            </circle>
-            <circle r={2.2} fill="var(--color-brand-pale)" filter="url(#cdGlow)">
-              <animateMotion dur="13s" repeatCount="indefinite" keyPoints="1;0" keyTimes="0;1" calcMode="linear"
-                path={`M ${E.x + 151} ${E.y} a 151 151 0 1 1 -302 0 a 151 151 0 1 1 302 0`} />
-            </circle>
-            {/* automation micro-nodes */}
-            {RING_NODES.map((n) => (
-              <g key={n.label}>
-                <circle cx={n.x} cy={n.y} r={4} fill="var(--accent-vivid)" filter="url(#cdGlow)" />
-                <circle cx={n.x} cy={n.y} r={9} fill="none" stroke="var(--accent-vivid)" strokeOpacity={0.3} strokeWidth={1} className="cd-rec-ring" />
-                <text x={n.x + n.lx} y={n.y + n.ly} textAnchor="middle" className="cd-micro">{n.label}</text>
-              </g>
-            ))}
-            <text x={E.x} y={E.y + 205} textAnchor="middle" className="cd-stage">AI + HUMAN PROCESSING</text>
-          </motion.g>
-
-          {/* ---------------------- content engine (layer 1) -------------------- */}
-          <motion.g
-            style={{ transformBox: 'fill-box', transformOrigin: 'center' }}
-            initial={{ scale: 0.5, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}
-            transition={{ duration: 0.9, ease: EASE, delay: 0.2 }}
-          >
-            <circle cx={E.x} cy={E.y} r={122} fill="url(#cdHalo)" className="cd-halo" />
-            <circle cx={E.x} cy={E.y} r={88} fill="url(#cdCore)" filter="url(#cdEngineShadow)" />
-            <circle cx={E.x} cy={E.y} r={88} fill="none" stroke="var(--on-accent)" strokeOpacity={0.35} strokeWidth={1.2} />
-            <circle cx={E.x} cy={E.y} r={72} fill="none" stroke="var(--on-accent)" strokeOpacity={0.16} strokeWidth={1} strokeDasharray="2 5" />
-            <ellipse cx={E.x - 26} cy={E.y - 38} rx={40} ry={22} fill="var(--on-accent)" opacity={0.18} />
-            {/* living waveform */}
-            <g fill="var(--on-accent)">
-              {[-24, -12, 0, 12, 24].map((dx, i) => (
-                <rect key={dx} className="cd-wave" x={E.x + dx - 2.5} y={E.y - 34} width={5} height={26} rx={2.5}
-                  style={{ animationDelay: `${i * 0.14}s` }} />
-              ))}
-            </g>
-            <text x={E.x} y={E.y + 26} textAnchor="middle" className="cd-engine-t1">CONTENT ENGINE</text>
-            <text x={E.x} y={E.y + 46} textAnchor="middle" className="cd-engine-t2">PROCESSING CORE</text>
-          </motion.g>
-
-          {/* ------------------------- routing junction ------------------------ */}
-          <motion.g initial={{ opacity: 0, scale: 0.6 }} animate={{ opacity: 1, scale: 1 }}
-            style={{ transformBox: 'fill-box', transformOrigin: 'center' }}
-            transition={{ duration: 0.6, ease: EASE, delay: 1.5 }}>
-            <circle cx={JUNCTION.x} cy={JUNCTION.y} r={15} fill="var(--surface)" stroke="var(--accent-vivid)" strokeOpacity={0.4}
-              strokeWidth={1.2} strokeDasharray="3 4" className="cd-ring-slow2" />
-            <circle cx={JUNCTION.x} cy={JUNCTION.y} r={5.5} fill="var(--accent-vivid)" filter="url(#cdGlow)" />
-            <text x={JUNCTION.x} y={JUNCTION.y + 46} textAnchor="middle" className="cd-stage">SMART ROUTING</text>
-          </motion.g>
-
-          {/* --------------------- destination clusters ------------------------ */}
-          {CLUSTERS.map((c, i) => (
-            <ClusterCard key={c.id} c={c} i={i} />
-          ))}
-        </svg>
+        </div>
       </div>
-
-      {/* story strip */}
-      <motion.div
-        initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.7, ease: EASE, delay: 2.1 }}
-        className="relative z-10 flex flex-wrap items-center justify-center gap-x-3 gap-y-2 px-8 pb-5 pt-0.5 text-[10.5px] font-medium uppercase tracking-[0.2em] text-[var(--muted)]"
-      >
-        {['Record once', 'Content engine', 'AI + human processing', 'Smart routing', 'Nine destinations'].map(
-          (s, i, arr) => (
-            <span key={s} className="flex items-center gap-3">
-              <span className={i === arr.length - 1 ? 'text-[var(--accent)]' : ''}>{s}</span>
-              {i < arr.length - 1 && <span className="text-[var(--muted)]">→</span>}
-            </span>
-          )
-        )}
-      </motion.div>
-
-      {/* scoped animation styles */}
-      <style>{`
-        .cd-flow { stroke-dasharray: 3 15; animation: cdDash 1.4s linear infinite; }
-        @keyframes cdDash { to { stroke-dashoffset: -18; } }
-
-        .cd-ring-slow  { transform-origin: ${E.x}px ${E.y}px; animation: cdSpin 52s linear infinite; }
-        .cd-ring-fast  { transform-origin: ${E.x}px ${E.y}px; animation: cdSpinRev 30s linear infinite; opacity: .55; }
-        .cd-ring-slow2 { transform-box: fill-box; transform-origin: center; animation: cdSpin 14s linear infinite; }
-        @keyframes cdSpin    { to { transform: rotate(360deg); } }
-        @keyframes cdSpinRev { to { transform: rotate(-360deg); } }
-
-        .cd-halo { animation: cdPulse 3.4s ease-in-out infinite; }
-        @keyframes cdPulse { 0%,100% { opacity: .5; } 50% { opacity: 1; } }
-
-        .cd-rec { transform-box: fill-box; transform-origin: center; animation: cdRec 2s ease-in-out infinite; }
-        @keyframes cdRec { 0%,100% { transform: scale(1); } 50% { transform: scale(.78); } }
-        .cd-rec-ring { transform-box: fill-box; transform-origin: center; animation: cdRecRing 2.6s ease-out infinite; }
-        @keyframes cdRecRing { 0% { transform: scale(.7); opacity: .8; } 100% { transform: scale(1.7); opacity: 0; } }
-
-        .cd-wave { transform-box: fill-box; transform-origin: center; animation: cdWave 1.1s ease-in-out infinite; }
-        @keyframes cdWave { 0%,100% { transform: scaleY(.35); } 50% { transform: scaleY(1); } }
-
-        .cd-cluster { transition: transform .45s cubic-bezier(.22,1,.36,1); transform-box: fill-box; transform-origin: center; }
-        .cd-cluster:hover { transform: translateY(-6px); }
-
-        .cd-icon { cursor: pointer; }
-        .cd-glyph { color: var(--on-surface); transition: color .3s ease; }
-        .cd-icon:hover .cd-glyph { color: var(--brand); }
-        .cd-icon > circle { transition: transform .3s cubic-bezier(.22,1,.36,1); transform-box: fill-box; transform-origin: center; }
-        .cd-icon:hover > circle { transform: scale(1.08); }
-
-        .cd-item-label { font-size: 10px; letter-spacing: .04em; fill: var(--muted); font-weight: 500; }
-        .cd-cluster-title { font-size: 10.5px; letter-spacing: .22em; fill: var(--muted); font-weight: 600; }
-        .cd-cluster-count { font-size: 10.5px; letter-spacing: .18em; fill: var(--muted); font-weight: 600; }
-        .cd-stage { font-size: 10px; letter-spacing: .24em; fill: var(--muted); font-weight: 600; }
-        .cd-substage { font-size: 10px; letter-spacing: .04em; fill: var(--muted); font-weight: 500; }
-        .cd-micro { font-size: 8.5px; letter-spacing: .2em; fill: var(--muted); font-weight: 600; }
-        .cd-engine-t1 { font-size: 13px; letter-spacing: .18em; fill: var(--on-accent); font-weight: 700; }
-        .cd-engine-t2 { font-size: 8px; letter-spacing: .3em; fill: color-mix(in oklch, var(--on-accent) 75%, transparent); font-weight: 600; }
-
-        @media (prefers-reduced-motion: reduce) {
-          .cd-flow, .cd-ring-slow, .cd-ring-fast, .cd-ring-slow2, .cd-halo,
-          .cd-rec, .cd-rec-ring, .cd-wave { animation: none; }
-        }
-      `}</style>
-    </section>
+    </div>
   );
 }

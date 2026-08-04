@@ -5,3 +5,5 @@
 - [x] Wire `distributionOpen` state & button in `ProcessFlowChart.tsx`
 - [x] Render `<DistributionModal>` in ProcessFlowChart
 - [x] Verify with build/dev server
+- [x] Create 16:9 outreach slide modals for The Infrastructure, The Fuel, The Script, The Launch importing steps-page proof artifacts (DnsRecordCard, LeadCard, EmailProvenance, MetricsPanel)
+- [x] Wire outreach phase slides into ProcessFlowChart with scroll-reveal animation
