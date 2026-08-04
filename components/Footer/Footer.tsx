@@ -10,8 +10,9 @@ import { LogoWordmark } from '@/components/Brand/Logo';
  */
 const LIVE_LINKS = [
   { label: 'Solutions', href: '/solutions' },
+  { label: 'Steps', href: '/steps' },
+  { label: 'Process', href: '/process' },
   { label: 'Pricing', href: '/pricing' },
-  { label: 'The Framework', href: '/steps#framework' },
 ];
 
 export default function Footer() {

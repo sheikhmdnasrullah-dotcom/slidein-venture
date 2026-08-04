@@ -7,6 +7,7 @@ import LetsTalkButton from './LetsTalkButton';
 
 const navLinks = [
   { label: 'Steps', href: '/steps' },
+  { label: 'Process', href: '/process' },
   { label: 'Portfolio', href: '/portfolio' },
   { label: 'Pricing', href: '/pricing' },
 ];

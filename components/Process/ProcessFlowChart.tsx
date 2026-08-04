@@ -1,0 +1,276 @@
+'use client';
+
+import { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { cn } from '@/lib/utils';
+
+const EASE = [0.16, 1, 0.3, 1] as const;
+
+type BranchId = 'content' | 'outreach';
+
+interface BranchNode {
+  id: string;
+  label: string;
+  description?: string;
+}
+
+interface Branch {
+  id: BranchId;
+  title: string;
+  accent: string;
+  accentHover: string;
+  nodes: BranchNode[];
+}
+
+const BRANCHES: Branch[] = [
+  {
+    id: 'content',
+    title: 'Content Production',
+    accent: 'var(--color-brand)',
+    accentHover: 'var(--color-brand-hi)',
+    nodes: [
+      { id: 'planning', label: 'Planning' },
+      { id: 'execution', label: 'Execution' },
+      { id: 'post', label: 'Post-production' },
+      { id: 'distribution', label: 'Distribution' },
+    ],
+  },
+  {
+    id: 'outreach',
+    title: 'Manual Outreach',
+    accent: 'var(--color-brand-hi)',
+    accentHover: 'var(--color-brand)',
+    nodes: [
+      { id: 'infrastructure', label: 'The Infrastructure' },
+      { id: 'fuel', label: 'The Fuel' },
+      { id: 'script', label: 'The Script' },
+      { id: 'launch', label: 'The Launch' },
+    ],
+  },
+];
+
+function PlusIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+      <path d="M12 5v14M5 12h14" />
+    </svg>
+  );
+}
+
+function ConnectorLines({ expanded }: { expanded: boolean }) {
+  if (!expanded) return null;
+
+  return (
+    <div className="absolute inset-0 pointer-events-none" aria-hidden>
+      {BRANCHES.map((branch, branchIndex) => {
+        const isLeft = branchIndex === 0;
+        return (
+          <svg
+            key={branch.id}
+            className="absolute inset-0 h-full w-full"
+            preserveAspectRatio="none"
+          >
+            {/* Vertical line from parent down to first child */}
+            <motion.line
+              x1={isLeft ? '25%' : '75%'}
+              y1="0%"
+              x2={isLeft ? '25%' : '75%'}
+              y2="100%"
+              stroke="var(--rule-strong)"
+              strokeWidth="1.5"
+              strokeDasharray="4 4"
+              initial={{ pathLength: 0 }}
+              animate={{ pathLength: 1 }}
+              transition={{ duration: 0.6, ease: EASE }}
+            />
+          </svg>
+        );
+      })}
+    </div>
+  );
+}
+
+export default function ProcessFlowChart({ className }: { className?: string }) {
+  const [expanded, setExpanded] = useState(false);
+  const [activeBranch, setActiveBranch] = useState<BranchId | null>(null);
+  const [hoveredNode, setHoveredNode] = useState<string | null>(null);
+
+  const toggleExpand = () => setExpanded((prev) => !prev);
+
+  return (
+    <div className={cn('mx-auto max-w-[1200px] px-6 md:px-10', className)}>
+      {/* Title */}
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, ease: EASE }}
+        className="mb-10 text-center"
+      >
+        <h2 className="font-display-xl max-w-[20ch] mx-auto text-[clamp(1.75rem,3.5vw,2.75rem)] text-[var(--on-surface)]">
+          The Complete Step by Step Process
+        </h2>
+      </motion.div>
+
+      {/* Flowchart */}
+      <div className="relative">
+        {/* Origin node */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.5, ease: EASE }}
+          className="flex justify-center mb-8"
+        >
+          <div className="flex flex-col items-center gap-4">
+            <div className="relative">
+              <span className="block h-4 w-4 rounded-full bg-[var(--accent-vivid)]" />
+              <span className="absolute inset-0 h-4 w-4 rounded-full bg-[var(--accent-vivid)] opacity-40 animate-ping" />
+            </div>
+          </div>
+        </motion.div>
+
+        {/* Connecting lines from origin to branch headers */}
+        {expanded && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.4, delay: 0.2 }}
+            className="flex justify-center mb-6"
+          >
+            <svg className="h-8 w-full max-w-[800px]" preserveAspectRatio="none">
+              <motion.line
+                x1="25%"
+                y1="0"
+                x2="25%"
+                y2="100%"
+                stroke="var(--rule-strong)"
+                strokeWidth="1.5"
+                strokeDasharray="4 4"
+                initial={{ pathLength: 0 }}
+                animate={{ pathLength: 1 }}
+                transition={{ duration: 0.5, ease: EASE }}
+              />
+              <motion.line
+                x1="75%"
+                y1="0"
+                x2="75%"
+                y2="100%"
+                stroke="var(--rule-strong)"
+                strokeWidth="1.5"
+                strokeDasharray="4 4"
+                initial={{ pathLength: 0 }}
+                animate={{ pathLength: 1 }}
+                transition={{ duration: 0.5, delay: 0.1, ease: EASE }}
+              />
+            </svg>
+          </motion.div>
+        )}
+
+        {/* Branch headers */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+          {BRANCHES.map((branch, index) => (
+            <motion.div
+              key={branch.id}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: index * 0.1, ease: EASE }}
+            >
+              <button
+                onClick={toggleExpand}
+                className="group w-full flex items-center justify-between rounded-xl border border-[var(--rule-strong)] px-6 py-4 text-left transition-all duration-300 hover:shadow-[0_8px_30px_color-mix(in_oklch,var(--on-surface)_8%,transparent)]"
+                style={{
+                  background: expanded && activeBranch === branch.id ? 'var(--accent-wash)' : 'var(--surface)',
+                  borderColor: expanded && activeBranch === branch.id ? 'var(--accent-ring)' : 'var(--rule-strong)',
+                }}
+                onMouseEnter={() => setActiveBranch(branch.id)}
+                onMouseLeave={() => setActiveBranch(null)}
+              >
+                <span
+                  className="font-display-sm text-[clamp(1rem,1.5vw,1.25rem)] transition-colors duration-300"
+                  style={{ color: expanded && activeBranch === branch.id ? branch.accent : 'var(--on-surface)' }}
+                >
+                  {branch.title}
+                </span>
+                <span
+                  className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full transition-all duration-300"
+                  style={{
+                    background: expanded && activeBranch === branch.id ? branch.accent : 'var(--rule)',
+                    color: expanded && activeBranch === branch.id ? 'var(--on-accent)' : 'var(--muted)',
+                  }}
+                >
+                  <PlusIcon />
+                </span>
+              </button>
+            </motion.div>
+          ))}
+        </div>
+
+        {/* Expanded nodes */}
+        <AnimatePresence>
+          {expanded && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              transition={{ duration: 0.4, ease: EASE }}
+              className="grid grid-cols-1 md:grid-cols-2 gap-6"
+            >
+              {BRANCHES.map((branch, branchIndex) => (
+                <div key={branch.id} className="flex flex-col gap-3">
+                  {branch.nodes.map((node, nodeIndex) => (
+                    <motion.div
+                      key={node.id}
+                      initial={{ opacity: 0, x: branchIndex === 0 ? -10 : 10 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ duration: 0.3, delay: nodeIndex * 0.05, ease: EASE }}
+                      onMouseEnter={() => setHoveredNode(node.id)}
+                      onMouseLeave={() => setHoveredNode(null)}
+                      className="group relative"
+                    >
+                      <div
+                        className="flex items-center gap-4 rounded-xl border px-5 py-4 transition-all duration-300 cursor-default"
+                        style={{
+                          background: 'var(--surface-2)',
+                          borderColor: hoveredNode === node.id ? branch.accent : 'var(--rule)',
+                          transform: hoveredNode === node.id ? 'translateX(4px)' : 'none',
+                        }}
+                      >
+                        {/* Accent dot */}
+                        <span className="relative flex h-2.5 w-2.5 shrink-0">
+                          <span
+                            className="absolute inset-0 rounded-full opacity-40"
+                            style={{ backgroundColor: branch.accent }}
+                          />
+                          <span
+                            className="absolute inset-[-2px] rounded-full opacity-0 transition-opacity duration-300"
+                            style={{
+                              backgroundColor: branch.accent,
+                              opacity: hoveredNode === node.id ? 0.3 : 0,
+                            }}
+                          />
+                        </span>
+
+                        <span className="flex-1 font-body text-[15px] text-[var(--on-surface)] transition-colors duration-300">
+                          {node.label}
+                        </span>
+
+                        <span
+                          className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full transition-all duration-300"
+                          style={{
+                            background: hoveredNode === node.id ? branch.accent : 'var(--rule)',
+                            color: hoveredNode === node.id ? 'var(--on-accent)' : 'var(--muted)',
+                          }}
+                        >
+                          <PlusIcon />
+                        </span>
+                      </div>
+                    </motion.div>
+                  ))}
+                </div>
+              ))}
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
+    </div>
+  );
+}
