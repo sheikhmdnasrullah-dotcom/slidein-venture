@@ -40,7 +40,7 @@
  *    headings already do the wayfinding on a narrow screen.
  */
 
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import Link from 'next/link';
 import { useReducedMotion } from 'framer-motion';
 import { ArrowRight02Icon as ArrowIcon } from 'hugeicons-react';
@@ -106,6 +106,22 @@ const CHAPTERS: ChapterDef[] = [
    ending lands. */
 function Close() {
   const still = !!useReducedMotion();
+
+  /**
+   * The travelling dot is dropped AFTER hydration, never during it.
+   *
+   * `{!still && <circle/>}` rendered the circle on the server, which cannot
+   * know the preference, and omitted it on a reduced motion client: two
+   * different element trees at the same position, which React reports as a
+   * hydration mismatch and recovers from by re rendering this whole band.
+   * Rendering it on the first pass either way and removing it in an effect
+   * gives the same end state with no mismatch.
+   */
+  const [dropped, setDropped] = useState(false);
+  useEffect(() => {
+    if (still) setDropped(true);
+  }, [still]);
+
   return (
     <Section tone="stage" pad="tall" seam className="text-center">
       <div className="mx-auto flex max-w-[1400px] flex-col items-center gap-6 px-6 md:px-10">
@@ -123,7 +139,7 @@ function Close() {
               strokeOpacity="0.34"
               strokeWidth="1.2"
             />
-            {!still && (
+            {!dropped && (
               <circle r={3.5} fill="var(--accent-vivid)" filter="url(#closeGlow)">
                 <animateMotion
                   path="M 200 80 C 280 80, 280 220, 200 220 C 120 220, 120 80, 200 80"

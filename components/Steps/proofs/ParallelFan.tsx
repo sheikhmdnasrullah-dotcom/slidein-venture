@@ -93,7 +93,7 @@ export default function ParallelFan({ className }: { className?: string }) {
               stroke="var(--rule-strong)"
               strokeWidth={1}
               vectorEffect="non-scaling-stroke"
-              initial={still ? false : { pathLength: 0 }}
+              initial={{ pathLength: 0 }}
               whileInView={{ pathLength: 1 }}
               viewport={{ once: true, margin: '0px 0px -15% 0px' }}
               /* Identical for every path. No index in this transition. */
@@ -106,7 +106,7 @@ export default function ParallelFan({ className }: { className?: string }) {
         <motion.div
           className="flex flex-1 flex-col"
           style={{ gap: GAP }}
-          initial={still ? false : { opacity: 0 }}
+          initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           viewport={{ once: true, margin: '0px 0px -15% 0px' }}
           transition={{ duration: still ? 0 : 0.5, delay: still ? 0 : 0.5, ease: EASE }}

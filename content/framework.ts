@@ -179,3 +179,139 @@ export function frameworkTallyLine(): string {
     WORDS[FRAMEWORK_CLIENT_NODE_COUNT] ?? String(FRAMEWORK_CLIENT_NODE_COUNT);
   return FRAMEWORK_NODE_COUNT + ' moving parts. ' + yours + ' of them are yours.';
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   THE THREAD — the homepage's two density version of the same business
+   ═══════════════════════════════════════════════════════════════════════════
+   A third consumer of this file, and it exists because the homepage needs a
+   drawing with two states rather than two drawings. Simple shows four
+   milestones a side; Complete adds seven detail nodes to each strand. Same
+   thread, same dots, same rules, one lower level of hierarchy. Nothing about
+   the Complete state introduces a visual language the Simple state does not
+   already use, which is the whole specification.
+
+   ROWS ARE PAIRS, AND THAT IS STRUCTURAL RATHER THAN TIDY
+   The two branches mirror each other position for position, so a row holds a
+   left node and a right node together. Typing them as two independent lists
+   would make it possible to ship a fifth node on one side and a fourth on the
+   other, and the drawing would silently come out of alignment at whichever
+   breakpoint nobody checked. A pair cannot do that.
+
+   ONE OMISSION WORTH KNOWING ABOUT
+   The seven content details below start at editing. Ideation, research and
+   scripting — three of the ten steps on /steps, and all of the work sold
+   before the camera is switched on — are inside "Content Production" but are
+   not drawn. That is the node graph as specified. It is also the exact thing
+   decision 2 at the top of this file warns about, so if this drawing ever
+   grows an eighth detail, that is the one.
+
+   THE FIGURES ARE SPLIT OUT OF THEIR SENTENCES
+   `pre` / `figure` / `post` rather than one string, because the numerals are
+   set in the display serif and the words around them in mono. Two registers in
+   one line needs two slots; a regex over a rendered string would eventually
+   catch a numeral that was never meant to be a figure. */
+
+export type ThreadStat = {
+  pre?: string;
+  /** Set in the display serif. The only numerals in the drawing. */
+  figure?: string;
+  post?: string;
+};
+
+export type ThreadNode = {
+  id: string;
+  kind: 'milestone' | 'detail';
+  label: string;
+  /** Mono, above the label. Used only by the two client nodes. */
+  eyebrow?: string;
+  stat?: ThreadStat;
+  /** The two closing statements. The only accent coloured labels. */
+  accent?: boolean;
+};
+
+export type ThreadRow = { left: ThreadNode; right: ThreadNode };
+
+const detail = (id: string, label: string): ThreadNode => ({
+  id,
+  kind: 'detail',
+  label,
+});
+
+/** Above the origin point, before the thread splits. */
+export const THREAD_ORIGIN: ThreadStat = {
+  figure: '1',
+  post: 'session a week',
+};
+
+/** Shown in both states. */
+export const THREAD_MILESTONES_TOP: ThreadRow[] = [
+  {
+    left: {
+      id: 'record',
+      kind: 'milestone',
+      label: 'You record, once',
+      eyebrow: 'YOU',
+    },
+    right: {
+      id: 'who',
+      kind: 'milestone',
+      label: 'You tell us who to reach, once',
+      eyebrow: 'YOU',
+    },
+  },
+  {
+    left: {
+      id: 'content-production',
+      kind: 'milestone',
+      label: 'Content Production',
+      stat: { pre: 'Every week ·', figure: '72', post: 'hour turnaround' },
+    },
+    right: {
+      id: 'researched-outreach',
+      kind: 'milestone',
+      label: 'Researched Outreach',
+      stat: { pre: 'Continuous · first sends day', figure: '17' },
+    },
+  },
+];
+
+/** Complete state only. Seven a side, in order, on the same strand. */
+export const THREAD_DETAILS: ThreadRow[] = [
+  { left: detail('audio-video', 'Audio & video editing'), right: detail('icp', 'Ideal client research') },
+  { left: detail('transcript', 'Transcript & show notes'), right: detail('infrastructure', 'Building sending infrastructure') },
+  { left: detail('clips', 'Short-form clips'), right: detail('leads', 'Finding & verifying leads') },
+  { left: detail('thumbnails', 'Thumbnails & cover art'), right: detail('verification', 'Email verification') },
+  { left: detail('articles', 'Blog articles'), right: detail('copywriting', 'Personalized copywriting') },
+  { left: detail('social', 'LinkedIn & social posts'), right: detail('sending', 'Sending & follow-ups') },
+  { left: detail('distribution', 'Multi-platform distribution'), right: detail('replies', 'Reply sorting & handoff') },
+];
+
+/** Shown in both states, below the details. */
+export const THREAD_MILESTONES_BOTTOM: ThreadRow[] = [
+  {
+    left: {
+      id: 'presence',
+      kind: 'milestone',
+      label: 'Consistent multi-platform presence',
+      stat: { pre: 'Six outputs · one master file' },
+    },
+    right: {
+      id: 'conversations',
+      kind: 'milestone',
+      label: 'Qualified conversations with the right people',
+      stat: { pre: 'Under', figure: '2%', post: 'bounce' },
+    },
+  },
+  {
+    left: { id: 'trust', kind: 'milestone', label: 'Content builds trust', accent: true },
+    right: { id: 'reach', kind: 'milestone', label: 'Outreach expands reach', accent: true },
+  },
+];
+
+/** Below the merge. */
+export const THREAD_OUTCOME = 'More clients, faster';
+
+export const THREAD_TOGGLE = {
+  open: 'View the complete framework',
+  close: 'Back to the simple framework',
+};

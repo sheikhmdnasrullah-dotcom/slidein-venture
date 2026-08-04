@@ -288,7 +288,7 @@ export default function PhaseRail({ className }: { className?: string }) {
           {open && (
             <motion.div
               key={open.id}
-              initial={still ? false : { opacity: 0, y: 16 }}
+              initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
               /* Shorter out than in: an exit that takes as long as an entrance
                  makes switching phases feel like waiting for a door. */

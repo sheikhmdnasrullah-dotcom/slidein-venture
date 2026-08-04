@@ -1,7 +1,7 @@
 import Hero from "@/components/Hero/Hero";
 import Section from "@/components/Section";
 import FrameworkHead from "@/components/Framework/FrameworkHead";
-import FrameworkWeave from "@/components/Framework/FrameworkWeave";
+import FrameworkThread from "@/components/Framework/FrameworkThread";
 
 /**
  * HOME — the hero, then the shape of the business.
@@ -14,17 +14,23 @@ import FrameworkWeave from "@/components/Framework/FrameworkWeave";
  * type in --accent in four places (the two YOU tags and the two cross link
  * statements). `raised` re-points it to signal-deeper, which clears AA.
  *
- * THE WEAVE, NOT THE DIAGRAM. This band used to render FrameworkDiagram's
- * `shape` variant — rounded cards on right-angle connectors, which is the
- * default output shape of every diagramming tool and reads as one before a
- * single label is read. FrameworkWeave states the same seven things (origin,
- * two inputs, two stages, two outputs, the cross link, the outcome, the tally)
- * as two threads that physically braid into one cord, which is the literal
- * picture of "two systems, one loop" instead of a caption claiming it.
+ * THE THREAD, AND WHAT IT REPLACED TWICE. This band first rendered
+ * FrameworkDiagram's `shape` variant — rounded cards on right-angle
+ * connectors, the default output shape of every diagramming tool, which reads
+ * as one before a single label is read. Then FrameworkWeave, which braided two
+ * threads into one cord.
  *
- * FrameworkDiagram is NOT deleted: `variant="complete"` still draws all
- * seventeen service nodes at the top of /steps, which is where the hero's
- * primary CTA points. Both read content/framework.ts, so the two cannot
+ * It now renders FrameworkThread, which is the same business drawn to a
+ * specification the braid could not meet: ONE drawing at TWO densities. Simple
+ * shows four milestones a side; Complete threads seven detail nodes onto the
+ * same strands and the thread grows to hold them. A braid has one length, so
+ * there was nowhere for fourteen more nodes to go.
+ *
+ * NEITHER OF THE OTHER TWO IS DELETED. FrameworkDiagram's `variant="complete"`
+ * still draws all seventeen service nodes at the top of /steps, which is where
+ * the hero's primary CTA points. FrameworkWeave is no longer mounted anywhere
+ * and is kept only so the decision to retire it can be reversed by changing
+ * one import back. All three read content/framework.ts, so no two of them can
  * describe different businesses.
  */
 export default function Home() {
@@ -45,7 +51,7 @@ export default function Home() {
           title="The Framework"
           coordinate="01 · Framework"
         />
-        <FrameworkWeave className="mt-24 md:mt-32" />
+        <FrameworkThread className="mt-16 md:mt-20" />
       </Section>
     </>
   );

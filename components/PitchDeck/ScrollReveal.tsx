@@ -103,10 +103,29 @@ export function Rise({
   return (
     <motion.div
       className={className}
-      initial={still ? false : { opacity: 0, y: 26 }}
+      /**
+       * THE PREFERENCE CHANGES THE TRANSITION, NEVER THE INITIAL STATE.
+       *
+       * `initial={still ? false : {...}}` looks equivalent and is not.
+       * `useReducedMotion()` cannot know the preference during server
+       * rendering, so it is always false there: the server emitted the opacity
+       * and transform inline, a client with the preference set hydrated with
+       * neither, and React reported a hydration mismatch and threw the whole
+       * subtree away to re render it. That fired on every route using this
+       * component for any visitor with reduced motion enabled.
+       *
+       * Branching only the transition is safe because a transition is never
+       * serialised into HTML. Under the preference the block still starts
+       * hidden and still waits for the viewport; it simply arrives in one
+       * frame, which is what the preference actually asks for. ShapeTimeline's
+       * header documents the same rule at length.
+       */
+      initial={{ opacity: 0, y: 26 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: '0px 0px -12% 0px' }}
-      transition={{ duration: 0.7, delay, ease: [0.16, 1, 0.3, 1] }}
+      transition={
+        still ? { duration: 0 } : { duration: 0.7, delay, ease: [0.16, 1, 0.3, 1] }
+      }
     >
       {children}
     </motion.div>

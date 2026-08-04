@@ -135,18 +135,18 @@ function Thread() {
       <motion.span
         className="absolute inset-0 border-l border-dashed border-[var(--rule-strong)]"
         style={{ transformOrigin: 'top' }}
-        initial={still ? false : { scaleY: 0 }}
+        initial={{ scaleY: 0 }}
         whileInView={{ scaleY: 1 }}
         viewport={{ once: true, margin: '0px 0px -20% 0px' }}
-        transition={{ duration: 0.7, ease: EASE }}
+        transition={still ? { duration: 0 } : { duration: 0.7, ease: EASE }}
       />
       <motion.span
         className="absolute -bottom-[3px] left-1/2 h-1.5 w-1.5 -translate-x-1/2 rounded-full bg-[var(--accent-vivid)]"
         style={{ boxShadow: '0 0 10px color-mix(in oklch, var(--accent-vivid) 55%, transparent)' }}
-        initial={still ? false : { opacity: 0, scale: 0.4 }}
+        initial={{ opacity: 0, scale: 0.4 }}
         whileInView={{ opacity: 1, scale: 1 }}
         viewport={{ once: true, margin: '0px 0px -20% 0px' }}
-        transition={{ duration: 0.4, delay: 0.45, ease: EASE }}
+        transition={still ? { duration: 0 } : { duration: 0.4, delay: 0.45, ease: EASE }}
       />
     </div>
   );
@@ -242,10 +242,10 @@ function Chapter({
             the deferred mount does not shift the page when it lands. */}
         <motion.div
           className={cn('relative', def.flow ? 'min-h-140' : CANVAS_MIN)}
-          initial={still ? false : { opacity: 0, y: 32 }}
+          initial={{ opacity: 0, y: 32 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: '0px 0px -10% 0px' }}
-          transition={{ duration: 0.75, ease: EASE }}
+          transition={still ? { duration: 0 } : { duration: 0.75, ease: EASE }}
         >
           {def.flow ? (
             <div className="flex justify-center">{mounted ? children : null}</div>

@@ -99,7 +99,12 @@ const VIEWPORT = { once: true, margin: '0px 0px -12% 0px' } as const;
    waits for the viewport, it simply arrives in one frame. */
 function fadeUp(delay: number, duration: number, still: boolean): Variants {
   return {
-    hidden: { opacity: 0, y: still ? 0 : 14 },
+    /* `y: still ? 0 : 14` here was a hydration mismatch and it is worth naming,
+       because the note above describes exactly this rule and the first version
+       of this function broke it anyway. The HIDDEN state is serialised into the
+       HTML as an inline transform, so it has to be identical on the server and
+       on every client. Only the transition may depend on the preference. */
+    hidden: { opacity: 0, y: 14 },
     shown: {
       opacity: 1,
       y: 0,
@@ -402,10 +407,19 @@ function RailNarrow({
 function Numeral({ value, still }: { value: number; still: boolean }) {
   const ref = useRef<HTMLSpanElement>(null);
   const inView = useInView(ref, { once: true, margin: '0px 0px -20% 0px' });
-  const [shown, setShown] = useState(still ? value : 0);
+  /* Starts at 0 for everyone, including the server. `useState(still ? value :
+     0)` rendered the final number on a reduced motion client and a zero in the
+     HTML the server sent, which is a hydration mismatch in a text node — the
+     easiest kind to ship and the hardest to see, because React silently
+     re renders and the number ends up correct either way. */
+  const [shown, setShown] = useState(0);
 
   useEffect(() => {
-    if (!inView || still) return;
+    if (still) {
+      setShown(value);
+      return;
+    }
+    if (!inView) return;
     const controls = animate(0, value, {
       duration: 0.6,
       ease: EASE,

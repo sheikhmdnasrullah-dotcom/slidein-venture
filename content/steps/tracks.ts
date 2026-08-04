@@ -21,8 +21,8 @@
  * Ten steps and eighteen steps. Uneven, and uneven is honest.
  *
  * WHY THIS IS A VIEW AND NOT A SECOND COPY
- * Nothing here holds a step. `phasesFor()` reads the pipeline and the outreach
- * file and groups what is already there, so a step added to either source shows
+ * Nothing here holds a step. `stepsInPhase()` reads the pipeline and the phase
+ * records read the outreach file, so a step added to either source shows
  * up in the shape drawing, in the phase card's step count and in the counter at
  * the foot of section 00 without anybody editing this file. A typed count would
  * be a number that can disagree with the page, and the one sentence on /steps
@@ -140,7 +140,7 @@ export const TRACKS: ShapeTrack[] = [
        primary source. Researched is the true word and the better one. */
     name: 'Researched Outreach',
     anchor: '#outreach',
-    cadence: 'CONTINUOUS · FIRST SENDS DAY 15',
+    cadence: 'CONTINUOUS · FIRST SENDS DAY 17',
     clientMoment: { label: 'You tell us your ICP', frequency: 'ONCE' },
     stepCount: OUTREACH_STEP_COUNT,
     phases: OUTREACH_PHASES.map((phase, i) => ({

@@ -78,9 +78,9 @@ function Line({
     <span className="block overflow-hidden pb-[0.14em] -mb-[0.14em]">
       <motion.span
         className="block"
-        initial={still ? false : { y: '112%' }}
+        initial={{ y: '112%' }}
         animate={{ y: '0%' }}
-        transition={{ duration: 1.05, delay, ease: EASE }}
+        transition={still ? { duration: 0 } : { duration: 1.05, delay, ease: EASE }}
       >
         {children}
       </motion.span>
@@ -110,7 +110,12 @@ function Magnetic({
     <motion.div
       ref={ref}
       className={className}
-      style={disabled ? undefined : { x, y }}
+      /* Always the motion values, never a conditional `undefined`. The
+         disabled branch produced a different style object on the client than
+         the server had emitted, which is a hydration mismatch for every
+         reduced motion visitor. The pointer handlers below already refuse to
+         move the springs when disabled, so one style is enough. */
+      style={{ x, y }}
       onPointerMove={(e) => {
         if (disabled || e.pointerType !== 'mouse' || !ref.current) return;
         const r = ref.current.getBoundingClientRect();
@@ -195,35 +200,43 @@ function RotatingPhrase({ still }: { still: boolean }) {
       ))}
 
       <span className="col-start-1 row-start-1" style={{ color: ACCENT_TEXT }} aria-hidden>
-        {still ? (
-          <span className="relative inline-block">
-            {PHRASES[0]}
+        {/**
+         * ONE TREE, WHATEVER THE PREFERENCE.
+         *
+         * This used to render a plain <span> under reduced motion and an
+         * AnimatePresence otherwise. `useReducedMotion()` is always false
+         * during server rendering, so the server emitted the animated branch
+         * and a client with the preference set hydrated the plain one: two
+         * different element trees at the same position, which React reports as
+         * a hydration mismatch and recovers from by throwing away and re
+         * rendering the entire hero.
+         *
+         * The preference is honoured by the interval above, which never starts
+         * when `still`, so `i` stays at 0 and the phrase never changes. All
+         * that is left to branch is the transition, and a transition is never
+         * serialised into HTML.
+         */}
+        <AnimatePresence mode="wait" initial={false}>
+          <motion.span
+            key={PHRASES[i]}
+            className="relative inline-block"
+            initial={{ opacity: 0, y: '38%', filter: 'blur(6px)' }}
+            animate={{ opacity: 1, y: '0%', filter: 'blur(0px)' }}
+            exit={{
+              opacity: 0,
+              y: '-38%',
+              filter: 'blur(6px)',
+              transition: { duration: still ? 0 : 0.42, ease: EASE },
+            }}
+            transition={still ? { duration: 0 } : { duration: 0.72, ease: EASE }}
+          >
+            {PHRASES[i]}
+            {/* Remounts with the phrase, so the rule redraws to the new word's
+                measure instead of hanging over a shorter one. */}
             <AccentRule />
             <ThreadOrigin />
-          </span>
-        ) : (
-          <AnimatePresence mode="wait" initial={false}>
-            <motion.span
-              key={PHRASES[i]}
-              className="relative inline-block"
-              initial={{ opacity: 0, y: '38%', filter: 'blur(6px)' }}
-              animate={{ opacity: 1, y: '0%', filter: 'blur(0px)' }}
-              exit={{
-                opacity: 0,
-                y: '-38%',
-                filter: 'blur(6px)',
-                transition: { duration: 0.42, ease: EASE },
-              }}
-              transition={{ duration: 0.72, ease: EASE }}
-            >
-              {PHRASES[i]}
-              {/* Remounts with the phrase, so the rule redraws to the new word's
-                  measure instead of hanging over a shorter one. */}
-              <AccentRule />
-              <ThreadOrigin />
-            </motion.span>
-          </AnimatePresence>
-        )}
+          </motion.span>
+        </AnimatePresence>
       </span>
 
       {/* Screen readers get the stable set, not a flickering word */}
@@ -251,6 +264,12 @@ function RotatingPhrase({ still }: { still: boolean }) {
 function ScrollCue({ still, onDepart }: { still: boolean; onDepart: () => void }) {
   const slotRef = useRef<HTMLSpanElement>(null);
   const [from, setFrom] = useState<{ x: number; y: number } | null>(null);
+  const [rested, setRested] = useState(false);
+
+  /* Post hydration, so it cannot disagree with the server. See the slot. */
+  useEffect(() => {
+    if (still) setRested(true);
+  }, [still]);
 
   useEffect(() => {
     if (still) return;
@@ -303,12 +322,22 @@ function ScrollCue({ still, onDepart }: { still: boolean; onDepart: () => void }
             landing point is wherever the label actually sits — no magic
             numbers, and it survives a copy change. */}
         <span ref={slotRef} className="relative block h-[7px] w-[7px]" aria-hidden>
-          {still ? (
+          {/* The slot is EMPTY on the server and on the first client render,
+              in both preferences. It has to be: the dot has not arrived yet,
+              and rendering it at rest during hydration was a mismatch for
+              every reduced motion visitor, because the server had no way to
+              know the preference and emitted the empty slot.
+
+              `rested` is set in an effect, which by definition runs after
+              hydration has already matched. A reader with reduced motion gets
+              the dot immediately after mount rather than watching it fly. */}
+          {rested && (
             <span
               className="absolute inset-0 rounded-full"
               style={{ background: ACCENT_VIVID }}
             />
-          ) : (
+          )}
+          {!still &&
             from && (
               <motion.span
                 className="absolute inset-0 rounded-full"
@@ -331,8 +360,7 @@ function ScrollCue({ still, onDepart }: { still: boolean; onDepart: () => void }
                   opacity: { duration: 0.3, ease: 'easeOut' },
                 }}
               />
-            )
-          )}
+            )}
         </span>
 
         <span className="font-mono text-[10px] uppercase tracking-[0.22em]">
@@ -376,9 +404,9 @@ export default function Hero() {
   }, []);
 
   const fade = (delay: number) => ({
-    initial: still ? false : { opacity: 0, y: 14 },
+    initial: { opacity: 0, y: 14 },
     animate: { opacity: 1, y: 0 },
-    transition: { duration: 0.8, delay, ease: EASE },
+    transition: still ? { duration: 0 } : { duration: 0.8, delay, ease: EASE },
   });
 
   return (
