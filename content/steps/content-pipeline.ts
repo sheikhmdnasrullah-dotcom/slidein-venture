@@ -62,6 +62,7 @@ export const PIPELINE_STEPS: PipelineStep[] = [
   /* ── ACT I ──────────────────────────────────────────────────────────── */
   {
     id: 'ideation',
+    phase: 'planning',
     act: 'act-1',
     index: '01',
     title: 'Content Ideation',
@@ -77,6 +78,7 @@ export const PIPELINE_STEPS: PipelineStep[] = [
   },
   {
     id: 'research',
+    phase: 'planning',
     act: 'act-1',
     index: '02',
     title: 'Guest and Topic Research',
@@ -92,6 +94,7 @@ export const PIPELINE_STEPS: PipelineStep[] = [
   },
   {
     id: 'script',
+    phase: 'planning',
     act: 'act-1',
     index: '03',
     title: 'Script and Runsheet',
@@ -110,6 +113,7 @@ export const PIPELINE_STEPS: PipelineStep[] = [
      One step. Do not add a second item to balance the layout. */
   {
     id: 'record',
+    phase: 'execution',
     act: 'act-2',
     index: '04',
     title: 'You Record',
@@ -127,6 +131,7 @@ export const PIPELINE_STEPS: PipelineStep[] = [
   /* ── ACT III ────────────────────────────────────────────────────────── */
   {
     id: 'moment-mapping',
+    phase: 'execution',
     act: 'act-3',
     index: '05',
     title: 'Intake and Moment Mapping',
@@ -142,6 +147,7 @@ export const PIPELINE_STEPS: PipelineStep[] = [
   },
   {
     id: 'audio',
+    phase: 'post',
     act: 'act-3',
     index: '06',
     title: 'Audio Foundation',
@@ -157,6 +163,7 @@ export const PIPELINE_STEPS: PipelineStep[] = [
   },
   {
     id: 'highlight',
+    phase: 'post',
     act: 'act-3',
     index: '07',
     title: 'The Highlight Cut',
@@ -172,6 +179,7 @@ export const PIPELINE_STEPS: PipelineStep[] = [
   },
   {
     id: 'full-edit',
+    phase: 'post',
     act: 'act-3',
     index: '08',
     title: 'Full Episode Edit',
@@ -187,6 +195,7 @@ export const PIPELINE_STEPS: PipelineStep[] = [
   },
   {
     id: 'fan-out',
+    phase: 'post',
     act: 'act-3',
     index: '09',
     title: 'Asset Fan Out',
@@ -203,6 +212,7 @@ export const PIPELINE_STEPS: PipelineStep[] = [
   },
   {
     id: 'publish',
+    phase: 'distribution',
     act: 'act-3',
     index: '10',
     title: 'Review and Publish',

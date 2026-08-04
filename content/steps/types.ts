@@ -55,9 +55,23 @@ export type DayId = 'before' | 'day-0' | 'day-1' | 'day-2' | 'day-3';
 
 export type ActId = 'act-1' | 'act-2' | 'act-3';
 
+/* ── The four phase spine ──────────────────────────────────────────────────
+   Both services are four phases. See content/steps/tracks.ts for why that
+   symmetry is the whole structural argument of the page.
+
+   A phase is not an act. An act says who is in the room — before the camera,
+   the session, after the camera — and it is what carries the owner pills. A
+   phase says which part of the process this is, and it is what both tracks
+   have in common. The content section renders phases as its bands and keeps
+   the acts inside them; deleting either one loses an argument. */
+export type ContentPhaseId = 'planning' | 'execution' | 'post' | 'distribution';
+
+export type TrackId = 'content' | 'outreach';
+
 export type PipelineStep = {
   id: string;
   act: ActId;
+  phase: ContentPhaseId;
   /** Display index, zero padded. Not the array position. */
   index: string;
   title: string;

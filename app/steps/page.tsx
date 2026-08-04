@@ -4,8 +4,9 @@ import SectionHead from '@/components/Steps/SectionHead';
 import StepsHero from '@/components/Steps/StepsHero';
 import StepsNav from '@/components/Steps/StepsNav';
 import ShapeTimeline from '@/components/Steps/ShapeTimeline';
-import ContentActs from '@/components/Steps/ContentActs';
-import ActThree from '@/components/Steps/ActThree';
+import TrackMap from '@/components/Steps/TrackMap';
+import StepsProgressRail from '@/components/Steps/StepsProgressRail';
+import ContentTrack from '@/components/Steps/ContentTrack';
 import WhyColdEmail from '@/components/Steps/WhyColdEmail';
 import PhaseRail from '@/components/Steps/PhaseRail';
 import YourPart from '@/components/Steps/YourPart';
@@ -78,6 +79,10 @@ export default function StepsPage() {
           stuck to the top by the time the reader is inside a section. */}
       <StepsNav />
 
+      {/* The eight phase ticks. Fixed, so it lives outside every band and
+          carries its own surface — see the header of StepsProgressRail. */}
+      <StepsProgressRail />
+
       {/* ── THE COMPLETE FRAMEWORK ───────────────────────────────────────
           The whole page as one drawing, before the page starts. It carries no
           section index: the five bands below are numbered 00 to 05 and this
@@ -112,27 +117,44 @@ export default function StepsPage() {
           canvas — see the note in SectionHead. */}
       <Section id={shape.id} tone="stage" pad="tall" seam bleed className="scroll-mt-[120px]">
         <SectionHead {...shape} chromeOnly />
-        <ShapeTimeline className="mt-14 md:mt-20" />
+
+        {/* THE SHAPE, then THE TIME. Two drawings, in that order, and the order
+            is the argument. TrackMap answers "what is this" — two rails, four
+            phases each, two client moments, one outcome, and the counter that
+            is the entire offer stated in two numbers. ShapeTimeline answers
+            "when" — the same two services against one week axis, which is the
+            only place the page says that the first episode is live in week 1
+            and that the infrastructure and the lead research run together.
+
+            Neither replaces the other and neither works alone: a shape with no
+            time reads as a diagram of a promise, and a timeline with no shape
+            is two lines a reader has no names for. */}
+        <TrackMap className="mt-14 md:mt-20" />
+        <ShapeTimeline className="mt-[clamp(5rem,10vw,9rem)]" />
       </Section>
 
-      {/* ── 01 · CONTENT PRODUCTION ────────────────────────────────────── */}
-      <Section id={content.id} tone="base" pad="tall" seam className="scroll-mt-[120px]">
-        <SectionHead {...content} />
-        <ContentActs className="mt-16 md:mt-24" />
-        <ActThree className="mt-[clamp(5rem,10vw,9rem)]" />
-      </Section>
+      {/* The eight phases live inside this wrapper. StepsProgressRail observes
+          it to know when it should be on screen at all, so the rail is never
+          floating over the hero or the CTA pointing at nothing. */}
+      <div id="steps-body">
+        {/* ── 01 · CONTENT PRODUCTION ──────────────────────────────────── */}
+        <Section id={content.id} tone="base" pad="tall" seam className="scroll-mt-[120px]">
+          <SectionHead {...content} />
+          <ContentTrack className="mt-16 md:mt-24" />
+        </Section>
 
-      {/* ── 02 · WHY COLD EMAIL ────────────────────────────────────────── */}
-      <Section id={whyEmail.id} tone="raised" pad="base" seam className="scroll-mt-[120px]">
-        <SectionHead {...whyEmail} />
-        <WhyColdEmail className="mt-16 md:mt-20" />
-      </Section>
+        {/* ── 02 · WHY COLD EMAIL ──────────────────────────────────────── */}
+        <Section id={whyEmail.id} tone="raised" pad="base" seam className="scroll-mt-[120px]">
+          <SectionHead {...whyEmail} />
+          <WhyColdEmail className="mt-16 md:mt-20" />
+        </Section>
 
-      {/* ── 03 · COLD OUTREACH ─────────────────────────────────────────── */}
-      <Section id={outreach.id} tone="stage" pad="tall" seam bleed className="scroll-mt-[120px]">
-        <SectionHead {...outreach} />
-        <PhaseRail className="mt-10 md:mt-14" />
-      </Section>
+        {/* ── 03 · COLD OUTREACH ───────────────────────────────────────── */}
+        <Section id={outreach.id} tone="stage" pad="tall" seam bleed className="scroll-mt-[120px]">
+          <SectionHead {...outreach} />
+          <PhaseRail className="mt-10 md:mt-14" />
+        </Section>
+      </div>
 
       {/* ── 04 · YOUR PART ─────────────────────────────────────────────── */}
       <Section id={yourPart.id} tone="base" pad="tall" seam className="scroll-mt-[120px]">

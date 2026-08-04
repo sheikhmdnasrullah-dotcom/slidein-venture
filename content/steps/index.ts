@@ -11,6 +11,7 @@ export * from './outreach-phases';
 export * from './benchmarks';
 export * from './page-copy';
 export * from './timeline';
+export * from './tracks';
 export * from './artifacts';
 export * from './deck-chapters';
 

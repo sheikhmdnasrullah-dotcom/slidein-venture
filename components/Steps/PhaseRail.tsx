@@ -31,7 +31,7 @@
  * which is the same position in the argument.
  */
 
-import { useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { MonoLabel } from '@/components/System/System';
@@ -49,6 +49,7 @@ import {
   StepIndex,
   Tier3,
 } from './Disclosure';
+import { OwnerTag } from './PipelineStep';
 import DnsRecordCard from './proofs/DnsRecordCard';
 import LeadCard from './proofs/LeadCard';
 import EmailProvenance from './proofs/EmailProvenance';
@@ -78,10 +79,16 @@ function PhaseCard({
   return (
     <button
       type="button"
+      /* The scroll target the shape drawing in section 00 links to, and the
+         anchor the sticky progress rail observes. Both halves of the page use
+         the same `phase-<id>` convention so neither has a special case. */
+      id={'phase-' + phase.id}
+      data-phase-anchor={phase.id}
       onClick={onToggle}
       aria-expanded={isOpen}
       aria-controls="phase-panel"
       className={cn(
+        'scroll-mt-[200px]',
         /* `h-full` so the four cards are one row of equal blocks. Phase 04's
            day range wraps to two lines and without this it was the only card
            with a different height, which reads as a rendering fault rather
@@ -156,8 +163,14 @@ function PhasePanel({ phase }: { phase: OutreachPhase }) {
               <DisclosureTrigger id={step.id}>
                 <StepIndex>{step.index}</StepIndex>
                 <span className="flex flex-1 flex-col gap-2">
-                  <span className="font-body-lead text-[var(--on-surface)]">
-                    {step.title}
+                  <span className="flex flex-wrap items-center gap-x-3 gap-y-1">
+                    <span className="font-body-lead text-[var(--on-surface)]">
+                      {step.title}
+                    </span>
+                    {/* Seventeen of these say SLIDEIN and one says YOU. The one
+                        that says YOU is 2.1, and it is the entire client
+                        obligation on this side of the page. */}
+                    <OwnerTag stepId={step.id} />
                   </span>
                   <span className="font-body max-w-[56ch] text-[var(--muted)]">
                     {step.whatWeDo}
@@ -190,6 +203,31 @@ export default function PhaseRail({ className }: { className?: string }) {
   const [openId, setOpenId] = useState<string | null>(null);
   const still = !!useReducedMotion();
   const open = OUTREACH_PHASES.find((p) => p.id === openId) ?? null;
+
+  /**
+   * A phase card in the shape drawing at section 00, and a tick on the sticky
+   * progress rail, both link to `#phase-<id>`. The browser scrolls the card
+   * into view on its own; this is what makes the phase actually OPEN when it
+   * gets there, so a reader who clicks POST-PRODUCTION on the map arrives at
+   * the thing they asked for rather than at a closed card.
+   *
+   * It also makes every phase deep linkable, which is worth having on a page
+   * this long: a link to the DNS work is now a link and not an instruction to
+   * scroll and click.
+   *
+   * `hashchange` does not fire on first load, so the initial hash is read
+   * separately in the same effect.
+   */
+  const openFromHash = useCallback(() => {
+    const id = window.location.hash.replace('#phase-', '');
+    if (OUTREACH_PHASES.some((p) => p.id === id)) setOpenId(id);
+  }, []);
+
+  useEffect(() => {
+    openFromHash();
+    window.addEventListener('hashchange', openFromHash);
+    return () => window.removeEventListener('hashchange', openFromHash);
+  }, [openFromHash]);
 
   return (
     <div className={cn('mx-auto max-w-[1400px] px-6 md:px-10', className)}>

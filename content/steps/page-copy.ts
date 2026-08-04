@@ -34,14 +34,14 @@ export const HERO = {
       id: 'content',
       index: '01',
       label: 'CONTENT',
-      line: 'Ten steps. One of them is yours.',
+      line: 'Four phases. Ten steps. Two of them need you.',
       href: '#content',
     },
     {
       id: 'outreach',
       index: '02',
       label: 'OUTREACH',
-      line: 'Eighteen steps. None of them are yours.',
+      line: 'Four phases. Eighteen steps. One of them needs you.',
       href: '#outreach',
     },
   ],
@@ -64,15 +64,19 @@ export const SECTIONS: {
     id: 'shape',
     index: '00',
     eyebrow: 'THE SHAPE',
-    title: 'When does something happen?',
-    lead: 'Both services, one time axis. This is the only question worth answering before the detail.',
+    /* Two drawings sit in this band and they answer the two questions a reader
+       has before any detail is worth reading: what shape is this, and when does
+       any of it happen. The heading is the first one because the second is
+       drawn against a labelled week axis and does not need announcing. */
+    title: 'Two tracks. Four phases each.',
+    lead: 'The whole service on one screen, then both halves against one time axis. Everything below this is the same picture, one step at a time.',
   },
   {
     id: 'content',
     index: '01',
     eyebrow: 'CONTENT PRODUCTION',
-    title: 'Ten steps. You appear in one.',
-    lead: 'Three acts. Everything before the camera and everything after it is ours. The session in the middle is yours.',
+    title: 'Four phases. Ten steps. You appear in two.',
+    lead: 'Planning, execution, post and distribution. Everything before the camera and everything after it is ours. The session in the middle is yours.',
   },
   {
     id: 'why-email',
@@ -85,8 +89,8 @@ export const SECTIONS: {
     id: 'outreach',
     index: '03',
     eyebrow: 'COLD OUTREACH',
-    title: 'Four phases. Eighteen steps. None of them are yours.',
-    lead: 'Open a phase to see its steps. Open a step to see why it is there and how it is done.',
+    title: 'Four phases. Eighteen steps. One of them is yours.',
+    lead: 'You tell us who is worth contacting, once. Open a phase to see its steps. Open a step to see why it is there and how it is done.',
   },
   {
     id: 'your-part',
