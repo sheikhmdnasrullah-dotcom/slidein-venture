@@ -59,42 +59,45 @@ type Cluster = {
 
 const JUNCTION = { x: 830, y: 415 };
 
-const ASSET_ITEMS = [
-  'ASSET',
-  'EP 14 · FULL EPISODE',
-  'HIGHLIGHT · 0:41 TO 1:52',
-  'CLIPS · 6 OF 6',
-  'THUMBNAILS · 6 OF 6',
-  'ARTICLE · 1,640 WORDS',
-  'POSTS · 4 OF 4',
-];
-
-const RIGHT_NODES = [
+const CLUSTERS: Cluster[] = [
   {
+    id: 'video',
     title: 'Video & Audio',
-    branch: 'M 838 407 C 938 380, 872 140, 1006 140',
-    platforms: [
-      { name: 'YouTube', logo: LOGOS.youtube, brand: '#FF0000' },
-      { name: 'Spotify', logo: LOGOS.spotify, brand: '#1ED760' },
-      { name: 'Apple Podcasts', logo: LOGOS.applepodcasts, brand: '#9933CC' },
+    count: '03',
+    x: 1010, y: 105, w: 330, h: 172, entryY: 191,
+    branch: 'M 838 407 C 938 380, 872 191, 1006 191',
+    items: [
+  /* The `brand` values below are third-party marks (YouTube red, Spotify green,
+     Apple Podcasts purple, Instagram, LinkedIn). They are fixed by their owners
+     and are the one exemption from the palette — a tokenised YouTube red would
+     not be YouTube red. Everything else in this file speaks the tone contract. */
+      { name: 'YouTube', brand: '#FF0000', logo: LOGOS.youtube },
+      { name: 'Spotify', brand: '#1ED760', logo: LOGOS.spotify },
+      { name: 'Apple Podcasts', brand: '#9933CC', logo: LOGOS.applepodcasts },
     ],
   },
   {
+    id: 'social',
     title: 'Social Distribution',
-    branch: 'M 844 416 C 918 418, 952 330, 1042 330',
-    platforms: [
-      { name: 'Instagram', logo: LOGOS.instagram, brand: '#E4405F' },
-      { name: 'TikTok', logo: LOGOS.tiktok, brand: 'var(--on-surface)' },
-      { name: 'LinkedIn', logo: LOGOS.linkedin, brand: '#0A66C2' },
-      { name: 'X', logo: LOGOS.x, brand: 'var(--on-surface)' },
+    count: '04',
+    x: 1046, y: 332, w: 350, h: 172, entryY: 418,
+    branch: 'M 844 416 C 918 418, 952 418, 1042 418',
+    items: [
+      { name: 'Instagram', brand: '#E4405F', logo: LOGOS.instagram },
+      { name: 'TikTok', brand: 'var(--on-surface)', logo: LOGOS.tiktok },
+      { name: 'LinkedIn', brand: '#0A66C2', logo: LOGOS.linkedin },
+      { name: 'X', brand: 'var(--on-surface)', logo: LOGOS.x },
     ],
   },
   {
+    id: 'owned',
     title: 'Owned Channels',
-    branch: 'M 838 423 C 938 452, 872 520, 1006 520',
-    platforms: [
-      { name: 'Website', logo: undefined, brand: 'var(--accent-vivid)', strokeIcon: 'globe' as const },
-      { name: 'Newsletter', logo: undefined, brand: 'var(--accent-vivid)', strokeIcon: 'mail' as const },
+    count: '02',
+    x: 1010, y: 560, w: 300, h: 172, entryY: 646,
+    branch: 'M 838 423 C 938 452, 872 646, 1006 646',
+    items: [
+      { name: 'Website', brand: 'var(--accent-vivid)', strokeIcon: 'globe' },
+      { name: 'Newsletter', brand: 'var(--accent-vivid)', strokeIcon: 'mail' },
     ],
   },
 ];
@@ -296,27 +299,27 @@ export default function DistributionSlide() {
             initial={{ pathLength: 0, opacity: 0 }} animate={{ pathLength: 1, opacity: 1 }}
             transition={{ duration: 0.6, ease: 'easeOut', delay: 1.2 }}
           />
-          {RIGHT_NODES.map((c, i) => (
-             <g key={c.title}>
-               {/* soft glow underlay */}
-               <path d={c.branch} fill="none" stroke="var(--accent-vivid)" strokeOpacity={0.07} strokeWidth={7} />
-               <motion.path
-                 id={`cd-branch-${c.title}`} d={c.branch}
-                 fill="none" stroke="url(#cdCable)" strokeWidth={1.8}
-                 initial={{ pathLength: 0, opacity: 0 }} animate={{ pathLength: 1, opacity: 1 }}
-                 transition={{ duration: 0.7, ease: 'easeOut', delay: 1.45 + i * 0.12 }}
-               />
-               {/* flowing energy overlay */}
-               <path className="cd-flow" d={c.branch} fill="none" stroke="var(--accent-vivid)" strokeOpacity={0.5} strokeWidth={1.8} />
-             </g>
-           ))}
-           <path className="cd-flow" d="M 196 415 C 300 415, 356 415, 424 415" fill="none" stroke="var(--accent-vivid)" strokeOpacity={0.45} strokeWidth={2} />
-           <path className="cd-flow" d="M 612 415 C 690 415, 748 415, 816 415" fill="none" stroke="var(--accent-vivid)" strokeOpacity={0.55} strokeWidth={2.2} />
+          {CLUSTERS.map((c, i) => (
+            <g key={c.id}>
+              {/* soft glow underlay */}
+              <path d={c.branch} fill="none" stroke="var(--accent-vivid)" strokeOpacity={0.07} strokeWidth={7} />
+              <motion.path
+                id={`cd-branch-${c.id}`} d={c.branch}
+                fill="none" stroke="url(#cdCable)" strokeWidth={1.8}
+                initial={{ pathLength: 0, opacity: 0 }} animate={{ pathLength: 1, opacity: 1 }}
+                transition={{ duration: 0.7, ease: 'easeOut', delay: 1.45 + i * 0.12 }}
+              />
+              {/* flowing energy overlay */}
+              <path className="cd-flow" d={c.branch} fill="none" stroke="var(--accent-vivid)" strokeOpacity={0.5} strokeWidth={1.8} />
+            </g>
+          ))}
+          <path className="cd-flow" d="M 196 415 C 300 415, 356 415, 424 415" fill="none" stroke="var(--accent-vivid)" strokeOpacity={0.45} strokeWidth={2} />
+          <path className="cd-flow" d="M 612 415 C 690 415, 748 415, 816 415" fill="none" stroke="var(--accent-vivid)" strokeOpacity={0.55} strokeWidth={2.2} />
 
-           {/* traveling particles */}
-           <motion.g initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 2.3, duration: 0.8 }}>
-             {RIGHT_NODES.map((c, i) => (
-               <g key={c.title}>
+          {/* traveling particles */}
+          <motion.g initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 2.3, duration: 0.8 }}>
+            {CLUSTERS.map((c, i) => (
+              <g key={c.id}>
                 <circle r={3.2} fill="var(--color-brand-lift)" filter="url(#cdGlow)">
                   <animateMotion dur={`${2.6 + i * 0.4}s`} begin={`${i * 0.9}s`} repeatCount="indefinite" path={c.branch} />
                 </circle>
@@ -403,82 +406,9 @@ export default function DistributionSlide() {
             <text x={JUNCTION.x} y={JUNCTION.y + 46} textAnchor="middle" className="cd-stage">SMART ROUTING</text>
           </motion.g>
 
-          {/* --------------------- left text items ------------------------ */}
-          <motion.g
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.8, delay: 1.2 }}
-          >
-            {ASSET_ITEMS.map((text, i) => {
-              const y = 120 + i * 52;
-              const targetNodeIndex = i < 3 ? 0 : i < 5 ? 1 : 2;
-              const targetY = 160 + targetNodeIndex * 190;
-
-              return (
-                <g key={text}>
-                  <text x={560} y={y} textAnchor="end" className="cd-left-text">
-                    {text}
-                  </text>
-                  <line x1={580} y1={y - 4} x2={620} y2={targetY} stroke="var(--rule)" strokeWidth={1} strokeDasharray="2 2" />
-                </g>
-              );
-            })}
-          </motion.g>
-
           {/* --------------------- destination clusters ------------------------ */}
-          {RIGHT_NODES.map((node, i) => (
-            <motion.g
-              key={node.title}
-              initial={{ opacity: 0, x: 18 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.7, ease: EASE, delay: 1.7 + i * 0.14 }}
-            >
-              {/* Node title */}
-              <text x={980} y={140 + i * 190} textAnchor="end" className="cd-cluster-title">
-                {node.title.toUpperCase()}
-              </text>
-
-              {/* Connection line from left text to icons */}
-              <line x1={620} y1={160 + i * 190} x2={680} y2={160 + i * 190} stroke="var(--rule)" strokeWidth={1} />
-
-              {/* Platform icons */}
-              {node.platforms.map((platform, k) => {
-                const cx = 760 + k * 90;
-                const cy = 160 + i * 190;
-                const iconSize = 36;
-                const s = ((iconSize - 8) / 24);
-                const off = (24 * Number(s)) / 2;
-
-                return (
-                  <g key={platform.name} className="cd-icon" style={{ ['--brand' as string]: platform.brand }}>
-                    <circle cx={cx} cy={cy} r={iconSize / 2} fill="var(--surface)" stroke="var(--rule)" strokeWidth={1} />
-                    {platform.logo ? (
-                      <g transform={`translate(${cx - off} ${cy - off}) scale(${s})`}>
-                        <path d={platform.logo} fill="currentColor" />
-                      </g>
-                     ) : (
-                       <g transform={`translate(${cx - off} ${cy - off}) scale(${s})`}>
-                         {'strokeIcon' in platform && platform.strokeIcon === 'globe' ? (
-                           <g fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
-                             <circle cx={12} cy={12} r={10} />
-                             <path d="M2 12h20" />
-                             <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
-                           </g>
-                         ) : (
-                           <g fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
-                             <rect x={2} y={4} width={20} height={16} rx={2.5} />
-                             <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
-                           </g>
-                         )}
-                       </g>
-                     )}
-                    <text x={cx} y={cy + 20} textAnchor="middle" className="cd-item-label">
-                      {platform.name}
-                    </text>
-                  </g>
-                );
-              })}
-            </motion.g>
+          {CLUSTERS.map((c, i) => (
+            <ClusterCard key={c.id} c={c} i={i} />
           ))}
         </svg>
       </div>
@@ -530,9 +460,8 @@ export default function DistributionSlide() {
         .cd-icon > circle { transition: transform .3s cubic-bezier(.22,1,.36,1); transform-box: fill-box; transform-origin: center; }
         .cd-icon:hover > circle { transform: scale(1.08); }
 
-        .cd-item-label { font-size: 9px; letter-spacing: .04em; fill: var(--muted); font-weight: 500; }
-        .cd-left-text { font-size: 11px; letter-spacing: .04em; fill: var(--on-surface); font-weight: 500; }
-        .cd-cluster-title { font-size: 10.5px; letter-spacing: .22em; fill: var(--accent); font-weight: 700; }
+        .cd-item-label { font-size: 10px; letter-spacing: .04em; fill: var(--muted); font-weight: 500; }
+        .cd-cluster-title { font-size: 10.5px; letter-spacing: .22em; fill: var(--muted); font-weight: 600; }
         .cd-cluster-count { font-size: 10.5px; letter-spacing: .18em; fill: var(--muted); font-weight: 600; }
         .cd-stage { font-size: 10px; letter-spacing: .24em; fill: var(--muted); font-weight: 600; }
         .cd-substage { font-size: 10px; letter-spacing: .04em; fill: var(--muted); font-weight: 500; }
