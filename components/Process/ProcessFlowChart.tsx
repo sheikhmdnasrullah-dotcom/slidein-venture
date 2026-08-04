@@ -15,6 +15,8 @@ interface BranchNode {
   id: string;
   label: string;
   number?: string;
+  description?: string;
+  details?: string;
   children?: BranchNode[];
 }
 
@@ -32,44 +34,76 @@ const BRANCHES: Branch[] = [
       {
         id: 'planning',
         label: 'Planning',
+        description: 'Research, outline, and script your episode before you record.',
+        details: 'We research the topic, write a script, and create a runsheet that guides the conversation. Every episode has a clear structure: intro, main content, and call to action.',
         children: [
-          { id: 'content-ideation', label: 'Content Ideation', number: '01' },
-          { id: 'guest-topic-research', label: 'Guest and Topic Research', number: '02' },
-          { id: 'script-runsheet', label: 'Script and Runsheet', number: '03' },
+          { id: 'content-ideation', label: 'Content Ideation', number: '01', description: 'Find topics that resonate with your audience.' },
+          { id: 'guest-topic-research', label: 'Guest and Topic Research', number: '02', description: 'Research guests and topics that align with your brand.' },
+          { id: 'script-runsheet', label: 'Script and Runsheet', number: '03', description: 'Create a script and runsheet for the episode.' },
         ],
       },
-      { id: 'execution', label: 'Execution', children: [{ id: 'you-record', label: '04 You Record', number: '04' }] },
+      {
+        id: 'execution',
+        label: 'Execution',
+        description: 'You record one long-form session. We handle the rest.',
+        details: 'A 45-minute recording session that becomes the raw material for everything else. We set up the audio, video, and environment so you can focus on the conversation.',
+        children: [{ id: 'you-record', label: '04 You Record', number: '04', description: 'One long-form session, 45 minutes.' }],
+      },
       {
         id: 'post',
         label: 'Post-production',
+        description: 'Editing, sound design, and asset creation.',
+        details: 'We turn your raw recording into a polished episode, then create the assets that promote it. This is where the work becomes content.',
         children: [
-          { id: 'sound-design', label: 'Sound Design', number: '05' },
-          { id: 'highlight-cut', label: 'Highlight Cut', number: '06' },
+          { id: 'sound-design', label: 'Sound Design', number: '05', description: 'Audio cleanup, noise reduction, and mixing.' },
+          { id: 'highlight-cut', label: 'Highlight Cut', number: '06', description: 'Extract the best moments for social clips.' },
           {
             id: 'full-episode-edit',
             label: 'Full Episode Edit',
             number: '07',
+            description: 'Full edit with graphics, transitions, and color grade.',
+            details: 'The complete episode is edited for pacing, clarity, and engagement. We add graphics, transitions, and color grading to make it visually compelling.',
             children: [
-              { id: 'transcripts', label: 'Transcripts and show notes', number: '08' },
-              { id: 'reels', label: '3-4 vertical reels', number: '09' },
-              { id: 'thumbnails', label: 'Thumbnail and Cover Arts', number: '10' },
-              { id: 'articles', label: 'Three long-form articles', number: '11' },
-              { id: 'linkedin-posts', label: 'LinkedIn posts', number: '12' },
+              { id: 'transcripts', label: 'Transcripts and show notes', number: '08', description: 'Full transcript and detailed show notes.' },
+              { id: 'reels', label: '3-4 vertical reels', number: '09', description: 'Vertical video clips optimized for social.' },
+              { id: 'thumbnails', label: 'Thumbnail and Cover Arts', number: '10', description: 'Eye-catching thumbnails and cover art.' },
+              { id: 'articles', label: 'Three long-form articles', number: '11', description: 'SEO-optimized articles from episode content.' },
+              { id: 'linkedin-posts', label: 'LinkedIn posts', number: '12', description: 'Engaging LinkedIn posts to drive discussion.' },
             ],
           },
         ],
       },
-      { id: 'distribution', label: 'Distribution' },
+      { id: 'distribution', label: 'Distribution', description: 'Publish everywhere from one recording.' },
     ],
   },
   {
     id: 'outreach',
     title: 'Manual Outreach',
     nodes: [
-      { id: 'infrastructure', label: 'The Infrastructure' },
-      { id: 'fuel', label: 'The Fuel' },
-      { id: 'script', label: 'The Script' },
-      { id: 'launch', label: 'The Launch' },
+      {
+        id: 'infrastructure',
+        label: 'The Infrastructure',
+        description: 'Separate domains, correct authentication, and a slow ramp.',
+        details: 'We buy domains for sending only. Your primary domain never sends a cold email. Reputation is attached to the sending domain. If a campaign goes badly on a dedicated domain you retire the domain. If it goes badly on your main one, your invoices and your password resets go to spam with it. Close variants of your brand, registered separately, each redirecting to your real site so a curious prospect lands somewhere real. Typically three to five domains, with a small number of mailboxes on each.',
+      },
+      {
+        id: 'fuel',
+        label: 'The Fuel',
+        description: 'A verified list with intelligence attached to each lead.',
+        details: 'A list built against stated criteria, verified by a person, with the intelligence that makes an email worth reading attached to each lead. Company size, revenue band, industry, role, geography, tooling in use, hiring signals, funding stage, content activity and buying trigger.',
+      },
+      {
+        id: 'script',
+        label: 'The Script',
+        description: 'Copy written per lead, not a template with the name swapped.',
+        details: 'Each email is written from that lead intelligence record. Not a template with the name swapped. The first two sentences come from the fields gathered in research and reference a source we can point at. Two emails from the same campaign do not share an opening.',
+      },
+      {
+        id: 'launch',
+        label: 'The Launch',
+        description: 'Staged sending, human replies, and iteration.',
+        details: 'Volume is spread across mailboxes and hours, and the first batch is deliberately small. Sends are distributed across mailboxes with randomised gaps inside working hours in the recipient timezone. The opening batch is held to a fraction of the list and reviewed before the rest goes.',
+      },
     ],
   },
 ];
@@ -88,6 +122,7 @@ export default function ProcessFlowChart({ className }: { className?: string }) 
   const [postOpen, setPostOpen] = useState(false);
   const [distributionOpen, setDistributionOpen] = useState(false);
   const [outreachPhaseId, setOutreachPhaseId] = useState<string | null>(null);
+  const [expandedNodes, setExpandedNodes] = useState<Set<string>>(new Set());
 
   const openOutreach = (id: string) => {
     const phaseId = id === 'infrastructure' ? 'fortress' : id;
@@ -95,9 +130,17 @@ export default function ProcessFlowChart({ className }: { className?: string }) 
   };
   const closeOutreach = () => setOutreachPhaseId(null);
 
-  const togglePlanning = () => setPlanningOpen((prev) => !prev);
-  const toggleExecution = () => setExecutionOpen((prev) => !prev);
-  const togglePost = () => setPostOpen((prev) => !prev);
+  const toggleNode = (id: string) => {
+    setExpandedNodes((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) {
+        next.delete(id);
+      } else {
+        next.add(id);
+      }
+      return next;
+    });
+  };
 
   return (
     <div className={cn('mx-auto max-w-[1200px] px-6 md:px-10', className)}>
@@ -126,10 +169,7 @@ export default function ProcessFlowChart({ className }: { className?: string }) 
               const isPost = node.id === 'post';
               const isDistribution = node.id === 'distribution';
               const isOutreach = branch.id === 'outreach';
-              const showChildren =
-                (isPlanning && planningOpen) ||
-                (isExecution && executionOpen) ||
-                (isPost && postOpen);
+              const isExpanded = expandedNodes.has(node.id);
 
               return (
                 <div key={node.id}>
@@ -137,52 +177,69 @@ export default function ProcessFlowChart({ className }: { className?: string }) 
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.4, delay: nodeIndex * 0.06, ease: EASE }}
-                    className="flex items-center gap-3 rounded-2xl border border-[var(--rule)] bg-[#F5F2ED] px-5 py-4 transition-all duration-300 hover:border-[var(--rule-strong)]"
+                    className="flex items-start gap-3 rounded-2xl border border-[var(--rule)] bg-[#F5F2ED] px-5 py-4 transition-all duration-300 hover:border-[var(--rule-strong)]"
                   >
                     {/* Orange dot */}
-                    <span className="h-2 w-2 shrink-0 rounded-full bg-[var(--color-brand)]" />
+                    <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-[var(--color-brand)]" />
 
-                    <button
-                      onClick={() => {
-                        if (isPlanning) togglePlanning();
-                        if (isExecution) toggleExecution();
-                        if (isPost) togglePost();
-                        if (isDistribution) setDistributionOpen(true);
-                        if (isOutreach) openOutreach(node.id);
-                      }}
-                      className="flex-1 text-left text-[15px] text-[var(--on-surface)] transition-colors"
-                    >
-                      {node.label}
-                    </button>
+                    <div className="flex-1">
+                      <button
+                        onClick={() => {
+                          if (isPlanning) toggleNode('planning');
+                          if (isExecution) toggleNode('execution');
+                          if (isPost) toggleNode('post');
+                          if (isDistribution) setDistributionOpen(true);
+                          if (isOutreach) openOutreach(node.id);
+                        }}
+                        className="flex items-center justify-between w-full text-left"
+                      >
+                        <div className="flex-1">
+                          <span className="block text-[15px] text-[var(--on-surface)]">{node.label}</span>
+                          {node.description && (
+                            <span className="mt-1 block text-[13px] text-[var(--muted)]">{node.description}</span>
+                          )}
+                        </div>
+                        <span className="ml-3 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[var(--rule)] text-[var(--muted)] transition-all duration-200">
+                          {(isPlanning || isExecution || isPost || isOutreach) ? (
+                            <motion.svg
+                              animate={{ rotate: isExpanded ? 45 : 0 }}
+                              transition={{ duration: 0.2 }}
+                              width="14"
+                              height="14"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="2.5"
+                              strokeLinecap="round"
+                            >
+                              <path d="M12 5v14M5 12h14" />
+                            </motion.svg>
+                          ) : (
+                            <PlusIcon />
+                          )}
+                        </span>
+                      </button>
 
-                    <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[var(--rule)] text-[var(--muted)] transition-all duration-200">
-                      {(isPlanning || isExecution || isPost) ? (
-                        <motion.svg
-                          animate={{
-                            rotate:
-                              (isPlanning && planningOpen) ||
-                              (isExecution && executionOpen) ||
-                              (isPost && postOpen)
-                                ? 45
-                                : 0,
-                          }}
-                          transition={{ duration: 0.2 }}
-                          width="14"
-                          height="14"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="2.5"
-                          strokeLinecap="round"
-                        >
-                          <path d="M12 5v14M5 12h14" />
-                        </motion.svg>
-                      ) : (
-                        <PlusIcon />
-                      )}
-                    </span>
+                      {/* Expanded details */}
+                      <AnimatePresence>
+                        {isExpanded && node.details && (
+                          <motion.div
+                            initial={{ opacity: 0, height: 0 }}
+                            animate={{ opacity: 1, height: 'auto' }}
+                            exit={{ opacity: 0, height: 0 }}
+                            transition={{ duration: 0.3, ease: EASE }}
+                            className="mt-3 pt-3 border-t border-[var(--rule)]"
+                          >
+                            <p className="text-[12px] leading-relaxed text-[var(--muted)] uppercase tracking-wide">
+                              {node.details}
+                            </p>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </div>
                   </motion.div>
 
+                  {/* Children */}
                   {(isPlanning && planningOpen && node.children) && (
                     <AnimatePresence>
                       <motion.div
