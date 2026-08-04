@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
+import PostProductionModal from './PostProductionModal';
 
 const EASE = [0.16, 1, 0.3, 1] as const;
 
@@ -12,6 +13,7 @@ interface BranchNode {
   id: string;
   label: string;
   description?: string;
+  number?: string;
   children?: BranchNode[];
 }
 
@@ -34,15 +36,25 @@ const BRANCHES: Branch[] = [
         id: 'planning',
         label: 'Planning',
         children: [
-          { id: 'content-ideation', label: 'Content Ideation' },
-          { id: 'guest-topic-research', label: 'Guest and Topic Research' },
-          { id: 'script-runsheet', label: 'Script and Runsheet' },
+          { id: 'content-ideation', label: 'Content Ideation', number: '01' },
+          { id: 'guest-topic-research', label: 'Guest and Topic Research', number: '02' },
+          { id: 'script-runsheet', label: 'Script and Runsheet', number: '03' },
         ],
       },
       { id: 'execution', label: 'Execution', children: [
-          { id: 'you-record', label: '04 You Record' },
+          { id: 'you-record', label: '04 You Record', number: '04' },
         ] },
-      { id: 'post', label: 'Post-production' },
+      { id: 'post', label: 'Post-production', children: [
+          { id: 'sound-design', label: 'Sound Design', number: '05' },
+          { id: 'highlight-cut', label: 'Highlight Cut', number: '06' },
+          { id: 'full-episode-edit', label: 'Full Episode Edit', number: '07', children: [
+            { id: 'transcripts', label: 'Transcripts and show notes', number: '08' },
+            { id: 'reels', label: '3-4 vertical reels', number: '09' },
+            { id: 'thumbnails', label: 'Thumbnail and Cover Arts', number: '10' },
+            { id: 'articles', label: 'Three long-form articles', number: '11' },
+            { id: 'linkedin-posts', label: 'LinkedIn posts', number: '12' },
+          ]},
+        ] },
       { id: 'distribution', label: 'Distribution' },
     ],
   },
@@ -68,51 +80,21 @@ function PlusIcon() {
   );
 }
 
-function ConnectorLines({ expanded }: { expanded: boolean }) {
-  if (!expanded) return null;
-
-  return (
-    <div className="absolute inset-0 pointer-events-none" aria-hidden>
-      {BRANCHES.map((branch, branchIndex) => {
-        const isLeft = branchIndex === 0;
-        return (
-          <svg
-            key={branch.id}
-            className="absolute inset-0 h-full w-full"
-            preserveAspectRatio="none"
-          >
-            {/* Vertical line from parent down to first child */}
-            <motion.line
-              x1={isLeft ? '25%' : '75%'}
-              y1="0%"
-              x2={isLeft ? '25%' : '75%'}
-              y2="100%"
-              stroke="var(--rule-strong)"
-              strokeWidth="1.5"
-              strokeDasharray="4 4"
-              initial={{ pathLength: 0 }}
-              animate={{ pathLength: 1 }}
-              transition={{ duration: 0.6, ease: EASE }}
-            />
-          </svg>
-        );
-      })}
-    </div>
-  );
-}
-
 export default function ProcessFlowChart({ className }: { className?: string }) {
   const [expanded, setExpanded] = useState(false);
   const [activeBranch, setActiveBranch] = useState<BranchId | null>(null);
   const [hoveredNode, setHoveredNode] = useState<string | null>(null);
   const [planningOpen, setPlanningOpen] = useState(false);
   const [executionOpen, setExecutionOpen] = useState(false);
+  const [postOpen, setPostOpen] = useState(false);
 
   const toggleExpand = () => setExpanded((prev) => !prev);
   const togglePlanning = () => setPlanningOpen((prev) => !prev);
   const toggleExecution = () => setExecutionOpen((prev) => !prev);
+  const togglePost = () => setPostOpen((prev) => !prev);
 
   return (
+    <>
     <div className={cn('mx-auto max-w-[1200px] px-6 md:px-10', className)}>
       {/* Title */}
       <motion.div
@@ -234,7 +216,8 @@ export default function ProcessFlowChart({ className }: { className?: string }) 
                   {branch.nodes.map((node, nodeIndex) => {
                     const isPlanning = node.id === 'planning';
                     const isExecution = node.id === 'execution';
-                    const showChildren = (isPlanning && planningOpen) || (isExecution && executionOpen);
+                    const isPost = node.id === 'post';
+                    const showChildren = (isPlanning && planningOpen) || (isExecution && executionOpen) || (isPost && postOpen);
 
                     return (
                       <div key={node.id}>
@@ -270,9 +253,10 @@ export default function ProcessFlowChart({ className }: { className?: string }) 
                             </span>
 
                             <button
-                              onClick={(isPlanning || isExecution) ? () => {
+                              onClick={(isPlanning || isExecution || isPost) ? () => {
                                 if (isPlanning) togglePlanning();
                                 if (isExecution) toggleExecution();
+                                if (isPost) togglePost();
                               } : undefined}
                               className="flex-1 font-body text-left text-[15px] text-[var(--on-surface)] transition-colors duration-300"
                             >
@@ -286,9 +270,9 @@ export default function ProcessFlowChart({ className }: { className?: string }) 
                                 color: hoveredNode === node.id ? 'var(--on-accent)' : 'var(--muted)',
                               }}
                             >
-                              {(isPlanning || isExecution) ? (
+                              {(isPlanning || isExecution || isPost) ? (
                                 <motion.svg
-                                  animate={{ rotate: (isPlanning && planningOpen) || (isExecution && executionOpen) ? 45 : 0 }}
+                                  animate={{ rotate: (isPlanning && planningOpen) || (isExecution && executionOpen) || (isPost && postOpen) ? 45 : 0 }}
                                   transition={{ duration: 0.2 }}
                                   width="14"
                                   height="14"
@@ -325,7 +309,7 @@ export default function ProcessFlowChart({ className }: { className?: string }) 
                                   className="flex items-center gap-3 rounded-lg border border-[var(--rule)] bg-[var(--surface)] px-4 py-3"
                                 >
                                   <span className="font-label text-[10px] tracking-[0.15em] text-[var(--muted)]">
-                                    0{i + 1}
+                                    {child.number || `0${i + 1}`}
                                   </span>
                                   <span className="font-body text-[13px] text-[var(--on-surface)]">
                                     {child.label}
@@ -353,8 +337,34 @@ export default function ProcessFlowChart({ className }: { className?: string }) 
                                   transition={{ duration: 0.25, delay: i * 0.06, ease: EASE }}
                                   className="flex items-center gap-3 rounded-lg border border-[var(--rule)] bg-[var(--surface)] px-4 py-3"
                                 >
+                                  <span className="font-body text-[13px] text-[var(--on-surface)]">
+                                    {child.label}
+                                  </span>
+                                </motion.div>
+                              ))}
+                            </motion.div>
+                          </AnimatePresence>
+                        )}
+
+                        {isPost && postOpen && node.children && (
+                          <AnimatePresence>
+                            <motion.div
+                              initial={{ opacity: 0, height: 0 }}
+                              animate={{ opacity: 1, height: 'auto' }}
+                              exit={{ opacity: 0, height: 0 }}
+                              transition={{ duration: 0.3, ease: EASE }}
+                              className="ml-8 mt-2 flex flex-col gap-2 border-l-2 border-[var(--rule-strong)] pl-4"
+                            >
+                              {node.children.map((child, i) => (
+                                <motion.div
+                                  key={child.id}
+                                  initial={{ opacity: 0, x: -8 }}
+                                  animate={{ opacity: 1, x: 0 }}
+                                  transition={{ duration: 0.25, delay: i * 0.06, ease: EASE }}
+                                  className="flex items-center gap-3 rounded-lg border border-[var(--rule)] bg-[var(--surface)] px-4 py-3"
+                                >
                                   <span className="font-label text-[10px] tracking-[0.15em] text-[var(--muted)]">
-                                    0{i + 1}
+                                    {child.number || `0${i + 1}`}
                                   </span>
                                   <span className="font-body text-[13px] text-[var(--on-surface)]">
                                     {child.label}
@@ -374,5 +384,8 @@ export default function ProcessFlowChart({ className }: { className?: string }) 
         </AnimatePresence>
       </div>
     </div>
+    <PostProductionModal open={postOpen} onClose={() => setPostOpen(false)} />
+    </>
   );
 }
+
