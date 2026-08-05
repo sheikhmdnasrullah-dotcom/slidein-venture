@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { OUTREACH_PHASES } from '@/content/steps';
+import { OUTREACH_PHASES, PARALLEL_BRACKET } from '@/content/steps';
 import FitScale from './FitScale';
 import FlipCard from './FlipCard';
 
@@ -75,8 +75,11 @@ export default function OutreachProcessModal({ open, phaseId, onClose }: Outreac
               md:h-auto md:aspect-[16/9] md:max-h-[92vh] md:w-[min(1120px,94vw)] md:rounded-[28px] md:border md:border-[var(--rule)]
               md:shadow-[0_25px_60px_color-mix(in_oklch,var(--color-ink)_25%,transparent)]"
           >
-            {/* Header — minimal, just the close affordance */}
-            <div className="z-10 flex items-center justify-end gap-4 bg-[var(--color-paper-50)]/85 px-5 py-4 backdrop-blur-sm md:px-8">
+            {/* Header — matches the content carousel: phase index/name left, close right */}
+            <div className="z-10 flex items-center justify-between gap-4 bg-[var(--color-paper-50)]/85 px-5 py-4 backdrop-blur-sm md:px-8">
+              <span className="font-label text-[10px] tracking-[0.2em] text-[var(--muted)] uppercase">
+                {phase.index} · {phase.name}
+              </span>
               <button
                 onClick={onClose}
                 className="flex h-10 w-10 items-center justify-center rounded-full bg-[var(--surface)] text-[var(--muted)] transition-colors hover:text-[var(--on-surface)]"
@@ -91,13 +94,36 @@ export default function OutreachProcessModal({ open, phaseId, onClose }: Outreac
             <div className="min-h-0 flex-1">
               <FitScale className="h-full">
                 <div className="flex h-full flex-col px-4 pb-4 pt-2 md:px-8 md:pb-6">
-                  {/* Subtitle as headline — e.g. "Building infrastructure" */}
-                  <h3 className="font-display-md text-center text-[clamp(1.25rem,2.2vw,1.75rem)] text-[var(--on-surface)]">
-                    {phase.subtitle}
-                  </h3>
+                  {/* Subheading — same hairline + accent label as the content carousel */}
+                  <div className="mb-3 flex items-center gap-4">
+                    <span className="h-px flex-1 bg-[var(--rule)]" aria-hidden />
+                    <span className="font-label text-[10px] tracking-[0.25em] text-[var(--accent)] uppercase">
+                      {phase.subtitle}
+                    </span>
+                    <span className="h-px flex-1 bg-[var(--rule)]" aria-hidden />
+                  </div>
 
-                  {/* Flip-card grid */}
-                  <div className="mt-4 grid flex-1 grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                  {/* Day range + summary — the tier-1 context that used to be dropped entirely */}
+                  <div className="mx-auto flex max-w-[62ch] flex-col items-center gap-2 text-center">
+                    <div className="flex flex-wrap items-center justify-center gap-2">
+                      <span className="font-label rounded-full border border-[var(--rule)] px-2.5 py-1 text-[9px] tracking-[0.15em] text-[var(--muted)]">
+                        {phase.dayRange}
+                      </span>
+                      {PARALLEL_BRACKET.spans.some((id) => id === phase.id) && (
+                        <span className="font-label rounded-full bg-[var(--accent-wash)] px-2.5 py-1 text-[9px] tracking-[0.15em] text-[var(--accent)]">
+                          {PARALLEL_BRACKET.label}
+                        </span>
+                      )}
+                    </div>
+                    <p className="font-body text-[13px] leading-relaxed text-[var(--muted)]">
+                      {phase.summary}
+                    </p>
+                  </div>
+
+                  {/* Flip-card grid — fixed cell height, since FlipCard's faces are
+                      absolutely positioned and contribute no intrinsic height of
+                      their own; an unconstrained grid row collapses to zero. */}
+                  <div className="mt-5 grid flex-1 auto-rows-[13rem] grid-cols-1 gap-3 content-start sm:grid-cols-2 sm:auto-rows-[12rem]">
                     {phase.steps.map((step) => (
                       <FlipCard key={step.id} step={step} />
                     ))}

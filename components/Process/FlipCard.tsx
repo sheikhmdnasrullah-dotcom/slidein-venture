@@ -74,14 +74,16 @@ export default function FlipCard({ step }: { step: OutreachStep }) {
             </svg>
           </button>
 
-          <p className="font-body text-[12px] leading-relaxed text-[var(--muted)]">
-            {step.whyItMatters}
-          </p>
-          {step.technicalDetail && (
-            <p className="font-label mt-3 border-l border-[var(--rule)] pl-3 text-[11px] leading-relaxed text-[var(--muted)] normal-case">
-              {step.technicalDetail}
+          <div className="min-h-0 flex-1 overflow-y-auto pr-1">
+            <p className="font-body text-[12px] leading-relaxed text-[var(--muted)]">
+              {step.whyItMatters}
             </p>
-          )}
+            {step.technicalDetail && (
+              <p className="font-label mt-3 border-l border-[var(--rule)] pl-3 text-[11px] leading-relaxed text-[var(--muted)] normal-case">
+                {step.technicalDetail}
+              </p>
+            )}
+          </div>
         </div>
       </motion.div>
     </div>

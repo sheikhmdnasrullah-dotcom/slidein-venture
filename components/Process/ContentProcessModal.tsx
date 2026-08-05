@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import FitScale from './FitScale';
 import PlanningSlide from './PlanningSlide';
 import ExecutionSlide from './ExecutionSlide';
+import PostProductionSlide from './PostProductionSlide';
 import DistributionSlide from '@/components/PitchDeck/DistributionSlide';
 
 const EASE = [0.16, 1, 0.3, 1] as const;
@@ -117,7 +118,7 @@ export default function ContentProcessModal({ open, phaseId, onClose }: ContentP
                   <div className="min-h-0 flex-1">
                     {phase.id === 'planning' && <PlanningSlide />}
                     {phase.id === 'execution' && <ExecutionSlide />}
-                    {phase.id === 'post' && <PostProductionContent />}
+                    {phase.id === 'post' && <PostProductionSlide />}
                     {phase.id === 'distribution' && <DistributionSlide />}
                   </div>
                 </div>
@@ -151,25 +152,5 @@ export default function ContentProcessModal({ open, phaseId, onClose }: ContentP
         </motion.div>
       )}
     </AnimatePresence>
-  );
-}
-
-/* Post-production content — the diagram inline (no nested modal), so it can
-   render inside the carousel. The HighlightCut interaction is simplified to
-   a static label here to keep the carousel self-contained. */
-function PostProductionContent() {
-  return (
-    <div className="flex h-full flex-col items-center justify-center gap-4">
-      <span className="font-label text-[10px] tracking-[0.25em] text-[var(--muted)] uppercase">
-        Post-production
-      </span>
-      <h2 className="font-display-md text-[clamp(1.25rem,2.5vw,1.75rem)] text-[var(--on-surface)]">
-        The complete edit pipeline
-      </h2>
-      <p className="font-body max-w-[54ch] text-center text-[var(--muted)]">
-        Sound design, highlight cut, full episode edit — then five outputs:
-        transcripts, vertical reels, thumbnails, long-form articles and LinkedIn posts.
-      </p>
-    </div>
   );
 }
