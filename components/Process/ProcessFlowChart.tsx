@@ -6,6 +6,8 @@ import { cn } from '@/lib/utils';
 import PostProductionModal from './PostProductionModal';
 import DistributionModal from './DistributionModal';
 import OutreachSlideModal from './OutreachSlideModal';
+import PlanningSlideModal from './PlanningSlideModal';
+import ExecutionSlideModal from './ExecutionSlideModal';
 
 const EASE = [0.16, 1, 0.3, 1] as const;
 
@@ -38,7 +40,7 @@ const BRANCHES: Branch[] = [
           { id: 'script-runsheet', label: 'Script and Runsheet', number: '03' },
         ],
       },
-      { id: 'execution', label: 'Execution', children: [{ id: 'you-record', label: '04 You Record', number: '04' }] },
+      { id: 'execution', label: 'Execution', children: [{ id: 'you-record', label: 'You Record', number: '04' }] },
       {
         id: 'post',
         label: 'Post-production',
@@ -83,11 +85,11 @@ function PlusIcon() {
 }
 
 export default function ProcessFlowChart({ className }: { className?: string }) {
-  const [planningOpen, setPlanningOpen] = useState(false);
-  const [executionOpen, setExecutionOpen] = useState(false);
   const [postOpen, setPostOpen] = useState(false);
   const [distributionOpen, setDistributionOpen] = useState(false);
   const [outreachPhaseId, setOutreachPhaseId] = useState<string | null>(null);
+  const [planningModalOpen, setPlanningModalOpen] = useState(false);
+  const [executionModalOpen, setExecutionModalOpen] = useState(false);
 
   const openOutreach = (id: string) => {
     const phaseId = id === 'infrastructure' ? 'fortress' : id;
@@ -95,8 +97,8 @@ export default function ProcessFlowChart({ className }: { className?: string }) 
   };
   const closeOutreach = () => setOutreachPhaseId(null);
 
-  const togglePlanning = () => setPlanningOpen((prev) => !prev);
-  const toggleExecution = () => setExecutionOpen((prev) => !prev);
+  const togglePlanning = () => setPlanningModalOpen(true);
+  const toggleExecution = () => setExecutionModalOpen(true);
   const togglePost = () => setPostOpen((prev) => !prev);
 
   return (
@@ -126,10 +128,6 @@ export default function ProcessFlowChart({ className }: { className?: string }) 
               const isPost = node.id === 'post';
               const isDistribution = node.id === 'distribution';
               const isOutreach = branch.id === 'outreach';
-              const showChildren =
-                (isPlanning && planningOpen) ||
-                (isExecution && executionOpen) ||
-                (isPost && postOpen);
 
               return (
                 <div key={node.id}>
@@ -156,16 +154,9 @@ export default function ProcessFlowChart({ className }: { className?: string }) 
                     </button>
 
                     <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[var(--rule)] text-[var(--muted)] transition-all duration-200">
-                      {(isPlanning || isExecution || isPost) ? (
+                      {isPost ? (
                         <motion.svg
-                          animate={{
-                            rotate:
-                              (isPlanning && planningOpen) ||
-                              (isExecution && executionOpen) ||
-                              (isPost && postOpen)
-                                ? 45
-                                : 0,
-                          }}
+                          animate={{ rotate: postOpen ? 45 : 0 }}
                           transition={{ duration: 0.2 }}
                           width="14"
                           height="14"
@@ -182,57 +173,6 @@ export default function ProcessFlowChart({ className }: { className?: string }) 
                       )}
                     </span>
                   </motion.div>
-
-                  {(isPlanning && planningOpen && node.children) && (
-                    <AnimatePresence>
-                      <motion.div
-                        initial={{ opacity: 0, height: 0 }}
-                        animate={{ opacity: 1, height: 'auto' }}
-                        exit={{ opacity: 0, height: 0 }}
-                        transition={{ duration: 0.3, ease: EASE }}
-                        className="ml-10 mt-2 flex flex-col gap-2 border-l-2 border-[var(--rule-strong)] pl-4"
-                      >
-                        {node.children.map((child, i) => (
-                          <motion.div
-                            key={child.id}
-                            initial={{ opacity: 0, x: -6 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            transition={{ duration: 0.25, delay: i * 0.05, ease: EASE }}
-                            className="flex items-center gap-3 rounded-lg border border-[var(--rule)] bg-[var(--surface)] px-4 py-2.5"
-                          >
-                            <span className="font-label text-[10px] tracking-[0.15em] text-[var(--muted)]">
-                              {child.number || `0${i + 1}`}
-                            </span>
-                            <span className="font-body text-[13px] text-[var(--on-surface)]">{child.label}</span>
-                          </motion.div>
-                        ))}
-                      </motion.div>
-                    </AnimatePresence>
-                  )}
-
-                  {isExecution && executionOpen && node.children && (
-                    <AnimatePresence>
-                      <motion.div
-                        initial={{ opacity: 0, height: 0 }}
-                        animate={{ opacity: 1, height: 'auto' }}
-                        exit={{ opacity: 0, height: 0 }}
-                        transition={{ duration: 0.3, ease: EASE }}
-                        className="ml-10 mt-2 flex flex-col gap-2 border-l-2 border-[var(--rule-strong)] pl-4"
-                      >
-                        {node.children.map((child, i) => (
-                          <motion.div
-                            key={child.id}
-                            initial={{ opacity: 0, x: -6 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            transition={{ duration: 0.25, delay: i * 0.05, ease: EASE }}
-                            className="flex items-center gap-3 rounded-lg border border-[var(--rule)] bg-[var(--surface)] px-4 py-2.5"
-                          >
-                            <span className="font-body text-[13px] text-[var(--on-surface)]">{child.label}</span>
-                          </motion.div>
-                        ))}
-                      </motion.div>
-                    </AnimatePresence>
-                  )}
 
                   {isPost && postOpen && node.children && (
                     <AnimatePresence>
@@ -268,6 +208,8 @@ export default function ProcessFlowChart({ className }: { className?: string }) 
       </div>
 
       {/* Modals */}
+      <PlanningSlideModal open={planningModalOpen} onClose={() => setPlanningModalOpen(false)} />
+      <ExecutionSlideModal open={executionModalOpen} onClose={() => setExecutionModalOpen(false)} />
       <PostProductionModal open={postOpen} onClose={() => setPostOpen(false)} />
       <DistributionModal open={distributionOpen} onClose={() => setDistributionOpen(false)} />
       <OutreachSlideModal open={outreachPhaseId !== null} phaseId={outreachPhaseId} onClose={closeOutreach} />

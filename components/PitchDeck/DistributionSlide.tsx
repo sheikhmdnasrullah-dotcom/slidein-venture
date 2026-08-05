@@ -376,15 +376,15 @@ export default function DistributionSlide() {
         .cd-icon > circle { transition: transform .3s cubic-bezier(.22,1,.36,1); transform-box: fill-box; transform-origin: center; }
         .cd-icon:hover > circle { transform: scale(1.08); }
 
-         .cd-row-label {
-           font-family: var(--font-mono); font-size: 15px; letter-spacing: .12em;
-           fill: var(--on-surface); font-weight: 500; transition: fill .25s ease;
-         }
-         .cd-row-label-on { fill: var(--accent); }
-         .cd-col-head { font-size: 10.5px; letter-spacing: .22em; fill: var(--muted); font-weight: 600; }
-         .cd-item-label { font-size: 10px; letter-spacing: .04em; fill: var(--muted); font-weight: 500; }
-         .cd-cluster-title { font-size: 10.5px; letter-spacing: .22em; fill: var(--muted); font-weight: 600; }
-         .cd-stage { font-size: 10px; letter-spacing: .24em; fill: var(--muted); font-weight: 600; }
+        .cd-row-label {
+          font-family: var(--font-mono); font-size: 15px; letter-spacing: .12em;
+          fill: var(--on-surface); font-weight: 500; transition: fill .25s ease;
+        }
+        .cd-row-label-on { fill: var(--accent); }
+        .cd-col-head { font-size: 10.5px; letter-spacing: .22em; fill: var(--muted); font-weight: 600; }
+        .cd-item-label { font-size: 10px; letter-spacing: .04em; fill: var(--muted); font-weight: 500; }
+        .cd-cluster-title { font-size: 10.5px; letter-spacing: .22em; fill: var(--muted); font-weight: 600; }
+        .cd-stage { font-size: 10px; letter-spacing: .24em; fill: var(--muted); font-weight: 600; }
 
         @media (prefers-reduced-motion: reduce) {
           .cd-flow, .cd-ring-slow { animation: none; }
