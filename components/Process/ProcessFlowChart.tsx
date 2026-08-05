@@ -12,10 +12,11 @@ import ExecutionSlideModal from './ExecutionSlideModal';
 const EASE = [0.16, 1, 0.3, 1] as const;
 
 /* ── Content ──────────────────────────────────────────────────────────────
-   Root -> two engines -> four phases each. The two engines that make up the
-   whole system: Content Production and Researched Outreach — the name the
-   rest of the site settled on once "Manual Outreach" read as inefficiency
-   rather than as the verified-research claim it actually is. */
+   Root -> two engines -> four phases each -> the result that phase produces
+   -> all eight results converge on the one outcome the whole system exists
+   for. The two engines: Content Production and Researched Outreach — the
+   name the rest of the site settled on once "Manual Outreach" read as
+   inefficiency rather than as the verified-research claim it actually is. */
 
 type LeafAction =
   | { kind: 'planning' }
@@ -27,39 +28,44 @@ type LeafAction =
 interface Leaf {
   id: string;
   label: string;
+  result: string;
   action: LeafAction;
 }
 
 const CONTENT_LEAVES: Leaf[] = [
-  { id: 'planning', label: 'Planning', action: { kind: 'planning' } },
-  { id: 'execution', label: 'Execution', action: { kind: 'execution' } },
-  { id: 'post', label: 'Post-production', action: { kind: 'post' } },
-  { id: 'distribution', label: 'Distribution', action: { kind: 'distribution' } },
+  { id: 'planning', label: 'Planning', result: 'Script Locked', action: { kind: 'planning' } },
+  { id: 'execution', label: 'Execution', result: 'Session Captured', action: { kind: 'execution' } },
+  { id: 'post', label: 'Post-production', result: 'Polished Episode', action: { kind: 'post' } },
+  { id: 'distribution', label: 'Distribution', result: 'Content Live', action: { kind: 'distribution' } },
 ];
 
 const OUTREACH_LEAVES: Leaf[] = [
-  { id: 'infrastructure', label: 'The Infrastructure', action: { kind: 'outreach', phaseId: 'fortress' } },
-  { id: 'fuel', label: 'The Fuel', action: { kind: 'outreach', phaseId: 'fuel' } },
-  { id: 'script', label: 'The Script', action: { kind: 'outreach', phaseId: 'script' } },
-  { id: 'launch', label: 'The Launch', action: { kind: 'outreach', phaseId: 'launch' } },
+  { id: 'infrastructure', label: 'The Infrastructure', result: 'Inbox Warmed', action: { kind: 'outreach', phaseId: 'fortress' } },
+  { id: 'fuel', label: 'The Fuel', result: 'Verified Leads', action: { kind: 'outreach', phaseId: 'fuel' } },
+  { id: 'script', label: 'The Script', result: 'Copy Personalized', action: { kind: 'outreach', phaseId: 'script' } },
+  { id: 'launch', label: 'The Launch', result: 'Replies Incoming', action: { kind: 'outreach', phaseId: 'launch' } },
 ];
 
+const ALL_LEAVES = [...CONTENT_LEAVES, ...OUTREACH_LEAVES];
+
 /* ── Shared coordinate space ─────────────────────────────────────────────
-   1000 x 560. The SVG (preserveAspectRatio="none") and the HTML node overlay
+   1000 x 800. The SVG (preserveAspectRatio="none") and the HTML node overlay
    (positioned in %) both map onto it, via an aspect-ratio box, so a curve's
    endpoint and a node's rendered center always coincide regardless of the
    container's actual pixel width. */
 const SPACE_W = 1000;
-const SPACE_H = 640;
+const SPACE_H = 800;
 
 const ROOT_Y = 8;
-const SPLIT_Y = 78;
-const HUB_Y = 160;
-const HUB_HALF = 36;
-const LEAF_Y = 460;
-const LEAF_HALF = 42;
-const OUTCOME_Y = 600;
-const OUTCOME_HALF = 40;
+const SPLIT_Y = 70;
+const HUB_Y = 150;
+const HUB_HALF = 34;
+const LEAF_Y = 370;
+const LEAF_HALF = 40;
+const RESULT_Y = 560;
+const RESULT_HALF = 32;
+const OUTCOME_Y = 730;
+const OUTCOME_HALF = 46;
 const OUTCOME_X = 500;
 
 const LEAF_MARGIN = 40;
@@ -71,8 +77,7 @@ const HUB_X_OUTREACH = avg(LEAF_X.slice(4, 8));
 
 /* Node width has to be a fraction of the SAME coordinate space its position
    is expressed in — a fixed rem width sized for the widest possible container
-   (max-w-[1200px], full LEAF_SLOT spacing) still overlaps its neighbour at any
-   narrower one, which is exactly what happened at md/lg widths before this. */
+   still overlaps its neighbour at any narrower one. */
 const LEAF_WIDTH_PCT = (LEAF_SLOT / SPACE_W) * 100 * 0.82;
 
 const pct = (v: number, total: number) => `${(v / total) * 100}%`;
@@ -88,22 +93,32 @@ const ROOT_TO_CONTENT = fan(500, SPLIT_Y, HUB_X_CONTENT, HUB_Y - HUB_HALF);
 const ROOT_TO_OUTREACH = fan(500, SPLIT_Y, HUB_X_OUTREACH, HUB_Y - HUB_HALF);
 const CONTENT_FANS = LEAF_X.slice(0, 4).map((x) => fan(HUB_X_CONTENT, HUB_Y + HUB_HALF, x, LEAF_Y - LEAF_HALF));
 const OUTREACH_FANS = LEAF_X.slice(4, 8).map((x) => fan(HUB_X_OUTREACH, HUB_Y + HUB_HALF, x, LEAF_Y - LEAF_HALF));
-/* Each of the 8 leaves converges into the single "More clients, faster"
-   outcome node at the bottom of the diagram. */
-const LEAF_TO_OUTCOME = LEAF_X.map((x) => fan(x, LEAF_Y + LEAF_HALF, OUTCOME_X, OUTCOME_Y - OUTCOME_HALF));
+/* Each leaf drops straight down into its own result — the thing that phase
+   actually produces — before all eight results converge on one outcome. */
+const LEAF_TO_RESULT = LEAF_X.map((x) => fan(x, LEAF_Y + LEAF_HALF, x, RESULT_Y - RESULT_HALF));
+const RESULT_TO_OUTCOME = LEAF_X.map((x) => fan(x, RESULT_Y + RESULT_HALF, OUTCOME_X, OUTCOME_Y - OUTCOME_HALF));
 const ALL_EDGES = [
   ROOT_STUB,
   ROOT_TO_CONTENT,
   ROOT_TO_OUTREACH,
   ...CONTENT_FANS,
   ...OUTREACH_FANS,
-  ...LEAF_TO_OUTCOME,
+  ...LEAF_TO_RESULT,
+  ...RESULT_TO_OUTCOME,
 ];
 
 function ArrowIcon() {
   return (
     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
       <path d="M7 17 17 7M8 7h9v9" />
+    </svg>
+  );
+}
+
+function CheckIcon() {
+  return (
+    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M4 12.5 9.5 18 20 6" />
     </svg>
   );
 }
@@ -125,10 +140,12 @@ function SendIcon() {
   );
 }
 
-function StarIcon() {
+function RocketIcon() {
   return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
-      <path d="M12 2.5 14.8 8.2 21 9.1l-4.5 4.4 1 6L12 16.9l-5.5 2.6 1-6L3 9.1l6.2-.9z" />
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M12 2.5c3 2 5 5.7 5 9.8 0 2.1-.5 3.9-1.2 5.4l-1 2.1h-5.6l-1-2.1C7.5 16.2 7 14.4 7 12.3c0-4.1 2-7.8 5-9.8z" />
+      <circle cx="12" cy="10.2" r="1.7" fill="currentColor" stroke="none" />
+      <path d="M7.3 15c-1.6.3-2.6 1.8-2.9 4.4 1.9-.2 3.4-1.1 4.2-2.6M16.7 15c1.6.3 2.6 1.8 2.9 4.4-1.9-.2-3.4-1.1-4.2-2.6" />
     </svg>
   );
 }
@@ -196,6 +213,88 @@ function LeafNode({ x, leaf, delay, onOpen }: { x: number; leaf: Leaf; delay: nu
         </span>
       </button>
     </motion.div>
+  );
+}
+
+/* ── Result node — same card language as the leaves, one tier down. Not a
+   button: it's what that phase produces, marked done rather than clickable. */
+function ResultNode({ x, label, delay }: { x: number; label: string; delay: number }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 16, scale: 0.85 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      transition={{ duration: 0.5, delay, ease: EASE }}
+      className="absolute -translate-x-1/2 -translate-y-1/2"
+      style={{ left: pct(x, SPACE_W), top: pct(RESULT_Y, SPACE_H), width: `${LEAF_WIDTH_PCT}%` }}
+    >
+      <div className="flex w-full flex-col items-center gap-2 rounded-xl border border-[var(--rule)] bg-[var(--surface-2)] px-2.5 py-3 text-center">
+        <motion.span
+          className="h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--color-brand)]"
+          animate={{ scale: [1, 1.4, 1], opacity: [1, 0.6, 1] }}
+          transition={{ duration: 1.8, repeat: Infinity, delay: delay * 0.4, ease: EASE }}
+        />
+        <span className="font-body text-[12px] leading-snug text-[var(--on-surface)]">{label}</span>
+        <span className="flex h-5 w-5 items-center justify-center rounded-full bg-[var(--accent-wash)] text-[var(--accent)]">
+          <CheckIcon />
+        </span>
+      </div>
+    </motion.div>
+  );
+}
+
+/* ── Outcome — the one thing every phase is for. Deliberately unlike every
+   other node: gradient fill, a halo of pulsing rings, orbiting sparks and a
+   light sweep across the label, so the payoff of the whole diagram reads as
+   a payoff rather than another card in the grid. */
+function OutcomeNode({ delay }: { delay: number }) {
+  return (
+    <div className="relative">
+      {/* orbiting sparks */}
+      <motion.div
+        className="pointer-events-none absolute inset-0"
+        animate={{ rotate: 360 }}
+        transition={{ duration: 9, repeat: Infinity, ease: 'linear', delay }}
+      >
+        {[0, 120, 240].map((deg) => (
+          <span
+            key={deg}
+            className="absolute left-1/2 top-1/2 h-[5px] w-[5px] rounded-full bg-[var(--color-brand)] shadow-[0_0_8px_var(--color-brand)]"
+            style={{ transform: `rotate(${deg}deg) translateX(88px)` }}
+          />
+        ))}
+      </motion.div>
+
+      {/* pulsing halo rings */}
+      {[0, 0.7].map((ringDelay, i) => (
+        <motion.span
+          key={i}
+          className="pointer-events-none absolute inset-0 rounded-[28px] border-2 border-[var(--color-brand)]"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: [0, 0.5, 0], scale: [1, 1.14, 1.26] }}
+          transition={{ duration: 2.6, repeat: Infinity, delay: delay + 0.4 + ringDelay, ease: EASE }}
+        />
+      ))}
+
+      <div className="relative flex flex-col items-center gap-2 overflow-hidden rounded-[28px] bg-gradient-to-br from-[var(--color-brand)] to-[var(--color-brand-lift)] px-10 py-6 shadow-[0_20px_50px_color-mix(in_oklch,var(--color-brand)_35%,transparent)]">
+        {/* light sweep across the card, periodic */}
+        <motion.span
+          className="pointer-events-none absolute inset-y-0 w-1/3 -skew-x-12 bg-gradient-to-r from-transparent via-white/35 to-transparent"
+          initial={{ left: '-40%' }}
+          animate={{ left: ['-40%', '140%'] }}
+          transition={{ duration: 1.1, repeat: Infinity, repeatDelay: 2.6, ease: 'easeInOut', delay: delay + 1 }}
+        />
+
+        <span className="flex h-11 w-11 items-center justify-center rounded-full bg-white/20 text-[var(--on-accent)]">
+          <RocketIcon />
+        </span>
+        <span className="font-display-sm whitespace-nowrap text-[20px] text-[var(--on-accent)]">
+          More clients, faster
+        </span>
+        <span className="font-label text-[8.5px] tracking-[0.22em] text-[var(--on-accent)]/75">
+          EVERY PHASE FEEDS THIS
+        </span>
+      </div>
+    </div>
   );
 }
 
@@ -343,6 +442,28 @@ export default function ProcessFlowChart({ className }: { className?: string }) 
                 transition={{ duration: 0.6, delay: 1.25 + (i % 4) * 0.09, ease: EASE }}
               />
             ))}
+            {LEAF_TO_RESULT.map((d, i) => (
+              <motion.path
+                key={`result-line-${i}`}
+                d={d}
+                stroke="var(--rule-strong)"
+                strokeWidth={2}
+                initial={{ pathLength: 0, opacity: 0 }}
+                animate={{ pathLength: 1, opacity: 1 }}
+                transition={{ duration: 0.4, delay: 2.6 + i * 0.08, ease: EASE }}
+              />
+            ))}
+            {RESULT_TO_OUTCOME.map((d, i) => (
+              <motion.path
+                key={`outcome-fan-${i}`}
+                d={d}
+                stroke="var(--rule-strong)"
+                strokeWidth={2}
+                initial={{ pathLength: 0, opacity: 0 }}
+                animate={{ pathLength: 1, opacity: 1 }}
+                transition={{ duration: 0.55, delay: 3.9 + i * 0.08, ease: EASE }}
+              />
+            ))}
 
             {ALL_EDGES.map((d, i) => (
               <motion.path
@@ -355,8 +476,8 @@ export default function ProcessFlowChart({ className }: { className?: string }) 
                 initial={{ opacity: 0 }}
                 animate={{ strokeDashoffset: [0, -960], opacity: 1 }}
                 transition={{
-                  opacity: { duration: 0.4, delay: 2.1 + i * 0.1 },
-                  strokeDashoffset: { duration: 3.2, repeat: Infinity, ease: 'linear', delay: 2.1 + i * 0.1 },
+                  opacity: { duration: 0.4, delay: 5.3 + i * 0.05 },
+                  strokeDashoffset: { duration: 3.2, repeat: Infinity, ease: 'linear', delay: 5.3 + i * 0.05 },
                 }}
               />
             ))}
@@ -384,31 +505,19 @@ export default function ProcessFlowChart({ className }: { className?: string }) 
             />
           ))}
 
-          {/* ── More clients, faster — the outcome every leaf feeds ─────── */}
+          {ALL_LEAVES.map((leaf, i) => (
+            <ResultNode key={`result-${leaf.id}`} x={LEAF_X[i]} label={leaf.result} delay={3.0 + i * 0.08} />
+          ))}
+
+          {/* ── More clients, faster — the outcome every result feeds ────── */}
           <motion.div
             initial={{ opacity: 0, y: 20, scale: 0.9 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
-            transition={{ duration: 0.6, delay: 2.6, ease: EASE }}
+            transition={{ duration: 0.6, delay: 4.9, ease: EASE }}
             className="absolute -translate-x-1/2 -translate-y-1/2"
             style={{ left: pct(OUTCOME_X, SPACE_W), top: pct(OUTCOME_Y, SPACE_H) }}
           >
-            <div className="relative flex flex-col items-center gap-2 rounded-2xl border-2 border-[var(--color-brand)] bg-[var(--surface)] px-8 py-4 shadow-[0_14px_40px_color-mix(in_oklch,var(--color-ember)_22%,transparent)]">
-              <motion.span
-                className="pointer-events-none absolute inset-0 rounded-2xl border-2 border-[var(--color-brand)]"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: [0, 0.5, 0], scale: [1, 1.06, 1.14] }}
-                transition={{ duration: 2.6, repeat: Infinity, delay: 3, ease: EASE }}
-              />
-              <span className="flex h-10 w-10 items-center justify-center rounded-full bg-[var(--accent-vivid)] text-[var(--on-accent)]">
-                <StarIcon />
-              </span>
-              <span className="font-body whitespace-nowrap text-[17px] font-bold tracking-[-0.01em] text-[var(--on-surface)]">
-                More clients, faster
-              </span>
-              <span className="font-label text-[8.5px] tracking-[0.2em] text-[var(--muted)]">
-                EVERY PHASE FEEDS THIS
-              </span>
-            </div>
+            <OutcomeNode delay={5.4} />
           </motion.div>
         </div>
       </div>
@@ -430,28 +539,41 @@ export default function ProcessFlowChart({ className }: { className?: string }) 
           onOpen={(leaf) => handleAction(leaf.action)}
         />
 
+        {/* The eight results, same tier the desktop tree shows between the
+            leaves and the outcome. */}
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, delay: 1.05, ease: EASE }}
+          className="flex flex-col items-center gap-2"
+        >
+          <span className="font-label text-[8.5px] tracking-[0.22em] text-[var(--muted)]">Which produce</span>
+          <div className="flex flex-wrap justify-center gap-2 px-2">
+            {ALL_LEAVES.map((leaf, i) => (
+              <motion.span
+                key={leaf.id}
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.35, delay: 1.15 + i * 0.05, ease: EASE }}
+                className="flex items-center gap-1.5 rounded-full border border-[var(--rule)] bg-[var(--surface-2)] px-3 py-1.5"
+              >
+                <span className="flex h-4 w-4 items-center justify-center rounded-full bg-[var(--accent-wash)] text-[var(--accent)]">
+                  <CheckIcon />
+                </span>
+                <span className="font-body text-[11px] text-[var(--on-surface)]">{leaf.result}</span>
+              </motion.span>
+            ))}
+          </div>
+        </motion.div>
+
         {/* Both tracks converge here, same as the desktop tree's outcome node. */}
         <motion.div
           initial={{ opacity: 0, y: 16, scale: 0.94 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
-          transition={{ duration: 0.5, delay: 1.1, ease: EASE }}
-          className="relative mx-auto flex w-fit flex-col items-center gap-2 rounded-2xl border-2 border-[var(--color-brand)] bg-[var(--surface)] px-8 py-4 shadow-[0_14px_40px_color-mix(in_oklch,var(--color-ember)_22%,transparent)]"
+          transition={{ duration: 0.5, delay: 1.7, ease: EASE }}
+          className="mx-auto"
         >
-          <motion.span
-            className="pointer-events-none absolute inset-0 rounded-2xl border-2 border-[var(--color-brand)]"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: [0, 0.5, 0], scale: [1, 1.06, 1.14] }}
-            transition={{ duration: 2.6, repeat: Infinity, delay: 1.5, ease: EASE }}
-          />
-          <span className="flex h-10 w-10 items-center justify-center rounded-full bg-[var(--accent-vivid)] text-[var(--on-accent)]">
-            <StarIcon />
-          </span>
-          <span className="font-body whitespace-nowrap text-[17px] font-bold tracking-[-0.01em] text-[var(--on-surface)]">
-            More clients, faster
-          </span>
-          <span className="font-label text-[8.5px] tracking-[0.2em] text-[var(--muted)]">
-            EVERY PHASE FEEDS THIS
-          </span>
+          <OutcomeNode delay={2.2} />
         </motion.div>
       </div>
 
