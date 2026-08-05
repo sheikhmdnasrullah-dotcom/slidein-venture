@@ -177,11 +177,10 @@ function ClusterCard({ c, i, dimmed }: { c: Cluster; i: number; dimmed: boolean 
       {/* cable port on the left edge */}
       <circle cx={c.x} cy={c.entryY} r={4} fill="var(--accent-vivid)" filter="url(#cdGlow)" />
       <circle cx={c.x} cy={c.entryY} r={8} fill="none" stroke="var(--accent-vivid)" strokeOpacity={0.3} strokeWidth={1} />
-      {/* header */}
-      <circle cx={c.x + 26} cy={c.y + 31} r={3.2} fill="var(--accent-vivid)" />
-      <text x={c.x + 38} y={c.y + 35} className="cd-cluster-title">{c.title.toUpperCase()}</text>
-      <text x={c.x + c.w - 24} y={c.y + 35} textAnchor="end" className="cd-cluster-count">{c.count}</text>
-      <line x1={c.x + 24} y1={c.y + 50} x2={c.x + c.w - 24} y2={c.y + 50} stroke="var(--rule)" strokeWidth={1} />
+       {/* cluster header */}
+       <circle cx={c.x + 24} cy={c.y + 31} r={3.2} fill="var(--accent-vivid)" />
+       <text x={c.x + 38} y={c.y + 35} className="cd-cluster-title">{c.title.toUpperCase()}</text>
+       <line x1={c.x + 24} y1={c.y + 50} x2={c.x + c.w - 24} y2={c.y + 50} stroke="var(--rule)" strokeWidth={1} />
       {c.items.map((it, k) => (
         <PlatformIcon key={it.name} cx={start + k * gap} cy={cy} r={iconR} item={it} />
       ))}
@@ -198,43 +197,10 @@ export default function DistributionSlide() {
   const activeCluster = activeRow === null ? null : DASHBOARD_ROWS[activeRow].cluster;
 
   return (
-    <section className="relative mx-auto w-full max-w-[920px] overflow-hidden rounded-[28px] bg-[var(--surface)] font-sans antialiased shadow-[var(--shadow-float)]">
+    <section className="relative w-full overflow-hidden bg-[var(--surface)] font-sans antialiased">
       {/* corner ticks */}
       <span className="pointer-events-none absolute left-5 top-5 h-3 w-3 border-l-2 border-t-2 border-[var(--accent-vivid)]/70" />
       <span className="pointer-events-none absolute bottom-5 right-5 h-3 w-3 border-b-2 border-r-2 border-[var(--accent-vivid)]/70" />
-
-      {/* header */}
-      <div className="relative z-10 flex items-end justify-between px-8 pt-5 md:px-12">
-        <motion.div
-          initial={{ opacity: 0, y: 14 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, ease: EASE }}
-        >
-          <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-[var(--accent)]">
-            04 — Content Distribution
-          </p>
-          <h2 className="mt-1.5 text-xl font-semibold tracking-tight text-[var(--on-surface)] md:text-[26px] md:leading-[1.05]">
-            Record once.{' '}
-            <span className="bg-gradient-to-r from-[var(--accent-vivid)] to-[var(--color-brand-lift)] bg-clip-text text-transparent">
-              Publish everywhere.
-            </span>
-          </h2>
-        </motion.div>
-        <motion.div
-          initial={{ opacity: 0, y: 14 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, ease: EASE, delay: 0.15 }}
-          className="hidden items-center gap-2 rounded-full border border-[var(--rule)] bg-[var(--surface-glass)] px-4 py-2 backdrop-blur md:flex"
-        >
-          <span className="relative flex h-2 w-2">
-            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[var(--accent-vivid)] opacity-60" />
-            <span className="relative inline-flex h-2 w-2 rounded-full bg-[var(--accent-vivid)]" />
-          </span>
-          <span className="text-[11px] font-medium uppercase tracking-[0.18em] text-[var(--muted)]">
-            Live system
-          </span>
-        </motion.div>
-      </div>
 
       {/* ------------------------------ canvas ------------------------------ */}
       <div className="relative">
@@ -329,7 +295,6 @@ export default function DistributionSlide() {
             transition={{ duration: 0.7, ease: EASE, delay: 0.2 }}
             role="list"
           >
-            <text x={COL.x + 24} y={rowCenterY(0) - 58} className="cd-col-head">EPISODE 14 · DELIVERED</text>
             {DASHBOARD_ROWS.map((row, i) => {
               const cy = rowCenterY(i);
               const on = activeRow === i;
@@ -349,9 +314,9 @@ export default function DistributionSlide() {
                     x={COL.x} y={cy - COL.rowH / 2} width={COL.w} height={COL.rowH} rx={10}
                     fill={on ? 'var(--accent-wash)' : 'transparent'}
                   />
-                  <text x={COL.x + 24} y={cy + 5} className={on ? 'cd-row-label cd-row-label-on' : 'cd-row-label'}>
-                    {row.asset}
-                  </text>
+                   <text x={COL.x + 24} y={cy + 5} className={on ? 'cd-row-label cd-row-label-on' : 'cd-row-label'}>
+                     {row.asset.replace(/^EP \d+ · /, '')}
+                   </text>
                   <line
                     x1={COL.x} y1={cy + COL.rowH / 2} x2={COL_PORT_X} y2={cy + COL.rowH / 2}
                     stroke="var(--rule)" strokeWidth={1}
@@ -374,7 +339,6 @@ export default function DistributionSlide() {
             <circle cx={JUNCTION.x} cy={JUNCTION.y} r={15} fill="var(--surface)" stroke="var(--accent-vivid)" strokeOpacity={0.4}
               strokeWidth={1.2} strokeDasharray="3 4" className="cd-ring-slow" />
             <circle cx={JUNCTION.x} cy={JUNCTION.y} r={5.5} fill="var(--accent-vivid)" filter="url(#cdGlow)" />
-            <text x={JUNCTION.x} y={JUNCTION.y + 46} textAnchor="middle" className="cd-stage">SMART ROUTING</text>
           </motion.g>
 
           {/* --------------------- destination clusters ------------------------ */}
@@ -388,20 +352,6 @@ export default function DistributionSlide() {
           ))}
         </svg>
       </div>
-
-      {/* story strip */}
-      <motion.div
-        initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.7, ease: EASE, delay: 1.1 }}
-        className="relative z-10 flex flex-wrap items-center justify-center gap-x-3 gap-y-2 px-8 pb-5 pt-0.5 text-[10.5px] font-medium uppercase tracking-[0.2em] text-[var(--muted)]"
-      >
-        {['Six assets delivered', 'Smart routing', 'Nine destinations'].map((s, i, arr) => (
-          <span key={s} className="flex items-center gap-3">
-            <span className={i === arr.length - 1 ? 'text-[var(--accent)]' : ''}>{s}</span>
-            {i < arr.length - 1 && <span className="text-[var(--muted)]">→</span>}
-          </span>
-        ))}
-      </motion.div>
 
       {/* scoped animation styles */}
       <style>{`
@@ -433,8 +383,7 @@ export default function DistributionSlide() {
         .cd-row-label-on { fill: var(--accent); }
         .cd-col-head { font-size: 10.5px; letter-spacing: .22em; fill: var(--muted); font-weight: 600; }
         .cd-item-label { font-size: 10px; letter-spacing: .04em; fill: var(--muted); font-weight: 500; }
-        .cd-cluster-title { font-size: 10.5px; letter-spacing: .22em; fill: var(--muted); font-weight: 600; }
-        .cd-cluster-count { font-size: 10.5px; letter-spacing: .18em; fill: var(--muted); font-weight: 600; }
+         .cd-cluster-title { font-size: 10.5px; letter-spacing: .22em; fill: var(--muted); font-weight: 600; }
         .cd-stage { font-size: 10px; letter-spacing: .24em; fill: var(--muted); font-weight: 600; }
 
         @media (prefers-reduced-motion: reduce) {

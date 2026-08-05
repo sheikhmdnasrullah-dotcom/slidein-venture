@@ -76,7 +76,7 @@ export default function PostProductionModal({ open, onClose }: { open: boolean; 
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.3, ease: EASE }}
-          className="fixed inset-0 z-[200] flex items-center justify-center p-4 md:p-8"
+          className="fixed inset-0 z-[1100] flex items-center justify-center p-4 md:p-8"
         >
           {/* Backdrop */}
           <motion.div

@@ -34,7 +34,7 @@ export default function DistributionModal({ open, onClose }: DistributionModalPr
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.3, ease: EASE }}
-          className="fixed inset-0 z-[200] flex items-end justify-center md:items-center"
+          className="fixed inset-0 z-[1100] flex items-end justify-center md:items-center"
           role="dialog"
           aria-modal="true"
           aria-label="Content distribution"
@@ -48,15 +48,15 @@ export default function DistributionModal({ open, onClose }: DistributionModalPr
             onClick={onClose}
           />
 
-          {/* 16:9 slide panel — scrolls its own content on desktop, full-sheet on mobile */}
+          {/* slide panel — full fit, no scroll */}
           <motion.div
             ref={scrollRef}
             initial={{ opacity: 0, y: 40, scale: 0.98 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 40, scale: 0.98 }}
             transition={{ duration: 0.45, ease: EASE }}
-            className="relative flex max-h-[94vh] w-full flex-col overflow-y-auto bg-[var(--color-paper-50)]
-              md:aspect-[16/9] md:max-h-[92vh] md:w-[min(1120px,94vw)] md:rounded-[28px] md:border md:border-[var(--rule)]
+            className="relative flex w-full flex-col bg-[var(--color-paper-50)]
+              md:max-h-[92vh] md:w-[min(1120px,94vw)] md:rounded-[28px] md:border md:border-[var(--rule)]
               md:shadow-[0_25px_60px_color-mix(in_oklch,var(--color-ink)_25%,transparent)]"
           >
             {/* Sticky header */}
@@ -75,15 +75,8 @@ export default function DistributionModal({ open, onClose }: DistributionModalPr
               </button>
             </div>
 
-            {/* One picture: the delivered assets and where each one goes. The
-                approval dashboard used to sit below this diagram as a second
-                visual saying the same thing — it is now the left half of it. */}
-            <div className="px-4 pb-12 pt-2 md:px-8 md:pb-10">
+            <div className="px-4 pb-4 pt-2 md:px-6 md:pb-6">
               <DistributionSlide />
-              <p className="mx-auto mt-6 max-w-[560px] text-center font-body text-sm leading-relaxed text-[var(--muted)]">
-                Point at any asset to see where it lands. Approve the set and every
-                piece goes out on schedule.
-              </p>
             </div>
           </motion.div>
         </motion.div>
