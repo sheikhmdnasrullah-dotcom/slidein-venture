@@ -86,24 +86,30 @@ export default function PostProductionModal({ open, onClose }: { open: boolean; 
           exit={{ opacity: 0 }}
           transition={{ duration: 0.3, ease: EASE }}
           className="fixed inset-0 z-[1100] flex items-end justify-center md:items-center"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Post-production"
         >
-          {/* Backdrop */}
+          {/* Backdrop — identical on every slide, so the nav recedes the same
+              amount whichever of the eight is open */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="absolute inset-0 bg-black/60 backdrop-blur-md"
+            className="absolute inset-0 bg-black/55 backdrop-blur-md"
             onClick={onClose}
           />
 
-          {/* 16:9 slide panel — scrolls its own content on desktop, full-sheet on mobile */}
+          {/* Same frame as every other slide: fixed height on mobile (not
+              content-driven), locked 16:9 on desktop — so all eight sit in
+              the exact same box regardless of how much content is inside. */}
           <motion.div
             initial={{ opacity: 0, scale: 0.92, y: 30 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.92, y: 30 }}
             transition={{ duration: 0.5, ease: EASE }}
-            className="relative flex max-h-[94vh] w-full flex-col overflow-y-auto bg-[var(--color-paper-50)]
-              md:aspect-[16/9] md:max-h-[92vh] md:w-[min(1120px,94vw)] md:rounded-[28px] md:border md:border-[var(--rule)]
+            className="relative flex h-[88dvh] w-full flex-col overflow-y-auto bg-[var(--color-paper-50)]
+              md:h-auto md:aspect-[16/9] md:max-h-[92vh] md:w-[min(1120px,94vw)] md:rounded-[28px] md:border md:border-[var(--rule)]
               md:shadow-[0_25px_60px_color-mix(in_oklch,var(--color-ink)_25%,transparent)]"
           >
             {/* Close button */}

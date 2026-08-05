@@ -429,6 +429,30 @@ export default function ProcessFlowChart({ className }: { className?: string }) 
           delayBase={0.65}
           onOpen={(leaf) => handleAction(leaf.action)}
         />
+
+        {/* Both tracks converge here, same as the desktop tree's outcome node. */}
+        <motion.div
+          initial={{ opacity: 0, y: 16, scale: 0.94 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          transition={{ duration: 0.5, delay: 1.1, ease: EASE }}
+          className="relative mx-auto flex w-fit flex-col items-center gap-2 rounded-2xl border-2 border-[var(--color-brand)] bg-[var(--surface)] px-8 py-4 shadow-[0_14px_40px_color-mix(in_oklch,var(--color-ember)_22%,transparent)]"
+        >
+          <motion.span
+            className="pointer-events-none absolute inset-0 rounded-2xl border-2 border-[var(--color-brand)]"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: [0, 0.5, 0], scale: [1, 1.06, 1.14] }}
+            transition={{ duration: 2.6, repeat: Infinity, delay: 1.5, ease: EASE }}
+          />
+          <span className="flex h-10 w-10 items-center justify-center rounded-full bg-[var(--accent-vivid)] text-[var(--on-accent)]">
+            <StarIcon />
+          </span>
+          <span className="font-body whitespace-nowrap text-[17px] font-bold tracking-[-0.01em] text-[var(--on-surface)]">
+            More clients, faster
+          </span>
+          <span className="font-label text-[8.5px] tracking-[0.2em] text-[var(--muted)]">
+            EVERY PHASE FEEDS THIS
+          </span>
+        </motion.div>
       </div>
 
       {/* Modals */}

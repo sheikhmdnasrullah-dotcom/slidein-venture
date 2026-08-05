@@ -39,24 +39,26 @@ export default function HighlightCutModal({ open, onClose }: HighlightCutModalPr
           aria-modal="true"
           aria-label="The Highlight Cut"
         >
-          {/* Backdrop — darker so it reads as a layer above the post-production slide */}
+          {/* Backdrop — same treatment as every slide; a hair darker reads as
+              "one layer up" from the post-production slide underneath it. */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="absolute inset-0 bg-black/60 backdrop-blur-md"
+            className="absolute inset-0 bg-black/65 backdrop-blur-md"
             onClick={onClose}
           />
 
-          {/* 16:9 slide panel — same size as every other slide */}
+          {/* Same frame as every other slide: fixed height on mobile, locked
+              16:9 on desktop. */}
           <motion.div
             ref={scrollRef}
             initial={{ opacity: 0, scale: 0.94, y: 30 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.94, y: 30 }}
             transition={{ duration: 0.5, ease: EASE }}
-            className="relative flex max-h-[94vh] w-full flex-col overflow-y-auto bg-[var(--color-paper-50)]
-              md:aspect-[16/9] md:max-h-[92vh] md:w-[min(1120px,94vw)] md:rounded-[28px] md:border md:border-[var(--rule)]
+            className="relative flex h-[88dvh] w-full flex-col overflow-y-auto bg-[var(--color-paper-50)]
+              md:h-auto md:aspect-[16/9] md:max-h-[92vh] md:w-[min(1120px,94vw)] md:rounded-[28px] md:border md:border-[var(--rule)]
               md:shadow-[0_25px_60px_color-mix(in_oklch,var(--color-ink)_25%,transparent)]"
           >
             {/* Sticky header */}
