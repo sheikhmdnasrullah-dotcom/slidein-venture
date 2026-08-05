@@ -1,6 +1,5 @@
 import Hero from "@/components/Hero/Hero";
 import Section from "@/components/Section";
-import FrameworkHead from "@/components/Framework/FrameworkHead";
 import FrameworkEngines from "@/components/Framework/FrameworkEngines";
 import InputSlide from "@/components/PitchDeck/InputSlide";
 import YourPart from "@/components/Steps/YourPart";
@@ -51,12 +50,7 @@ export default function Home() {
         bleed
         className="scroll-mt-[120px]"
       >
-        <FrameworkHead
-          eyebrow="How it works"
-          title="The Framework"
-          coordinate="01 · Framework"
-        />
-        <FrameworkEngines className="mt-16 md:mt-20" />
+        <FrameworkEngines className="mt-4 md:mt-6" />
       </Section>
 
       <div className="relative min-h-[640px] overflow-hidden">

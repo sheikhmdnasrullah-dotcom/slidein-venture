@@ -17,10 +17,16 @@
  * bottom, styled the same way the process page's own "More clients, faster"
  * node is, so the payoff reads identically wherever it appears on the site.
  *
- * All copy is read from content/framework.ts — nothing here is invented.
+ * The origin/outcome labels and cross-link copy still read from
+ * content/framework.ts, which stays the single source of truth for /steps.
+ * The two node lists below are a HOMEPAGE-ONLY shortlist — the pared-down,
+ * headline version of the same seventeen service nodes /steps draws in full
+ * — so trimming what the homepage shows can never quietly change what
+ * /steps promises.
  */
 
-import { motion } from 'framer-motion';
+import { useState } from 'react';
+import { motion, useReducedMotion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { MonoLabel } from '@/components/System/System';
 import {
@@ -28,12 +34,42 @@ import {
   FRAMEWORK_ORIGIN,
   FRAMEWORK_OUTCOME,
   FRAMEWORK_TRACKS,
-  ownerTag,
-  type FrameworkTrack,
 } from '@/content/framework';
 
 const EASE = [0.16, 1, 0.3, 1] as const;
 const GUTTER = 'md:w-28';
+
+type HomeNode = {
+  id: string;
+  label: string;
+  /** Whether this node still carries the accent "client" treatment. */
+  accent?: boolean;
+};
+
+/** The homepage shortlist for Content Production. Six of the nine /steps
+   nodes — the client's own "you record, once" step is dropped here, so the
+   list reads as pure output rather than repeating the origin above it. */
+const HOME_CONTENT_NODES: HomeNode[] = [
+  { id: 'ideation', label: 'Ideation, Research & Script' },
+  { id: 'audio-video', label: 'Audio & Video Editing' },
+  { id: 'clips', label: 'Short Form Clips' },
+  { id: 'thumbnails', label: 'Thumbnails & Visual Assets' },
+  { id: 'articles-social', label: 'Articles and Social Posts' },
+  { id: 'distribution', label: 'Multi-platform Distribution' },
+];
+
+/** The homepage shortlist for Researched Outreach. The client's own input
+   stays first — it is the one thing they actually do — but plain, with no
+   "once" and no owner tag, since it now reads as a step in the list rather
+   than a separate accent callout. */
+const HOME_OUTREACH_NODES: HomeNode[] = [
+  { id: 'who', label: 'You tell us who to reach' },
+  { id: 'icp', label: 'Ideal Client Research' },
+  { id: 'infrastructure', label: 'Sending Infrastructure' },
+  { id: 'lists', label: 'Hand-Built Prospect Lists' },
+  { id: 'copy', label: 'Personalised Copywriting' },
+  { id: 'sending', label: 'Sending & Follow-Ups' },
+];
 
 function LayersIcon() {
   return (
@@ -63,9 +99,24 @@ function RocketIcon() {
 }
 
 /** The single point at each end of the drawing — origin and, before this
-   file existed, the merge. Kept from FrameworkThread's own vocabulary. */
+   file existed, the merge. Kept from FrameworkThread's own vocabulary. Now
+   breathes gently so the two nodes that connect both engines read as live
+   rather than static. */
 function Terminal() {
-  return <span aria-hidden className="block h-[9px] w-[9px] rounded-full bg-[var(--accent-vivid)]" />;
+  const reduceMotion = useReducedMotion();
+  return (
+    <span className="relative flex h-[9px] w-[9px] items-center justify-center">
+      {!reduceMotion && (
+        <motion.span
+          aria-hidden
+          className="absolute inline-flex h-full w-full rounded-full bg-[var(--accent-vivid)]"
+          animate={{ scale: [1, 2.2, 1], opacity: [0.5, 0, 0.5] }}
+          transition={{ duration: 2.4, repeat: Infinity, ease: EASE }}
+        />
+      )}
+      <span aria-hidden className="relative block h-[9px] w-[9px] rounded-full bg-[var(--accent-vivid)]" />
+    </span>
+  );
 }
 
 /** A short vertical stub, the fixed-height connective tissue between a
@@ -78,8 +129,12 @@ function Stub({ h = 28 }: { h?: number }) {
 
 /** Splits one line into two, landing on the gutter's own edges — which is
    exactly where the two engine columns begin, so the fork's curves and the
-   card columns always meet regardless of how wide those columns render. */
+   card columns always meet regardless of how wide those columns render. The
+   two curves are drawn once, then a bright pulse travels along each on loop —
+   the two nodes visibly connecting Content Production and Researched
+   Outreach to the same origin and the same outcome. */
 function Fork({ direction }: { direction: 'split' | 'merge' }) {
+  const reduceMotion = useReducedMotion();
   const W = 176;
   const H = 64;
   const d =
@@ -89,8 +144,22 @@ function Fork({ direction }: { direction: 'split' | 'merge' }) {
 
   return (
     <svg aria-hidden viewBox={`0 0 ${W} ${H}`} className={cn(GUTTER, 'hidden md:block')} style={{ height: H }} fill="none" preserveAspectRatio="none">
-      {d.map((path) => (
-        <path key={path} d={path} stroke="var(--accent-ring)" strokeWidth={1} vectorEffect="non-scaling-stroke" />
+      {d.map((path, i) => (
+        <g key={path}>
+          <path d={path} stroke="var(--accent-ring)" strokeWidth={1} vectorEffect="non-scaling-stroke" />
+          {!reduceMotion && (
+            <motion.path
+              d={path}
+              stroke="var(--accent-vivid)"
+              strokeWidth={1.5}
+              strokeLinecap="round"
+              vectorEffect="non-scaling-stroke"
+              strokeDasharray="14 220"
+              animate={{ strokeDashoffset: [0, -234] }}
+              transition={{ duration: 2.6, repeat: Infinity, ease: 'linear', delay: i * 0.5 }}
+            />
+          )}
+        </g>
       ))}
     </svg>
   );
@@ -99,12 +168,17 @@ function Fork({ direction }: { direction: 'split' | 'merge' }) {
 /** The reason two services are one system — shown once, centred between the
    two engines, instead of duplicated as an accent row at the foot of each
    strand. Two short diagonal marks point the statement at the engine it is
-   actually about. */
+   actually about. The whole band lifts slightly on hover, inviting a reader
+   to notice it rather than skim past. */
 function CrossLink() {
   return (
-    <div className={cn(GUTTER, 'relative hidden flex-col items-center justify-center gap-3 py-6 md:flex')}>
+    <motion.div
+      whileHover={{ scale: 1.04 }}
+      transition={{ duration: 0.3, ease: EASE }}
+      className={cn(GUTTER, 'relative hidden flex-col items-center justify-center gap-3 py-6 md:flex')}
+    >
       <span aria-hidden className="absolute inset-y-0 left-1/2 w-px -translate-x-1/2 bg-[var(--accent-ring)]" />
-      <div className="relative flex flex-col items-center gap-2 bg-[var(--surface)] px-2 py-3">
+      <div className="relative flex flex-col items-center gap-2 rounded-2xl bg-[var(--surface)] px-3 py-3 shadow-[0_0_0_1px_var(--accent-ring)]">
         {FRAMEWORK_CROSS.map((line) => (
           <div key={line.id} className="flex items-center gap-1.5">
             {line.dir === 'left' && (
@@ -123,71 +197,85 @@ function CrossLink() {
           </div>
         ))}
       </div>
-    </div>
+    </motion.div>
   );
 }
 
-/** One engine, fully expanded, always. Every real node the track has, read
-   top to bottom — the concrete list a visitor can see without a click. */
-function EngineCard({ track, icon, delay }: { track: FrameworkTrack; icon: React.ReactNode; delay: number }) {
+/** One engine card, its shortlist read top to bottom. Lifts and glows on
+   hover/focus, and each row brightens under the pointer, so the drawing
+   feels like a surface a reader can explore rather than a flat diagram. */
+function EngineCard({
+  label,
+  icon,
+  nodes,
+  outputLabel,
+  side,
+  delay,
+}: {
+  label: string;
+  icon: React.ReactNode;
+  nodes: HomeNode[];
+  outputLabel: string;
+  side: 'left' | 'right';
+  delay: number;
+}) {
+  const [hoveredId, setHoveredId] = useState<string | null>(null);
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 18 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: '-80px' }}
+      whileHover={{ y: -6 }}
       transition={{ duration: 0.55, delay, ease: EASE }}
-      className="flex flex-col rounded-2xl border border-[var(--rule)] bg-[var(--surface)] shadow-[0_10px_30px_color-mix(in_oklch,var(--on-surface)_6%,transparent)]"
+      className="group flex flex-col rounded-2xl border border-[var(--rule)] bg-[var(--surface)] shadow-[0_10px_30px_color-mix(in_oklch,var(--on-surface)_6%,transparent)] transition-shadow duration-300 hover:shadow-[0_24px_48px_color-mix(in_oklch,var(--accent)_18%,transparent)]"
     >
       {/* Header */}
       <div className="flex items-center gap-3 border-b border-[var(--rule)] px-6 py-5">
-        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[var(--accent-wash)] text-[var(--accent)]">
+        <motion.span
+          whileHover={{ rotate: -8, scale: 1.08 }}
+          transition={{ duration: 0.25, ease: EASE }}
+          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[var(--accent-wash)] text-[var(--accent)] transition-colors duration-300 group-hover:bg-[var(--accent-vivid)] group-hover:text-[var(--on-accent)]"
+        >
           {icon}
-        </span>
-        <div className="min-w-0">
-          <h3 className="font-display-sm truncate text-[1.15rem] text-[var(--on-surface)]">{track.label}</h3>
-          <MonoLabel className="text-[var(--muted)]">{track.cadence}</MonoLabel>
-        </div>
+        </motion.span>
+        <h3 className="font-display-sm truncate text-[1.15rem] text-[var(--on-surface)]">{label}</h3>
       </div>
 
-      {/* Every real node, in order */}
+      {/* Shortlist */}
       <ul className="flex flex-col gap-2 px-4 py-4">
-        {track.nodes.map((node, i) => {
-          const isClient = node.owner === 'client';
-          return (
-            <motion.li
-              key={node.id}
-              initial={{ opacity: 0, x: track.side === 'left' ? -10 : 10 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true, margin: '-80px' }}
-              transition={{ duration: 0.4, delay: delay + 0.15 + i * 0.035, ease: EASE }}
+        {nodes.map((node, i) => (
+          <motion.li
+            key={node.id}
+            initial={{ opacity: 0, x: side === 'left' ? -10 : 10 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true, margin: '-80px' }}
+            whileHover={{ x: side === 'left' ? 4 : -4, scale: 1.015 }}
+            onHoverStart={() => setHoveredId(node.id)}
+            onHoverEnd={() => setHoveredId((id) => (id === node.id ? null : id))}
+            transition={{ duration: 0.4, delay: delay + 0.15 + i * 0.035, ease: EASE }}
+            className={cn(
+              'flex items-center gap-3 rounded-lg border px-4 py-2.5 transition-colors duration-200',
+              node.accent
+                ? 'border-[var(--accent-ring)] bg-[var(--accent-wash)]'
+                : 'border-[var(--rule)] bg-[var(--surface-2)] hover:border-[var(--accent-ring)] hover:bg-[var(--accent-wash)]'
+            )}
+          >
+            <span
               className={cn(
-                'flex items-center gap-3 rounded-lg border px-4 py-2.5 transition-colors',
-                isClient
-                  ? 'border-[var(--accent-ring)] bg-[var(--accent-wash)]'
-                  : 'border-[var(--rule)] bg-[var(--surface-2)]'
+                'h-1.5 w-1.5 shrink-0 rounded-full transition-transform duration-200',
+                node.accent ? 'bg-[var(--accent-vivid)]' : 'bg-[var(--rule-strong)]',
+                hoveredId === node.id && 'scale-150 bg-[var(--accent-vivid)]'
               )}
-            >
-              <span
-                className={cn(
-                  'h-1.5 w-1.5 shrink-0 rounded-full',
-                  isClient ? 'bg-[var(--accent-vivid)]' : 'bg-[var(--rule-strong)]'
-                )}
-              />
-              <span className="font-body flex-1 text-[13px] text-[var(--on-surface)]">{node.label}</span>
-              {isClient && (
-                <span className="font-label shrink-0 text-[8.5px] tracking-[0.15em] text-[var(--accent)]">
-                  {ownerTag(node.owner)}
-                </span>
-              )}
-            </motion.li>
-          );
-        })}
+            />
+            <span className="font-body flex-1 text-[13px] text-[var(--on-surface)]">{node.label}</span>
+          </motion.li>
+        ))}
       </ul>
 
       {/* Output */}
       <div className="mt-auto border-t border-[var(--rule)] px-6 py-5">
-        <p className="font-display-sm text-[1.05rem] leading-snug text-[var(--on-surface)]">{track.output.label}</p>
-        <MonoLabel className="mt-1 text-[var(--muted)]">{track.output.metric}</MonoLabel>
+        <p className="font-display-sm text-[1.05rem] leading-snug text-[var(--on-surface)]">{outputLabel}</p>
       </div>
     </motion.div>
   );
@@ -195,10 +283,11 @@ function EngineCard({ track, icon, delay }: { track: FrameworkTrack; icon: React
 
 /** The one thing every phase of both engines is for. Same gradient, rings
    and rocket the process page's own outcome node uses, so the payoff reads
-   as the same idea wherever a visitor meets it on the site. */
+   as the same idea wherever a visitor meets it on the site. Now also lifts
+   and brightens under the pointer. */
 function OutcomeCard() {
   return (
-    <div className="relative mx-auto w-fit">
+    <motion.div whileHover={{ scale: 1.05 }} transition={{ duration: 0.3, ease: EASE }} className="relative mx-auto w-fit">
       <motion.div
         className="pointer-events-none absolute inset-0"
         animate={{ rotate: 360 }}
@@ -236,14 +325,17 @@ function OutcomeCard() {
           animate={{ left: ['-40%', '140%'] }}
           transition={{ duration: 1.1, repeat: Infinity, repeatDelay: 2.6, ease: 'easeInOut', delay: 1 }}
         />
-        <span className="flex h-11 w-11 items-center justify-center rounded-full bg-white/20 text-[var(--on-accent)]">
+        <motion.span
+          whileHover={{ rotate: 12 }}
+          className="flex h-11 w-11 items-center justify-center rounded-full bg-white/20 text-[var(--on-accent)]"
+        >
           <RocketIcon />
-        </span>
+        </motion.span>
         <span className="font-display-sm whitespace-nowrap text-[22px] text-[var(--on-accent)]">
           {FRAMEWORK_OUTCOME.label}
         </span>
       </motion.div>
-    </div>
+    </motion.div>
   );
 }
 
@@ -251,7 +343,19 @@ export default function FrameworkEngines({ className }: { className?: string }) 
   const [content, outreach] = FRAMEWORK_TRACKS;
 
   return (
-    <div className={cn('mx-auto max-w-[1160px] px-6 md:px-10', className)}>
+    <div className={cn('relative mx-auto max-w-[1160px] px-6 md:px-10', className)}>
+      {/* A faint drifting glow behind the whole drawing, purely decorative */}
+      <motion.div
+        aria-hidden
+        className="pointer-events-none absolute -inset-x-10 -inset-y-16 -z-10 opacity-40"
+        animate={{ opacity: [0.25, 0.45, 0.25] }}
+        transition={{ duration: 6, repeat: Infinity, ease: EASE }}
+        style={{
+          background:
+            'radial-gradient(60% 50% at 20% 20%, color-mix(in oklch, var(--accent) 14%, transparent), transparent), radial-gradient(50% 45% at 85% 75%, color-mix(in oklch, var(--color-brand) 12%, transparent), transparent)',
+        }}
+      />
+
       {/* Origin */}
       <div className="flex flex-col items-center">
         <MonoLabel className="text-[var(--muted)]">
@@ -266,9 +370,23 @@ export default function FrameworkEngines({ className }: { className?: string }) 
 
       {/* Two engines, one gutter */}
       <div className="grid grid-cols-1 items-stretch gap-8 md:grid-cols-[1fr_auto_1fr] md:gap-0">
-        <EngineCard track={content} icon={<LayersIcon />} delay={0.1} />
+        <EngineCard
+          label={content.label}
+          icon={<LayersIcon />}
+          nodes={HOME_CONTENT_NODES}
+          outputLabel={content.output.label}
+          side="left"
+          delay={0.1}
+        />
         <CrossLink />
-        <EngineCard track={outreach} icon={<SendIcon />} delay={0.25} />
+        <EngineCard
+          label={outreach.label}
+          icon={<SendIcon />}
+          nodes={HOME_OUTREACH_NODES}
+          outputLabel={outreach.output.label}
+          side="right"
+          delay={0.25}
+        />
       </div>
 
       {/* Mobile cross-link: same statements, no gutter to sit in */}
