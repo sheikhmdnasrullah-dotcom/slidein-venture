@@ -50,7 +50,7 @@ const OUTREACH_LEAVES: Leaf[] = [
    endpoint and a node's rendered center always coincide regardless of the
    container's actual pixel width. */
 const SPACE_W = 1000;
-const SPACE_H = 560;
+const SPACE_H = 640;
 
 const ROOT_Y = 8;
 const SPLIT_Y = 78;
@@ -58,6 +58,9 @@ const HUB_Y = 160;
 const HUB_HALF = 36;
 const LEAF_Y = 460;
 const LEAF_HALF = 42;
+const OUTCOME_Y = 600;
+const OUTCOME_HALF = 40;
+const OUTCOME_X = 500;
 
 const LEAF_MARGIN = 40;
 const LEAF_SLOT = (SPACE_W - 2 * LEAF_MARGIN) / 7;
@@ -85,7 +88,17 @@ const ROOT_TO_CONTENT = fan(500, SPLIT_Y, HUB_X_CONTENT, HUB_Y - HUB_HALF);
 const ROOT_TO_OUTREACH = fan(500, SPLIT_Y, HUB_X_OUTREACH, HUB_Y - HUB_HALF);
 const CONTENT_FANS = LEAF_X.slice(0, 4).map((x) => fan(HUB_X_CONTENT, HUB_Y + HUB_HALF, x, LEAF_Y - LEAF_HALF));
 const OUTREACH_FANS = LEAF_X.slice(4, 8).map((x) => fan(HUB_X_OUTREACH, HUB_Y + HUB_HALF, x, LEAF_Y - LEAF_HALF));
-const ALL_EDGES = [ROOT_STUB, ROOT_TO_CONTENT, ROOT_TO_OUTREACH, ...CONTENT_FANS, ...OUTREACH_FANS];
+/* Each of the 8 leaves converges into the single "More clients, faster"
+   outcome node at the bottom of the diagram. */
+const LEAF_TO_OUTCOME = LEAF_X.map((x) => fan(x, LEAF_Y + LEAF_HALF, OUTCOME_X, OUTCOME_Y - OUTCOME_HALF));
+const ALL_EDGES = [
+  ROOT_STUB,
+  ROOT_TO_CONTENT,
+  ROOT_TO_OUTREACH,
+  ...CONTENT_FANS,
+  ...OUTREACH_FANS,
+  ...LEAF_TO_OUTCOME,
+];
 
 function ArrowIcon() {
   return (
@@ -108,6 +121,14 @@ function SendIcon() {
   return (
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
       <path d="M21 3 3 10.5l7.5 3M21 3l-7.5 18-3-7.5M21 3 10.5 13.5" />
+    </svg>
+  );
+}
+
+function StarIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+      <path d="M12 2.5 14.8 8.2 21 9.1l-4.5 4.4 1 6L12 16.9l-5.5 2.6 1-6L3 9.1l6.2-.9z" />
     </svg>
   );
 }
@@ -362,6 +383,33 @@ export default function ProcessFlowChart({ className }: { className?: string }) 
               onOpen={() => handleAction(leaf.action)}
             />
           ))}
+
+          {/* ── More clients, faster — the outcome every leaf feeds ─────── */}
+          <motion.div
+            initial={{ opacity: 0, y: 20, scale: 0.9 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            transition={{ duration: 0.6, delay: 2.6, ease: EASE }}
+            className="absolute -translate-x-1/2 -translate-y-1/2"
+            style={{ left: pct(OUTCOME_X, SPACE_W), top: pct(OUTCOME_Y, SPACE_H) }}
+          >
+            <div className="relative flex flex-col items-center gap-2 rounded-2xl border-2 border-[var(--color-brand)] bg-[var(--surface)] px-8 py-4 shadow-[0_14px_40px_color-mix(in_oklch,var(--color-ember)_22%,transparent)]">
+              <motion.span
+                className="pointer-events-none absolute inset-0 rounded-2xl border-2 border-[var(--color-brand)]"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: [0, 0.5, 0], scale: [1, 1.06, 1.14] }}
+                transition={{ duration: 2.6, repeat: Infinity, delay: 3, ease: EASE }}
+              />
+              <span className="flex h-10 w-10 items-center justify-center rounded-full bg-[var(--accent-vivid)] text-[var(--on-accent)]">
+                <StarIcon />
+              </span>
+              <span className="font-body whitespace-nowrap text-[17px] font-bold tracking-[-0.01em] text-[var(--on-surface)]">
+                More clients, faster
+              </span>
+              <span className="font-label text-[8.5px] tracking-[0.2em] text-[var(--muted)]">
+                EVERY PHASE FEEDS THIS
+              </span>
+            </div>
+          </motion.div>
         </div>
       </div>
 

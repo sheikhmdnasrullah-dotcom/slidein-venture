@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import MomentThread from '@/components/Steps/proofs/MomentThread';
+import HighlightCutModal from './HighlightCutModal';
 
 const EASE = [0.16, 1, 0.3, 1] as const;
 
@@ -60,6 +60,11 @@ function branchPath(x: number) {
 export default function PostProductionModal({ open, onClose }: { open: boolean; onClose: () => void }) {
   const [highlightCutOpen, setHighlightCutOpen] = useState(false);
 
+  // When the parent closes, reset the highlight cut slide too.
+  useEffect(() => {
+    if (!open) setHighlightCutOpen(false);
+  }, [open]);
+
   useEffect(() => {
     if (open) {
       document.body.style.overflow = 'hidden';
@@ -72,6 +77,7 @@ export default function PostProductionModal({ open, onClose }: { open: boolean; 
   }, [open]);
 
   return (
+    <>
     <AnimatePresence>
       {open && (
         <motion.div
@@ -79,7 +85,7 @@ export default function PostProductionModal({ open, onClose }: { open: boolean; 
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.3, ease: EASE }}
-          className="fixed inset-0 z-[2000] flex items-center justify-center p-4 md:p-8"
+          className="fixed inset-0 z-[1100] flex items-end justify-center md:items-center"
         >
           {/* Backdrop */}
           <motion.div
@@ -96,7 +102,9 @@ export default function PostProductionModal({ open, onClose }: { open: boolean; 
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.92, y: 30 }}
             transition={{ duration: 0.5, ease: EASE }}
-            className="relative flex max-h-[94vh] w-full max-w-[1040px] flex-col overflow-y-auto bg-[var(--color-paper-50)] md:aspect-[16/9] md:max-h-[92vh] md:rounded-[28px] md:border md:border-[var(--rule)] md:shadow-[0_25px_60px_color-mix(in_oklch,var(--color-ink)_25%,transparent)]"
+            className="relative flex max-h-[94vh] w-full flex-col overflow-y-auto bg-[var(--color-paper-50)]
+              md:aspect-[16/9] md:max-h-[92vh] md:w-[min(1120px,94vw)] md:rounded-[28px] md:border md:border-[var(--rule)]
+              md:shadow-[0_25px_60px_color-mix(in_oklch,var(--color-ink)_25%,transparent)]"
           >
             {/* Close button */}
             <button
@@ -219,7 +227,10 @@ export default function PostProductionModal({ open, onClose }: { open: boolean; 
                         className="absolute -translate-x-1/2 -translate-y-1/2"
                         style={{ left: pct(TRUNK_X, SPACE_W), top: pct(TRUNK_Y[item.id], SPACE_H) }}
                       >
-                        <div className={`relative flex items-center gap-3 rounded-xl border border-[var(--rule)] bg-[var(--surface)] px-4 py-3 shadow-[0_6px_20px_color-mix(in_oklch,var(--on-surface)_6%,transparent)] ${isHighlightCut ? 'cursor-pointer' : ''}`}>
+                        <div
+                          onClick={isHighlightCut ? () => setHighlightCutOpen(true) : undefined}
+                          className={`relative flex items-center gap-3 rounded-xl border border-[var(--rule)] bg-[var(--surface)] px-4 py-3 shadow-[0_6px_20px_color-mix(in_oklch,var(--on-surface)_6%,transparent)] ${isHighlightCut ? 'cursor-pointer hover:border-[var(--accent-ring)] transition-colors' : ''}`}
+                        >
                           {isFinal && (
                             <motion.span
                               className="pointer-events-none absolute inset-0 rounded-xl border-2 border-[var(--color-brand)]"
@@ -240,32 +251,14 @@ export default function PostProductionModal({ open, onClose }: { open: boolean; 
                             {item.label}
                           </span>
                           {isHighlightCut && (
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                setHighlightCutOpen((prev) => !prev);
-                              }}
-                              className="ml-1 flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-[var(--muted)] transition-colors hover:text-[var(--on-surface)]"
-                              aria-label={highlightCutOpen ? 'Hide highlight cut visual' : 'View highlight cut visual'}
-                            >
+                            <span className="ml-1 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[var(--accent-wash)] text-[var(--accent)]">
                               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                {highlightCutOpen ? (
-                                  <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" />
-                                ) : (
-                                  <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7z" />
-                                )}
+                                <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7z" />
                                 <circle cx="12" cy="12" r="3" />
                               </svg>
-                            </button>
+                            </span>
                           )}
                         </div>
-                        {isHighlightCut && (
-                          <button
-                            onClick={() => setHighlightCutOpen((prev) => !prev)}
-                            className="absolute inset-0 rounded-xl"
-                            aria-label={highlightCutOpen ? 'Hide highlight cut visual' : 'View highlight cut visual'}
-                          />
-                        )}
                       </motion.div>
                     );
                   })}
@@ -297,63 +290,25 @@ export default function PostProductionModal({ open, onClose }: { open: boolean; 
               <div className="relative md:hidden">
                 <div className="relative flex flex-col gap-2.5 pl-2">
                   <div className="absolute left-[19px] top-3 bottom-3 w-px bg-[var(--rule-strong)]" />
-                  {POST_ITEMS.map((item, i) => {
-                    const isFinal = item.id === 'full-episode-edit';
-                    const isHighlightCut = item.id === 'highlight-cut';
-                    return (
-                      <motion.div
-                        key={item.id}
-                        initial={{ opacity: 0, x: -10 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ duration: 0.4, delay: i * 0.15, ease: EASE }}
-                        className="relative flex items-center gap-3 rounded-lg border border-[var(--rule)] bg-[var(--surface)] px-4 py-3"
-                      >
-                        {isFinal && (
-                          <motion.span
-                            className="pointer-events-none absolute inset-0 rounded-lg border-2 border-[var(--color-brand)]"
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: [0, 0.6, 0], scale: [1, 1.04, 1.08] }}
-                            transition={{ duration: 2.2, repeat: Infinity, delay: 0.6, ease: EASE }}
-                          />
-                        )}
-                        <motion.span
-                          className="h-2 w-2 shrink-0 rounded-full bg-[var(--color-brand)]"
-                          animate={{ scale: [1, 1.4, 1], opacity: [1, 0.6, 1] }}
-                          transition={{ duration: 1.8, repeat: Infinity, delay: i * 0.3, ease: EASE }}
-                        />
-                        <span className="font-label text-[9px] tracking-[0.15em] text-[var(--muted)]">
-                          {item.number}
-                        </span>
-                        <span className="font-body text-[13px] text-[var(--on-surface)]">{item.label}</span>
-                        {isHighlightCut && (
-                          <>
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                setHighlightCutOpen((prev) => !prev);
-                              }}
-                              className="ml-auto flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-[var(--muted)] transition-colors hover:text-[var(--on-surface)]"
-                              aria-label={highlightCutOpen ? 'Hide highlight cut visual' : 'View highlight cut visual'}
-                            >
-                              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                {highlightCutOpen ? (
-                                  <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" />
-                                ) : (
-                                  <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7z" />
-                                )}
-                                <circle cx="12" cy="12" r="3" />
-                              </svg>
-                            </button>
-                            <button
-                              onClick={() => setHighlightCutOpen((prev) => !prev)}
-                              className="absolute inset-0 rounded-lg"
-                              aria-label={highlightCutOpen ? 'Hide highlight cut visual' : 'View highlight cut visual'}
-                            />
-                          </>
-                        )}
-                      </motion.div>
-                    );
-                  })}
+                  {POST_ITEMS.map((item, i) => (
+                    <motion.div
+                      key={item.id}
+                      initial={{ opacity: 0, x: -10 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ duration: 0.4, delay: i * 0.15, ease: EASE }}
+                      className="relative flex items-center gap-3 rounded-lg border border-[var(--rule)] bg-[var(--surface)] px-4 py-3"
+                    >
+                      <motion.span
+                        className="h-2 w-2 shrink-0 rounded-full bg-[var(--color-brand)]"
+                        animate={{ scale: [1, 1.4, 1], opacity: [1, 0.6, 1] }}
+                        transition={{ duration: 1.8, repeat: Infinity, delay: i * 0.3, ease: EASE }}
+                      />
+                      <span className="font-label text-[9px] tracking-[0.15em] text-[var(--muted)]">
+                        {item.number}
+                      </span>
+                      <span className="font-body text-[13px] text-[var(--on-surface)]">{item.label}</span>
+                    </motion.div>
+                  ))}
                 </div>
 
                 <motion.div
@@ -386,24 +341,15 @@ export default function PostProductionModal({ open, onClose }: { open: boolean; 
                   ))}
                 </div>
               </div>
-
-              <AnimatePresence>
-                {highlightCutOpen && (
-                  <motion.div
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: 10 }}
-                    transition={{ duration: 0.35, ease: EASE }}
-                    className="mt-10"
-                  >
-                    <MomentThread />
-                  </motion.div>
-                )}
-              </AnimatePresence>
             </div>
           </motion.div>
         </motion.div>
       )}
     </AnimatePresence>
+
+    {/* The highlight cut opens as its own slide above this one — same size,
+        smooth dissolve in, and its own interactive story. */}
+    <HighlightCutModal open={highlightCutOpen} onClose={() => setHighlightCutOpen(false)} />
+    </>
   );
 }

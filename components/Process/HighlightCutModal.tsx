@@ -2,16 +2,16 @@
 
 import { useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import DistributionSlide from '@/components/PitchDeck/DistributionSlide';
+import HighlightCutSlide from './HighlightCutSlide';
 
 const EASE = [0.16, 1, 0.3, 1] as const;
 
-interface DistributionModalProps {
+interface HighlightCutModalProps {
   open: boolean;
   onClose: () => void;
 }
 
-export default function DistributionModal({ open, onClose }: DistributionModalProps) {
+export default function HighlightCutModal({ open, onClose }: HighlightCutModalProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -34,35 +34,35 @@ export default function DistributionModal({ open, onClose }: DistributionModalPr
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.3, ease: EASE }}
-          className="fixed inset-0 z-[1100] flex items-end justify-center md:items-center"
+          className="fixed inset-0 z-[1200] flex items-end justify-center md:items-center"
           role="dialog"
           aria-modal="true"
-          aria-label="Content distribution"
+          aria-label="The Highlight Cut"
         >
-          {/* Backdrop */}
+          {/* Backdrop — darker so it reads as a layer above the post-production slide */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="absolute inset-0 bg-black/40 backdrop-blur-sm"
+            className="absolute inset-0 bg-black/60 backdrop-blur-md"
             onClick={onClose}
           />
 
-          {/* 16:9 slide panel — scrolls its own content on desktop, full-sheet on mobile */}
+          {/* 16:9 slide panel — same size as every other slide */}
           <motion.div
             ref={scrollRef}
-            initial={{ opacity: 0, y: 40, scale: 0.98 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 40, scale: 0.98 }}
-            transition={{ duration: 0.45, ease: EASE }}
+            initial={{ opacity: 0, scale: 0.94, y: 30 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.94, y: 30 }}
+            transition={{ duration: 0.5, ease: EASE }}
             className="relative flex max-h-[94vh] w-full flex-col overflow-y-auto bg-[var(--color-paper-50)]
               md:aspect-[16/9] md:max-h-[92vh] md:w-[min(1120px,94vw)] md:rounded-[28px] md:border md:border-[var(--rule)]
               md:shadow-[0_25px_60px_color-mix(in_oklch,var(--color-ink)_25%,transparent)]"
           >
             {/* Sticky header */}
             <div className="sticky top-0 z-10 flex items-center justify-between gap-4 bg-[var(--color-paper-50)]/85 px-5 py-4 backdrop-blur-sm md:px-8">
-              <span className="font-label text-[10px] tracking-[0.2em] text-[var(--muted)] uppercase">
-                Distribution
+              <span className="font-label text-[10px] tracking-[0.2em] text-[var(--accent)] uppercase">
+                Post-production · The Highlight Cut
               </span>
               <button
                 onClick={onClose}
@@ -75,8 +75,8 @@ export default function DistributionModal({ open, onClose }: DistributionModalPr
               </button>
             </div>
 
-            <div className="px-4 pb-4 pt-2 md:px-6 md:pb-6">
-              <DistributionSlide />
+            <div className="px-6 py-8 md:px-10 md:py-10">
+              <HighlightCutSlide />
             </div>
           </motion.div>
         </motion.div>
@@ -84,4 +84,3 @@ export default function DistributionModal({ open, onClose }: DistributionModalPr
     </AnimatePresence>
   );
 }
-
