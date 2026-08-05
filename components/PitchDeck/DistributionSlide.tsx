@@ -177,10 +177,10 @@ function ClusterCard({ c, i, dimmed }: { c: Cluster; i: number; dimmed: boolean 
       {/* cable port on the left edge */}
       <circle cx={c.x} cy={c.entryY} r={4} fill="var(--accent-vivid)" filter="url(#cdGlow)" />
       <circle cx={c.x} cy={c.entryY} r={8} fill="none" stroke="var(--accent-vivid)" strokeOpacity={0.3} strokeWidth={1} />
-       {/* cluster header */}
-       <circle cx={c.x + 24} cy={c.y + 31} r={3.2} fill="var(--accent-vivid)" />
-       <text x={c.x + 38} y={c.y + 35} className="cd-cluster-title">{c.title.toUpperCase()}</text>
-       <line x1={c.x + 24} y1={c.y + 50} x2={c.x + c.w - 24} y2={c.y + 50} stroke="var(--rule)" strokeWidth={1} />
+      {/* cluster header */}
+      <circle cx={c.x + 24} cy={c.y + 31} r={3.2} fill="var(--accent-vivid)" />
+      <text x={c.x + 38} y={c.y + 35} className="cd-cluster-title">{c.title.toUpperCase()}</text>
+      <line x1={c.x + 24} y1={c.y + 50} x2={c.x + c.w - 24} y2={c.y + 50} stroke="var(--rule)" strokeWidth={1} />
       {c.items.map((it, k) => (
         <PlatformIcon key={it.name} cx={start + k * gap} cy={cy} r={iconR} item={it} />
       ))}
@@ -384,7 +384,7 @@ export default function DistributionSlide() {
         .cd-col-head { font-size: 10.5px; letter-spacing: .22em; fill: var(--muted); font-weight: 600; }
         .cd-item-label { font-size: 10px; letter-spacing: .04em; fill: var(--muted); font-weight: 500; }
          .cd-cluster-title { font-size: 10.5px; letter-spacing: .22em; fill: var(--muted); font-weight: 600; }
-        .cd-stage { font-size: 10px; letter-spacing: .24em; fill: var(--muted); font-weight: 600; }
+         .cd-stage { font-size: 10px; letter-spacing: .24em; fill: var(--muted); font-weight: 600; }
 
         @media (prefers-reduced-motion: reduce) {
           .cd-flow, .cd-ring-slow { animation: none; }
