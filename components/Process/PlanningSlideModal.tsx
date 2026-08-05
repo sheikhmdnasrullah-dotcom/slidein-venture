@@ -1,8 +1,9 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import PlanningSlide from './PlanningSlide';
+import FitScale from './FitScale';
 
 const EASE = [0.16, 1, 0.3, 1] as const;
 
@@ -12,12 +13,9 @@ interface PlanningSlideModalProps {
 }
 
 export default function PlanningSlideModal({ open, onClose }: PlanningSlideModalProps) {
-  const scrollRef = useRef<HTMLDivElement>(null);
-
   useEffect(() => {
     if (open) {
       document.body.style.overflow = 'hidden';
-      scrollRef.current?.scrollTo({ top: 0 });
     } else {
       document.body.style.overflow = '';
     }
@@ -53,17 +51,16 @@ export default function PlanningSlideModal({ open, onClose }: PlanningSlideModal
               content-driven), locked 16:9 on desktop — so all eight sit in
               the exact same box regardless of how much content is inside. */}
           <motion.div
-            ref={scrollRef}
             initial={{ opacity: 0, y: 40, scale: 0.98 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 40, scale: 0.98 }}
             transition={{ duration: 0.45, ease: EASE }}
-            className="relative flex h-[88dvh] w-full flex-col overflow-y-auto bg-[var(--color-paper-50)]
+            className="relative flex h-[88dvh] w-full flex-col overflow-hidden bg-[var(--color-paper-50)]
               md:h-auto md:aspect-[16/9] md:max-h-[92vh] md:w-[min(1120px,94vw)] md:rounded-[28px] md:border md:border-[var(--rule)]
               md:shadow-[0_25px_60px_color-mix(in_oklch,var(--color-ink)_25%,transparent)]"
           >
-            {/* Sticky header */}
-            <div className="sticky top-0 z-10 flex items-center justify-between gap-4 bg-[var(--color-paper-50)]/85 px-5 py-4 backdrop-blur-sm md:px-8">
+            {/* Header */}
+            <div className="z-10 flex items-center justify-between gap-4 bg-[var(--color-paper-50)]/85 px-5 py-4 backdrop-blur-sm md:px-8">
               <span className="font-label text-[10px] tracking-[0.2em] text-[var(--muted)] uppercase">
                 Planning
               </span>
@@ -78,22 +75,26 @@ export default function PlanningSlideModal({ open, onClose }: PlanningSlideModal
               </button>
             </div>
 
-            <div className="px-4 pb-12 pt-2 md:px-8 md:pb-10">
-              {/* Planning step detail cards */}
-              <div className="mx-auto max-w-[820px]">
-                <div className="flex items-center gap-4">
-                  <span className="h-px flex-1 bg-[var(--rule)]" aria-hidden />
-                  <span className="font-label text-[10px] tracking-[0.25em] text-[var(--accent)] uppercase">
-                    Before the camera
-                  </span>
-                  <span className="h-px flex-1 bg-[var(--rule)]" aria-hidden />
-                </div>
+            <div className="min-h-0 flex-1">
+              <FitScale className="h-full">
+                <div className="px-4 pb-12 pt-2 md:px-8 md:pb-10">
+                  {/* Planning step detail cards */}
+                  <div className="mx-auto max-w-[820px]">
+                    <div className="flex items-center gap-4">
+                      <span className="h-px flex-1 bg-[var(--rule)]" aria-hidden />
+                      <span className="font-label text-[10px] tracking-[0.25em] text-[var(--accent)] uppercase">
+                        Before the camera
+                      </span>
+                      <span className="h-px flex-1 bg-[var(--rule)]" aria-hidden />
+                    </div>
 
-                {/* The step list with rich detail */}
-                <div className="mt-8">
-                  <PlanningSlide />
+                    {/* The step list with rich detail */}
+                    <div className="mt-8">
+                      <PlanningSlide />
+                    </div>
+                  </div>
                 </div>
-              </div>
+              </FitScale>
             </div>
           </motion.div>
         </motion.div>

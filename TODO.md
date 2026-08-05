@@ -1,9 +1,12 @@
-# Task: Distribution modal on Process page
+# TODO: Fit all 8 process modal slides fully on screen without scrolling
 
-- [x] Explore files (ProcessFlowChart, DistributionSlide, Solutions page)
-- [x] Create `components/Process/DistributionModal.tsx` (16:9 slide, merged distribution system + dashboard, scrolling reveal animation)
-- [x] Wire `distributionOpen` state & button in `ProcessFlowChart.tsx`
-- [x] Render `<DistributionModal>` in ProcessFlowChart
-- [x] Verify with build/dev server
-- [x] Create 16:9 outreach slide modals for The Infrastructure, The Fuel, The Script, The Launch importing steps-page proof artifacts (DnsRecordCard, LeadCard, EmailProvenance, MetricsPanel)
-- [x] Wire outreach phase slides into ProcessFlowChart with scroll-reveal animation
+## Steps
+- [x] Explore and understand all modal components
+- [x] Create `components/Process/FitScale.tsx` reusable scale-to-fit component
+- [x] Update `PlanningSlideModal.tsx` to use FitScale
+- [x] Update `ExecutionSlideModal.tsx` to use FitScale
+- [x] Update `PostProductionModal.tsx` to use FitScale
+- [x] Update `DistributionModal.tsx` to use FitScale
+- [x] Update `HighlightCutModal.tsx` to use FitScale
+- [x] Update `OutreachSlideModal.tsx` to use FitScale
+- [ ] Verify all 8 buttons open slides that fit fully on screen without scrolling (blocked: node_modules missing, npm unavailable)

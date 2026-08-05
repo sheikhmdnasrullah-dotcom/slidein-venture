@@ -1,8 +1,9 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import HighlightCutSlide from './HighlightCutSlide';
+import FitScale from './FitScale';
 
 const EASE = [0.16, 1, 0.3, 1] as const;
 
@@ -12,12 +13,9 @@ interface HighlightCutModalProps {
 }
 
 export default function HighlightCutModal({ open, onClose }: HighlightCutModalProps) {
-  const scrollRef = useRef<HTMLDivElement>(null);
-
   useEffect(() => {
     if (open) {
       document.body.style.overflow = 'hidden';
-      scrollRef.current?.scrollTo({ top: 0 });
     } else {
       document.body.style.overflow = '';
     }
@@ -52,17 +50,16 @@ export default function HighlightCutModal({ open, onClose }: HighlightCutModalPr
           {/* Same frame as every other slide: fixed height on mobile, locked
               16:9 on desktop. */}
           <motion.div
-            ref={scrollRef}
             initial={{ opacity: 0, scale: 0.94, y: 30 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.94, y: 30 }}
             transition={{ duration: 0.5, ease: EASE }}
-            className="relative flex h-[88dvh] w-full flex-col overflow-y-auto bg-[var(--color-paper-50)]
+            className="relative flex h-[88dvh] w-full flex-col overflow-hidden bg-[var(--color-paper-50)]
               md:h-auto md:aspect-[16/9] md:max-h-[92vh] md:w-[min(1120px,94vw)] md:rounded-[28px] md:border md:border-[var(--rule)]
               md:shadow-[0_25px_60px_color-mix(in_oklch,var(--color-ink)_25%,transparent)]"
           >
-            {/* Sticky header */}
-            <div className="sticky top-0 z-10 flex items-center justify-between gap-4 bg-[var(--color-paper-50)]/85 px-5 py-4 backdrop-blur-sm md:px-8">
+            {/* Header */}
+            <div className="z-10 flex items-center justify-between gap-4 bg-[var(--color-paper-50)]/85 px-5 py-4 backdrop-blur-sm md:px-8">
               <span className="font-label text-[10px] tracking-[0.2em] text-[var(--accent)] uppercase">
                 Post-production · The Highlight Cut
               </span>
@@ -77,8 +74,12 @@ export default function HighlightCutModal({ open, onClose }: HighlightCutModalPr
               </button>
             </div>
 
-            <div className="px-6 py-8 md:px-10 md:py-10">
-              <HighlightCutSlide />
+            <div className="min-h-0 flex-1">
+              <FitScale className="h-full">
+                <div className="px-6 py-8 md:px-10 md:py-10">
+                  <HighlightCutSlide />
+                </div>
+              </FitScale>
             </div>
           </motion.div>
         </motion.div>

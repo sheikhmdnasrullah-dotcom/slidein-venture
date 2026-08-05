@@ -12,11 +12,11 @@ import ExecutionSlideModal from './ExecutionSlideModal';
 const EASE = [0.16, 1, 0.3, 1] as const;
 
 /* ── Content ──────────────────────────────────────────────────────────────
-   Root -> two engines -> four phases each -> the result that phase produces
-   -> all eight results converge on the one outcome the whole system exists
-   for. The two engines: Content Production and Researched Outreach — the
-   name the rest of the site settled on once "Manual Outreach" read as
-   inefficiency rather than as the verified-research claim it actually is. */
+   Root -> two engines -> four phases each -> all eight phases converge on
+   the one outcome the whole system exists for. The two engines: Content
+   Production and Researched Outreach — the name the rest of the site
+   settled on once "Manual Outreach" read as inefficiency rather than as the
+   verified-research claim it actually is. */
 
 type LeafAction =
   | { kind: 'planning' }
@@ -28,44 +28,39 @@ type LeafAction =
 interface Leaf {
   id: string;
   label: string;
-  result: string;
   action: LeafAction;
 }
 
 const CONTENT_LEAVES: Leaf[] = [
-  { id: 'planning', label: 'Planning', result: 'Script Locked', action: { kind: 'planning' } },
-  { id: 'execution', label: 'Execution', result: 'Session Captured', action: { kind: 'execution' } },
-  { id: 'post', label: 'Post-production', result: 'Polished Episode', action: { kind: 'post' } },
-  { id: 'distribution', label: 'Distribution', result: 'Content Live', action: { kind: 'distribution' } },
+  { id: 'planning', label: 'Planning', action: { kind: 'planning' } },
+  { id: 'execution', label: 'Execution', action: { kind: 'execution' } },
+  { id: 'post', label: 'Post-production', action: { kind: 'post' } },
+  { id: 'distribution', label: 'Distribution', action: { kind: 'distribution' } },
 ];
 
 const OUTREACH_LEAVES: Leaf[] = [
-  { id: 'infrastructure', label: 'The Infrastructure', result: 'Inbox Warmed', action: { kind: 'outreach', phaseId: 'fortress' } },
-  { id: 'fuel', label: 'The Fuel', result: 'Verified Leads', action: { kind: 'outreach', phaseId: 'fuel' } },
-  { id: 'script', label: 'The Script', result: 'Copy Personalized', action: { kind: 'outreach', phaseId: 'script' } },
-  { id: 'launch', label: 'The Launch', result: 'Replies Incoming', action: { kind: 'outreach', phaseId: 'launch' } },
+  { id: 'infrastructure', label: 'The Infrastructure', action: { kind: 'outreach', phaseId: 'fortress' } },
+  { id: 'fuel', label: 'The Fuel', action: { kind: 'outreach', phaseId: 'fuel' } },
+  { id: 'script', label: 'The Script', action: { kind: 'outreach', phaseId: 'script' } },
+  { id: 'launch', label: 'The Launch', action: { kind: 'outreach', phaseId: 'launch' } },
 ];
 
-const ALL_LEAVES = [...CONTENT_LEAVES, ...OUTREACH_LEAVES];
-
 /* ── Shared coordinate space ─────────────────────────────────────────────
-   1000 x 800. The SVG (preserveAspectRatio="none") and the HTML node overlay
+   1000 x 700. The SVG (preserveAspectRatio="none") and the HTML node overlay
    (positioned in %) both map onto it, via an aspect-ratio box, so a curve's
    endpoint and a node's rendered center always coincide regardless of the
    container's actual pixel width. */
 const SPACE_W = 1000;
-const SPACE_H = 800;
+const SPACE_H = 700;
 
 const ROOT_Y = 8;
-const SPLIT_Y = 70;
-const HUB_Y = 150;
-const HUB_HALF = 34;
-const LEAF_Y = 370;
-const LEAF_HALF = 40;
-const RESULT_Y = 560;
-const RESULT_HALF = 32;
-const OUTCOME_Y = 730;
-const OUTCOME_HALF = 46;
+const SPLIT_Y = 78;
+const HUB_Y = 165;
+const HUB_HALF = 36;
+const LEAF_Y = 460;
+const LEAF_HALF = 42;
+const OUTCOME_Y = 615;
+const OUTCOME_HALF = 58;
 const OUTCOME_X = 500;
 
 const LEAF_MARGIN = 40;
@@ -93,32 +88,14 @@ const ROOT_TO_CONTENT = fan(500, SPLIT_Y, HUB_X_CONTENT, HUB_Y - HUB_HALF);
 const ROOT_TO_OUTREACH = fan(500, SPLIT_Y, HUB_X_OUTREACH, HUB_Y - HUB_HALF);
 const CONTENT_FANS = LEAF_X.slice(0, 4).map((x) => fan(HUB_X_CONTENT, HUB_Y + HUB_HALF, x, LEAF_Y - LEAF_HALF));
 const OUTREACH_FANS = LEAF_X.slice(4, 8).map((x) => fan(HUB_X_OUTREACH, HUB_Y + HUB_HALF, x, LEAF_Y - LEAF_HALF));
-/* Each leaf drops straight down into its own result — the thing that phase
-   actually produces — before all eight results converge on one outcome. */
-const LEAF_TO_RESULT = LEAF_X.map((x) => fan(x, LEAF_Y + LEAF_HALF, x, RESULT_Y - RESULT_HALF));
-const RESULT_TO_OUTCOME = LEAF_X.map((x) => fan(x, RESULT_Y + RESULT_HALF, OUTCOME_X, OUTCOME_Y - OUTCOME_HALF));
-const ALL_EDGES = [
-  ROOT_STUB,
-  ROOT_TO_CONTENT,
-  ROOT_TO_OUTREACH,
-  ...CONTENT_FANS,
-  ...OUTREACH_FANS,
-  ...LEAF_TO_RESULT,
-  ...RESULT_TO_OUTCOME,
-];
+/* All eight leaves converge directly on the single outcome. */
+const LEAF_TO_OUTCOME = LEAF_X.map((x) => fan(x, LEAF_Y + LEAF_HALF, OUTCOME_X, OUTCOME_Y - OUTCOME_HALF));
+const ALL_EDGES = [ROOT_STUB, ROOT_TO_CONTENT, ROOT_TO_OUTREACH, ...CONTENT_FANS, ...OUTREACH_FANS, ...LEAF_TO_OUTCOME];
 
 function ArrowIcon() {
   return (
     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
       <path d="M7 17 17 7M8 7h9v9" />
-    </svg>
-  );
-}
-
-function CheckIcon() {
-  return (
-    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M4 12.5 9.5 18 20 6" />
     </svg>
   );
 }
@@ -216,32 +193,6 @@ function LeafNode({ x, leaf, delay, onOpen }: { x: number; leaf: Leaf; delay: nu
   );
 }
 
-/* ── Result node — same card language as the leaves, one tier down. Not a
-   button: it's what that phase produces, marked done rather than clickable. */
-function ResultNode({ x, label, delay }: { x: number; label: string; delay: number }) {
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 16, scale: 0.85 }}
-      animate={{ opacity: 1, y: 0, scale: 1 }}
-      transition={{ duration: 0.5, delay, ease: EASE }}
-      className="absolute -translate-x-1/2 -translate-y-1/2"
-      style={{ left: pct(x, SPACE_W), top: pct(RESULT_Y, SPACE_H), width: `${LEAF_WIDTH_PCT}%` }}
-    >
-      <div className="flex w-full flex-col items-center gap-2 rounded-xl border border-[var(--rule)] bg-[var(--surface-2)] px-2.5 py-3 text-center">
-        <motion.span
-          className="h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--color-brand)]"
-          animate={{ scale: [1, 1.4, 1], opacity: [1, 0.6, 1] }}
-          transition={{ duration: 1.8, repeat: Infinity, delay: delay * 0.4, ease: EASE }}
-        />
-        <span className="font-body text-[12px] leading-snug text-[var(--on-surface)]">{label}</span>
-        <span className="flex h-5 w-5 items-center justify-center rounded-full bg-[var(--accent-wash)] text-[var(--accent)]">
-          <CheckIcon />
-        </span>
-      </div>
-    </motion.div>
-  );
-}
-
 /* ── Outcome — the one thing every phase is for. Deliberately unlike every
    other node: gradient fill, a halo of pulsing rings, orbiting sparks and a
    light sweep across the label, so the payoff of the whole diagram reads as
@@ -289,9 +240,6 @@ function OutcomeNode({ delay }: { delay: number }) {
         </span>
         <span className="font-display-sm whitespace-nowrap text-[20px] text-[var(--on-accent)]">
           More clients, faster
-        </span>
-        <span className="font-label text-[8.5px] tracking-[0.22em] text-[var(--on-accent)]/75">
-          EVERY PHASE FEEDS THIS
         </span>
       </div>
     </div>
@@ -442,18 +390,7 @@ export default function ProcessFlowChart({ className }: { className?: string }) 
                 transition={{ duration: 0.6, delay: 1.25 + (i % 4) * 0.09, ease: EASE }}
               />
             ))}
-            {LEAF_TO_RESULT.map((d, i) => (
-              <motion.path
-                key={`result-line-${i}`}
-                d={d}
-                stroke="var(--rule-strong)"
-                strokeWidth={2}
-                initial={{ pathLength: 0, opacity: 0 }}
-                animate={{ pathLength: 1, opacity: 1 }}
-                transition={{ duration: 0.4, delay: 2.6 + i * 0.08, ease: EASE }}
-              />
-            ))}
-            {RESULT_TO_OUTCOME.map((d, i) => (
+            {LEAF_TO_OUTCOME.map((d, i) => (
               <motion.path
                 key={`outcome-fan-${i}`}
                 d={d}
@@ -461,7 +398,7 @@ export default function ProcessFlowChart({ className }: { className?: string }) 
                 strokeWidth={2}
                 initial={{ pathLength: 0, opacity: 0 }}
                 animate={{ pathLength: 1, opacity: 1 }}
-                transition={{ duration: 0.55, delay: 3.9 + i * 0.08, ease: EASE }}
+                transition={{ duration: 0.65, delay: 2.1 + i * 0.08, ease: EASE }}
               />
             ))}
 
@@ -476,8 +413,8 @@ export default function ProcessFlowChart({ className }: { className?: string }) 
                 initial={{ opacity: 0 }}
                 animate={{ strokeDashoffset: [0, -960], opacity: 1 }}
                 transition={{
-                  opacity: { duration: 0.4, delay: 5.3 + i * 0.05 },
-                  strokeDashoffset: { duration: 3.2, repeat: Infinity, ease: 'linear', delay: 5.3 + i * 0.05 },
+                  opacity: { duration: 0.4, delay: 3.2 + i * 0.06 },
+                  strokeDashoffset: { duration: 3.2, repeat: Infinity, ease: 'linear', delay: 3.2 + i * 0.06 },
                 }}
               />
             ))}
@@ -505,19 +442,15 @@ export default function ProcessFlowChart({ className }: { className?: string }) 
             />
           ))}
 
-          {ALL_LEAVES.map((leaf, i) => (
-            <ResultNode key={`result-${leaf.id}`} x={LEAF_X[i]} label={leaf.result} delay={3.0 + i * 0.08} />
-          ))}
-
-          {/* ── More clients, faster — the outcome every result feeds ────── */}
+          {/* ── More clients, faster — the outcome every leaf feeds ─────── */}
           <motion.div
             initial={{ opacity: 0, y: 20, scale: 0.9 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
-            transition={{ duration: 0.6, delay: 4.9, ease: EASE }}
+            transition={{ duration: 0.6, delay: 3.1, ease: EASE }}
             className="absolute -translate-x-1/2 -translate-y-1/2"
             style={{ left: pct(OUTCOME_X, SPACE_W), top: pct(OUTCOME_Y, SPACE_H) }}
           >
-            <OutcomeNode delay={5.4} />
+            <OutcomeNode delay={3.6} />
           </motion.div>
         </div>
       </div>
@@ -539,41 +472,14 @@ export default function ProcessFlowChart({ className }: { className?: string }) 
           onOpen={(leaf) => handleAction(leaf.action)}
         />
 
-        {/* The eight results, same tier the desktop tree shows between the
-            leaves and the outcome. */}
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4, delay: 1.05, ease: EASE }}
-          className="flex flex-col items-center gap-2"
-        >
-          <span className="font-label text-[8.5px] tracking-[0.22em] text-[var(--muted)]">Which produce</span>
-          <div className="flex flex-wrap justify-center gap-2 px-2">
-            {ALL_LEAVES.map((leaf, i) => (
-              <motion.span
-                key={leaf.id}
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.35, delay: 1.15 + i * 0.05, ease: EASE }}
-                className="flex items-center gap-1.5 rounded-full border border-[var(--rule)] bg-[var(--surface-2)] px-3 py-1.5"
-              >
-                <span className="flex h-4 w-4 items-center justify-center rounded-full bg-[var(--accent-wash)] text-[var(--accent)]">
-                  <CheckIcon />
-                </span>
-                <span className="font-body text-[11px] text-[var(--on-surface)]">{leaf.result}</span>
-              </motion.span>
-            ))}
-          </div>
-        </motion.div>
-
         {/* Both tracks converge here, same as the desktop tree's outcome node. */}
         <motion.div
           initial={{ opacity: 0, y: 16, scale: 0.94 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
-          transition={{ duration: 0.5, delay: 1.7, ease: EASE }}
+          transition={{ duration: 0.5, delay: 1.1, ease: EASE }}
           className="mx-auto"
         >
-          <OutcomeNode delay={2.2} />
+          <OutcomeNode delay={1.6} />
         </motion.div>
       </div>
 

@@ -56,6 +56,16 @@ export default function Home() {
         />
         <FrameworkThread className="mt-16 md:mt-20" />
       </Section>
+
+      <div className="relative min-h-[640px] overflow-hidden">
+        <InputSlide />
+      </div>
+
+      <YourPart className="mt-20" />
+
+      <div className="mt-20">
+        <GrowthLoopSlide />
+      </div>
     </>
   );
 }
