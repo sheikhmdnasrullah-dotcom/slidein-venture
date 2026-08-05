@@ -210,6 +210,7 @@ export default function PostProductionModal({ open, onClose }: { open: boolean; 
                   {/* Main chain nodes */}
                   {POST_ITEMS.map((item, i) => {
                     const isFinal = item.id === 'full-episode-edit';
+                    const isHighlightCut = item.id === 'highlight-cut';
                     return (
                       <motion.div
                         key={item.id}
@@ -219,7 +220,7 @@ export default function PostProductionModal({ open, onClose }: { open: boolean; 
                         className="absolute -translate-x-1/2 -translate-y-1/2"
                         style={{ left: pct(TRUNK_X, SPACE_W), top: pct(TRUNK_Y[item.id], SPACE_H) }}
                       >
-                        <div className="relative flex items-center gap-3 rounded-xl border border-[var(--rule)] bg-[var(--surface)] px-4 py-3 shadow-[0_6px_20px_color-mix(in_oklch,var(--on-surface)_6%,transparent)]">
+                        <div className={`relative flex items-center gap-3 rounded-xl border border-[var(--rule)] bg-[var(--surface)] px-4 py-3 shadow-[0_6px_20px_color-mix(in_oklch,var(--on-surface)_6%,transparent)] ${isHighlightCut ? 'cursor-pointer' : ''}`}>
                           {isFinal && (
                             <motion.span
                               className="pointer-events-none absolute inset-0 rounded-xl border-2 border-[var(--color-brand)]"
@@ -239,7 +240,33 @@ export default function PostProductionModal({ open, onClose }: { open: boolean; 
                           <span className="font-body whitespace-nowrap text-[13px] text-[var(--on-surface)]">
                             {item.label}
                           </span>
+                          {isHighlightCut && (
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setHighlightCutOpen((prev) => !prev);
+                              }}
+                              className="ml-1 flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-[var(--muted)] transition-colors hover:text-[var(--on-surface)]"
+                              aria-label={highlightCutOpen ? 'Hide highlight cut visual' : 'View highlight cut visual'}
+                            >
+                              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                {highlightCutOpen ? (
+                                  <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" />
+                                ) : (
+                                  <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7z" />
+                                )}
+                                <circle cx="12" cy="12" r="3" />
+                              </svg>
+                            </button>
+                          )}
                         </div>
+                        {isHighlightCut && (
+                          <button
+                            onClick={() => setHighlightCutOpen((prev) => !prev)}
+                            className="absolute inset-0 rounded-xl"
+                            aria-label={highlightCutOpen ? 'Hide highlight cut visual' : 'View highlight cut visual'}
+                          />
+                        )}
                       </motion.div>
                     );
                   })}
@@ -273,6 +300,7 @@ export default function PostProductionModal({ open, onClose }: { open: boolean; 
                   <div className="absolute left-[19px] top-3 bottom-3 w-px bg-[var(--rule-strong)]" />
                   {POST_ITEMS.map((item, i) => {
                     const isFinal = item.id === 'full-episode-edit';
+                    const isHighlightCut = item.id === 'highlight-cut';
                     return (
                       <motion.div
                         key={item.id}
@@ -298,6 +326,32 @@ export default function PostProductionModal({ open, onClose }: { open: boolean; 
                           {item.number}
                         </span>
                         <span className="font-body text-[13px] text-[var(--on-surface)]">{item.label}</span>
+                        {isHighlightCut && (
+                          <>
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setHighlightCutOpen((prev) => !prev);
+                              }}
+                              className="ml-auto flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-[var(--muted)] transition-colors hover:text-[var(--on-surface)]"
+                              aria-label={highlightCutOpen ? 'Hide highlight cut visual' : 'View highlight cut visual'}
+                            >
+                              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                {highlightCutOpen ? (
+                                  <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" />
+                                ) : (
+                                  <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7z" />
+                                )}
+                                <circle cx="12" cy="12" r="3" />
+                              </svg>
+                            </button>
+                            <button
+                              onClick={() => setHighlightCutOpen((prev) => !prev)}
+                              className="absolute inset-0 rounded-lg"
+                              aria-label={highlightCutOpen ? 'Hide highlight cut visual' : 'View highlight cut visual'}
+                            />
+                          </>
+                        )}
                       </motion.div>
                     );
                   })}
@@ -333,6 +387,20 @@ export default function PostProductionModal({ open, onClose }: { open: boolean; 
                   ))}
                 </div>
               </div>
+
+              <AnimatePresence>
+                {highlightCutOpen && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 10 }}
+                    transition={{ duration: 0.35, ease: EASE }}
+                    className="mt-10"
+                  >
+                    <MomentThread />
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
           </motion.div>
         </motion.div>

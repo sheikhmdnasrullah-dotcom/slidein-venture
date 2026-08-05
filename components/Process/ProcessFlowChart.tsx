@@ -60,10 +60,17 @@ const LEAF_Y = 460;
 const LEAF_HALF = 42;
 
 const LEAF_MARGIN = 40;
-const LEAF_X = Array.from({ length: 8 }, (_, i) => LEAF_MARGIN + i * ((SPACE_W - 2 * LEAF_MARGIN) / 7));
+const LEAF_SLOT = (SPACE_W - 2 * LEAF_MARGIN) / 7;
+const LEAF_X = Array.from({ length: 8 }, (_, i) => LEAF_MARGIN + i * LEAF_SLOT);
 const avg = (arr: number[]) => arr.reduce((a, b) => a + b, 0) / arr.length;
 const HUB_X_CONTENT = avg(LEAF_X.slice(0, 4));
 const HUB_X_OUTREACH = avg(LEAF_X.slice(4, 8));
+
+/* Node width has to be a fraction of the SAME coordinate space its position
+   is expressed in — a fixed rem width sized for the widest possible container
+   (max-w-[1200px], full LEAF_SLOT spacing) still overlaps its neighbour at any
+   narrower one, which is exactly what happened at md/lg widths before this. */
+const LEAF_WIDTH_PCT = (LEAF_SLOT / SPACE_W) * 100 * 0.82;
 
 const pct = (v: number, total: number) => `${(v / total) * 100}%`;
 
@@ -154,11 +161,11 @@ function LeafNode({ x, leaf, delay, onOpen }: { x: number; leaf: Leaf; delay: nu
       animate={{ opacity: 1, y: 0, scale: 1 }}
       transition={{ duration: 0.5, delay, ease: EASE }}
       className="absolute -translate-x-1/2 -translate-y-1/2"
-      style={{ left: pct(x, SPACE_W), top: pct(LEAF_Y, SPACE_H) }}
+      style={{ left: pct(x, SPACE_W), top: pct(LEAF_Y, SPACE_H), width: `${LEAF_WIDTH_PCT}%` }}
     >
       <button
         onClick={onOpen}
-        className="group flex w-[8.6rem] flex-col items-center gap-2 rounded-xl border border-[var(--rule)] bg-[var(--surface-2)] px-3 py-3.5 text-center transition-all hover:-translate-y-1 hover:border-[var(--accent-ring)] hover:shadow-[0_10px_24px_color-mix(in_oklch,var(--on-surface)_8%,transparent)] sm:w-[9.6rem]"
+        className="group flex w-full flex-col items-center gap-2 rounded-xl border border-[var(--rule)] bg-[var(--surface-2)] px-2.5 py-3 text-center transition-all hover:-translate-y-1 hover:border-[var(--accent-ring)] hover:shadow-[0_10px_24px_color-mix(in_oklch,var(--on-surface)_8%,transparent)]"
       >
         <motion.span
           className="h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--color-brand)]"
@@ -278,8 +285,9 @@ export default function ProcessFlowChart({ className }: { className?: string }) 
         </p>
       </motion.div>
 
-      {/* Tree diagram — desktop/tablet */}
-      <div className="relative hidden w-full md:block" style={{ paddingBottom: `${(SPACE_H / SPACE_W) * 100}%` }}>
+      {/* Tree diagram — desktop only. 8 leaves need real width per slot; below
+          lg the stacked fallback reads better than shrinking them further. */}
+      <div className="relative hidden w-full lg:block" style={{ paddingBottom: `${(SPACE_H / SPACE_W) * 100}%` }}>
         <div className="absolute inset-0">
           <svg
             className="absolute inset-0 h-full w-full"
@@ -368,8 +376,8 @@ export default function ProcessFlowChart({ className }: { className?: string }) 
         </div>
       </div>
 
-      {/* Stacked fallback — mobile */}
-      <div className="flex flex-col gap-8 md:hidden">
+      {/* Stacked fallback — phone and tablet */}
+      <div className="flex flex-col gap-8 lg:hidden">
         <MobileTrack
           label="Content Production"
           sublabel="4 phases"
