@@ -1,7 +1,8 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import MomentThread from '@/components/Steps/proofs/MomentThread';
 
 const EASE = [0.16, 1, 0.3, 1] as const;
 
@@ -57,6 +58,8 @@ function branchPath(x: number) {
 }
 
 export default function PostProductionModal({ open, onClose }: { open: boolean; onClose: () => void }) {
+  const [highlightCutOpen, setHighlightCutOpen] = useState(false);
+
   useEffect(() => {
     if (open) {
       document.body.style.overflow = 'hidden';
