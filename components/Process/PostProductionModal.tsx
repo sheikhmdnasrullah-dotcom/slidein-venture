@@ -1,8 +1,7 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
-import { motion, useScroll, useTransform, AnimatePresence } from 'framer-motion';
-import { cn } from '@/lib/utils';
+import { useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const EASE = [0.16, 1, 0.3, 1] as const;
 
@@ -26,23 +25,38 @@ const OUTPUT_ITEMS: PostItem[] = [
   { id: 'linkedin-posts', number: '12', label: 'LinkedIn posts' },
 ];
 
+// Shared 1000x620 coordinate space. Both the SVG (preserveAspectRatio="none")
+// and the HTML node overlay (positioned in %) map onto it, so they line up
+// at any container width.
+const SPACE_W = 1000;
+const SPACE_H = 620;
+
+const TRUNK_X = 500;
+const TRUNK_Y: Record<string, number> = {
+  'sound-design': 46,
+  'highlight-cut': 168,
+  'full-episode-edit': 290,
+};
+
+const BRANCH_Y = 486;
+const BRANCH_X = [100, 300, 500, 700, 900];
+
+const pct = (v: number, total: number) => `${(v / total) * 100}%`;
+
+// Trunk connector between two stacked main-chain nodes.
+function trunkPath(fromY: number, toY: number) {
+  return `M${TRUNK_X},${fromY + 30} L${TRUNK_X},${toY - 30}`;
+}
+
+// Fan-out branch: S-curve from Full Episode Edit down/out to each output node.
+function branchPath(x: number) {
+  const startY = TRUNK_Y['full-episode-edit'] + 34;
+  const endY = BRANCH_Y - 34;
+  const midY = startY + (endY - startY) * 0.55;
+  return `M${TRUNK_X},${startY} C${TRUNK_X},${midY} ${x},${startY + (endY - startY) * 0.25} ${x},${endY}`;
+}
+
 export default function PostProductionModal({ open, onClose }: { open: boolean; onClose: () => void }) {
-  const containerRef = useRef<HTMLDivElement>(null);
-
-  const { scrollYProgress } = useScroll({
-    target: containerRef,
-    offset: ['start start', 'end end'],
-  });
-
-  const headerOpacity = useTransform(scrollYProgress, [0, 0.1], [1, 0]);
-  const headerY = useTransform(scrollYProgress, [0, 0.1], [0, -20]);
-
-  const mainItemsY = useTransform(scrollYProgress, [0.08, 0.35], [24, 0]);
-
-  const dividerScale = useTransform(scrollYProgress, [0.3, 0.45], [0, 1]);
-
-  const outputsY = useTransform(scrollYProgress, [0.4, 0.7], [32, 0]);
-
   useEffect(() => {
     if (open) {
       document.body.style.overflow = 'hidden';
@@ -73,13 +87,13 @@ export default function PostProductionModal({ open, onClose }: { open: boolean; 
             onClick={onClose}
           />
 
-          {/* 16:9 Slide */}
+          {/* Slide */}
           <motion.div
             initial={{ opacity: 0, scale: 0.92, y: 30 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.92, y: 30 }}
             transition={{ duration: 0.5, ease: EASE }}
-            className="relative w-full max-w-[960px] aspect-video bg-[var(--color-paper-50)] md:rounded-2xl border border-[var(--rule)] shadow-[0_30px_80px_color-mix(in_oklch,var(--color-ink)_30%,transparent)] overflow-hidden"
+            className="relative w-full max-w-[1040px] max-h-[92vh] bg-[var(--color-paper-50)] md:rounded-2xl border border-[var(--rule)] shadow-[0_30px_80px_color-mix(in_oklch,var(--color-ink)_30%,transparent)] overflow-hidden"
           >
             {/* Close button */}
             <button
@@ -93,14 +107,13 @@ export default function PostProductionModal({ open, onClose }: { open: boolean; 
             </button>
 
             {/* Scrollable content */}
-            <div
-              ref={containerRef}
-              className="h-full overflow-y-auto px-6 py-10 md:px-10 md:py-12"
-            >
+            <div className="h-full max-h-[92vh] overflow-y-auto px-6 py-10 md:px-10 md:py-12">
               {/* Header */}
               <motion.div
-                style={{ opacity: headerOpacity, y: headerY }}
-                className="mb-8 text-center"
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.4, ease: EASE }}
+                className="mb-6 text-center"
               >
                 <span className="font-label mb-2 inline-block text-[10px] tracking-[0.25em] text-[var(--muted)] uppercase">
                   Post-production
@@ -110,67 +123,213 @@ export default function PostProductionModal({ open, onClose }: { open: boolean; 
                 </h2>
               </motion.div>
 
-              {/* Main steps */}
-              <motion.div
-                style={{ y: mainItemsY }}
-                className="mb-6 grid grid-cols-1 gap-2.5 md:grid-cols-3"
+              {/* Diagram: vertical timeline branching into 5 outputs (tablet/desktop) */}
+              <div
+                className="relative hidden w-full md:block"
+                style={{ paddingBottom: `${(SPACE_H / SPACE_W) * 100}%` }}
               >
-                {POST_ITEMS.map((item, i) => (
-                  <motion.div
-                    key={item.id}
-                    initial={{ opacity: 0, y: 16 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.45, delay: i * 0.08, ease: EASE }}
-                    className="flex items-center gap-3 rounded-lg border border-[var(--rule)] bg-[var(--surface)] px-4 py-3 transition-all hover:border-[var(--rule-strong)] hover:shadow-[0_6px_20px_color-mix(in_oklch,var(--on-surface)_5%,transparent)]"
+                <div className="absolute inset-0">
+                  {/* Connector lines */}
+                  <svg
+                    className="absolute inset-0 h-full w-full"
+                    viewBox={`0 0 ${SPACE_W} ${SPACE_H}`}
+                    preserveAspectRatio="none"
+                    fill="none"
                   >
-                    <span className="font-label text-[9px] tracking-[0.15em] text-[var(--muted)]">
-                      {item.number}
-                    </span>
-                    <span className="font-body text-[13px] text-[var(--on-surface)] transition-colors group-hover:text-[var(--accent)]">
-                      {item.label}
-                    </span>
-                  </motion.div>
-                ))}
-              </motion.div>
+                    <defs>
+                      <linearGradient id="flowGradient" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stopColor="var(--color-brand)" stopOpacity="0" />
+                        <stop offset="50%" stopColor="var(--color-brand)" stopOpacity="1" />
+                        <stop offset="100%" stopColor="var(--color-brand)" stopOpacity="0" />
+                      </linearGradient>
+                    </defs>
 
-              {/* Divider */}
-              <motion.div
-                style={{ scale: dividerScale }}
-                className="mb-6 flex items-center gap-3"
-              >
-                <div className="h-px flex-1 bg-[var(--rule)]" />
-                <span className="font-label text-[9px] tracking-[0.25em] text-[var(--muted)] uppercase">
-                  Outputs
-                </span>
-                <div className="h-px flex-1 bg-[var(--rule)]" />
-              </motion.div>
+                    {/* Trunk: Sound Design -> Highlight Cut */}
+                    <motion.path
+                      d={trunkPath(TRUNK_Y['sound-design'], TRUNK_Y['highlight-cut'])}
+                      stroke="var(--rule-strong)"
+                      strokeWidth={2}
+                      initial={{ pathLength: 0, opacity: 0 }}
+                      animate={{ pathLength: 1, opacity: 1 }}
+                      transition={{ duration: 0.5, delay: 0.35, ease: EASE }}
+                    />
+                    {/* Trunk: Highlight Cut -> Full Episode Edit */}
+                    <motion.path
+                      d={trunkPath(TRUNK_Y['highlight-cut'], TRUNK_Y['full-episode-edit'])}
+                      stroke="var(--rule-strong)"
+                      strokeWidth={2}
+                      initial={{ pathLength: 0, opacity: 0 }}
+                      animate={{ pathLength: 1, opacity: 1 }}
+                      transition={{ duration: 0.5, delay: 0.75, ease: EASE }}
+                    />
 
-              {/* Output nodes */}
-              <motion.div
-                style={{ y: outputsY }}
-                className="grid grid-cols-1 gap-2 md:grid-cols-2"
-              >
-                {OUTPUT_ITEMS.map((item, i) => (
-                  <motion.div
-                    key={item.id}
-                    initial={{ opacity: 0, x: i % 2 === 0 ? -16 : 16, scale: 0.96 }}
-                    animate={{ opacity: 1, x: 0, scale: 1 }}
-                    transition={{
-                      duration: 0.45,
-                      delay: 0.5 + i * 0.07,
-                      ease: EASE,
-                    }}
-                    className="flex items-center gap-3 rounded-lg border border-[var(--rule)] bg-[var(--surface-2)] px-4 py-2.5 transition-all hover:border-[var(--accent-ring)] hover:translate-x-1"
-                  >
-                    <span className="font-label text-[9px] tracking-[0.15em] text-[var(--accent)]">
-                      {item.number}
-                    </span>
-                    <span className="font-body text-[12px] text-[var(--on-surface)] transition-colors group-hover:text-[var(--accent)]">
-                      {item.label}
-                    </span>
-                  </motion.div>
-                ))}
-              </motion.div>
+                    {/* Branches: Full Episode Edit -> 5 outputs */}
+                    {BRANCH_X.map((x, i) => (
+                      <motion.path
+                        key={`branch-${x}`}
+                        d={branchPath(x)}
+                        stroke="var(--rule-strong)"
+                        strokeWidth={2}
+                        initial={{ pathLength: 0, opacity: 0 }}
+                        animate={{ pathLength: 1, opacity: 1 }}
+                        transition={{ duration: 0.7, delay: 1.15 + i * 0.1, ease: EASE }}
+                      />
+                    ))}
+
+                    {/* Flowing light pulses, looping, once the network is drawn */}
+                    {[
+                      trunkPath(TRUNK_Y['sound-design'], TRUNK_Y['highlight-cut']),
+                      trunkPath(TRUNK_Y['highlight-cut'], TRUNK_Y['full-episode-edit']),
+                      ...BRANCH_X.map((x) => branchPath(x)),
+                    ].map((d, i) => (
+                      <motion.path
+                        key={`flow-${i}`}
+                        d={d}
+                        stroke="url(#flowGradient)"
+                        strokeWidth={3}
+                        strokeLinecap="round"
+                        strokeDasharray="60 900"
+                        initial={{ opacity: 0 }}
+                        animate={{ strokeDashoffset: [0, -960], opacity: 1 }}
+                        transition={{
+                          opacity: { duration: 0.4, delay: 1.9 + i * 0.12 },
+                          strokeDashoffset: {
+                            duration: 3.2,
+                            repeat: Infinity,
+                            ease: 'linear',
+                            delay: 1.9 + i * 0.12,
+                          },
+                        }}
+                      />
+                    ))}
+                  </svg>
+
+                  {/* Main chain nodes */}
+                  {POST_ITEMS.map((item, i) => {
+                    const isFinal = item.id === 'full-episode-edit';
+                    return (
+                      <motion.div
+                        key={item.id}
+                        initial={{ opacity: 0, y: 14, scale: 0.94 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        transition={{ duration: 0.45, delay: i * 0.4, ease: EASE }}
+                        className="absolute -translate-x-1/2 -translate-y-1/2"
+                        style={{ left: pct(TRUNK_X, SPACE_W), top: pct(TRUNK_Y[item.id], SPACE_H) }}
+                      >
+                        <div className="relative flex items-center gap-3 rounded-xl border border-[var(--rule)] bg-[var(--surface)] px-4 py-3 shadow-[0_6px_20px_color-mix(in_oklch,var(--on-surface)_6%,transparent)]">
+                          {isFinal && (
+                            <motion.span
+                              className="pointer-events-none absolute inset-0 rounded-xl border-2 border-[var(--color-brand)]"
+                              initial={{ opacity: 0 }}
+                              animate={{ opacity: [0, 0.6, 0], scale: [1, 1.12, 1.22] }}
+                              transition={{ duration: 2.2, repeat: Infinity, delay: 1.6, ease: EASE }}
+                            />
+                          )}
+                          <motion.span
+                            className="h-2 w-2 shrink-0 rounded-full bg-[var(--color-brand)]"
+                            animate={{ scale: [1, 1.4, 1], opacity: [1, 0.6, 1] }}
+                            transition={{ duration: 1.8, repeat: Infinity, delay: i * 0.3, ease: EASE }}
+                          />
+                          <span className="font-label text-[9px] tracking-[0.15em] text-[var(--muted)]">
+                            {item.number}
+                          </span>
+                          <span className="font-body whitespace-nowrap text-[13px] text-[var(--on-surface)]">
+                            {item.label}
+                          </span>
+                        </div>
+                      </motion.div>
+                    );
+                  })}
+
+                  {/* Output nodes fanned out from Full Episode Edit */}
+                  {OUTPUT_ITEMS.map((item, i) => (
+                    <motion.div
+                      key={item.id}
+                      initial={{ opacity: 0, y: 18, scale: 0.85 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      transition={{ duration: 0.5, delay: 1.5 + i * 0.1, ease: EASE }}
+                      className="absolute -translate-x-1/2 -translate-y-1/2"
+                      style={{ left: pct(BRANCH_X[i], SPACE_W), top: pct(BRANCH_Y, SPACE_H) }}
+                    >
+                      <div className="flex w-[9.4rem] flex-col items-center gap-1.5 rounded-lg border border-[var(--rule)] bg-[var(--surface-2)] px-3 py-3 text-center transition-all hover:border-[var(--accent-ring)] hover:-translate-y-1 sm:w-[10.5rem]">
+                        <span className="font-label text-[9px] tracking-[0.15em] text-[var(--accent)]">
+                          {item.number}
+                        </span>
+                        <span className="font-body text-[11.5px] leading-snug text-[var(--on-surface)]">
+                          {item.label}
+                        </span>
+                      </div>
+                    </motion.div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Mobile fallback: stacked vertical timeline, branches read top-to-bottom */}
+              <div className="relative md:hidden">
+                <div className="relative flex flex-col gap-2.5 pl-2">
+                  <div className="absolute left-[19px] top-3 bottom-3 w-px bg-[var(--rule-strong)]" />
+                  {POST_ITEMS.map((item, i) => {
+                    const isFinal = item.id === 'full-episode-edit';
+                    return (
+                      <motion.div
+                        key={item.id}
+                        initial={{ opacity: 0, x: -10 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ duration: 0.4, delay: i * 0.15, ease: EASE }}
+                        className="relative flex items-center gap-3 rounded-lg border border-[var(--rule)] bg-[var(--surface)] px-4 py-3"
+                      >
+                        {isFinal && (
+                          <motion.span
+                            className="pointer-events-none absolute inset-0 rounded-lg border-2 border-[var(--color-brand)]"
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: [0, 0.6, 0], scale: [1, 1.04, 1.08] }}
+                            transition={{ duration: 2.2, repeat: Infinity, delay: 0.6, ease: EASE }}
+                          />
+                        )}
+                        <motion.span
+                          className="h-2 w-2 shrink-0 rounded-full bg-[var(--color-brand)]"
+                          animate={{ scale: [1, 1.4, 1], opacity: [1, 0.6, 1] }}
+                          transition={{ duration: 1.8, repeat: Infinity, delay: i * 0.3, ease: EASE }}
+                        />
+                        <span className="font-label text-[9px] tracking-[0.15em] text-[var(--muted)]">
+                          {item.number}
+                        </span>
+                        <span className="font-body text-[13px] text-[var(--on-surface)]">{item.label}</span>
+                      </motion.div>
+                    );
+                  })}
+                </div>
+
+                <motion.div
+                  initial={{ opacity: 0, scale: 0 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.3, delay: 0.55, ease: EASE }}
+                  className="my-4 flex items-center gap-3 pl-2"
+                >
+                  <div className="h-px flex-1 bg-[var(--rule)]" />
+                  <span className="font-label text-[9px] tracking-[0.25em] text-[var(--muted)] uppercase">
+                    Branches into
+                  </span>
+                  <div className="h-px flex-1 bg-[var(--rule)]" />
+                </motion.div>
+
+                <div className="flex flex-col gap-2">
+                  {OUTPUT_ITEMS.map((item, i) => (
+                    <motion.div
+                      key={item.id}
+                      initial={{ opacity: 0, x: -14, scale: 0.96 }}
+                      animate={{ opacity: 1, x: 0, scale: 1 }}
+                      transition={{ duration: 0.4, delay: 0.7 + i * 0.09, ease: EASE }}
+                      className="flex items-center gap-3 rounded-lg border border-[var(--rule)] bg-[var(--surface-2)] px-4 py-2.5"
+                    >
+                      <span className="font-label text-[9px] tracking-[0.15em] text-[var(--accent)]">
+                        {item.number}
+                      </span>
+                      <span className="font-body text-[12px] text-[var(--on-surface)]">{item.label}</span>
+                    </motion.div>
+                  ))}
+                </div>
+              </div>
             </div>
           </motion.div>
         </motion.div>
