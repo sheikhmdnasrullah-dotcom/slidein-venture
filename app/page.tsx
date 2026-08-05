@@ -1,7 +1,7 @@
 import Hero from "@/components/Hero/Hero";
 import Section from "@/components/Section";
 import FrameworkHead from "@/components/Framework/FrameworkHead";
-import FrameworkThread from "@/components/Framework/FrameworkThread";
+import FrameworkEngines from "@/components/Framework/FrameworkEngines";
 import InputSlide from "@/components/PitchDeck/InputSlide";
 import YourPart from "@/components/Steps/YourPart";
 import GrowthLoopSlide from "@/components/PitchDeck/GrowthLoopSlide";
@@ -17,24 +17,26 @@ import GrowthLoopSlide from "@/components/PitchDeck/GrowthLoopSlide";
  * type in --accent in four places (the two YOU tags and the two cross link
  * statements). `raised` re-points it to signal-deeper, which clears AA.
  *
- * THE THREAD, AND WHAT IT REPLACED TWICE. This band first rendered
+ * WHAT THIS BAND HAS RENDERED, AND WHY EACH ONE MOVED ON. First
  * FrameworkDiagram's `shape` variant — rounded cards on right-angle
  * connectors, the default output shape of every diagramming tool, which reads
  * as one before a single label is read. Then FrameworkWeave, which braided two
- * threads into one cord.
+ * threads into one cord. Then FrameworkThread: one drawing at two densities,
+ * four milestones a side by default with fourteen detail nodes behind a
+ * toggle. The toggle was the problem — the thing a visitor could see without
+ * clicking was an outline, not the business.
  *
- * It now renders FrameworkThread, which is the same business drawn to a
- * specification the braid could not meet: ONE drawing at TWO densities. Simple
- * shows four milestones a side; Complete threads seven detail nodes onto the
- * same strands and the thread grows to hold them. A braid has one length, so
- * there was nowhere for fourteen more nodes to go.
+ * It now renders FrameworkEngines: both engines' full node lists, always
+ * visible, as two cards a reader just reads top to bottom. The cross-link
+ * (content builds trust / outreach expands reach) shown once, centred between
+ * them, instead of duplicated as an accent row at the foot of each strand.
  *
- * NEITHER OF THE OTHER TWO IS DELETED. FrameworkDiagram's `variant="complete"`
+ * NONE OF THE EARLIER THREE IS DELETED. FrameworkDiagram's `variant="complete"`
  * still draws all seventeen service nodes at the top of /steps, which is where
- * the hero's primary CTA points. FrameworkWeave is no longer mounted anywhere
- * and is kept only so the decision to retire it can be reversed by changing
- * one import back. All three read content/framework.ts, so no two of them can
- * describe different businesses.
+ * the hero's primary CTA points. FrameworkWeave and FrameworkThread are no
+ * longer mounted anywhere and are kept only so a decision here can be reversed
+ * by changing one import back. All four read content/framework.ts, so no two
+ * of them can describe different businesses.
  */
 export default function Home() {
   return (
@@ -54,7 +56,7 @@ export default function Home() {
           title="The Framework"
           coordinate="01 · Framework"
         />
-        <FrameworkThread className="mt-16 md:mt-20" />
+        <FrameworkEngines className="mt-16 md:mt-20" />
       </Section>
 
       <div className="relative min-h-[640px] overflow-hidden">
