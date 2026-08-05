@@ -48,15 +48,15 @@ export default function ExecutionSlideModal({ open, onClose }: ExecutionSlideMod
             onClick={onClose}
           />
 
-          {/* slide panel — full fit, no scroll */}
+          {/* 16:9 slide panel — scrolls its own content on desktop, full-sheet on mobile */}
           <motion.div
             ref={scrollRef}
             initial={{ opacity: 0, y: 40, scale: 0.98 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 40, scale: 0.98 }}
             transition={{ duration: 0.45, ease: EASE }}
-            className="relative flex w-full flex-col bg-[var(--color-paper-50)]
-              md:max-h-[92vh] md:w-[min(1120px,94vw)] md:rounded-[28px] md:border md:border-[var(--rule)]
+            className="relative flex max-h-[94vh] w-full flex-col overflow-y-auto bg-[var(--color-paper-50)]
+              md:aspect-[16/9] md:max-h-[92vh] md:w-[min(1120px,94vw)] md:rounded-[28px] md:border md:border-[var(--rule)]
               md:shadow-[0_25px_60px_color-mix(in_oklch,var(--color-ink)_25%,transparent)]"
           >
             {/* Sticky header */}
@@ -89,39 +89,6 @@ export default function ExecutionSlideModal({ open, onClose }: ExecutionSlideMod
                 {/* The step list with rich detail */}
                 <div className="mt-8">
                   <ExecutionSlide />
-                </div>
-
-                {/* Step descriptions */}
-                <div className="mt-10 flex flex-col gap-4">
-                  {[
-                    {
-                      index: '04',
-                      title: 'You Record',
-                      desc: 'One session. Script in hand. Drop the raw file in cloud storage and share the link.',
-                    },
-                    {
-                      index: '05',
-                      title: 'Intake and Moment Mapping',
-                      desc: 'We watch the whole thing and find the single strongest moment before cutting anything.',
-                    },
-                  ].map((step) => (
-                    <div
-                      key={step.index}
-                      className="flex items-start gap-4 rounded-xl border border-[var(--rule)] bg-[var(--surface)] px-5 py-4"
-                    >
-                      <span className="font-label mt-0.5 shrink-0 rounded-full bg-[var(--rule)] px-2.5 py-1 text-[10px] tracking-[0.15em] text-[var(--muted)]">
-                        {step.index}
-                      </span>
-                      <div>
-                        <h4 className="font-display-sm text-[15px] font-bold text-[var(--on-surface)]">
-                          {step.title}
-                        </h4>
-                        <p className="font-body mt-1 max-w-[56ch] text-[13px] leading-relaxed text-[var(--muted)]">
-                          {step.desc}
-                        </p>
-                      </div>
-                    </div>
-                  ))}
                 </div>
               </div>
             </div>

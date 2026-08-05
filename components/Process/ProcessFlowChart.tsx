@@ -116,13 +116,11 @@ function SendIcon() {
 function HubNode({
   x,
   label,
-  sublabel,
   icon,
   delay,
 }: {
   x: number;
   label: string;
-  sublabel: string;
   icon: React.ReactNode;
   delay: number;
 }) {
@@ -147,7 +145,6 @@ function HubNode({
         <span className="font-body whitespace-nowrap text-[15px] font-semibold tracking-[-0.01em] text-[var(--on-surface)]">
           {label}
         </span>
-        <span className="font-label text-[8.5px] tracking-[0.2em] text-[var(--muted)]">{sublabel}</span>
       </div>
     </motion.div>
   );
@@ -184,14 +181,12 @@ function LeafNode({ x, leaf, delay, onOpen }: { x: number; leaf: Leaf; delay: nu
 /* ── Mobile fallback — one track at a time, stacked vertically ──────────── */
 function MobileTrack({
   label,
-  sublabel,
   icon,
   leaves,
   delayBase,
   onOpen,
 }: {
   label: string;
-  sublabel: string;
   icon: React.ReactNode;
   leaves: Leaf[];
   delayBase: number;
@@ -209,7 +204,6 @@ function MobileTrack({
           {icon}
         </span>
         <span className="font-body text-[13px] font-semibold text-[var(--on-surface)]">{label}</span>
-        <span className="font-label text-[8px] tracking-[0.15em] text-[var(--muted)]">{sublabel}</span>
       </motion.div>
 
       <div className="relative mt-3 flex flex-col gap-2 pl-2">
@@ -275,14 +269,9 @@ export default function ProcessFlowChart({ className }: { className?: string }) 
         transition={{ duration: 0.5, ease: EASE }}
         className="mb-4 text-center"
       >
-        <span className="font-label mb-3 inline-block text-[var(--muted)]">Two engines · eight moving parts</span>
         <h2 className="font-display-xl mx-auto max-w-[22ch] text-[clamp(1.9rem,4vw,3rem)] text-[var(--on-surface)]">
           The Complete Step by Step <span className="wonk text-[var(--accent)]">Process</span>
         </h2>
-        <p className="mx-auto mt-4 max-w-[46ch] text-[13px] leading-[1.75] text-[var(--muted)] md:text-[14px]">
-          One root splits into the two engines that run the whole system, and each engine
-          branches into the phases that make it up.
-        </p>
       </motion.div>
 
       {/* Tree diagram — desktop only. 8 leaves need real width per slot; below
@@ -352,8 +341,8 @@ export default function ProcessFlowChart({ className }: { className?: string }) 
             ))}
           </svg>
 
-          <HubNode x={HUB_X_CONTENT} label="Content Production" sublabel="4 phases" icon={<LayersIcon />} delay={0.95} />
-          <HubNode x={HUB_X_OUTREACH} label="Researched Outreach" sublabel="4 phases" icon={<SendIcon />} delay={0.95} />
+          <HubNode x={HUB_X_CONTENT} label="Content Production" icon={<LayersIcon />} delay={0.95} />
+          <HubNode x={HUB_X_OUTREACH} label="Researched Outreach" icon={<SendIcon />} delay={0.95} />
 
           {CONTENT_LEAVES.map((leaf, i) => (
             <LeafNode
@@ -380,7 +369,6 @@ export default function ProcessFlowChart({ className }: { className?: string }) 
       <div className="flex flex-col gap-8 lg:hidden">
         <MobileTrack
           label="Content Production"
-          sublabel="4 phases"
           icon={<LayersIcon />}
           leaves={CONTENT_LEAVES}
           delayBase={0.2}
@@ -388,7 +376,6 @@ export default function ProcessFlowChart({ className }: { className?: string }) 
         />
         <MobileTrack
           label="Researched Outreach"
-          sublabel="4 phases"
           icon={<SendIcon />}
           leaves={OUTREACH_LEAVES}
           delayBase={0.65}

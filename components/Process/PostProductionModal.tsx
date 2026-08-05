@@ -79,7 +79,7 @@ export default function PostProductionModal({ open, onClose }: { open: boolean; 
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.3, ease: EASE }}
-          className="fixed inset-0 z-[1100] flex items-center justify-center p-4 md:p-8"
+          className="fixed inset-0 z-[2000] flex items-center justify-center p-4 md:p-8"
         >
           {/* Backdrop */}
           <motion.div
@@ -90,13 +90,13 @@ export default function PostProductionModal({ open, onClose }: { open: boolean; 
             onClick={onClose}
           />
 
-          {/* Slide */}
+          {/* 16:9 slide panel — scrolls its own content on desktop, full-sheet on mobile */}
           <motion.div
             initial={{ opacity: 0, scale: 0.92, y: 30 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.92, y: 30 }}
             transition={{ duration: 0.5, ease: EASE }}
-            className="relative w-full max-w-[1040px] max-h-[92vh] bg-[var(--color-paper-50)] md:rounded-2xl border border-[var(--rule)] shadow-[0_30px_80px_color-mix(in_oklch,var(--color-ink)_30%,transparent)] overflow-hidden"
+            className="relative flex max-h-[94vh] w-full max-w-[1040px] flex-col overflow-y-auto bg-[var(--color-paper-50)] md:aspect-[16/9] md:max-h-[92vh] md:rounded-[28px] md:border md:border-[var(--rule)] md:shadow-[0_25px_60px_color-mix(in_oklch,var(--color-ink)_25%,transparent)]"
           >
             {/* Close button */}
             <button
@@ -109,8 +109,7 @@ export default function PostProductionModal({ open, onClose }: { open: boolean; 
               </svg>
             </button>
 
-            {/* Scrollable content */}
-            <div className="h-full max-h-[92vh] overflow-y-auto px-6 py-10 md:px-10 md:py-12">
+            <div className="px-6 py-10 md:px-10 md:py-12">
               {/* Header */}
               <motion.div
                 initial={{ opacity: 0, y: -10 }}

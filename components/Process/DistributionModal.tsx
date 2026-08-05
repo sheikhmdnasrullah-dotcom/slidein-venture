@@ -34,7 +34,7 @@ export default function DistributionModal({ open, onClose }: DistributionModalPr
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.3, ease: EASE }}
-          className="fixed inset-0 z-[1100] flex items-end justify-center md:items-center"
+          className="fixed inset-0 z-[2000] flex items-end justify-center md:items-center"
           role="dialog"
           aria-modal="true"
           aria-label="Content distribution"
@@ -48,15 +48,15 @@ export default function DistributionModal({ open, onClose }: DistributionModalPr
             onClick={onClose}
           />
 
-          {/* slide panel — full fit, no scroll */}
+          {/* 16:9 slide panel — scrolls its own content on desktop, full-sheet on mobile */}
           <motion.div
             ref={scrollRef}
             initial={{ opacity: 0, y: 40, scale: 0.98 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 40, scale: 0.98 }}
             transition={{ duration: 0.45, ease: EASE }}
-            className="relative flex w-full flex-col bg-[var(--color-paper-50)]
-              md:max-h-[92vh] md:w-[min(1120px,94vw)] md:rounded-[28px] md:border md:border-[var(--rule)]
+            className="relative flex max-h-[94vh] w-full flex-col overflow-y-auto bg-[var(--color-paper-50)]
+              md:aspect-[16/9] md:max-h-[92vh] md:w-[min(1120px,94vw)] md:rounded-[28px] md:border md:border-[var(--rule)]
               md:shadow-[0_25px_60px_color-mix(in_oklch,var(--color-ink)_25%,transparent)]"
           >
             {/* Sticky header */}
