@@ -5,6 +5,13 @@ import { motion, useScroll, useTransform, AnimatePresence } from 'framer-motion'
 import { OUTREACH_PHASES, type OutreachPhase } from '@/content/steps';
 import { MonoLabel } from '@/components/System/System';
 import { OwnerTag } from '@/components/Steps/PipelineStep';
+import {
+  DisclosureProvider,
+  DisclosureTrigger,
+  DisclosureMark,
+  Tier3,
+  StepIndex,
+} from '@/components/Steps/Disclosure';
 
 const EASE = [0.16, 1, 0.3, 1] as const;
 
@@ -64,7 +71,7 @@ export default function OutreachSlideModal({ open, phaseId, onClose }: OutreachS
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.3, ease: EASE }}
-          className="fixed inset-0 z-[2000] flex items-end justify-center md:items-center"
+          className="fixed inset-0 z-[1100] flex items-end justify-center md:items-center"
           role="dialog"
           aria-modal="true"
           aria-label={phase.name}
@@ -130,28 +137,43 @@ export default function OutreachSlideModal({ open, phaseId, onClose }: OutreachS
                 </div>
               </Reveal>
 
-              {/* The numbered step list — exactly what appears on the left of the steps section */}
+              {/* The numbered step list — expandable, exactly like the steps page.
+                  Each step has a plus icon that expands to reveal whyItMatters
+                  and technicalDetail. */}
               <Reveal index={1} total={2}>
-                <ol className="mx-auto mt-8 max-w-[820px]">
-                  {phase.steps.map((step) => (
-                    <li key={step.id} className="border-t border-[var(--rule)] py-5">
-                      <div className="flex flex-1 flex-col gap-2">
-                        <span className="flex flex-wrap items-center gap-x-3 gap-y-1">
-                          <MonoLabel className="tnum shrink-0 text-[var(--muted)]">
-                            {step.index}
-                          </MonoLabel>
-                          <span className="font-body-lead text-[var(--on-surface)]">
-                            {step.title}
-                          </span>
-                          <OwnerTag stepId={step.id} />
-                        </span>
-                        <span className="font-body max-w-[56ch] text-[var(--muted)]">
-                          {step.whatWeDo}
-                        </span>
-                      </div>
-                    </li>
-                  ))}
-                </ol>
+                <DisclosureProvider>
+                  <ol className="mx-auto mt-8 max-w-[820px]">
+                    {phase.steps.map((step) => (
+                      <li key={step.id} className="border-t border-[var(--rule)]">
+                        <div className="py-5">
+                          <DisclosureTrigger id={step.id}>
+                            <StepIndex>{step.index}</StepIndex>
+
+                            <span className="flex flex-1 flex-col gap-2">
+                              <span className="flex flex-wrap items-center gap-x-3 gap-y-1">
+                                <span className="font-body-lead text-[clamp(1rem,1.2vw,1.125rem)] text-[var(--on-surface)]">
+                                  {step.title}
+                                </span>
+                                <OwnerTag stepId={step.id} />
+                              </span>
+                              <span className="font-body max-w-[54ch] text-[var(--muted)]">
+                                {step.whatWeDo}
+                              </span>
+                            </span>
+
+                            <DisclosureMark id={step.id} />
+                          </DisclosureTrigger>
+
+                          <Tier3
+                            id={step.id}
+                            whyItMatters={step.whyItMatters}
+                            technicalDetail={step.technicalDetail}
+                          />
+                        </div>
+                      </li>
+                    ))}
+                  </ol>
+                </DisclosureProvider>
               </Reveal>
             </div>
           </motion.div>
