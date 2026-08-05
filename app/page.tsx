@@ -2,8 +2,6 @@ import Hero from "@/components/Hero/Hero";
 import Section from "@/components/Section";
 import FrameworkEngines from "@/components/Framework/FrameworkEngines";
 import InputSlide from "@/components/PitchDeck/InputSlide";
-import YourPart from "@/components/Steps/YourPart";
-import GrowthLoopSlide from "@/components/PitchDeck/GrowthLoopSlide";
 
 /**
  * HOME — the hero, then the shape of the business.
