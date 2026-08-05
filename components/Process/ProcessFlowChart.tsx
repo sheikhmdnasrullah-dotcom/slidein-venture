@@ -1,13 +1,10 @@
-'use client';
+r'use client';
 
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
-import PostProductionModal from './PostProductionModal';
-import DistributionModal from './DistributionModal';
-import OutreachSlideModal from './OutreachSlideModal';
-import PlanningSlideModal from './PlanningSlideModal';
-import ExecutionSlideModal from './ExecutionSlideModal';
+import ContentProcessModal, { type ContentPhaseId } from './ContentProcessModal';
+import OutreachProcessModal from './OutreachProcessModal';
 
 const EASE = [0.16, 1, 0.3, 1] as const;
 
@@ -19,10 +16,7 @@ const EASE = [0.16, 1, 0.3, 1] as const;
    verified-research claim it actually is. */
 
 type LeafAction =
-  | { kind: 'planning' }
-  | { kind: 'execution' }
-  | { kind: 'post' }
-  | { kind: 'distribution' }
+  | { kind: 'content'; phaseId: ContentPhaseId }
   | { kind: 'outreach'; phaseId: string };
 
 interface Leaf {
@@ -32,10 +26,10 @@ interface Leaf {
 }
 
 const CONTENT_LEAVES: Leaf[] = [
-  { id: 'planning', label: 'Planning', action: { kind: 'planning' } },
-  { id: 'execution', label: 'Execution', action: { kind: 'execution' } },
-  { id: 'post', label: 'Post-production', action: { kind: 'post' } },
-  { id: 'distribution', label: 'Distribution', action: { kind: 'distribution' } },
+  { id: 'planning', label: 'Planning', action: { kind: 'content', phaseId: 'planning' } },
+  { id: 'execution', label: 'Execution', action: { kind: 'content', phaseId: 'execution' } },
+  { id: 'post', label: 'Post-production', action: { kind: 'content', phaseId: 'post' } },
+  { id: 'distribution', label: 'Distribution', action: { kind: 'content', phaseId: 'distribution' } },
 ];
 
 const OUTREACH_LEAVES: Leaf[] = [
@@ -298,17 +292,11 @@ function MobileTrack({
 }
 
 export default function ProcessFlowChart({ className }: { className?: string }) {
-  const [planningOpen, setPlanningOpen] = useState(false);
-  const [executionOpen, setExecutionOpen] = useState(false);
-  const [postOpen, setPostOpen] = useState(false);
-  const [distributionOpen, setDistributionOpen] = useState(false);
+  const [contentPhaseId, setContentPhaseId] = useState<ContentPhaseId | null>(null);
   const [outreachPhaseId, setOutreachPhaseId] = useState<string | null>(null);
 
   const handleAction = (action: LeafAction) => {
-    if (action.kind === 'planning') setPlanningOpen(true);
-    if (action.kind === 'execution') setExecutionOpen(true);
-    if (action.kind === 'post') setPostOpen(true);
-    if (action.kind === 'distribution') setDistributionOpen(true);
+    if (action.kind === 'content') setContentPhaseId(action.phaseId);
     if (action.kind === 'outreach') setOutreachPhaseId(action.phaseId);
   };
 
@@ -484,11 +472,12 @@ export default function ProcessFlowChart({ className }: { className?: string }) 
       </div>
 
       {/* Modals */}
-      <PlanningSlideModal open={planningOpen} onClose={() => setPlanningOpen(false)} />
-      <ExecutionSlideModal open={executionOpen} onClose={() => setExecutionOpen(false)} />
-      <PostProductionModal open={postOpen} onClose={() => setPostOpen(false)} />
-      <DistributionModal open={distributionOpen} onClose={() => setDistributionOpen(false)} />
-      <OutreachSlideModal
+      <ContentProcessModal
+        open={contentPhaseId !== null}
+        phaseId={contentPhaseId}
+        onClose={() => setContentPhaseId(null)}
+      />
+      <OutreachProcessModal
         open={outreachPhaseId !== null}
         phaseId={outreachPhaseId}
         onClose={() => setOutreachPhaseId(null)}

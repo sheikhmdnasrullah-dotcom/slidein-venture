@@ -1,12 +1,9 @@
-# TODO: Fit all 8 process modal slides fully on screen without scrolling
+# TODO: Redesign Process Modals with Toggle Navigation
 
 ## Steps
-- [x] Explore and understand all modal components
-- [x] Create `components/Process/FitScale.tsx` reusable scale-to-fit component
-- [x] Update `PlanningSlideModal.tsx` to use FitScale
-- [x] Update `ExecutionSlideModal.tsx` to use FitScale
-- [x] Update `PostProductionModal.tsx` to use FitScale
-- [x] Update `DistributionModal.tsx` to use FitScale
-- [x] Update `HighlightCutModal.tsx` to use FitScale
-- [x] Update `OutreachSlideModal.tsx` to use FitScale
-- [ ] Verify all 8 buttons open slides that fit fully on screen without scrolling (blocked: node_modules missing, npm unavailable)
+- [x] Update `content/steps/outreach-phases.ts` — renumber phase 1 steps sequentially (remove 1.2b)
+- [x] Create `components/Process/FlipCard.tsx` — reusable 3D flip card for outreach steps
+- [x] Create `components/Process/OutreachProcessModal.tsx` — unified carousel for 4 outreach phases
+- [x] Create `components/Process/ContentProcessModal.tsx` — unified carousel for 4 content phases
+- [x] Update `components/Process/ProcessFlowChart.tsx` — use 2 unified modals
+- [ ] Verify all 8 buttons open slides with content fully on screen, arrows navigate correctly (blocked: node_modules missing, npm unavailable)

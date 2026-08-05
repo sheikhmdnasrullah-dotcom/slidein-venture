@@ -88,7 +88,7 @@ export const OUTREACH_PHASES: OutreachPhase[] = [
       },
       {
         id: 'bulk-compliance',
-        index: '1.2b',
+        index: '1.3',
         title: 'Bulk Sender Compliance',
         whatWeDo:
           'We meet the bulk sender requirements the mailbox providers now enforce, and we can show it.',
@@ -100,7 +100,7 @@ export const OUTREACH_PHASES: OutreachPhase[] = [
       },
       {
         id: 'mailboxes',
-        index: '1.3',
+        index: '1.4',
         title: 'Mailbox Provisioning',
         whatWeDo:
           'Real mailboxes with real signatures, real profile photos and a real reply path.',
@@ -112,7 +112,7 @@ export const OUTREACH_PHASES: OutreachPhase[] = [
       },
       {
         id: 'ramp',
-        index: '1.4',
+        index: '1.5',
         title: 'The Ramp',
         whatWeDo:
           'Volume increases gradually on real sends, monitored daily, and slows itself if any signal degrades.',
