@@ -30,7 +30,6 @@ import { motion, useReducedMotion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { MonoLabel } from '@/components/System/System';
 import {
-  FRAMEWORK_CROSS,
   FRAMEWORK_ORIGIN,
   FRAMEWORK_OUTCOME,
   FRAMEWORK_TRACKS,
@@ -162,42 +161,6 @@ function Fork({ direction }: { direction: 'split' | 'merge' }) {
         </g>
       ))}
     </svg>
-  );
-}
-
-/** The reason two services are one system — shown once, centred between the
-   two engines, instead of duplicated as an accent row at the foot of each
-   strand. Two short diagonal marks point the statement at the engine it is
-   actually about. The whole band lifts slightly on hover, inviting a reader
-   to notice it rather than skim past. */
-function CrossLink() {
-  return (
-    <motion.div
-      whileHover={{ scale: 1.04 }}
-      transition={{ duration: 0.3, ease: EASE }}
-      className={cn(GUTTER, 'relative hidden flex-col items-center justify-center gap-3 py-6 md:flex')}
-    >
-      <span aria-hidden className="absolute inset-y-0 left-1/2 w-px -translate-x-1/2 bg-[var(--accent-ring)]" />
-      <div className="relative flex flex-col items-center gap-2 rounded-2xl bg-[var(--surface)] px-3 py-3 shadow-[0_0_0_1px_var(--accent-ring)]">
-        {FRAMEWORK_CROSS.map((line) => (
-          <div key={line.id} className="flex items-center gap-1.5">
-            {line.dir === 'left' && (
-              <svg width="14" height="10" viewBox="0 0 24 16" fill="none" stroke="var(--accent)" strokeWidth={1.6} strokeLinecap="round">
-                <path d="M22 8H2M2 8l6-6M2 8l6 6" />
-              </svg>
-            )}
-            <span className="font-body whitespace-nowrap text-center text-[11px] font-medium leading-tight text-[var(--accent)]">
-              {line.label}
-            </span>
-            {line.dir === 'right' && (
-              <svg width="14" height="10" viewBox="0 0 24 16" fill="none" stroke="var(--accent)" strokeWidth={1.6} strokeLinecap="round">
-                <path d="M2 8h20M16 2l6 6-6 6" />
-              </svg>
-            )}
-          </div>
-        ))}
-      </div>
-    </motion.div>
   );
 }
 
