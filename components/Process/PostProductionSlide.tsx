@@ -1,21 +1,39 @@
 'use client';
 
 /**
- * POST-PRODUCTION — the complete edit pipeline
+ * POST-PRODUCTION
  * ---------------------------------------------------------------------------
- * Sound design -> highlight cut -> full episode edit -> five fanned outputs.
- * The Highlight Cut node's eye badge used to open HighlightCutSlide in its
- * own nested modal, stacked on top of this one. It now dissolves in place:
- * clicking the eye fades this diagram out and HighlightCutSlide in, in the
- * exact same slide area; the back button HighlightCutSlide renders in its
- * corner reverses the same dissolve. One slide, two states, no second popup.
+ * Same twelve items, same order, same labels. What changed is the reading:
+ * the chain runs into a hub and the hub fans out, so the picture states the
+ * one thing the section is about — one edit becomes many assets — instead of
+ * making it a nine-rung ladder.
+ *
+ *   05 Sound Design ─┐
+ *                    ├─▶ 07 FULL EPISODE EDIT ═╪═▶ 08 … 12
+ *   06 Highlight Cut ┘        (the hub)
+ *
+ * Everything is authored inside slideChrome's fixed canvas, so the whole slide
+ * is always fully visible in the modal with no scrolling at any width.
+ *
+ * The Highlight Cut node's eye badge dissolves this diagram out and
+ * HighlightCutSlide in, in the same slide area; the back button that slide
+ * renders reverses it. One slide, two states, no second popup.
  */
 
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import HighlightCutSlide from './HighlightCutSlide';
-
-const EASE = [0.16, 1, 0.3, 1] as const;
+import {
+  EASE,
+  FlowPath,
+  MobileNode,
+  MobileRail,
+  PulseDot,
+  SlideCanvas,
+  SlideDefs,
+  SPACE_H,
+  SPACE_W,
+} from './slideChrome';
 
 interface PostItem {
   id: string;
@@ -37,36 +55,29 @@ const OUTPUT_ITEMS: PostItem[] = [
   { id: 'linkedin-posts', number: '12', label: 'LinkedIn posts' },
 ];
 
-// Shared 1000x620 coordinate space. Both the SVG (preserveAspectRatio="none")
-// and the HTML node overlay (positioned in %) map onto it, so they line up
-// at any container width.
-const SPACE_W = 1000;
-const SPACE_H = 620;
+/* ── geometry ─────────────────────────────────────────────────────────────
+   Three zones, left to right: the chain, the hub, the deliverables. */
+const CHAIN_X = 24;
+const CHAIN_W = 196;
+const CHAIN_H = 88;
+const CHAIN_CY = [200, 344]; // 05, 06 — straddling the hub's centre line
 
-const TRUNK_X = 500;
-const TRUNK_Y: Record<string, number> = {
-  'sound-design': 46,
-  'highlight-cut': 168,
-  'full-episode-edit': 290,
-};
+const HUB_X = 268;
+const HUB_W = 300;
+const HUB_H = 156;
+const HUB_CY = 275;
 
-const BRANCH_Y = 486;
-const BRANCH_X = [100, 300, 500, 700, 900];
+const OUT_X = 736;
+const OUT_W = 244;
+const OUT_H = 66;
+/* Centred on the hub's y so the fan opens symmetrically, and stopping short of
+   the canvas corner ticks. */
+const OUT_CY = [123, 199, 275, 351, 427];
 
-const pct = (v: number, total: number) => `${(v / total) * 100}%`;
-
-// Trunk connector between two stacked main-chain nodes.
-function trunkPath(fromY: number, toY: number) {
-  return `M${TRUNK_X},${fromY + 30} L${TRUNK_X},${toY - 30}`;
-}
-
-// Fan-out branch: S-curve from Full Episode Edit down/out to each output node.
-function branchPath(x: number) {
-  const startY = TRUNK_Y['full-episode-edit'] + 34;
-  const endY = BRANCH_Y - 34;
-  const midY = startY + (endY - startY) * 0.55;
-  return `M${TRUNK_X},${startY} C${TRUNK_X},${midY} ${x},${startY + (endY - startY) * 0.25} ${x},${endY}`;
-}
+const chainToChain = `M${CHAIN_X + CHAIN_W / 2},${CHAIN_CY[0] + CHAIN_H / 2} L${CHAIN_X + CHAIN_W / 2},${CHAIN_CY[1] - CHAIN_H / 2}`;
+const chainToHub = `M${CHAIN_X + CHAIN_W},${CHAIN_CY[1]} C${CHAIN_X + CHAIN_W + 24},${CHAIN_CY[1]} ${HUB_X - 24},${HUB_CY} ${HUB_X},${HUB_CY}`;
+const hubToOut = (cy: number) =>
+  `M${HUB_X + HUB_W},${HUB_CY} C${HUB_X + HUB_W + 72},${HUB_CY} ${OUT_X - 72},${cy} ${OUT_X},${cy}`;
 
 function EyeIcon() {
   return (
@@ -77,192 +88,299 @@ function EyeIcon() {
   );
 }
 
+const LIFTED =
+  'inset 0 1px 0 var(--gloss), 0 26px 50px -26px color-mix(in oklch, var(--color-ember) 55%, transparent), 0 3px 10px -4px color-mix(in oklch, var(--color-ink) 14%, transparent)';
+const RESTING =
+  'inset 0 1px 0 var(--gloss), 0 12px 28px -22px color-mix(in oklch, var(--color-ember) 40%, transparent), 0 1px 2px -1px color-mix(in oklch, var(--color-ink) 12%, transparent)';
+
+/* ── chain node (05, 06) ──────────────────────────────────────────────────── */
+
+function ChainNode({
+  item,
+  i,
+  hovered,
+  onHover,
+  onClick,
+}: {
+  item: PostItem;
+  i: number;
+  hovered: boolean;
+  onHover: (v: boolean) => void;
+  onClick?: () => void;
+}) {
+  return (
+    <motion.div
+      className="absolute cursor-pointer"
+      style={{ left: CHAIN_X, top: CHAIN_CY[i] - CHAIN_H / 2, width: CHAIN_W, height: CHAIN_H }}
+      initial={{ opacity: 0, x: -18, scale: 0.95 }}
+      animate={{ opacity: 1, x: 0, scale: 1 }}
+      transition={{ duration: 0.65, delay: 0.15 + i * 0.14, ease: EASE }}
+      whileHover={{ y: -6 }}
+      onHoverStart={() => onHover(true)}
+      onHoverEnd={() => onHover(false)}
+      onClick={onClick}
+    >
+      <div
+        className="relative flex h-full flex-col justify-center gap-2 overflow-hidden rounded-[18px] border bg-[var(--surface)] px-5 transition-[border-color,box-shadow] duration-500"
+        style={{
+          borderColor: hovered ? 'var(--accent-ring)' : 'var(--rule)',
+          boxShadow: hovered ? LIFTED : RESTING,
+        }}
+      >
+        <div className="flex items-center gap-2.5">
+          <span
+            className="font-label tnum text-[11px] tracking-[0.2em] transition-colors duration-500"
+            style={{ color: hovered ? 'var(--accent)' : 'var(--muted)' }}
+          >
+            {item.number}
+          </span>
+          <span className="ml-auto flex items-center gap-1.5">
+            {onClick && (
+              <span className="flex h-6 w-6 items-center justify-center rounded-full bg-[var(--accent-wash)] text-[var(--accent)]">
+                <EyeIcon />
+              </span>
+            )}
+            <PulseDot size={7} delay={i * 0.4} />
+          </span>
+        </div>
+        <p className="font-display-sm text-[17px] leading-[1.15] text-[var(--on-surface)]">{item.label}</p>
+      </div>
+    </motion.div>
+  );
+}
+
+/* ── the hub (07) ─────────────────────────────────────────────────────────── */
+
+function Hub({ item, hovered, onHover }: { item: PostItem; hovered: boolean; onHover: (v: boolean) => void }) {
+  return (
+    <motion.div
+      className="absolute cursor-pointer"
+      style={{ left: HUB_X, top: HUB_CY - HUB_H / 2, width: HUB_W, height: HUB_H }}
+      initial={{ opacity: 0, scale: 0.9 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{ duration: 0.8, delay: 0.45, ease: EASE }}
+      whileHover={{ y: -8 }}
+      onHoverStart={() => onHover(true)}
+      onHoverEnd={() => onHover(false)}
+    >
+      {/* the hub breathes — two rings pushing outward on a loop */}
+      {[0, 1].map((k) => (
+        <motion.span
+          key={k}
+          aria-hidden
+          className="pointer-events-none absolute inset-0 rounded-[24px] border border-[var(--color-brand)]"
+          animate={{ opacity: [0, 0.45, 0], scale: [1, 1.06, 1.11] }}
+          transition={{ duration: 3, repeat: Infinity, delay: 1.4 + k * 1.5, ease: EASE }}
+        />
+      ))}
+
+      <div
+        className="relative flex h-full flex-col justify-center gap-3 overflow-hidden rounded-[24px] border px-8 transition-[border-color,box-shadow] duration-500"
+        style={{
+          borderColor: hovered ? 'var(--color-brand)' : 'var(--accent-ring)',
+          background:
+            'linear-gradient(158deg, color-mix(in oklch, var(--color-brand) 7%, var(--surface)) 0%, var(--surface) 58%)',
+          boxShadow: hovered ? LIFTED : RESTING,
+        }}
+      >
+        <span
+          aria-hidden
+          className="pointer-events-none absolute -inset-px"
+          style={{
+            background:
+              'radial-gradient(90% 120% at 100% 50%, color-mix(in oklch, var(--color-brand) 14%, transparent) 0%, transparent 62%)',
+          }}
+        />
+        <div className="relative flex items-center gap-3">
+          <PulseDot size={9} />
+          <span className="font-label tnum text-[11px] tracking-[0.24em] text-[var(--accent)]">{item.number}</span>
+        </div>
+        <p className="font-display-md relative text-[30px] leading-[1.06] text-[var(--on-surface)]">{item.label}</p>
+      </div>
+    </motion.div>
+  );
+}
+
+/* ── a deliverable ────────────────────────────────────────────────────────── */
+
+function OutputCard({
+  item,
+  i,
+  hovered,
+  onHover,
+}: {
+  item: PostItem;
+  i: number;
+  hovered: boolean;
+  onHover: (v: boolean) => void;
+}) {
+  return (
+    <motion.div
+      className="absolute cursor-pointer"
+      style={{ left: OUT_X, top: OUT_CY[i] - OUT_H / 2, width: OUT_W, height: OUT_H }}
+      initial={{ opacity: 0, x: 22, scale: 0.94 }}
+      animate={{ opacity: 1, x: 0, scale: 1 }}
+      transition={{ duration: 0.65, delay: 1 + i * 0.11, ease: EASE }}
+      whileHover={{ y: -5, scale: 1.035 }}
+      onHoverStart={() => onHover(true)}
+      onHoverEnd={() => onHover(false)}
+    >
+      {/* the row drifts, each on its own phase, so the column is never frozen */}
+      <motion.div
+        className="h-full w-full"
+        animate={{ y: [0, -3.5, 0] }}
+        transition={{ duration: 5.5 + i * 0.7, repeat: Infinity, ease: 'easeInOut', delay: i * 0.5 }}
+      >
+        <div
+          className="relative flex h-full items-center gap-3.5 overflow-hidden rounded-[16px] border bg-[var(--surface)] px-4 transition-[border-color,box-shadow] duration-500"
+          style={{
+            borderColor: hovered ? 'var(--accent-ring)' : 'var(--rule)',
+            boxShadow: hovered ? LIFTED : RESTING,
+          }}
+        >
+          <motion.span
+            aria-hidden
+            className="pointer-events-none absolute -inset-px"
+            style={{
+              background:
+                'radial-gradient(110% 140% at 0% 50%, color-mix(in oklch, var(--color-brand) 14%, transparent) 0%, transparent 62%)',
+            }}
+            animate={{ opacity: hovered ? 1 : 0 }}
+            transition={{ duration: 0.4, ease: EASE }}
+          />
+          <span className="font-label tnum relative text-[11px] tracking-[0.2em] text-[var(--accent)]">
+            {item.number}
+          </span>
+          <span className="relative h-7 w-px shrink-0 bg-[var(--rule)]" aria-hidden />
+          <span className="font-body relative flex-1 text-[14px] leading-[1.25] text-[var(--on-surface)]">
+            {item.label}
+          </span>
+        </div>
+      </motion.div>
+    </motion.div>
+  );
+}
+
+/* ── the pipeline ─────────────────────────────────────────────────────────── */
+
 function Pipeline({ onOpenHighlight }: { onOpenHighlight: () => void }) {
+  const [chainHover, setChainHover] = useState<number | null>(null);
+  const [hubHover, setHubHover] = useState(false);
+  const [outHover, setOutHover] = useState<number | null>(null);
+
   return (
     <div className="relative w-full">
-      {/* Diagram: vertical timeline branching into 5 outputs (tablet/desktop) */}
-      <div className="relative hidden w-full md:block" style={{ paddingBottom: `${(SPACE_H / SPACE_W) * 100}%` }}>
-        <div className="absolute inset-0">
-          {/* Connector lines */}
-          <svg className="absolute inset-0 h-full w-full" viewBox={`0 0 ${SPACE_W} ${SPACE_H}`} preserveAspectRatio="none" fill="none">
-            <defs>
-              <linearGradient id="postProdFlowGradient" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="var(--color-brand)" stopOpacity="0" />
-                <stop offset="50%" stopColor="var(--color-brand)" stopOpacity="1" />
-                <stop offset="100%" stopColor="var(--color-brand)" stopOpacity="0" />
-              </linearGradient>
-            </defs>
+      <SlideCanvas glow={{ x: 430, y: 285, r: 460 }}>
+        {/* hero */}
+        <motion.h2
+          className="font-display-xl absolute inset-x-0 top-[28px] text-center text-[42px] leading-none text-[var(--on-surface)]"
+          style={{ letterSpacing: '0.02em' }}
+          initial={{ opacity: 0, y: -12, filter: 'blur(8px)' }}
+          animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+          transition={{ duration: 0.8, ease: EASE }}
+        >
+          POST-PRODUCTION
+        </motion.h2>
 
-            {/* Trunk: Sound Design -> Highlight Cut */}
-            <motion.path
-              d={trunkPath(TRUNK_Y['sound-design'], TRUNK_Y['highlight-cut'])}
-              stroke="var(--rule-strong)"
-              strokeWidth={2}
-              initial={{ pathLength: 0, opacity: 0 }}
-              animate={{ pathLength: 1, opacity: 1 }}
-              transition={{ duration: 0.5, delay: 0.35, ease: EASE }}
+        {/* connectors */}
+        <svg
+          className="pointer-events-none absolute inset-0 h-full w-full"
+          viewBox={`0 0 ${SPACE_W} ${SPACE_H}`}
+          fill="none"
+          aria-hidden
+        >
+          <SlideDefs />
+          <FlowPath d={chainToChain} delay={0.5} travel={1.5} active={chainHover !== null} />
+          <FlowPath d={chainToHub} delay={0.7} travel={1.8} active={chainHover === 1 || hubHover} />
+          {OUT_CY.map((cy, i) => (
+            <FlowPath
+              key={cy}
+              d={hubToOut(cy)}
+              delay={0.95 + i * 0.1}
+              travel={2.6 + i * 0.15}
+              active={hubHover || outHover === i}
             />
-            {/* Trunk: Highlight Cut -> Full Episode Edit */}
-            <motion.path
-              d={trunkPath(TRUNK_Y['highlight-cut'], TRUNK_Y['full-episode-edit'])}
-              stroke="var(--rule-strong)"
-              strokeWidth={2}
-              initial={{ pathLength: 0, opacity: 0 }}
-              animate={{ pathLength: 1, opacity: 1 }}
-              transition={{ duration: 0.5, delay: 0.75, ease: EASE }}
-            />
-
-            {/* Branches: Full Episode Edit -> 5 outputs */}
-            {BRANCH_X.map((x, i) => (
-              <motion.path
-                key={`branch-${x}`}
-                d={branchPath(x)}
-                stroke="var(--rule-strong)"
-                strokeWidth={2}
-                initial={{ pathLength: 0, opacity: 0 }}
-                animate={{ pathLength: 1, opacity: 1 }}
-                transition={{ duration: 0.7, delay: 1.15 + i * 0.1, ease: EASE }}
-              />
-            ))}
-
-            {/* Flowing light pulses, looping, once the network is drawn */}
-            {[
-              trunkPath(TRUNK_Y['sound-design'], TRUNK_Y['highlight-cut']),
-              trunkPath(TRUNK_Y['highlight-cut'], TRUNK_Y['full-episode-edit']),
-              ...BRANCH_X.map((x) => branchPath(x)),
-            ].map((d, i) => (
-              <motion.path
-                key={`flow-${i}`}
-                d={d}
-                stroke="url(#postProdFlowGradient)"
-                strokeWidth={3}
-                strokeLinecap="round"
-                strokeDasharray="60 900"
-                initial={{ opacity: 0 }}
-                animate={{ strokeDashoffset: [0, -960], opacity: 1 }}
-                transition={{
-                  opacity: { duration: 0.4, delay: 1.9 + i * 0.12 },
-                  strokeDashoffset: { duration: 3.2, repeat: Infinity, ease: 'linear', delay: 1.9 + i * 0.12 },
-                }}
-              />
-            ))}
-          </svg>
-
-          {/* Main chain nodes */}
-          {POST_ITEMS.map((item, i) => {
-            const isFinal = item.id === 'full-episode-edit';
-            const isHighlightCut = item.id === 'highlight-cut';
-            return (
-              <motion.div
-                key={item.id}
-                initial={{ opacity: 0, y: 14, scale: 0.94 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                transition={{ duration: 0.45, delay: i * 0.4, ease: EASE }}
-                className="absolute -translate-x-1/2 -translate-y-1/2"
-                style={{ left: pct(TRUNK_X, SPACE_W), top: pct(TRUNK_Y[item.id], SPACE_H) }}
-              >
-                <div
-                  onClick={isHighlightCut ? onOpenHighlight : undefined}
-                  className={`relative flex items-center gap-3 rounded-xl border border-[var(--rule)] bg-[var(--surface)] px-4 py-3 shadow-[0_6px_20px_color-mix(in_oklch,var(--on-surface)_6%,transparent)] ${isHighlightCut ? 'cursor-pointer hover:border-[var(--accent-ring)] transition-colors' : ''}`}
-                >
-                  {isFinal && (
-                    <motion.span
-                      className="pointer-events-none absolute inset-0 rounded-xl border-2 border-[var(--color-brand)]"
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: [0, 0.6, 0], scale: [1, 1.12, 1.22] }}
-                      transition={{ duration: 2.2, repeat: Infinity, delay: 1.6, ease: EASE }}
-                    />
-                  )}
-                  <motion.span
-                    className="h-2 w-2 shrink-0 rounded-full bg-[var(--color-brand)]"
-                    animate={{ scale: [1, 1.4, 1], opacity: [1, 0.6, 1] }}
-                    transition={{ duration: 1.8, repeat: Infinity, delay: i * 0.3, ease: EASE }}
-                  />
-                  <span className="font-label text-[9px] tracking-[0.15em] text-[var(--muted)]">{item.number}</span>
-                  <span className="font-body whitespace-nowrap text-[13px] text-[var(--on-surface)]">{item.label}</span>
-                  {isHighlightCut && (
-                    <span className="ml-1 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[var(--accent-wash)] text-[var(--accent)]">
-                      <EyeIcon />
-                    </span>
-                  )}
-                </div>
-              </motion.div>
-            );
-          })}
-
-          {/* Output nodes fanned out from Full Episode Edit */}
-          {OUTPUT_ITEMS.map((item, i) => (
-            <motion.div
-              key={item.id}
-              initial={{ opacity: 0, y: 18, scale: 0.85 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              transition={{ duration: 0.5, delay: 1.5 + i * 0.1, ease: EASE }}
-              className="absolute -translate-x-1/2 -translate-y-1/2"
-              style={{ left: pct(BRANCH_X[i], SPACE_W), top: pct(BRANCH_Y, SPACE_H) }}
-            >
-              <div className="flex w-[9.4rem] flex-col items-center gap-1.5 rounded-lg border border-[var(--rule)] bg-[var(--surface-2)] px-3 py-3 text-center transition-all hover:border-[var(--accent-ring)] hover:-translate-y-1 sm:w-[10.5rem]">
-                <span className="font-label text-[9px] tracking-[0.15em] text-[var(--accent)]">{item.number}</span>
-                <span className="font-body text-[11.5px] leading-snug text-[var(--on-surface)]">{item.label}</span>
-              </div>
-            </motion.div>
           ))}
-        </div>
-      </div>
+          {/* ports */}
+          <circle cx={HUB_X + HUB_W} cy={HUB_CY} r={5} fill="var(--accent-vivid)" />
+          <circle cx={HUB_X + HUB_W} cy={HUB_CY} r={9} fill="none" stroke="var(--accent-vivid)" strokeOpacity={0.3} />
+          <circle cx={HUB_X} cy={HUB_CY} r={4} fill="var(--accent-vivid)" />
+          {OUT_CY.map((cy) => (
+            <circle key={cy} cx={OUT_X} cy={cy} r={3.4} fill="var(--accent-vivid)" />
+          ))}
+        </svg>
 
-      {/* Mobile fallback: stacked vertical timeline, branches read top-to-bottom */}
-      <div className="relative md:hidden">
-        <div className="relative flex flex-col gap-2.5 pl-2">
-          <div className="absolute left-[19px] top-3 bottom-3 w-px bg-[var(--rule-strong)]" />
-          {POST_ITEMS.map((item, i) => {
-            const isHighlightCut = item.id === 'highlight-cut';
-            return (
-              <motion.div
-                key={item.id}
-                initial={{ opacity: 0, x: -10 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.4, delay: i * 0.15, ease: EASE }}
-                onClick={isHighlightCut ? onOpenHighlight : undefined}
-                className={`relative flex items-center gap-3 rounded-lg border border-[var(--rule)] bg-[var(--surface)] px-4 py-3 ${isHighlightCut ? 'cursor-pointer' : ''}`}
-              >
-                <motion.span
-                  className="h-2 w-2 shrink-0 rounded-full bg-[var(--color-brand)]"
-                  animate={{ scale: [1, 1.4, 1], opacity: [1, 0.6, 1] }}
-                  transition={{ duration: 1.8, repeat: Infinity, delay: i * 0.3, ease: EASE }}
-                />
-                <span className="font-label text-[9px] tracking-[0.15em] text-[var(--muted)]">{item.number}</span>
-                <span className="font-body flex-1 text-[13px] text-[var(--on-surface)]">{item.label}</span>
-                {isHighlightCut && (
+        {POST_ITEMS.slice(0, 2).map((item, i) => (
+          <ChainNode
+            key={item.id}
+            item={item}
+            i={i}
+            hovered={chainHover === i}
+            onHover={(v) => setChainHover(v ? i : null)}
+            onClick={item.id === 'highlight-cut' ? onOpenHighlight : undefined}
+          />
+        ))}
+
+        <Hub item={POST_ITEMS[2]} hovered={hubHover} onHover={setHubHover} />
+
+        {OUTPUT_ITEMS.map((item, i) => (
+          <OutputCard
+            key={item.id}
+            item={item}
+            i={i}
+            hovered={outHover === i}
+            onHover={(v) => setOutHover(v ? i : null)}
+          />
+        ))}
+      </SlideCanvas>
+
+      {/* Mobile */}
+      <div className="md:hidden">
+        <motion.h2
+          className="font-display-xl mb-5 text-center text-[30px] leading-none text-[var(--on-surface)]"
+          initial={{ opacity: 0, y: -8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, ease: EASE }}
+        >
+          POST-PRODUCTION
+        </motion.h2>
+
+        <MobileRail>
+          {POST_ITEMS.map((item, i) => (
+            <MobileNode
+              key={item.id}
+              index={item.number}
+              label={item.label}
+              i={i}
+              onClick={item.id === 'highlight-cut' ? onOpenHighlight : undefined}
+              trailing={
+                item.id === 'highlight-cut' ? (
                   <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[var(--accent-wash)] text-[var(--accent)]">
                     <EyeIcon />
                   </span>
-                )}
-              </motion.div>
-            );
-          })}
-        </div>
+                ) : undefined
+              }
+            />
+          ))}
+        </MobileRail>
 
-        <motion.div
-          initial={{ opacity: 0, scale: 0 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.3, delay: 0.55, ease: EASE }}
-          className="my-4 flex items-center gap-3 pl-2"
-        >
+        <div className="my-4 flex items-center gap-3 pl-2">
           <div className="h-px flex-1 bg-[var(--rule)]" />
           <span className="font-label text-[9px] tracking-[0.25em] text-[var(--muted)] uppercase">Branches into</span>
           <div className="h-px flex-1 bg-[var(--rule)]" />
-        </motion.div>
+        </div>
 
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-col gap-2.5">
           {OUTPUT_ITEMS.map((item, i) => (
             <motion.div
               key={item.id}
               initial={{ opacity: 0, x: -14, scale: 0.96 }}
               animate={{ opacity: 1, x: 0, scale: 1 }}
-              transition={{ duration: 0.4, delay: 0.7 + i * 0.09, ease: EASE }}
-              className="flex items-center gap-3 rounded-lg border border-[var(--rule)] bg-[var(--surface-2)] px-4 py-2.5"
+              transition={{ duration: 0.45, delay: 0.5 + i * 0.08, ease: EASE }}
+              className="flex items-center gap-3 rounded-xl border border-[var(--rule)] bg-[var(--surface-2)] px-4 py-3"
             >
-              <span className="font-label text-[9px] tracking-[0.15em] text-[var(--accent)]">{item.number}</span>
-              <span className="font-body text-[12px] text-[var(--on-surface)]">{item.label}</span>
+              <span className="font-label tnum text-[10px] tracking-[0.18em] text-[var(--accent)]">{item.number}</span>
+              <span className="font-body text-[13px] text-[var(--on-surface)]">{item.label}</span>
             </motion.div>
           ))}
         </div>
@@ -279,20 +397,20 @@ export default function PostProductionSlide() {
       {showHighlight ? (
         <motion.div
           key="highlight"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.35, ease: EASE }}
+          initial={{ opacity: 0, scale: 0.985 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0, scale: 0.985 }}
+          transition={{ duration: 0.4, ease: EASE }}
         >
           <HighlightCutSlide onExit={() => setShowHighlight(false)} />
         </motion.div>
       ) : (
         <motion.div
           key="pipeline"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.35, ease: EASE }}
+          initial={{ opacity: 0, scale: 0.985 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0, scale: 0.985 }}
+          transition={{ duration: 0.4, ease: EASE }}
         >
           <Pipeline onOpenHighlight={() => setShowHighlight(true)} />
         </motion.div>
