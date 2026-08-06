@@ -13,8 +13,20 @@
  *
  * No scroll triggers, no viewport observers. A local `phase` state drives
  * everything, auto-advancing once on mount and yielding to the viewer the
- * instant they click anything — so the whole story fits inside a 16:9 slide,
- * plays itself as an introduction, and stays fully scrubbable afterward.
+ * instant they click anything.
+ *
+ * ONE COORDINATE SPACE, LIKE EVERY OTHER DIAGRAM ON /process. The previous
+ * version positioned the waveform inside a 40px `inset-x-10` div, then
+ * positioned its connector lines and cut-mark with percentages measured
+ * against the OUTER frame — two different rulers for one drawing, so nothing
+ * lined up. Worse, the cut-mark's `left` was a CSS calc() multiplying a
+ * percentage by a percentage (`${CENTRE}% * 0.01 * (100% - 80px)`), which is
+ * invalid arithmetic in CSS calc() — the browser drops the whole declaration,
+ * so the badge was never actually where the math said it should be. Every
+ * element below is placed with the same `pct(v, SPACE_W | SPACE_H)` helper
+ * PlanningSlide/ExecutionSlide/PostProductionSlide already use, against one
+ * 1000x560 space, so a bar's real position and the line pointing at it are
+ * computed from the same numbers.
  */
 
 import { useEffect, useRef, useState } from 'react';
@@ -24,14 +36,69 @@ import { MOMENT_BAR } from '@/content/steps';
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 
-/* Render in a 960x540 coordinate space so the layout is fixed. */
-const CENTRE = MOMENT_BAR.start + MOMENT_BAR.width / 2;
+/* ── Shared coordinate space ─────────────────────────────────────────────
+   Matches the 1000-wide convention every other /process diagram uses. Height
+   is picked close to 16:9 at that width so the stage's own proportions and
+   the outer aspect-ratio box roughly agree (not load bearing — the SVG uses
+   preserveAspectRatio="none" — but it keeps stroke widths from distorting). */
+const SPACE_W = 1000;
+const SPACE_H = 560;
 
-/* Stage geometry */
-const SESSION_Y = 74;
-const CLIP_Y = 268;
-const CLIP_H = 64;
-const EPISODE_Y = 446;
+const TRACK_X0 = 60;
+const TRACK_X1 = 940;
+const TRACK_W = TRACK_X1 - TRACK_X0;
+
+const SESSION_LABEL_Y = 42;
+const SESSION_WAVE_Y = 64;
+const SESSION_WAVE_H = 70;
+const SESSION_WAVE_BOTTOM = SESSION_WAVE_Y + SESSION_WAVE_H;
+
+const CLIP_TOP = 248;
+const CLIP_H = 118;
+const CLIP_BOTTOM = CLIP_TOP + CLIP_H;
+
+const EPISODE_LABEL_Y = 436;
+const EPISODE_WAVE_Y = 458;
+
+/* The moment's true horizontal position in the shared space — one number,
+   used by the waveform highlight, the timecode badge, the cut-mark and both
+   connectors, so all four agree by construction rather than by coincidence. */
+const MOMENT_FRACTION = (MOMENT_BAR.start + MOMENT_BAR.width / 2) / 100;
+const MOMENT_X = TRACK_X0 + MOMENT_FRACTION * TRACK_W;
+
+/* The clip card sits directly beneath the moment it was cut from — a
+   straight connector, not an approximation — then the second connector
+   carries it back to the LEFT edge of the track, because the finished
+   episode opens with it. */
+const CLIP_CENTER_X = MOMENT_X;
+
+const pct = (v: number, total: number) => `${(v / total) * 100}%`;
+
+function straightPath(x: number, y1: number, y2: number) {
+  return `M${x},${y1} L${x},${y2}`;
+}
+
+/* Smooth S-curve for the one connector that actually changes column —
+   clip card back to the front of the episode waveform. Same curve shape
+   PostProductionSlide's own branch paths use. */
+function curvePath(x1: number, y1: number, x2: number, y2: number) {
+  const midY = y1 + (y2 - y1) * 0.55;
+  const ctrl2Y = y1 + (y2 - y1) * 0.25;
+  return `M${x1},${y1} C${x1},${midY} ${x2},${ctrl2Y} ${x2},${y2}`;
+}
+
+/* mm:ss from a 0..1 fraction of the session, so the timecode on screen is
+   always the number the highlighted bars actually represent — not a fixed
+   string that drifts the moment MOMENT_BAR's numbers change. */
+const TOTAL_MINUTES = Number(MOMENT_BAR.durationLabel.match(/\d+/)?.[0] ?? 60);
+function timecode(fractionOfTotal: number) {
+  const totalSeconds = Math.round(fractionOfTotal * TOTAL_MINUTES * 60);
+  const m = Math.floor(totalSeconds / 60);
+  const s = totalSeconds % 60;
+  return `${m}:${String(s).padStart(2, '0')}`;
+}
+const MOMENT_START_TC = timecode(MOMENT_BAR.start / 100);
+const MOMENT_END_TC = timecode((MOMENT_BAR.start + MOMENT_BAR.width) / 100);
 
 /* A deterministic, organic-looking waveform — three sines at incommensurate
    frequencies, so nothing repeats visibly across 72 bars. Fixed rather than
@@ -91,7 +158,16 @@ function Waveform({
   );
 }
 
-export default function HighlightCutSlide() {
+function EyeOffIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 10 8 10 8a17.5 17.5 0 0 1-2.16 3.19M6.61 6.61C3.86 8.36 2 11 2 12s3 8 10 8a9.13 9.13 0 0 0 5.39-1.61M14.12 14.12a3 3 0 1 1-4.24-4.24" />
+      <path d="M2 2l20 20" />
+    </svg>
+  );
+}
+
+export default function HighlightCutSlide({ onExit }: { onExit?: () => void } = {}) {
   const [phase, setPhase] = useState<0 | 1 | 2 | 3>(0);
   const [hovering, setHovering] = useState(false);
   const autoPlaying = useRef(true);
@@ -138,13 +214,48 @@ export default function HighlightCutSlide() {
           }}
         />
 
+        {/* Back to pipeline — same dissolve toggle as the eye badge that opened this */}
+        {onExit && (
+          <button
+            onClick={onExit}
+            aria-label="Back to the edit pipeline"
+            className="absolute right-4 top-4 z-20 flex h-8 w-8 items-center justify-center rounded-full border border-[var(--rule)] bg-[var(--surface)] text-[var(--muted)] shadow-sm transition-colors hover:border-[var(--accent-ring)] hover:text-[var(--accent)]"
+          >
+            <EyeOffIcon />
+          </button>
+        )}
+
+        {/* Connector lines, all in the one shared coordinate space */}
+        <svg className="absolute inset-0 h-full w-full" viewBox={`0 0 ${SPACE_W} ${SPACE_H}`} preserveAspectRatio="none" fill="none">
+          {/* moment → clip */}
+          <motion.path
+            d={straightPath(MOMENT_X, SESSION_WAVE_BOTTOM + 10, CLIP_TOP)}
+            stroke="var(--accent-vivid)"
+            strokeWidth={2}
+            vectorEffect="non-scaling-stroke"
+            initial={{ pathLength: 0, opacity: 0 }}
+            animate={phase >= 2 ? { pathLength: 1, opacity: 1 } : { pathLength: 0, opacity: 0 }}
+            transition={{ duration: 0.5, delay: 0.25, ease: EASE }}
+          />
+          {/* clip → front of the finished episode */}
+          <motion.path
+            d={curvePath(CLIP_CENTER_X, CLIP_BOTTOM, TRACK_X0, EPISODE_WAVE_Y - 10)}
+            stroke="var(--accent-vivid)"
+            strokeWidth={2}
+            vectorEffect="non-scaling-stroke"
+            initial={{ pathLength: 0, opacity: 0 }}
+            animate={phase >= 3 ? { pathLength: 1, opacity: 1 } : { pathLength: 0, opacity: 0 }}
+            transition={{ duration: 0.55, delay: 0.2, ease: EASE }}
+          />
+        </svg>
+
         {/* ── Stage 1 · full session, as a waveform ─────────────────────── */}
         <motion.div
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, ease: EASE }}
-          className="absolute inset-x-10"
-          style={{ top: SESSION_Y - 34 }}
+          className="absolute"
+          style={{ left: pct(TRACK_X0, SPACE_W), top: pct(SESSION_LABEL_Y, SPACE_H), width: pct(TRACK_W, SPACE_W) }}
         >
           <div className="mb-3 flex items-center justify-between">
             <span className="font-mono text-[9px] font-bold uppercase tracking-[0.18em] text-[var(--muted)]">
@@ -191,7 +302,8 @@ export default function HighlightCutSlide() {
               )}
             </AnimatePresence>
 
-            {/* timecode tick above the moment */}
+            {/* timecode tick above the moment — position derived from the
+                same MOMENT_FRACTION as the connector below it */}
             <AnimatePresence>
               {(phase >= 1 || hovering) && (
                 <motion.span
@@ -200,31 +312,23 @@ export default function HighlightCutSlide() {
                   exit={{ opacity: 0, y: -6 }}
                   transition={{ duration: 0.25 }}
                   className="absolute -top-8 -translate-x-1/2 whitespace-nowrap rounded-full border border-[var(--accent-ring)] bg-[var(--accent-wash)] px-2 py-0.5 font-mono text-[8px] font-bold tracking-[0.12em] text-[var(--accent)]"
-                  style={{ left: `${CENTRE}%` }}
+                  style={{ left: `${MOMENT_FRACTION * 100}%` }}
                 >
-                  {MOMENT_BAR.label} · 0:41 TO 1:52
+                  {MOMENT_BAR.label} · {MOMENT_START_TC} TO {MOMENT_END_TC}
                 </motion.span>
               )}
             </AnimatePresence>
           </div>
         </motion.div>
 
-        {/* ── connector: moment → clip ───────────────────────────── */}
-        <motion.div
-          className="absolute w-px bg-[var(--accent-vivid)]"
-          style={{ left: `${CENTRE}%`, top: SESSION_Y + 14 + 4, height: CLIP_Y - (SESSION_Y + 14 + 4), transformOrigin: 'top' }}
-          initial={{ scaleY: 0, opacity: 0 }}
-          animate={phase >= 2 ? { scaleY: 1, opacity: 1 } : { scaleY: 0, opacity: 0 }}
-          transition={{ duration: 0.55, delay: 0.25, ease: EASE }}
-        />
-
-        {/* the cut mark — flashes once at the instant of extraction */}
+        {/* the cut mark — flashes once at the instant of extraction, sitting
+            exactly on the connector's start point */}
         <AnimatePresence>
           {phase === 2 && (
             <motion.span
               key="cut-mark"
-              className="absolute flex h-6 w-6 -translate-x-1/2 items-center justify-center rounded-full bg-[var(--accent-vivid)] text-[var(--on-accent)]"
-              style={{ left: `calc(${CENTRE}% * 0.01 * (100% - 80px) + 40px)`, top: SESSION_Y + 14 - 12 }}
+              className="absolute flex h-6 w-6 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-[var(--accent-vivid)] text-[var(--on-accent)]"
+              style={{ left: pct(MOMENT_X, SPACE_W), top: pct(SESSION_WAVE_BOTTOM + 10, SPACE_H) }}
               initial={{ opacity: 0, scale: 0.4, rotate: -20 }}
               animate={{ opacity: [0, 1, 1, 0], scale: [0.4, 1.15, 1, 0.8], rotate: 0 }}
               exit={{ opacity: 0 }}
@@ -239,15 +343,15 @@ export default function HighlightCutSlide() {
           )}
         </AnimatePresence>
 
-        {/* ── Stage 2 · the clip ─────────────────────────────────── */}
+        {/* ── Stage 2 · the clip — centred on the moment it was cut from ──── */}
         <motion.div
-          className="absolute inset-x-10"
-          style={{ top: CLIP_Y }}
+          className="absolute -translate-x-1/2"
+          style={{ left: pct(CLIP_CENTER_X, SPACE_W), top: pct(CLIP_TOP, SPACE_H) }}
           initial={{ opacity: 0, y: 18 }}
           animate={phase >= 2 ? { opacity: 1, y: 0 } : { opacity: 0, y: 18 }}
           transition={{ duration: 0.5, delay: 0.55, ease: EASE }}
         >
-          <div className="relative mx-auto flex w-[min(420px,70%)] flex-col items-center gap-2 rounded-2xl border-2 border-[var(--accent-ring)] bg-[var(--accent-wash)] px-6 py-4">
+          <div className="relative flex w-[300px] sm:w-[340px] flex-col items-center gap-2 rounded-2xl border-2 border-[var(--accent-ring)] bg-[var(--accent-wash)] px-6 py-4">
             <motion.span
               className="pointer-events-none absolute inset-0 rounded-2xl border-2 border-[var(--accent-vivid)]"
               initial={{ opacity: 0 }}
@@ -282,26 +386,10 @@ export default function HighlightCutSlide() {
           </div>
         </motion.div>
 
-        {/* ── connector: clip → front of episode ─────────────────── */}
-        <motion.div
-          className="absolute w-px bg-[var(--accent-vivid)]"
-          style={{ left: `${MIN(30, CENTRE)}%`, top: CLIP_Y + CLIP_H, height: EPISODE_Y - (CLIP_Y + CLIP_H), transformOrigin: 'top' }}
-          initial={{ scaleY: 0, opacity: 0 }}
-          animate={phase >= 3 ? { scaleY: 1, opacity: 1 } : { scaleY: 0, opacity: 0 }}
-          transition={{ duration: 0.5, delay: 0.2, ease: EASE }}
-        />
-        <motion.div
-          className="absolute h-px bg-[var(--accent-vivid)]"
-          style={{ top: EPISODE_Y + 7, left: 40 + 24, width: `calc(${CENTRE}% - 64px)`, transformOrigin: 'left' }}
-          initial={{ scaleX: 0, opacity: 0 }}
-          animate={phase >= 3 ? { scaleX: 1, opacity: 1 } : { scaleX: 0, opacity: 0 }}
-          transition={{ duration: 0.5, delay: 0.35, ease: EASE }}
-        />
-
         {/* ── Stage 3 · the finished episode, waveform rearranged ──── */}
         <motion.div
-          className="absolute inset-x-10"
-          style={{ top: EPISODE_Y }}
+          className="absolute"
+          style={{ left: pct(TRACK_X0, SPACE_W), top: pct(EPISODE_LABEL_Y, SPACE_H), width: pct(TRACK_W, SPACE_W) }}
           initial={{ opacity: 0, y: 14 }}
           animate={phase >= 3 ? { opacity: 1, y: 0 } : { opacity: 0, y: 14 }}
           transition={{ duration: 0.5, delay: 0.6, ease: EASE }}
@@ -350,8 +438,4 @@ export default function HighlightCutSlide() {
       </div>
     </div>
   );
-}
-
-function MIN(a: number, b: number) {
-  return a < b ? a : b;
 }
