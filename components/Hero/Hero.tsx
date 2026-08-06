@@ -462,7 +462,7 @@ export default function Hero() {
                 glow. Orange stays an accent — never the surface. */}
             <Magnetic disabled={still} className="block w-full sm:inline-block sm:w-auto">
               <a
-                href="/steps#framework"
+                href="/process"
                 className="btn-premium group flex w-full cursor-pointer items-center justify-center gap-2.5 rounded-2xl px-7 py-4 text-[15px] font-medium text-paper-25 sm:inline-flex sm:w-auto"
                 style={{
                   background: 'linear-gradient(180deg,var(--color-graphite-800) 0%,var(--color-ink) 100%)',

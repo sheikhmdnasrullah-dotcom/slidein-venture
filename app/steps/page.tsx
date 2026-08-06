@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { notFound } from 'next/navigation';
 import Section from '@/components/Section';
 import SectionHead from '@/components/Steps/SectionHead';
 import StepsHero from '@/components/Steps/StepsHero';
@@ -65,6 +66,11 @@ export const metadata: Metadata = {
 const [shape, content, whyEmail, outreach, yourPart] = SECTIONS;
 
 export default function StepsPage() {
+  /* Pulled out of the nav, footer, and homepage CTA at the owner's request —
+     kept in place rather than deleted so it can come back with one line
+     removed here instead of a rebuild. */
+  notFound();
+
   return (
     /* One provider for the whole page, because the tier 3 rule is "one open at
        a time" page wide rather than per section. See Disclosure.tsx. */

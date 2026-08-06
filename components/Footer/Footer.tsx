@@ -10,7 +10,6 @@ import { LogoWordmark } from '@/components/Brand/Logo';
  */
 const LIVE_LINKS = [
   { label: 'Solutions', href: '/solutions' },
-  { label: 'Steps', href: '/steps' },
   { label: 'Process', href: '/process' },
   { label: 'Pricing', href: '/pricing' },
 ];
