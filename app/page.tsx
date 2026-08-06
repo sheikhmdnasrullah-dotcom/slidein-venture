@@ -47,13 +47,24 @@ export default function Home() {
 
       <Section
         id="framework"
-        tone="raised"
+        tone="base"
         pad="tall"
         seam
         bleed
         className="scroll-mt-[120px]"
       >
         <FrameworkEngines className="mt-4 md:mt-6" />
+        <div className="mt-8 flex justify-center">
+          <a
+            href="/process"
+            className="inline-flex items-center gap-2 rounded-full border border-[var(--rule-strong)] bg-[var(--surface)] px-6 py-3 text-[15px] font-medium text-[var(--on-surface)] transition-all hover:border-[var(--accent-ring)] hover:shadow-[0_8px_30px_color-mix(in_oklch,var(--on-surface)_8%,transparent)]"
+          >
+            See the whole process
+            <svg width="15" height="15" viewBox="0 0 15 15" fill="none" aria-hidden className="transition-transform duration-500 ease-out group-hover:translate-x-1">
+              <path d="M3 7.5h9M8 3.5l4 4-4 4" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </a>
+        </div>
       </Section>
     </>
   );

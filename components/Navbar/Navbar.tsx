@@ -1,11 +1,13 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import LetsTalkButton from './LetsTalkButton';
 
 const navLinks = [
+  { label: 'Home', href: '/' },
+  { label: 'Steps', href: '/steps' },
   { label: 'Process', href: '/process' },
   { label: 'Portfolio', href: '/portfolio' },
   { label: 'Pricing', href: '/pricing' },
@@ -16,10 +18,36 @@ export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [hoveredLink, setHoveredLink] = useState<string | null>(null);
+  const [activeLink, setActiveLink] = useState<string>('Home');
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 10);
+    const onScroll = () => {
+      setScrolled(window.scrollY > 10);
+
+      const sections = [
+        { id: 'top', href: '/', label: 'Home' },
+        { id: 'steps', href: '/steps', label: 'Steps' },
+        { id: 'process', href: '/process', label: 'Process' },
+        { id: 'portfolio', href: '/portfolio', label: 'Portfolio' },
+        { id: 'pricing', href: '/pricing', label: 'Pricing' },
+      ];
+
+      let current = 'Home';
+      for (const section of sections) {
+        const el = document.getElementById(section.id);
+        if (el) {
+          const rect = el.getBoundingClientRect();
+          if (rect.top <= 150 && rect.bottom >= 150) {
+            current = section.label;
+            break;
+          }
+        }
+      }
+      setActiveLink(current);
+    };
+
     window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
@@ -74,23 +102,28 @@ export default function Navbar() {
 
           {/* ── Desktop Nav Links ─────────────────────────────────────── */}
           <div className="hidden lg:flex items-center gap-0.5 px-3" onMouseLeave={() => setHoveredLink(null)}>
-            {navLinks.map((link) => (
-              <Link
-                key={link.label}
-                href={link.href}
-                onMouseEnter={() => setHoveredLink(link.label)}
-                className="relative inline-flex items-center whitespace-nowrap rounded-full px-5 py-2.5 text-[16px] font-[500] text-[var(--muted)] transition-colors duration-150 hover:text-[var(--on-surface)]"
-              >
-                {hoveredLink === link.label && (
-                  <motion.span
-                    layoutId="nav-liquid-pill"
-                    className="absolute inset-0 rounded-full bg-[var(--rule)]"
-                    transition={{ type: 'spring', stiffness: 400, damping: 32 }}
-                  />
-                )}
-                <span className="relative">{link.label}</span>
-              </Link>
-            ))}
+            {navLinks.map((link) => {
+              const isActive = activeLink === link.label;
+              return (
+                <Link
+                  key={link.label}
+                  href={link.href}
+                  onMouseEnter={() => setHoveredLink(link.label)}
+                  className={`relative inline-flex items-center whitespace-nowrap rounded-full px-5 py-2.5 text-[16px] font-[500] transition-colors duration-150 ${
+                    isActive ? 'text-[var(--on-surface)]' : 'text-[var(--muted)] hover:text-[var(--on-surface)]'
+                  }`}
+                >
+                  {(hoveredLink === link.label || isActive) && (
+                    <motion.span
+                      layoutId="nav-liquid-pill"
+                      className="absolute inset-0 rounded-full bg-[var(--rule)]"
+                      transition={{ type: 'spring', stiffness: 400, damping: 32 }}
+                    />
+                  )}
+                  <span className="relative">{link.label}</span>
+                </Link>
+              );
+            })}
           </div>
 
           {/* ── CTA Button (right side) ───────────────────────────────── */}
