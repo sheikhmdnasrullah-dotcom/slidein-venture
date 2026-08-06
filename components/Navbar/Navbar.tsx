@@ -6,9 +6,10 @@ import { usePathname } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import LetsTalkButton from './LetsTalkButton';
 
+/* Four items and the CTA. /steps is deliberately NOT here — the route still
+   exists and still resolves, it just no longer takes a slot in the nav. */
 const navLinks = [
   { label: 'Home', href: '/' },
-  { label: 'Steps', href: '/steps' },
   { label: 'Process', href: '/process' },
   { label: 'Portfolio', href: '/portfolio' },
   { label: 'Pricing', href: '/pricing' },
@@ -138,22 +139,17 @@ export default function Navbar() {
           animate={{ y: 0, opacity: 1, scale: scrolled ? 0.955 : 1 }}
           transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
         >
-          {/* ── Home Pill ──────────────────────────────────────────────── */}
-          <Link
-            href="/"
-            className="group flex h-[48px] flex-shrink-0 items-center rounded-full px-6 transition-all duration-300 hover:bg-[var(--surface)]"
-            style={{
-              background: 'var(--surface-glass)',
-              border: '1px solid var(--rule)',
-              boxShadow: 'var(--shadow-contact)',
-            }}
-            aria-label="Home"
-          >
-            <span className="text-[15px] font-[700] tracking-[0.03em] text-[var(--on-surface)] group-hover:text-[var(--accent)] transition-colors">
-              Home
-            </span>
-          </Link>
+          {/* THE STANDALONE HOME PILL IS GONE. It rendered a second "Home"
+              button immediately to the left of the Home in the link row, so
+              the desktop nav read Home · Home · Process · Portfolio · Pricing.
+              Two controls with the same label going to the same route is a
+              duplicate whichever one you call the anchor, and only one of them
+              could ever carry the active marker — which made the marker look
+              broken rather than the nav look wrong.
 
+              Home now lives in the link row like every other destination, and
+              the bar is exactly the five controls it should be: Home, Process,
+              Portfolio, Pricing, Let's Talk. */}
           {/* ── Desktop Nav Links ───────────────────────────────────────
               TWO INDICATORS, NOT ONE. There used to be a single shared
               `layoutId` driving both hover and active, which meant hovering

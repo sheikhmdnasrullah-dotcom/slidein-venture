@@ -10,6 +10,7 @@
  */
 
 import { useCallback, useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import FitScale from './FitScale';
 import PlanningSlide from './PlanningSlide';
@@ -114,7 +115,13 @@ export default function ContentProcessModal({ open, phaseId, onClose }: ContentP
 
   const phase = CONTENT_PHASES[activeIndex];
 
-  return (
+  /* Portalled for the same reason OutreachProcessModal is: this renders
+     inside <Section>, whose `isolate` opens a stacking context, so z-1100
+     declared in here loses to the navbar's z-1000 declared at the document
+     root and the nav pill paints over the slide. */
+  if (typeof document === 'undefined') return null;
+
+  return createPortal(
     <AnimatePresence>
       {open && phase && (
         <motion.div
@@ -211,6 +218,7 @@ export default function ContentProcessModal({ open, phaseId, onClose }: ContentP
           </motion.div>
         </motion.div>
       )}
-    </AnimatePresence>
+    </AnimatePresence>,
+    document.body
   );
 }

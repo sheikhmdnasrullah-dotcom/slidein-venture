@@ -72,7 +72,11 @@ export default function Home() {
             an orange edge that arrives on hover. `group` is on the anchor —
             without it the arrow's `group-hover:translate-x-1` had no group to
             hang off and the glyph never moved. */}
-        <div className="mt-12 flex justify-center">
+        {/* mt-20, not mt-12. The outcome plate above throws a blurred orange
+            bloom well past its own bottom edge, and at twelve the secondary
+            button sat inside that glow — which read as one lit object with a
+            pill stuck to it rather than as two separate actions. */}
+        <div className="mt-20 flex justify-center">
           <a
             href="/process"
             className="btn-premium group inline-flex items-center gap-2.5 rounded-[var(--radius-pill)] px-7 py-4 text-[15px] font-medium text-[var(--on-surface)] transition-[border-color] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] hover:border-[var(--accent-ring)]"
