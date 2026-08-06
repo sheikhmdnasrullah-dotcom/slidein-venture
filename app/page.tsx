@@ -45,23 +45,49 @@ export default function Home() {
     <>
       <Hero />
 
+      {/* NO SEAM, AND THAT IS THE FIX FOR THE "ORANGE BAND" COMPLAINT.
+          This band is `tone="base"` — the page's own value — so there is no
+          value change to mark, and a `seam` hairline across the full width was
+          drawing a horizontal line where nothing actually joins. That line,
+          plus FrameworkEngines' own decorative glow, was what made the section
+          read as a separate warm panel dropped onto a white page.
+
+          The glow is now a low-alpha wash masked to nothing at its edges (see
+          FrameworkEngines), the seam is gone, and `bleed` stays because its
+          gradient runs to --bleed-to, which on this tone IS the page fill — an
+          invisible run-up rather than a join. The warmth survives; the edge
+          does not. */}
       <Section
         id="framework"
         tone="base"
         pad="tall"
-        seam
         bleed
         className="scroll-mt-[120px]"
       >
         <FrameworkEngines className="mt-4 md:mt-6" />
-        <div className="mt-8 flex justify-center">
+
+        {/* Secondary action, directly under the outcome plate the band ends
+            on. Deliberately NOT a second orange object: the outcome card above
+            it is the only filled orange in this band, so this one is paper with
+            an orange edge that arrives on hover. `group` is on the anchor —
+            without it the arrow's `group-hover:translate-x-1` had no group to
+            hang off and the glyph never moved. */}
+        <div className="mt-12 flex justify-center">
           <a
             href="/process"
-            className="inline-flex items-center gap-2 rounded-full border border-[var(--rule-strong)] bg-[var(--surface)] px-6 py-3 text-[15px] font-medium text-[var(--on-surface)] transition-all hover:border-[var(--accent-ring)] hover:shadow-[0_8px_30px_color-mix(in_oklch,var(--on-surface)_8%,transparent)]"
+            className="btn-premium group inline-flex items-center gap-2.5 rounded-[var(--radius-pill)] px-7 py-4 text-[15px] font-medium text-[var(--on-surface)] transition-[border-color] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] hover:border-[var(--accent-ring)]"
+            style={{ background: 'var(--surface)', border: '1px solid var(--rule-strong)' }}
           >
             See the whole process
-            <svg width="15" height="15" viewBox="0 0 15 15" fill="none" aria-hidden className="transition-transform duration-500 ease-out group-hover:translate-x-1">
-              <path d="M3 7.5h9M8 3.5l4 4-4 4" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
+            <svg
+              width="15"
+              height="15"
+              viewBox="0 0 15 15"
+              fill="none"
+              aria-hidden
+              className="text-[var(--accent)] transition-transform duration-500 ease-out group-hover:translate-x-1"
+            >
+              <path d="M3 7.5h9M8 3.5l4 4-4 4" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
           </a>
         </div>

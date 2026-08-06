@@ -306,15 +306,28 @@ export default function FrameworkEngines({ className }: { className?: string }) 
 
   return (
     <div className={cn('relative mx-auto max-w-[1160px] px-6 md:px-10', className)}>
-      {/* A faint drifting glow behind the whole drawing, purely decorative */}
+      {/* AMBIENT LIGHT, NOT A COLOURED PANEL.
+          This wash used to run at 12–14% brand over a hard-edged box at 25–45%
+          opacity, which is why this band read as an orange section bolted onto
+          a white page: the gradient stopped dead at the box's edges, and the
+          eye reads a stopped gradient as an edge.
+
+          Two changes. The alphas come down to 6/5% — still unmistakably warm,
+          no longer a field. And the whole layer is masked with a radial that
+          reaches zero well before its own bounds, so there is no edge anywhere
+          for the eye to catch; it dissolves into --page-fill in every
+          direction. The band and the page are now one continuous surface with
+          a light source in the middle of it. */}
       <motion.div
         aria-hidden
-        className="pointer-events-none absolute -inset-x-10 -inset-y-16 -z-10 opacity-40"
-        animate={{ opacity: [0.25, 0.45, 0.25] }}
-        transition={{ duration: 6, repeat: Infinity, ease: EASE }}
+        className="pointer-events-none absolute -inset-x-24 -inset-y-32 -z-10"
+        animate={{ opacity: [0.6, 0.95, 0.6] }}
+        transition={{ duration: 9, repeat: Infinity, ease: EASE }}
         style={{
           background:
-            'radial-gradient(60% 50% at 20% 20%, color-mix(in oklch, var(--accent) 14%, transparent), transparent), radial-gradient(50% 45% at 85% 75%, color-mix(in oklch, var(--color-brand) 12%, transparent), transparent)',
+            'radial-gradient(58% 46% at 22% 22%, color-mix(in oklch, var(--accent-vivid) 6%, transparent), transparent 70%), radial-gradient(52% 44% at 84% 76%, color-mix(in oklch, var(--accent-vivid) 5%, transparent), transparent 70%)',
+          maskImage: 'radial-gradient(ellipse 74% 66% at 50% 50%, black 8%, transparent 88%)',
+          WebkitMaskImage: 'radial-gradient(ellipse 74% 66% at 50% 50%, black 8%, transparent 88%)',
         }}
       />
 

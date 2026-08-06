@@ -1,7 +1,8 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import LetsTalkButton from './LetsTalkButton';
 
@@ -13,43 +14,96 @@ const navLinks = [
   { label: 'Pricing', href: '/pricing' },
 ];
 
+/* ─── Where am I? ───────────────────────────────────────────────────────────
+   THE ROUTE IS THE TRUTH, NOT THE SCROLL POSITION.
+
+   This used to be scroll-only: it looked for elements with ids `steps`,
+   `process`, `portfolio` and `pricing` in the current document and picked the
+   one crossing y=150. Those are separate ROUTES, not sections — no page has
+   ever contained all four ids — so the loop found nothing, fell through to its
+   `'Home'` default, and the nav highlighted Home on every page of the site.
+
+   So: pathname decides, and an in-page scroll spy only refines the answer when
+   the current page actually contains a section matching another nav entry.
+   Longest-prefix match, so `/steps/anything` still resolves to Steps.
+
+   Returns '' — no active item — for a route that is not in the nav at all
+   (/contact, /solutions). Falling back to 'Home' there would light up Home on
+   a page that is not Home, which is the same lie the old scroll-only version
+   told on every page of the site. */
+function routeLabel(pathname: string): string {
+  if (pathname === '/') return 'Home';
+  const match = navLinks
+    .filter((l) => l.href !== '/' && (pathname === l.href || pathname.startsWith(`${l.href}/`)))
+    .sort((a, b) => b.href.length - a.href.length)[0];
+  return match ? match.label : '';
+}
+
 // ─── Main Navbar ──────────────────────────────────────────────────────────────
 export default function Navbar() {
+  const pathname = usePathname() || '/';
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [hoveredLink, setHoveredLink] = useState<string | null>(null);
-  const [activeLink, setActiveLink] = useState<string>('Home');
+
+  /* THE SCROLL SPY IS A REFINEMENT OF THE ROUTE, NOT A SECOND SOURCE OF TRUTH.
+     It is stored WITH the path it was measured on, and the active item is
+     derived during render — so a route change settles the highlight
+     immediately, on the very first render of the new page, without an effect
+     that calls setState (which React 19 flags as a cascading render, and which
+     would show the previous page's item lit for one frame). */
+  const base = routeLabel(pathname);
+  const [spyHit, setSpyHit] = useState<{ path: string; label: string } | null>(null);
+  const activeLink = spyHit && spyHit.path === pathname ? spyHit.label : base;
 
   useEffect(() => {
+    const currentPath = pathname;
+
+    /* In-page sections that correspond to a nav entry, if this page has any.
+       Resolved once per route rather than on every scroll tick — a
+       getElementById per link per frame is the kind of thing that shows up as
+       jank on a page with a diagram animating in it. */
+    const spy = navLinks
+      .map((l) => {
+        const id = l.href === '/' ? 'top' : l.href.replace(/^\//, '');
+        const el = document.getElementById(id);
+        return el ? { label: l.label, el } : null;
+      })
+      .filter((s): s is { label: string; el: HTMLElement } => s !== null);
+
+    let frame = 0;
     const onScroll = () => {
-      setScrolled(window.scrollY > 10);
+      if (frame) return;
+      frame = window.requestAnimationFrame(() => {
+        frame = 0;
+        setScrolled(window.scrollY > 10);
 
-      const sections = [
-        { id: 'top', href: '/', label: 'Home' },
-        { id: 'steps', href: '/steps', label: 'Steps' },
-        { id: 'process', href: '/process', label: 'Process' },
-        { id: 'portfolio', href: '/portfolio', label: 'Portfolio' },
-        { id: 'pricing', href: '/pricing', label: 'Pricing' },
-      ];
+        /* Scrolled back to the very top of any page — the hero — is always
+           the page's own entry, whatever a section boundary says. */
+        if (window.scrollY < 120) {
+          setSpyHit(null);
+          return;
+        }
 
-      let current = 'Home';
-      for (const section of sections) {
-        const el = document.getElementById(section.id);
-        if (el) {
-          const rect = el.getBoundingClientRect();
+        let current: string | null = null;
+        for (const section of spy) {
+          const rect = section.el.getBoundingClientRect();
           if (rect.top <= 150 && rect.bottom >= 150) {
             current = section.label;
             break;
           }
         }
-      }
-      setActiveLink(current);
+        setSpyHit(current ? { path: currentPath, label: current } : null);
+      });
     };
 
     window.addEventListener('scroll', onScroll, { passive: true });
     onScroll();
-    return () => window.removeEventListener('scroll', onScroll);
-  }, []);
+    return () => {
+      window.removeEventListener('scroll', onScroll);
+      if (frame) window.cancelAnimationFrame(frame);
+    };
+  }, [pathname]);
 
   return (
     <>
@@ -100,27 +154,75 @@ export default function Navbar() {
             </span>
           </Link>
 
-          {/* ── Desktop Nav Links ─────────────────────────────────────── */}
+          {/* ── Desktop Nav Links ───────────────────────────────────────
+              TWO INDICATORS, NOT ONE. There used to be a single shared
+              `layoutId` driving both hover and active, which meant hovering
+              any item STOLE the marker off the active one — the nav forgot
+              where you were for as long as your pointer was in it, then
+              sprang back when you left.
+
+              So the active state is its own persistent layer (a raised paper
+              chip with an orange underline and a lit dot) and hover is a
+              separate, much quieter wash that glides between items on its own
+              layoutId. They can occupy the same item without fighting, and
+              the active marker never leaves. */}
           <div className="hidden lg:flex items-center gap-0.5 px-3" onMouseLeave={() => setHoveredLink(null)}>
             {navLinks.map((link) => {
               const isActive = activeLink === link.label;
+              const isHovered = hoveredLink === link.label;
               return (
                 <Link
                   key={link.label}
                   href={link.href}
+                  aria-current={isActive ? 'page' : undefined}
                   onMouseEnter={() => setHoveredLink(link.label)}
-                  className={`relative inline-flex items-center whitespace-nowrap rounded-full px-5 py-2.5 text-[16px] font-[500] transition-colors duration-150 ${
-                    isActive ? 'text-[var(--on-surface)]' : 'text-[var(--muted)] hover:text-[var(--on-surface)]'
+                  className={`relative inline-flex items-center whitespace-nowrap rounded-full px-5 py-2.5 text-[16px] transition-colors duration-200 ${
+                    isActive
+                      ? 'font-[600] text-[var(--on-surface)]'
+                      : 'font-[500] text-[var(--muted)] hover:text-[var(--on-surface)]'
                   }`}
                 >
-                  {(hoveredLink === link.label || isActive) && (
+                  {/* Hover wash — under the active chip, so an active item you
+                      happen to be pointing at does not double up. */}
+                  {isHovered && !isActive && (
                     <motion.span
-                      layoutId="nav-liquid-pill"
+                      layoutId="nav-hover-wash"
                       className="absolute inset-0 rounded-full bg-[var(--rule)]"
-                      transition={{ type: 'spring', stiffness: 400, damping: 32 }}
+                      style={{ opacity: 0.65 }}
+                      transition={{ type: 'spring', stiffness: 420, damping: 34 }}
                     />
                   )}
+
+                  {/* Active chip — a real raised surface, not a colour change. */}
+                  {isActive && (
+                    <motion.span
+                      layoutId="nav-active-chip"
+                      className="absolute inset-0 rounded-full"
+                      style={{
+                        background: 'var(--surface)',
+                        border: '1px solid var(--rule)',
+                        boxShadow: 'var(--shadow-contact)',
+                      }}
+                      transition={{ type: 'spring', stiffness: 380, damping: 32 }}
+                    />
+                  )}
+
                   <span className="relative">{link.label}</span>
+
+                  {/* The lit terminal. Same 42.28 orange the rest of the site
+                      uses for a live indicator, scaled in rather than faded so
+                      it reads as arriving. */}
+                  {isActive && (
+                    <motion.span
+                      layoutId="nav-active-dot"
+                      className="absolute left-1/2 bottom-[3px] h-[3px] w-[3px] -translate-x-1/2 rounded-full"
+                      style={{
+                        background: 'var(--accent-vivid)',
+                        boxShadow: '0 0 7px var(--accent-vivid)',
+                      }}
+                      transition={{ type: 'spring', stiffness: 380, damping: 30 }}
+                    />
+                  )}
                 </Link>
               );
             })}
@@ -174,16 +276,40 @@ export default function Navbar() {
               transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
             >
               <div className="px-4 py-4 flex flex-col gap-0.5 max-h-[calc(100vh-120px)] overflow-y-auto">
-                {navLinks.map((link) => (
-                  <Link
-                    key={link.label}
-                    href={link.href}
-                    className="block rounded-[var(--radius-md)] px-4 py-3 text-[15px] font-[500] text-[var(--muted)] transition-colors hover:bg-[var(--rule)] hover:text-[var(--on-surface)]"
-                    onClick={() => setMobileOpen(false)}
-                  >
-                    {link.label}
-                  </Link>
-                ))}
+                {navLinks.map((link) => {
+                  const isActive = activeLink === link.label;
+                  return (
+                    <Link
+                      key={link.label}
+                      href={link.href}
+                      aria-current={isActive ? 'page' : undefined}
+                      className={`relative flex items-center justify-between rounded-[var(--radius-md)] px-4 py-3 text-[15px] transition-colors ${
+                        isActive
+                          ? 'font-[600] text-[var(--on-surface)]'
+                          : 'font-[500] text-[var(--muted)] hover:bg-[var(--rule)] hover:text-[var(--on-surface)]'
+                      }`}
+                      style={
+                        isActive
+                          ? { background: 'var(--surface)', boxShadow: 'var(--shadow-contact)' }
+                          : undefined
+                      }
+                      onClick={() => setMobileOpen(false)}
+                    >
+                      {link.label}
+                      {isActive && (
+                        <motion.span
+                          layoutId="nav-active-dot-mobile"
+                          className="h-[5px] w-[5px] rounded-full"
+                          style={{
+                            background: 'var(--accent-vivid)',
+                            boxShadow: '0 0 8px var(--accent-vivid)',
+                          }}
+                          transition={{ type: 'spring', stiffness: 380, damping: 30 }}
+                        />
+                      )}
+                    </Link>
+                  );
+                })}
 
                 {/* Mobile CTA */}
                 <div className="pt-3 mt-2 pb-4 flex justify-center" style={{ borderTop: '1px solid var(--rule)' }}>
