@@ -6,3 +6,4 @@
 - [x] Render `<DistributionModal>` in ProcessFlowChart
 - [x] Verify with build/dev server
 - [x] Create 16:9 outreach slide modals for The Infrastructure, The Fuel, The Script, The Launch importing steps-page proof artifacts (DnsRecordCard, LeadCard, EmailProvenance, MetricsPanel)
+- [x] Add plus-icon + detail reveal to the Researched Outreach phases (FlipCard front has a + button; back reveals whyItMatters + technicalDetail)
