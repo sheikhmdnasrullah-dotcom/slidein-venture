@@ -1,7 +1,6 @@
 import Hero from "@/components/Hero/Hero";
 import Section from "@/components/Section";
 import FrameworkEngines from "@/components/Framework/FrameworkEngines";
-import InputSlide from "@/components/PitchDeck/InputSlide";
 
 /**
  * HOME — the hero, then the shape of the business.
@@ -29,11 +28,17 @@ import InputSlide from "@/components/PitchDeck/InputSlide";
  * them, instead of duplicated as an accent row at the foot of each strand.
  *
  * NONE OF THE EARLIER THREE IS DELETED. FrameworkDiagram's `variant="complete"`
- * still draws all seventeen service nodes at the top of /steps, which is where
- * the hero's primary CTA points. FrameworkWeave and FrameworkThread are no
- * longer mounted anywhere and are kept only so a decision here can be reversed
- * by changing one import back. All four read content/framework.ts, so no two
- * of them can describe different businesses.
+ * still draws all seventeen service nodes at the top of /steps (currently
+ * pulled from navigation, see that page's own header). FrameworkWeave and
+ * FrameworkThread are no longer mounted anywhere and are kept only so a
+ * decision here can be reversed by changing one import back. All four read
+ * content/framework.ts, so no two of them can describe different businesses.
+ *
+ * THE PAGE ENDS HERE. A second section used to follow — an "The Framework"
+ * heading over InputSlide, a standalone deck slide — but that repeated the
+ * headline a beat after FrameworkEngines' own origin line already said it,
+ * and added nothing past the outcome card. The origin line now reads "The
+ * Framework" directly and the page ends on FrameworkEngines' outcome card.
  */
 export default function Home() {
   return (
@@ -50,17 +55,6 @@ export default function Home() {
       >
         <FrameworkEngines className="mt-4 md:mt-6" />
       </Section>
-
-      <section className="mt-20">
-        <div className="mx-auto max-w-[1400px] px-6 md:px-10">
-          <h2 className="font-display-md text-center text-[clamp(1.5rem,3vw,2.25rem)] text-[var(--on-surface)]">
-            The Framework
-          </h2>
-        </div>
-        <div className="relative mt-10 min-h-[640px] overflow-hidden">
-          <InputSlide />
-        </div>
-      </section>
     </>
   );
 }

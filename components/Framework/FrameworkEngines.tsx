@@ -30,7 +30,6 @@ import { motion, useReducedMotion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { MonoLabel } from '@/components/System/System';
 import {
-  FRAMEWORK_ORIGIN,
   FRAMEWORK_OUTCOME,
   FRAMEWORK_TRACKS,
 } from '@/content/framework';
@@ -319,11 +318,13 @@ export default function FrameworkEngines({ className }: { className?: string }) 
         }}
       />
 
-      {/* Origin */}
+      {/* Origin. Was FRAMEWORK_ORIGIN.label ("One session a week") — now the
+          section's own headline, since the page no longer repeats "The
+          Framework" in a second section below this one. */}
       <div className="flex flex-col items-center">
         <MonoLabel className="text-[var(--muted)]">
           <span className="font-display-sm tnum text-[1.125em] leading-none text-[var(--on-surface)]">
-            {FRAMEWORK_ORIGIN.label}
+            The Framework
           </span>
         </MonoLabel>
         <span className="mt-4 block h-8 w-px bg-[var(--accent-ring)]" aria-hidden />
