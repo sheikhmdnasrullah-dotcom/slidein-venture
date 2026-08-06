@@ -369,7 +369,7 @@ export default function FrameworkEngines({ className }: { className?: string }) 
       </div>
 
       {/* Two engines, one gutter */}
-      <div className="grid grid-cols-1 items-stretch gap-8 md:grid-cols-[1fr_auto_1fr] md:gap-0">
+      <div className="grid grid-cols-1 items-stretch gap-8 md:grid-cols-[1fr_1fr] md:gap-8">
         <EngineCard
           label={content.label}
           icon={<LayersIcon />}
@@ -378,7 +378,6 @@ export default function FrameworkEngines({ className }: { className?: string }) 
           side="left"
           delay={0.1}
         />
-        <CrossLink />
         <EngineCard
           label={outreach.label}
           icon={<SendIcon />}
@@ -389,14 +388,8 @@ export default function FrameworkEngines({ className }: { className?: string }) 
         />
       </div>
 
-      {/* Mobile cross-link: same statements, no gutter to sit in */}
+      {/* Mobile: single column */}
       <div className="flex flex-col items-center gap-2 py-6 md:hidden">
-        <span className="h-8 w-px bg-[var(--accent-ring)]" aria-hidden />
-        {FRAMEWORK_CROSS.map((line) => (
-          <span key={line.id} className="font-body text-[12px] font-medium text-[var(--accent)]">
-            {line.label}
-          </span>
-        ))}
         <span className="h-8 w-px bg-[var(--accent-ring)]" aria-hidden />
       </div>
 

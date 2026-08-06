@@ -38,21 +38,13 @@ export default function InputSlide() {
     <div className="relative h-full w-full">
       {/* 42%, not 50%. See the note above — this is the whole composition. */}
       <div className="absolute inset-x-0 top-[42%] flex -translate-y-1/2 flex-col items-center px-11 text-center sm:px-4">
-        {/* The numeral. By far the largest thing on the slide.
-            A single serif "1" is a beautiful shape — let it carry it alone. */}
-        <span className="input-numeral font-display-xl tnum block text-[var(--on-surface)]">1</span>
-
-        <p className="input-line font-display-md mt-2 text-[var(--on-surface)] md:mt-3">
-          session a week. That is your part.
+        <p className="input-line font-display-md text-[var(--on-surface)] md:mt-3">
+          The Framework
         </p>
 
-        {/* The rule and the departing dot. The dot is positioned on the rule's
-            right end so it reads as detaching, not as a second object that
-            appeared. The rule draws in over 900ms; the dot departs the moment
-            the rule lands, then leaves the frame. */}
+        {/* The rule. Neutral gray so it blends with the page background. */}
         <span className="input-rule-track relative mt-7 block md:mt-9" aria-hidden>
-          <span className="input-rule block h-px w-full bg-[var(--accent-vivid)]" />
-          <span className="input-dot" />
+          <span className="input-rule block h-px w-full bg-[var(--rule)]" />
         </span>
       </div>
 
@@ -63,76 +55,39 @@ export default function InputSlide() {
       </span>
 
       <style>{`
-        /* ~240px at full size. A single "1" in serif has ink traps and elegant
-           proportions — at this scale it is a shape, not just a character.
-           The 7rem floor still reads as the loudest thing at 390px viewport. */
-        .input-numeral {
-          font-size: clamp(7rem, 20vw, 15rem);
-          line-height: 0.84;
-          font-variant-numeric: tabular-nums;
-          /* Slight tighten for the display serif at this scale */
-          letter-spacing: -0.02em;
-        }
+         .input-line {
+           font-size: clamp(0.875rem, 3.1vw, 2.5rem);
+           letter-spacing: var(--tracking-display-md);
+         }
 
-        /* 40px at full size. One line, never two — the sentence is the slide's
-           single statement. Two lines would turn it into a paragraph. */
-        .input-line {
-          font-size: clamp(0.875rem, 3.1vw, 2.5rem);
-          letter-spacing: var(--tracking-display-md);
-        }
+         /* 380px as specified, but capped at 54vw so the rule clears the nav
+            arrows on small screens. */
+         .input-rule-track {
+           width: min(380px, 54vw);
+         }
 
-        /* 380px as specified, but capped at 54vw so the rule clears the nav
-           arrows on small screens. */
-        .input-rule-track {
-          width: min(380px, 54vw);
-        }
+         /* Rule draws left to right over 900ms in neutral gray. */
+         @keyframes input-rule-draw {
+           from { transform: scaleX(0); }
+           to   { transform: scaleX(1); }
+         }
 
-        /* Rule draws left to right over 900ms in brand orange. */
-        @keyframes input-rule-draw {
-          from { transform: scaleX(0); }
-          to   { transform: scaleX(1); }
-        }
+         .input-rule {
+           transform-origin: left center;
+           animation: input-rule-draw var(--dur-reveal, 0.9s) var(--ease-expo, cubic-bezier(0.16,1,0.3,1)) var(--dur-base, 0.2s) both;
+         }
 
-        .input-rule {
-          transform-origin: left center;
-          animation: input-rule-draw var(--dur-reveal, 0.9s) var(--ease-expo, cubic-bezier(0.16,1,0.3,1)) var(--dur-base, 0.2s) both;
-        }
+         .input-footnote {
+           font-size: 0.65rem;
+           letter-spacing: 0.12em;
+         }
 
-        /* The dot detaches from the rule's right end the moment the rule lands,
-           then leaves the frame to the right. 60vw guarantees it clears the
-           stage at every breakpoint; the stage clips it. */
-        @keyframes input-dot-depart {
-          0%   { transform: translate(0, -50%) scale(0.4); opacity: 0; }
-          10%  { transform: translate(0, -50%) scale(1);   opacity: 1; }
-          22%  { transform: translate(0, -50%) scale(1);   opacity: 1; }
-          100% { transform: translate(60vw, -50%) scale(1); opacity: 0; }
-        }
-
-        .input-dot {
-          position: absolute;
-          right: 0;
-          top: 50%;
-          width: 6px;
-          height: 6px;
-          border-radius: var(--radius-pill, 9999px);
-          background: var(--accent-vivid);
-          box-shadow: 0 0 10px color-mix(in oklch, var(--accent-vivid) 70%, transparent);
-          animation: input-dot-depart calc(var(--dur-reveal, 0.9s) * 1.9) var(--ease-std, cubic-bezier(0.4,0,0.2,1))
-                     calc(var(--dur-base, 0.2s) + var(--dur-reveal, 0.9s)) both;
-        }
-
-        .input-footnote {
-          font-size: 0.65rem;
-          letter-spacing: 0.12em;
-        }
-
-        /* The global backstop collapses durations to 1ms, which leaves the
-           rule drawn (correct end state) and the dot already gone. */
-        @media (prefers-reduced-motion: reduce) {
-          .input-rule { animation: none; transform: scaleX(1); }
-          .input-dot  { animation: none; opacity: 0; }
-        }
-      `}</style>
+         /* The global backstop collapses durations to 1ms, which leaves the
+            rule drawn (correct end state). */
+         @media (prefers-reduced-motion: reduce) {
+           .input-rule { animation: none; transform: scaleX(1); }
+         }
+       `}</style>
     </div>
   );
 }

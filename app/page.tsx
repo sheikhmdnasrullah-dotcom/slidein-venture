@@ -51,15 +51,16 @@ export default function Home() {
         <FrameworkEngines className="mt-4 md:mt-6" />
       </Section>
 
-      <div className="relative min-h-[640px] overflow-hidden">
-        <InputSlide />
-      </div>
-
-      <YourPart className="mt-20" />
-
-      <div className="mt-20">
-        <GrowthLoopSlide />
-      </div>
+      <section className="mt-20">
+        <div className="mx-auto max-w-[1400px] px-6 md:px-10">
+          <h2 className="font-display-md text-center text-[clamp(1.5rem,3vw,2.25rem)] text-[var(--on-surface)]">
+            The Framework
+          </h2>
+        </div>
+        <div className="relative mt-10 min-h-[640px] overflow-hidden">
+          <InputSlide />
+        </div>
+      </section>
     </>
   );
 }
