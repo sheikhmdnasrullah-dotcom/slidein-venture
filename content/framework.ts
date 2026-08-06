@@ -185,25 +185,22 @@ export function frameworkTallyLine(): string {
    ═══════════════════════════════════════════════════════════════════════════
    A third consumer of this file, and it exists because the homepage needs a
    drawing with two states rather than two drawings. Simple shows four
-   milestones a side; Complete adds seven detail nodes to each strand. Same
-   thread, same dots, same rules, one lower level of hierarchy. Nothing about
-   the Complete state introduces a visual language the Simple state does not
-   already use, which is the whole specification.
+   milestones a side; each track's milestone then opens its own six steps onto
+   the same strand. Same thread, same dots, same rules, one lower level of
+   hierarchy. The only mark the open state adds is the chevron on the two track
+   milestones, which is the whole specification.
 
-   ROWS ARE PAIRS, AND THAT IS STRUCTURAL RATHER THAN TIDY
-   The two branches mirror each other position for position, so a row holds a
-   left node and a right node together. Typing them as two independent lists
-   would make it possible to ship a fifth node on one side and a fourth on the
-   other, and the drawing would silently come out of alignment at whichever
-   breakpoint nobody checked. A pair cannot do that.
+   THE MILESTONE ROWS ARE PAIRS, THE DETAIL LISTS ARE NOT
+   The four milestones mirror each other position for position, so those rows
+   hold a left node and a right node together and cannot come out of alignment.
+   The details are two independent lists because the branches open
+   independently — see THREAD_DETAILS_CONTENT below.
 
-   ONE OMISSION WORTH KNOWING ABOUT
-   The seven content details below start at editing. Ideation, research and
-   scripting — three of the ten steps on /steps, and all of the work sold
-   before the camera is switched on — are inside "Content Production" but are
-   not drawn. That is the node graph as specified. It is also the exact thing
-   decision 2 at the top of this file warns about, so if this drawing ever
-   grows an eighth detail, that is the one.
+   AN EARLIER OMISSION, NOW CLOSED
+   The content details used to start at editing, which left ideation, research
+   and scripting — all of the work sold before the camera is switched on —
+   inside "Content Production" but undrawn, exactly what decision 2 at the top
+   of this file warns about. Ideation now opens the list.
 
    THE FIGURES ARE SPLIT OUT OF THEIR SENTENCES
    `pre` / `figure` / `post` rather than one string, because the numerals are
@@ -275,16 +272,41 @@ export const THREAD_MILESTONES_TOP: ThreadRow[] = [
   },
 ];
 
-/** Complete state only. Seven a side, in order, on the same strand. */
-export const THREAD_DETAILS: ThreadRow[] = [
-  { left: detail('audio-video', 'Audio & video editing'), right: detail('icp', 'Ideal client research') },
-  { left: detail('transcript', 'Transcript & show notes'), right: detail('infrastructure', 'Building sending infrastructure') },
-  { left: detail('clips', 'Short-form clips'), right: detail('leads', 'Finding & verifying leads') },
-  { left: detail('thumbnails', 'Thumbnails & cover art'), right: detail('verification', 'Email verification') },
-  { left: detail('articles', 'Blog articles'), right: detail('copywriting', 'Personalized copywriting') },
-  { left: detail('social', 'LinkedIn & social posts'), right: detail('sending', 'Sending & follow-ups') },
-  { left: detail('distribution', 'Multi-platform distribution'), right: detail('replies', 'Reply sorting & handoff') },
+/**
+ * Complete state only, and one list per track rather than one paired list.
+ *
+ * The two tracks open independently — each milestone carries its own
+ * disclosure — so a reader can hold one branch open and read it without the
+ * other branch's seven nodes competing for the same glance. Pairing the rows
+ * would force both open together, which is what the single toggle above the
+ * drawing used to do.
+ *
+ * The rows still line up because both lists are the same length. `THREAD_ROWS`
+ * below zips them for the wide layout and tolerates one side being closed.
+ */
+export const THREAD_DETAILS_CONTENT: ThreadNode[] = [
+  detail('ideation', 'Ideation, Research & Script'),
+  detail('audio-video', 'Audio & Video Editing'),
+  detail('clips', 'Short Form Clips'),
+  detail('thumbnails', 'Thumbnails & Visual Assets'),
+  detail('articles', 'Articles and Social Posts'),
+  detail('distribution', 'Multi-platform Distribution'),
 ];
+
+export const THREAD_DETAILS_OUTREACH: ThreadNode[] = [
+  detail('who-detail', 'You tell us who to reach'),
+  detail('icp', 'Ideal Client Research'),
+  detail('infrastructure', 'Sending Infrastructure'),
+  detail('lists', 'Hand-Built Prospect Lists'),
+  detail('copywriting', 'Personalised Copywriting'),
+  detail('sending', 'Sending & Follow-Ups'),
+];
+
+/** How many detail rows the wide grid paints, whichever branches are open. */
+export const THREAD_DETAIL_ROWS = Math.max(
+  THREAD_DETAILS_CONTENT.length,
+  THREAD_DETAILS_OUTREACH.length,
+);
 
 /** Shown in both states, below the details. */
 export const THREAD_MILESTONES_BOTTOM: ThreadRow[] = [
@@ -311,7 +333,8 @@ export const THREAD_MILESTONES_BOTTOM: ThreadRow[] = [
 /** Below the merge. */
 export const THREAD_OUTCOME = 'More clients, faster';
 
+/** Sits on each track's milestone, not above the whole drawing. */
 export const THREAD_TOGGLE = {
-  open: 'View the complete framework',
-  close: 'Back to the simple framework',
+  open: 'See the steps',
+  close: 'Hide the steps',
 };
