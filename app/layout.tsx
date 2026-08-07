@@ -7,8 +7,8 @@ import { displayFace, bodyFace, monoFace } from "./fonts";
 import { cn } from "@/lib/utils";
 
 export const metadata: Metadata = {
-  title: "SlideIn Venture — The AI workspace that works for you",
-  description: "Build custom agents, search across all your apps, and automate busywork. The AI workspace where teams get more done, faster.",
+  title: "SlideIn Venture",
+  description: "Helping Creators with Content Production, Outreach, and Backend Tasks.",
 };
 
 /* One theme, so one colour. This is the paper the page is made of — it tells

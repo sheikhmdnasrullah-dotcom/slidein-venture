@@ -1,12 +1,13 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { ArrowLeft01Icon as ArrowLeft, PlayIcon as Play } from 'hugeicons-react';
 import VideoEmbedModal from '@/components/VideoModal/VideoEmbedModal';
 import { Rise } from '@/components/PitchDeck/ScrollReveal';
 import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
 
 const RED_TEXT = 'var(--accent)';
 
@@ -53,35 +54,83 @@ function getYouTubeThumbnail(youtubeId?: string) {
   return `https://img.youtube.com/vi/${youtubeId}/mqdefault.jpg`;
 }
 
-function VideoCard({ title, subtitle, thumbnail, onClick }: { title: string; subtitle?: string; thumbnail?: string; onClick: () => void }) {
+/* Vimeo has no predictable thumbnail URL pattern the way YouTube does — the
+   image has to come from the oEmbed response. Fetched client-side, once per
+   card, and only when no static thumbnail was already supplied. */
+function useVimeoThumbnail(url: string, enabled: boolean) {
+  const [thumbnail, setThumbnail] = useState<string | undefined>(undefined);
+
+  useEffect(() => {
+    if (!enabled) return;
+    let cancelled = false;
+
+    fetch(`https://vimeo.com/api/oembed.json?url=${encodeURIComponent(url)}`)
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (!cancelled && data?.thumbnail_url) setThumbnail(data.thumbnail_url);
+      })
+      .catch(() => {});
+
+    return () => {
+      cancelled = true;
+    };
+  }, [url, enabled]);
+
+  return thumbnail;
+}
+
+function VideoCard({
+  title,
+  subtitle,
+  url,
+  thumbnail,
+  aspect = 'wide',
+  onClick,
+}: {
+  title: string;
+  subtitle?: string;
+  url: string;
+  thumbnail?: string;
+  aspect?: 'wide' | 'portrait';
+  onClick: () => void;
+}) {
+  const vimeoThumbnail = useVimeoThumbnail(url, !thumbnail && url.includes('vimeo.com'));
+  const resolvedThumbnail = thumbnail ?? vimeoThumbnail;
+
   return (
     <button
       type="button"
       onClick={onClick}
-      className="group relative w-full aspect-video rounded-2xl border border-[var(--rule)] bg-[var(--surface)] overflow-hidden cursor-pointer text-left shadow-[0_4px_14px_color-mix(in oklch, var(--on-surface) 6%, transparent)] hover:shadow-[0_14px_36px_color-mix(in oklch, var(--on-surface) 12%, transparent)] hover:border-[var(--accent-vivid)]/40 transition-all duration-300"
+      aria-label={`Play ${title}`}
+      className={cn(
+        'group relative w-full overflow-hidden rounded-[var(--radius-md)] border border-[var(--rule)] bg-[var(--surface)] cursor-pointer text-left',
+        'shadow-[var(--shadow-raised)] transition-all duration-[var(--dur-slow)] ease-[var(--ease-expo)]',
+        'hover:-translate-y-1.5 hover:border-[var(--accent-vivid)]/45 hover:shadow-[var(--shadow-float)]',
+        aspect === 'portrait' ? 'aspect-[9/16]' : 'aspect-video'
+      )}
     >
-      {thumbnail ? (
+      {resolvedThumbnail ? (
         <img
-          src={thumbnail}
+          src={resolvedThumbnail}
           alt=""
-          className="absolute inset-0 h-full w-full object-cover opacity-90 group-hover:opacity-100 group-hover:scale-105 transition-all duration-500"
+          className="absolute inset-0 h-full w-full object-cover opacity-90 transition-all duration-[var(--dur-slow)] ease-[var(--ease-expo)] group-hover:scale-[1.06] group-hover:opacity-100"
           loading="lazy"
         />
       ) : (
-        <div className="absolute inset-0 bg-gradient-to-br from-[var(--surface)] to-color-mix(in oklch, var(--accent-vivid) 6%, transparent)" />
+        <div className="absolute inset-0 bg-gradient-to-br from-[var(--surface-2)] to-[var(--surface)]" />
       )}
 
-      <div className="absolute inset-0 bg-gradient-to-t from-[var(--on-surface)]/70 via-transparent to-transparent" />
+      <div className="absolute inset-0 bg-gradient-to-t from-[var(--on-surface)]/75 via-[var(--on-surface)]/5 to-transparent transition-colors duration-[var(--dur-base)] ease-[var(--ease-std)] group-hover:from-[var(--on-surface)]/85 group-hover:via-[var(--on-surface)]/15" />
 
       <div className="absolute inset-0 flex items-center justify-center">
-        <span className="flex h-14 w-14 items-center justify-center rounded-full bg-[var(--surface)]/90 border border-[var(--rule)] text-[var(--muted)] group-hover:border-[var(--accent-vivid)] group-hover:text-[var(--accent-vivid)] group-hover:scale-110 transition-all duration-300 shadow-[0_8px_24px_color-mix(in oklch, var(--on-surface) 18%, transparent)]">
-          <Play size={22} strokeWidth={2} />
+        <span className="flex h-12 w-12 md:h-14 md:w-14 items-center justify-center rounded-full border border-[var(--surface)]/50 bg-[var(--surface-glass)] text-[var(--on-surface)] backdrop-blur-md shadow-[0_8px_24px_color-mix(in_oklch,var(--on-surface)_30%,transparent)] transition-all duration-[var(--dur-base)] ease-[var(--ease-expo)] group-hover:scale-110 group-hover:border-[var(--accent-vivid)] group-hover:bg-[var(--accent-vivid)] group-hover:text-[var(--on-accent)]">
+          <Play size={20} strokeWidth={2} className="ml-0.5" />
         </span>
       </div>
 
       <div className="absolute inset-x-0 bottom-0 p-4">
-        <p className="text-[11px] font-[700] text-[var(--surface)] leading-snug">{title}</p>
-        {subtitle && <p className="text-[9px] font-[600] uppercase tracking-[0.14em] text-[var(--surface)]/75 mt-1">{subtitle}</p>}
+        <p className="text-[12px] font-[700] leading-snug text-[var(--surface)]">{title}</p>
+        {subtitle && <p className="mt-1 text-[9px] font-[600] uppercase tracking-[0.14em] text-[var(--surface)]/75">{subtitle}</p>}
       </div>
     </button>
   );
@@ -92,20 +141,19 @@ export default function PortfolioPage() {
 
   return (
     <div className="min-h-screen">
-      <section className="pt-[calc(56px+80px)] pb-16">
+      <section className="pt-[calc(56px+88px)] pb-20 md:pb-24">
         <div className="max-w-[1200px] mx-auto px-6 md:px-10">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-            className="mb-12"
           >
-            <Link href="/solutions" className="inline-flex items-center gap-2 text-[13px] font-[500] text-[var(--muted)] hover:text-[var(--accent)] transition-colors mb-8">
+            <Link href="/solutions" className="inline-flex items-center gap-2 text-[13px] font-[500] text-[var(--muted)] hover:text-[var(--accent)] transition-colors mb-10">
               <ArrowLeft size={16} strokeWidth={2} />
               Back to Solutions
             </Link>
 
-            <h1 className="section-headline text-[clamp(2.5rem,6vw,4.5rem)] text-[var(--on-surface)] mb-4">
+            <h1 className="section-headline text-[clamp(2.5rem,6vw,4.5rem)] text-[var(--on-surface)] mb-5">
               Our work
             </h1>
             <p className="body-copy text-base text-[var(--muted)] max-w-[600px]">
@@ -116,15 +164,15 @@ export default function PortfolioPage() {
       </section>
 
       {/* Podcast Edits */}
-      <section className="pb-20">
+      <section className="pb-24 md:pb-28">
         <div className="max-w-[1200px] mx-auto px-6 md:px-10">
           <Rise>
-            <span className="font-label mb-4 block text-[var(--accent)]">Podcast Edits</span>
-            <h2 className="font-display-md text-[clamp(1.75rem,3vw,2.5rem)] text-[var(--on-surface)] mb-8">
+            <span className="font-label mb-3 block text-[var(--accent)]">Podcast Edits</span>
+            <h2 className="font-display-md text-[clamp(1.75rem,3vw,2.5rem)] text-[var(--on-surface)] mb-10 md:mb-12">
               Full podcast productions
             </h2>
           </Rise>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
             {podcastEdits.map((video, index) => (
               <motion.div
                 key={video.id}
@@ -135,6 +183,7 @@ export default function PortfolioPage() {
               >
                 <VideoCard
                   title={video.title}
+                  url={video.url}
                   thumbnail={getYouTubeThumbnail(video.youtubeId)}
                   onClick={() => setVideoUrl(video.url)}
                 />
@@ -145,15 +194,15 @@ export default function PortfolioPage() {
       </section>
 
       {/* Guest Appearances */}
-      <section className="pb-20 bg-[var(--surface-2)] border-y border-[var(--rule)]">
-        <div className="max-w-[1200px] mx-auto px-6 md:px-10 py-16">
+      <section className="py-20 md:py-24 bg-[var(--surface-2)] border-y border-[var(--rule)]">
+        <div className="max-w-[1200px] mx-auto px-6 md:px-10">
           <Rise>
-            <span className="font-label mb-4 block text-[var(--accent)]">Guest Appearances</span>
-            <h2 className="font-display-md text-[clamp(1.75rem,3vw,2.5rem)] text-[var(--on-surface)] mb-8">
+            <span className="font-label mb-3 block text-[var(--accent)]">Guest Appearances</span>
+            <h2 className="font-display-md text-[clamp(1.75rem,3vw,2.5rem)] text-[var(--on-surface)] mb-10 md:mb-12">
               Conversations worth watching
             </h2>
           </Rise>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
             {guestAppearances.map((item, index) => (
               <motion.div
                 key={`${item.name}-${item.guest}`}
@@ -165,6 +214,7 @@ export default function PortfolioPage() {
                 <VideoCard
                   title={`${item.name} — ${item.guest}`}
                   subtitle={item.platform}
+                  url={item.url}
                   thumbnail={item.platform === 'YouTube' && item.youtubeId ? getYouTubeThumbnail(item.youtubeId) : undefined}
                   onClick={() => setVideoUrl(item.url)}
                 />
@@ -175,15 +225,15 @@ export default function PortfolioPage() {
       </section>
 
       {/* Reel Edits */}
-      <section className="pb-24">
+      <section className="pt-20 md:pt-24 pb-24 md:pb-32">
         <div className="max-w-[1200px] mx-auto px-6 md:px-10">
           <Rise>
-            <span className="font-label mb-4 block text-[var(--accent)]">Reel Edits</span>
-            <h2 className="font-display-md text-[clamp(1.75rem,3vw,2.5rem)] text-[var(--on-surface)] mb-8">
+            <span className="font-label mb-3 block text-[var(--accent)]">Reel Edits</span>
+            <h2 className="font-display-md text-[clamp(1.75rem,3vw,2.5rem)] text-[var(--on-surface)] mb-10 md:mb-12">
               Short-form cuts
             </h2>
           </Rise>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 md:gap-6">
             {reelEdits.map((video, index) => (
               <motion.div
                 key={video.id}
@@ -194,7 +244,9 @@ export default function PortfolioPage() {
               >
                 <VideoCard
                   title={video.title}
+                  url={video.url}
                   thumbnail={getYouTubeThumbnail(video.youtubeId)}
+                  aspect="portrait"
                   onClick={() => setVideoUrl(video.url)}
                 />
               </motion.div>
