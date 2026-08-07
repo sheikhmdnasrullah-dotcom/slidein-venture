@@ -54,9 +54,12 @@ const money = (n: number) => `$${n.toLocaleString('en-US')}`;
    Drawn here rather than pulled from the icon package so all eight sit at the
    same optical weight. A row of icons at mismatched stroke weights reads as a
    sticker sheet, and this column has to read as a bill. */
-type IconKind = 'strategy' | 'film' | 'mic' | 'pen' | 'share' | 'search' | 'send' | 'system';
+export type IconKind = 'strategy' | 'film' | 'mic' | 'pen' | 'share' | 'search' | 'send' | 'system';
 
-function Glyph({ kind }: { kind: IconKind }) {
+/* Exported so the pricing page's roles table draws the SAME glyphs at the same
+   optical weight rather than introducing a second icon set for the same five
+   roles. One source, one stroke weight. */
+export function Glyph({ kind }: { kind: IconKind }) {
   const s = {
     fill: 'none',
     stroke: 'currentColor',
