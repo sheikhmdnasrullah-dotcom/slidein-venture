@@ -22,12 +22,20 @@ export default function FrameworkHead({
   lead,
   coordinate,
   className,
+  size = 'md',
 }: {
   eyebrow: string;
   title: string;
   lead?: string;
   coordinate: string;
   className?: string;
+  /**
+   * `xl` on the homepage, where this is the first heading after the hero and
+   * has to carry the band on its own. /steps keeps `md`, because there the
+   * heading sits inside an existing 00-05 section rhythm and outsizing it
+   * would put the framework above the sections that number it.
+   */
+  size?: 'md' | 'xl';
 }) {
   return (
     <div className={cn('mx-auto max-w-[1160px] px-6 md:px-10', className)}>
@@ -43,7 +51,14 @@ export default function FrameworkHead({
 
       <Rise delay={0.06}>
         <div className="mt-8 flex flex-col gap-4 md:mt-10 md:flex-row md:items-end md:justify-between md:gap-10">
-          <h2 className="font-display-md max-w-full text-[clamp(1.75rem,3.4vw,2.75rem)] text-[var(--on-surface)] md:max-w-[46%]">
+          <h2
+            className={cn(
+              'max-w-full text-[var(--on-surface)] md:max-w-[46%]',
+              size === 'xl'
+                ? 'font-display-xl text-[clamp(2.5rem,5.4vw,4.25rem)] leading-[1.02]'
+                : 'font-display-md text-[clamp(1.75rem,3.4vw,2.75rem)]',
+            )}
+          >
             {title}
           </h2>
           {lead && (
