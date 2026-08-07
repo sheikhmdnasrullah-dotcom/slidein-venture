@@ -146,12 +146,9 @@ export default function PortfolioPage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
           >
-            <h1 className="section-headline text-[clamp(2.5rem,6vw,4.5rem)] text-[var(--on-surface)] mb-5">
+            <h1 className="section-headline text-[clamp(2.5rem,6vw,4.5rem)] text-[var(--on-surface)]">
               Our work
             </h1>
-            <p className="body-copy text-base text-[var(--muted)] max-w-[600px]">
-              Podcast edits, guest appearances, and reel cuts — the same polish we bring to every client project.
-            </p>
           </motion.div>
         </div>
       </section>
@@ -160,7 +157,6 @@ export default function PortfolioPage() {
       <section className="pb-24 md:pb-28">
         <div className="max-w-[1200px] mx-auto px-6 md:px-10">
           <Rise>
-            <span className="font-label mb-3 block text-[var(--accent)]">Podcast Edits</span>
             <h2 className="font-display-md text-[clamp(1.75rem,3vw,2.5rem)] text-[var(--on-surface)] mb-10 md:mb-12">
               Full podcast productions
             </h2>
@@ -190,7 +186,6 @@ export default function PortfolioPage() {
       <section className="py-20 md:py-24 bg-[var(--surface-2)] border-y border-[var(--rule)]">
         <div className="max-w-[1200px] mx-auto px-6 md:px-10">
           <Rise>
-            <span className="font-label mb-3 block text-[var(--accent)]">Guest Appearances</span>
             <h2 className="font-display-md text-[clamp(1.75rem,3vw,2.5rem)] text-[var(--on-surface)] mb-10 md:mb-12">
               Conversations worth watching
             </h2>
@@ -220,7 +215,6 @@ export default function PortfolioPage() {
       <section className="pt-20 md:pt-24 pb-24 md:pb-32">
         <div className="max-w-[1200px] mx-auto px-6 md:px-10">
           <Rise>
-            <span className="font-label mb-3 block text-[var(--accent)]">Reel Edits</span>
             <h2 className="font-display-md text-[clamp(1.75rem,3vw,2.5rem)] text-[var(--on-surface)] mb-10 md:mb-12">
               Short-form cuts
             </h2>

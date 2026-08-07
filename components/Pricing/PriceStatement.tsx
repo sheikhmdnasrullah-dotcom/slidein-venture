@@ -95,7 +95,7 @@ export default function PriceStatement() {
       >
         We will handle your
         <br />
-        <span className="text-[var(--accent)]">content and outreach.</span>
+        <span className="text-[var(--accent)]">content and outreach</span>
       </motion.h1>
 
       {/* Hairline. Short and centred — the only divider in the band, and it
@@ -125,6 +125,12 @@ export default function PriceStatement() {
         />
 
         <p className="tnum flex items-baseline justify-center gap-3 leading-none text-[var(--on-surface)]">
+          {/* Bridges the sentence above into the figure, so the two read as
+              one claim ("...content and outreach for $3,999 / month")
+              instead of a statement over an unrelated number. */}
+          <span className="translate-y-[-0.4em] text-[15px] font-semibold tracking-[0.02em] text-[var(--muted)]">
+            For
+          </span>
           <span className="font-display-xl inline-flex items-baseline text-[clamp(3.6rem,12vw,8rem)] leading-[0.86]">
             <span
               aria-hidden
@@ -143,9 +149,9 @@ export default function PriceStatement() {
           </span>
         </p>
         {/* The `$` is aria-hidden above and restored here, so assistive tech
-            reads "$3,999 / month" as one string instead of announcing a
+            reads "For $3,999 / month" as one string instead of announcing a
             floating dollar sign ahead of the figure. */}
-        <span className="sr-only">$3,999 / month</span>
+        <span className="sr-only">For $3,999 / month</span>
       </motion.div>
 
       {/* ── The way to book ──────────────────────────────────────────── */}
