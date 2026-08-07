@@ -15,17 +15,25 @@ export const metadata: Metadata = {
    the browser what to tint form controls, the scrollbar and mobile chrome
    with, and it must track --color-paper-50 in app/styles/tokens.css.
 
-   `colorScheme: "light"` renders the <meta name="color-scheme" content="light">
-   tag the CSS `color-scheme: light` in globals.css (html selector) already
-   sets at the stylesheet level — belt and suspenders. Mobile Chrome/Samsung
-   Internet's "Auto Dark Theme" algorithmically re-colours any page that does
-   not explicitly declare a supported scheme, which is what reads as "the
-   homepage switches to dark mode on mobile": nothing in this codebase asked
-   for that, the OS-level dark-mode heuristic did it TO the page. This tag is
-   the documented opt-out, independent of any `dark:` class or media query. */
+   "only light", NOT "light" — and the difference is the whole fix.
+
+   Mobile Chrome and Samsung Internet ship an "Auto Dark Theme" that
+   algorithmically re-colours any page it decides is a light page. That is what
+   reads as "the site goes dark on mobile": nothing in this codebase asked for
+   it, no `dark:` class and no media query is involved, and it does not
+   reproduce in a desktop browser at a phone width — the OS-level heuristic
+   does it TO the page after CSS has finished.
+
+   `color-scheme: light` only says "this page prefers light", which the
+   auto-darkener is free to override; it reads that as a page that has simply
+   never thought about dark mode, which is exactly its trigger condition. The
+   documented opt-out is the `only` keyword: it declares light as the sole
+   supported scheme and switches the algorithm off. Set here as the meta tag
+   and again in globals.css on <html>, because the two are honoured by
+   different engines. */
 export const viewport = {
   themeColor: "#f6f4f0",
-  colorScheme: "light",
+  colorScheme: "only light",
 };
 
 export default function RootLayout({

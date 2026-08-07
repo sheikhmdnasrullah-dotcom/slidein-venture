@@ -130,7 +130,11 @@ html {
   /* Declared, not inferred. Without it a visitor whose OS is in dark mode gets
      dark form controls, a dark scrollbar and a dark autofill wash on a page
      that is made of paper. One theme means telling the UA so. */
-  color-scheme: light;
+  /* `only light`, not `light`. The `only` keyword is what disables mobile
+     Chrome / Samsung Internet's Auto Dark Theme; plain `light` is a preference
+     the auto-darkener may override, and a page that merely prefers light is
+     precisely what it targets. See the note on `viewport` in app/layout.tsx. */
+  color-scheme: only light;
   /* Sections are scroll targets now that the deck is a scroll narrative, and
      the navbar floats over the top of them. Landing a chapter flush under the
      nav pill hides its own heading. */
@@ -141,6 +145,9 @@ html {
 }
 
 body {
+  /* Repeated on <body> as well as <html>: some engines only consult the used
+     value on the element actually being painted. */
+  color-scheme: only light;
   font-family: var(--font-sans);
   /* The page fill is the BASE tone, not --surface: --surface is what a card is
      made of, and painting the page with it flattens every raised element on it.

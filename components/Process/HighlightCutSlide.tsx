@@ -198,8 +198,209 @@ export default function HighlightCutSlide({ onExit }: { onExit?: () => void } = 
     setPhase(p);
   };
 
+  const dots = (
+    <div className="flex items-center gap-1.5">
+      {[0, 1, 2, 3].map((p) => (
+        <button
+          key={p}
+          onClick={() => jumpTo(p as 0 | 1 | 2 | 3)}
+          className={cn(
+            'h-1.5 rounded-full transition-all duration-300',
+            phase === p ? 'w-6 bg-[var(--accent-vivid)]' : 'w-3 bg-[var(--rule-strong)] hover:bg-[var(--muted)]'
+          )}
+          aria-label={`Story step ${p + 1}`}
+        />
+      ))}
+    </div>
+  );
+
+  const advanceButton = (
+    <button
+      onClick={advance}
+      className="flex items-center gap-2 rounded-full border border-[var(--rule)] bg-[var(--surface)] px-4 py-1.5 font-mono text-[9px] font-bold uppercase tracking-[0.16em] text-[var(--muted)] transition-colors hover:border-[var(--accent-ring)] hover:text-[var(--accent)]"
+    >
+      {phase === 3 ? 'Replay' : 'Next'}
+      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+        <path d="M5 12h14m-6-6 6 6-6 6" />
+      </svg>
+    </button>
+  );
+
+  /* ── The clip card, shared by both layouts ────────────────────────────────
+     Width is a prop rather than a fixed 300/340, because on a phone the card
+     IS the column. */
+  const clipCard = (
+    <div className="relative flex w-full flex-col items-center gap-2 rounded-2xl border-2 border-[var(--accent-ring)] bg-[var(--accent-wash)] px-6 py-4">
+      <motion.span
+        className="pointer-events-none absolute inset-0 rounded-2xl border-2 border-[var(--accent-vivid)]"
+        initial={{ opacity: 0 }}
+        animate={phase >= 2 ? { opacity: [0, 0.5, 0], scale: [1, 1.05, 1.1] } : { opacity: 0 }}
+        transition={{ duration: 2, repeat: Infinity, delay: 0.9, ease: EASE }}
+      />
+      <motion.span
+        className="flex h-9 w-9 items-center justify-center rounded-full bg-[var(--accent-vivid)] text-[var(--on-accent)] shadow-[0_8px_20px_color-mix(in_oklch,var(--accent-vivid)_45%,transparent)]"
+        whileHover={{ scale: 1.1 }}
+      >
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+          <path d="M8 5.5v13l11-6.5z" />
+        </svg>
+      </motion.span>
+      <span className="font-mono text-center text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--accent)]">
+        The Highlight Cut
+      </span>
+      <span className="font-mono text-center text-[8.5px] font-semibold uppercase tracking-[0.14em] text-[var(--muted)]">
+        Cut before the episode · vertical + 16:9
+      </span>
+      <div className="mt-1 w-[70%]">
+        <Waveform
+          heights={BAR_HEIGHTS.slice(MOMENT_START_BAR, MOMENT_START_BAR + MOMENT_BAR_COUNT)}
+          highlightStart={0}
+          highlightCount={MOMENT_BAR_COUNT}
+          active={phase >= 2}
+          height={16}
+        />
+      </div>
+    </div>
+  );
+
+  /* ── A run of connector between two stacked mobile sections ────────────
+     A function returning JSX, deliberately NOT a component declared in the
+     render body: React treats a fresh component identity on every render as a
+     brand-new type and remounts its whole subtree, which restarts the fill
+     animation on every phase change. */
+  const link = (lit: boolean) => (
+    <div key={lit ? 'lit' : 'dim'} className="flex h-9 justify-center" aria-hidden>
+      <span className="relative block w-px overflow-hidden bg-[var(--rule-strong)]">
+        <motion.span
+          className="absolute inset-x-0 top-0 block w-px bg-[var(--accent-vivid)]"
+          initial={{ height: '0%' }}
+          animate={{ height: lit ? '100%' : '0%' }}
+          transition={{ duration: 0.45, ease: EASE }}
+        />
+      </span>
+    </div>
+  );
+
   return (
-    <div className="relative w-full select-none" style={{ aspectRatio: '16 / 9' }}>
+    <>
+      {/* ══ MOBILE ══════════════════════════════════════════════════════════
+          The desktop drawing below is a 16:9 stage with everything absolutely
+          positioned inside a 1000×560 space: a full-width waveform, a clip
+          card hanging under the point it was cut from, and a second waveform
+          at the foot. On a 390px sheet that whole composition is 219px tall —
+          the bars collapse to a smear and the 8px mono labels are unreadable.
+          FitScale cannot help, because scaling a landscape drawing to fit a
+          portrait column just makes it smaller.
+
+          So the phone gets the same four beats stacked vertically, with the
+          same `phase` state, the same words and the same controls. The
+          waveforms keep full column width and gain height; the connectors
+          become short vertical runs that fill as each beat lands. */}
+      <div className="select-none md:hidden">
+        <div className="rounded-[22px] border border-[var(--rule)] bg-[var(--surface)] px-4 py-5">
+          {onExit && (
+            <div className="mb-4 flex justify-end">
+              <button
+                onClick={onExit}
+                aria-label="Back to the edit pipeline"
+                className="flex h-9 w-9 items-center justify-center rounded-full border border-[var(--rule)] bg-[var(--surface)] text-[var(--muted)] shadow-sm transition-colors hover:border-[var(--accent-ring)] hover:text-[var(--accent)]"
+              >
+                <EyeOffIcon />
+              </button>
+            </div>
+          )}
+
+          {/* 1 · the full session */}
+          <div className="mb-2.5 flex items-center justify-between gap-3">
+            <span className="font-mono text-[9px] font-bold uppercase tracking-[0.18em] text-[var(--muted)]">
+              The full session
+            </span>
+            <span className="font-mono text-[9px] font-bold uppercase tracking-[0.18em] text-[var(--muted)]">
+              {MOMENT_BAR.durationLabel}
+            </span>
+          </div>
+          <div
+            className="relative"
+            onClick={advance}
+            role="button"
+            tabIndex={0}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') advance();
+            }}
+            aria-label="Highlight cut story: tap to advance"
+          >
+            <Waveform
+              heights={BAR_HEIGHTS}
+              highlightStart={MOMENT_START_BAR}
+              highlightCount={MOMENT_BAR_COUNT}
+              active={phase >= 1}
+              height={58}
+            />
+          </div>
+
+          {/* the timecode, on its own line rather than floating over the bars —
+              at this width a centred pill would cover a third of the waveform */}
+          <AnimatePresence>
+            {phase >= 1 && (
+              <motion.div
+                initial={{ opacity: 0, y: -4 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -4 }}
+                transition={{ duration: 0.25 }}
+                className="mt-3 flex justify-center"
+              >
+                <span className="whitespace-nowrap rounded-full border border-[var(--accent-ring)] bg-[var(--accent-wash)] px-2.5 py-1 font-mono text-[8.5px] font-bold tracking-[0.12em] text-[var(--accent)]">
+                  {MOMENT_BAR.label} · {MOMENT_START_TC} TO {MOMENT_END_TC}
+                </span>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {link(phase >= 2)}
+
+          {/* 2 · the clip */}
+          <motion.div
+            initial={{ opacity: 0, y: 14 }}
+            animate={phase >= 2 ? { opacity: 1, y: 0 } : { opacity: 0.25, y: 0 }}
+            transition={{ duration: 0.45, ease: EASE }}
+          >
+            {clipCard}
+          </motion.div>
+
+          {link(phase >= 3)}
+
+          {/* 3 · the finished episode */}
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={phase >= 3 ? { opacity: 1, y: 0 } : { opacity: 0.25, y: 0 }}
+            transition={{ duration: 0.45, ease: EASE }}
+          >
+            <div className="mb-2.5 flex items-center justify-between gap-3">
+              <span className="font-mono text-[9px] font-bold uppercase tracking-[0.18em] text-[var(--muted)]">
+                The finished episode
+              </span>
+              <span className="font-mono text-[9px] font-bold uppercase tracking-[0.18em] text-[var(--muted)]">
+                Episode opens with it
+              </span>
+            </div>
+            <Waveform
+              heights={EPISODE_HEIGHTS}
+              highlightStart={0}
+              highlightCount={MOMENT_BAR_COUNT}
+              active={phase >= 3}
+              height={52}
+            />
+          </motion.div>
+
+          <div className="mt-6 flex items-center justify-between gap-4">
+            {dots}
+            {advanceButton}
+          </div>
+        </div>
+      </div>
+
+      {/* ══ DESKTOP ═════════════════════════════════════════════════════════ */}
+      <div className="relative hidden w-full select-none md:block" style={{ aspectRatio: '16 / 9' }}>
       {/* Outer border frame */}
       <div className="absolute inset-0 rounded-[24px] border border-[var(--rule)] bg-[var(--surface)]">
         {/* Ambient dot grid */}
@@ -351,39 +552,7 @@ export default function HighlightCutSlide({ onExit }: { onExit?: () => void } = 
           animate={phase >= 2 ? { opacity: 1, y: 0 } : { opacity: 0, y: 18 }}
           transition={{ duration: 0.5, delay: 0.55, ease: EASE }}
         >
-          <div className="relative flex w-[300px] sm:w-[340px] flex-col items-center gap-2 rounded-2xl border-2 border-[var(--accent-ring)] bg-[var(--accent-wash)] px-6 py-4">
-            <motion.span
-              className="pointer-events-none absolute inset-0 rounded-2xl border-2 border-[var(--accent-vivid)]"
-              initial={{ opacity: 0 }}
-              animate={phase >= 2 ? { opacity: [0, 0.5, 0], scale: [1, 1.05, 1.1] } : { opacity: 0 }}
-              transition={{ duration: 2, repeat: Infinity, delay: 0.9, ease: EASE }}
-            />
-            {/* play icon */}
-            <motion.span
-              className="flex h-9 w-9 items-center justify-center rounded-full bg-[var(--accent-vivid)] text-[var(--on-accent)] shadow-[0_8px_20px_color-mix(in_oklch,var(--accent-vivid)_45%,transparent)]"
-              whileHover={{ scale: 1.1 }}
-            >
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
-                <path d="M8 5.5v13l11-6.5z" />
-              </svg>
-            </motion.span>
-            <span className="font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--accent)]">
-              The Highlight Cut
-            </span>
-            <span className="font-mono text-[8.5px] font-semibold uppercase tracking-[0.14em] text-[var(--muted)]">
-              Cut before the episode · vertical + 16:9
-            </span>
-            {/* a miniature of the extracted waveform segment */}
-            <div className="mt-1 w-[70%]">
-              <Waveform
-                heights={BAR_HEIGHTS.slice(MOMENT_START_BAR, MOMENT_START_BAR + MOMENT_BAR_COUNT)}
-                highlightStart={0}
-                highlightCount={MOMENT_BAR_COUNT}
-                active={phase >= 2}
-                height={16}
-              />
-            </div>
-          </div>
+          <div className="w-[300px] sm:w-[340px]">{clipCard}</div>
         </motion.div>
 
         {/* ── Stage 3 · the finished episode, waveform rearranged ──── */}
@@ -412,30 +581,11 @@ export default function HighlightCutSlide({ onExit }: { onExit?: () => void } = 
 
         {/* ── Control bar ─────────────────────────────────────────── */}
         <div className="absolute inset-x-8 bottom-6 flex items-center justify-between">
-          <div className="flex items-center gap-1.5">
-            {[0, 1, 2, 3].map((p) => (
-              <button
-                key={p}
-                onClick={() => jumpTo(p as 0 | 1 | 2 | 3)}
-                className={cn(
-                  'h-1.5 rounded-full transition-all duration-300',
-                  phase === p ? 'w-6 bg-[var(--accent-vivid)]' : 'w-3 bg-[var(--rule-strong)] hover:bg-[var(--muted)]'
-                )}
-                aria-label={`Story step ${p + 1}`}
-              />
-            ))}
-          </div>
-          <button
-            onClick={advance}
-            className="flex items-center gap-2 rounded-full border border-[var(--rule)] bg-[var(--surface)] px-4 py-1.5 font-mono text-[9px] font-bold uppercase tracking-[0.16em] text-[var(--muted)] transition-colors hover:border-[var(--accent-ring)] hover:text-[var(--accent)]"
-          >
-            {phase === 3 ? 'Replay' : 'Next'}
-            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-              <path d="M5 12h14m-6-6 6 6-6 6" />
-            </svg>
-          </button>
+          {dots}
+          {advanceButton}
         </div>
       </div>
-    </div>
+      </div>
+    </>
   );
 }

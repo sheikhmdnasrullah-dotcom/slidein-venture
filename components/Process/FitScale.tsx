@@ -1,11 +1,10 @@
 'use client';
 
-import { useLayoutEffect, useRef, useState } from 'react';
+import { useLayoutEffect, useRef, useState, useSyncExternalStore } from 'react';
 
 /**
  * FitScale — scales its children down to fit entirely within the container,
- * so the content never overflows and no scrolling is needed. The scaled
- * content is centered within the container.
+ * so the content never overflows and no scrolling is needed.
  *
  * Usage:
  *   <div className="min-h-0 flex-1">
@@ -16,7 +15,38 @@ import { useLayoutEffect, useRef, useState } from 'react';
  * applies a uniform scale transform so everything fits within the available
  * width and height. Transforms don't affect layout dimensions, so measuring
  * via scrollWidth/scrollHeight is safe regardless of the current scale.
+ *
+ * ── IT DOES NOTHING BELOW md, AND THAT IS THE POINT ────────────────────────
+ * Uniform downscaling is the right tool for the /process slides' DESKTOP
+ * artwork: a 1000×520 canvas authored once, with its geometry, type, stroke
+ * weights and shadows all shrinking together. It is the wrong tool for a phone.
+ *
+ * Every slide already ships a real mobile layout behind `md:hidden` — a
+ * vertical rail of full-width nodes. Those are authored to fit a phone, so
+ * scaling them is never needed; but when one of them ran a little long, this
+ * component would silently shrink the whole slide to 0.6 and the reader got
+ * 8px type instead of a scroll. Worse, a SHORT mobile stack was absolutely
+ * positioned at 50%/50% inside an 88dvh sheet, which is where the large dead
+ * band under the header came from.
+ *
+ * So below 768px this renders a plain scrolling column instead. `my-auto` on
+ * the inner div centres the content when it is shorter than the sheet and
+ * yields to normal top-aligned scrolling when it is taller — `items-center`
+ * on the flex parent would clip the top of anything that overflows.
+ *
+ * The breakpoint is read with useSyncExternalStore rather than an effect that
+ * calls setState: the server snapshot is `false`, so SSR and first paint both
+ * render the desktop branch and hydration cannot mismatch.
  */
+
+const MOBILE_QUERY = '(max-width: 767px)';
+
+function subscribe(onChange: () => void) {
+  const mq = window.matchMedia(MOBILE_QUERY);
+  mq.addEventListener('change', onChange);
+  return () => mq.removeEventListener('change', onChange);
+}
+
 export default function FitScale({
   children,
   className = '',
@@ -28,9 +58,16 @@ export default function FitScale({
   const contentRef = useRef<HTMLDivElement>(null);
   const [scale, setScale] = useState(1);
 
+  const isMobile = useSyncExternalStore(
+    subscribe,
+    () => window.matchMedia(MOBILE_QUERY).matches,
+    () => false
+  );
+
   useLayoutEffect(() => {
     const container = containerRef.current;
     const content = contentRef.current;
+    /* Refs are null on the mobile branch — it renders a different tree. */
     if (!container || !content) return;
 
     const update = () => {
@@ -57,7 +94,15 @@ export default function FitScale({
       ro.disconnect();
       window.removeEventListener('resize', update);
     };
-  }, [children]);
+  }, [children, isMobile]);
+
+  if (isMobile) {
+    return (
+      <div className={`relative flex overflow-y-auto overscroll-contain ${className}`}>
+        <div className="my-auto w-full">{children}</div>
+      </div>
+    );
+  }
 
   return (
     <div ref={containerRef} className={`relative overflow-hidden ${className}`}>

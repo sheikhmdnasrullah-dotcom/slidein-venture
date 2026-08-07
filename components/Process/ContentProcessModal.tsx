@@ -53,10 +53,17 @@ function NavButton({
       transition={{ duration: 0.35, ease: EASE }}
       whileHover={{ scale: 1.08 }}
       whileTap={{ scale: 0.94 }}
-      className={`absolute top-1/2 z-20 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full
+      /* ON PHONES THESE SIT AT THE FOOT, not vertically centred at the sides.
+         The mobile slide layout is a column of full-width rails with no side
+         gutter to put a 48px button in, so centred arrows landed on top of the
+         node rows — over the index number on the left and the row's trailing
+         affordance on the right. From md up the frame is wide enough and they
+         return to the sides. */
+      className={`absolute z-20 flex h-12 w-12 items-center justify-center rounded-full
         border border-[var(--rule)] bg-[var(--surface)]/80 text-[var(--muted)] backdrop-blur-md
         transition-colors duration-300 hover:border-[var(--accent-ring)] hover:text-[var(--accent)]
-        ${side === 'left' ? 'left-2 md:left-5' : 'right-2 md:right-5'}`}
+        bottom-4 md:bottom-auto md:top-1/2 md:-translate-y-1/2
+        ${side === 'left' ? 'left-4 md:left-5' : 'right-4 md:right-5'}`}
       style={{
         boxShadow:
           'inset 0 1px 0 var(--gloss), 0 10px 24px -14px color-mix(in oklch, var(--color-ink) 40%, transparent)',
@@ -70,15 +77,29 @@ function NavButton({
 }
 
 export default function ContentProcessModal({ open, phaseId, onClose }: ContentProcessModalProps) {
-  const [activeIndex, setActiveIndex] = useState(0);
+  /* Which slide is showing is DERIVED from `phaseId`, not synced to it by an
+     effect. The old `useState(0)` + `useEffect(setActiveIndex)` pair rendered
+     one frame of the wrong slide every time the modal opened, and React 19
+     flags the effect as a cascading render. Arrow navigation stores an
+     override together with the phaseId it was made against, so opening a
+     different node discards it without anything having to reset it. */
+  const requestedIndex = Math.max(
+    0,
+    phaseId ? CONTENT_PHASES.findIndex((p) => p.id === phaseId) : 0
+  );
+  const [override, setOverride] = useState<{ for: string | null; index: number } | null>(null);
+  const activeIndex = override && override.for === phaseId ? override.index : requestedIndex;
 
-  // When opened (or phaseId changes), jump to the matching phase.
-  useEffect(() => {
-    if (open && phaseId) {
-      const idx = CONTENT_PHASES.findIndex((p) => p.id === phaseId);
-      if (idx >= 0) setActiveIndex(idx);
-    }
-  }, [open, phaseId]);
+  const setActiveIndex = useCallback(
+    (next: number | ((i: number) => number)) => {
+      setOverride((prev) => {
+        const current = prev && prev.for === phaseId ? prev.index : requestedIndex;
+        const value = typeof next === 'function' ? next(current) : next;
+        return { for: phaseId, index: value };
+      });
+    },
+    [phaseId, requestedIndex]
+  );
 
   useEffect(() => {
     if (open) {
@@ -94,10 +115,10 @@ export default function ContentProcessModal({ open, phaseId, onClose }: ContentP
   const canPrev = activeIndex > 0;
   const canNext = activeIndex < CONTENT_PHASES.length - 1;
 
-  const goPrev = useCallback(() => setActiveIndex((i) => Math.max(0, i - 1)), []);
+  const goPrev = useCallback(() => setActiveIndex((i) => Math.max(0, i - 1)), [setActiveIndex]);
   const goNext = useCallback(
     () => setActiveIndex((i) => Math.min(CONTENT_PHASES.length - 1, i + 1)),
-    [],
+    [setActiveIndex],
   );
 
   // Escape closes, arrows page — the frame is a slide deck, so it should
@@ -192,7 +213,10 @@ export default function ContentProcessModal({ open, phaseId, onClose }: ContentP
 
             <div className="min-h-0 flex-1">
               <FitScale className="h-full">
-                <div className="px-4 pb-4 pt-3 md:px-6">
+                {/* pb-24 on phones clears the two nav buttons now parked at
+                    the foot of the sheet; md returns it to the tight padding
+                    the fixed canvas was authored against. */}
+                <div className="px-4 pb-24 pt-4 md:px-6 md:pb-4 md:pt-3">
                   <AnimatePresence mode="wait">
                     <motion.div
                       key={phase.id}
