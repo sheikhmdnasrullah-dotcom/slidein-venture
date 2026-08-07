@@ -102,7 +102,7 @@ const HOME_OUTREACH_NODES: HomeNode[] = [
   { id: 'sending', label: 'Sending & Follow-Ups' },
 ];
 
-function LayersIcon({ size = 20 }: { size?: number }) {
+function LayersIcon({ size = 23 }: { size?: number }) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
       <path d="m12 3 9 5-9 5-9-5z" />
@@ -111,11 +111,33 @@ function LayersIcon({ size = 20 }: { size?: number }) {
   );
 }
 
-function SendIcon({ size = 20 }: { size?: number }) {
+function SendIcon({ size = 23 }: { size?: number }) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
       <path d="M21 3 3 10.5l7.5 3M21 3l-7.5 18-3-7.5M21 3 10.5 13.5" />
     </svg>
+  );
+}
+
+/** Toggle affordance on each card header. Rotates in place rather than
+   cross-fading to a different glyph, so the same object reads as "opening"
+   and "closing" instead of as two unrelated icons swapped mid-interaction. */
+function ChevronIcon({ size = 16, expanded, still }: { size?: number; expanded: boolean; still: boolean }) {
+  return (
+    <motion.svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      animate={{ rotate: expanded ? 180 : 0 }}
+      transition={still ? { duration: 0 } : { duration: 0.4, ease: EASE }}
+    >
+      <path d="m6 9 6 6 6-6" />
+    </motion.svg>
   );
 }
 
@@ -135,13 +157,16 @@ function RocketIcon({ size = 23 }: { size?: number }) {
 function Terminal({ size = 10, still }: { size?: number; still: boolean }) {
   return (
     <span className="relative flex items-center justify-center" style={{ height: size, width: size }}>
+      {/* Same glow family as the outcome button below — accent-vivid/color-brand
+         at a matched ~45% strength, just scaled down to the dot's own size —
+         so all three lit points on the drawing read as one light source. */}
       <span
         aria-hidden
-        className="pointer-events-none absolute rounded-full blur-md"
+        className="pointer-events-none absolute rounded-full blur-lg"
         style={{
-          height: size * 4,
-          width: size * 4,
-          background: 'color-mix(in oklch, var(--accent-vivid) 42%, transparent)',
+          height: size * 4.4,
+          width: size * 4.4,
+          background: 'color-mix(in oklch, var(--accent-vivid) 46%, transparent)',
         }}
       />
       {!still && (
@@ -178,70 +203,94 @@ function Stub({ h = 30, still }: { h?: number; still: boolean }) {
   );
 }
 
-/** Splits one line into two, landing on the centre of each engine column
-   (x=250 and x=750 of a 1000-wide box). Three layers per curve: a static
-   rail, a draw-on that fires when the section enters the viewport, and a
-   bright dash travelling the path forever after. */
-function Fork({ direction, still }: { direction: 'split' | 'merge'; still: boolean }) {
-  const H = 118;
-  const paths =
-    direction === 'split'
-      ? [`M500,0 C500,${H * 0.55} 250,${H * 0.42} 250,${H}`, `M500,0 C500,${H * 0.55} 750,${H * 0.42} 750,${H}`]
-      : [`M250,0 C250,${H * 0.58} 500,${H * 0.45} 500,${H}`, `M750,0 C750,${H * 0.58} 500,${H * 0.45} 500,${H}`];
+/** Splits one line into two, landing on the true centre of each engine
+   card. Each half lives in its OWN grid cell, sharing the exact
+   `grid-cols-[1fr_1fr]` + gap the card row below uses — so the curve always
+   meets the card's actual centre, at any viewport width, instead of a fixed
+   25%/75% split that only lines up when the gap happens to be zero. The two
+   halves start from the inner edge of their own column (right against the
+   gap, directly under the Terminal dot sitting above it), so they still read
+   as one point branching into two rather than two unrelated lines.
 
+   Both halves use the same control-point fractions, so `merge` is a precise
+   vertical mirror of `split` rather than a separately tuned curve — the two
+   forks on the drawing now bend by the same amount. Three layers per curve:
+   a static rail, a draw-on that fires when the section enters the viewport,
+   and a bright dash travelling the path forever after. */
+const FORK_H = 130;
+
+/** One half of a Fork — a single curve inside its own `0 0 100 FORK_H`
+   viewBox, so it exactly spans one grid cell. A top-level component (not
+   nested inside Fork's body) so its identity is stable across renders and
+   its `whileInView` draw-on never gets remounted and re-armed. */
+function ForkHalf({ d, delay, still }: { d: string; delay: number; still: boolean }) {
   return (
-    <svg
-      aria-hidden
-      viewBox={`0 0 1000 ${H}`}
-      className="w-full"
-      style={{ aspectRatio: `1000 / ${H}` }}
-      fill="none"
-    >
-      {paths.map((d, i) => (
-        <g key={d}>
-          <path d={d} stroke="var(--accent-ring)" strokeWidth={1.4} strokeLinecap="round" opacity={0.5} />
+    <svg aria-hidden viewBox={`0 0 100 ${FORK_H}`} className="w-full" style={{ aspectRatio: `100 / ${FORK_H}` }} fill="none">
+      <path d={d} stroke="var(--accent-ring)" strokeWidth={1.4} strokeLinecap="round" opacity={0.5} />
+      <motion.path
+        d={d}
+        stroke="var(--accent-ring)"
+        strokeWidth={1.6}
+        strokeLinecap="round"
+        initial={{ pathLength: 0 }}
+        whileInView={{ pathLength: 1 }}
+        viewport={VIEWPORT}
+        transition={still ? { duration: 0 } : { duration: 1.1, delay: 0.12 + delay, ease: EASE }}
+      />
+      {!still && (
+        <>
           <motion.path
             d={d}
-            stroke="var(--accent-ring)"
-            strokeWidth={1.6}
+            stroke="var(--accent-vivid)"
+            strokeWidth={5}
             strokeLinecap="round"
-            initial={{ pathLength: 0 }}
-            whileInView={{ pathLength: 1 }}
-            viewport={VIEWPORT}
-            transition={still ? { duration: 0 } : { duration: 1.1, delay: 0.12 + i * 0.12, ease: EASE }}
+            opacity={0.16}
+            strokeDasharray="4 46"
+            animate={{ strokeDashoffset: [0, -50] }}
+            transition={{ duration: 2.2, repeat: Infinity, ease: 'linear', delay }}
           />
-          {!still && (
-            <>
-              <motion.path
-                d={d}
-                stroke="var(--accent-vivid)"
-                strokeWidth={5}
-                strokeLinecap="round"
-                opacity={0.16}
-                strokeDasharray="38 462"
-                animate={{ strokeDashoffset: [0, -500] }}
-                transition={{ duration: 3.4, repeat: Infinity, ease: 'linear', delay: i * 0.55 }}
-              />
-              <motion.path
-                d={d}
-                stroke="var(--accent-vivid)"
-                strokeWidth={2}
-                strokeLinecap="round"
-                strokeDasharray="24 476"
-                animate={{ strokeDashoffset: [0, -500] }}
-                transition={{ duration: 3.4, repeat: Infinity, ease: 'linear', delay: i * 0.55 }}
-              />
-            </>
-          )}
-        </g>
-      ))}
+          <motion.path
+            d={d}
+            stroke="var(--accent-vivid)"
+            strokeWidth={2}
+            strokeLinecap="round"
+            strokeDasharray="2.5 47.5"
+            animate={{ strokeDashoffset: [0, -50] }}
+            transition={{ duration: 2.2, repeat: Infinity, ease: 'linear', delay }}
+          />
+        </>
+      )}
     </svg>
   );
 }
 
-/** One engine card, its shortlist read top to bottom. A frosted panel that
-   floats gently, lifts under the pointer, and warms from a floor light —
-   never a colour change on the type, which stays ink at full contrast. */
+function Fork({ direction, still }: { direction: 'split' | 'merge'; still: boolean }) {
+  const CTRL_NEAR = 0.56; // fraction of FORK_H for the control point at the trunk end
+  const CTRL_FAR = 0.42; // fraction of FORK_H for the control point at the card end
+
+  const leftPath =
+    direction === 'split'
+      ? `M100,0 C100,${FORK_H * CTRL_NEAR} 50,${FORK_H * CTRL_FAR} 50,${FORK_H}`
+      : `M50,0 C50,${FORK_H * CTRL_NEAR} 100,${FORK_H * CTRL_FAR} 100,${FORK_H}`;
+  const rightPath =
+    direction === 'split'
+      ? `M0,0 C0,${FORK_H * CTRL_NEAR} 50,${FORK_H * CTRL_FAR} 50,${FORK_H}`
+      : `M50,0 C50,${FORK_H * CTRL_NEAR} 0,${FORK_H * CTRL_FAR} 0,${FORK_H}`;
+
+  return (
+    <div className="grid grid-cols-[1fr_1fr] gap-10 lg:gap-14">
+      <ForkHalf d={leftPath} delay={0} still={still} />
+      <ForkHalf d={rightPath} delay={0.55} still={still} />
+    </div>
+  );
+}
+
+/** One engine card, its shortlist collapsed to header + summary by default.
+   A frosted panel that floats gently, lifts under the pointer, and warms
+   from a floor light — never a colour change on the type, which stays ink
+   at full contrast. Expansion is controlled by the parent (both cards share
+   one `expanded` flag) so the two stay symmetrical in every state — there is
+   no way for one to be open while the other is closed. */
 function EngineCard({
   label,
   icon,
@@ -250,6 +299,8 @@ function EngineCard({
   side,
   delay,
   still,
+  expanded,
+  onToggle,
 }: {
   label: string;
   icon: React.ReactNode;
@@ -258,8 +309,18 @@ function EngineCard({
   side: 'left' | 'right';
   delay: number;
   still: boolean;
+  expanded: boolean;
+  onToggle: () => void;
 }) {
   const [hoveredId, setHoveredId] = useState<string | null>(null);
+  const listId = `engine-list-${side}`;
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      onToggle();
+    }
+  };
 
   return (
     <motion.div
@@ -298,11 +359,23 @@ function EngineCard({
         <span aria-hidden className="pointer-events-none absolute bottom-3.5 right-3.5 h-3.5 w-3.5 border-b border-r border-[var(--rule-strong)]" />
 
         {/* ── Header ──────────────────────────────────────────────────── */}
-        <div className="relative flex items-center gap-4 px-6 pb-6 pt-8 sm:px-9 sm:pb-7 sm:pt-10">
+        {/* The primary toggle control. `role="button"` rather than a real
+           `<button>` because it wraps the icon badge's own hover animation
+           and an h3 — a real button around block-level heading markup is the
+           kind of nesting that trips up assistive tech in other ways. */}
+        <div
+          role="button"
+          tabIndex={0}
+          aria-expanded={expanded}
+          aria-controls={listId}
+          onClick={onToggle}
+          onKeyDown={handleKeyDown}
+          className="relative flex cursor-pointer select-none items-center gap-4 px-6 pb-6 pt-8 outline-none transition-colors duration-300 focus-visible:bg-[var(--accent-wash)] sm:px-9 sm:pb-7 sm:pt-10"
+        >
           <motion.span
             whileHover={still ? undefined : { rotate: -8, scale: 1.06 }}
             transition={{ duration: 0.35, ease: EASE }}
-            className="relative flex h-12 w-12 shrink-0 items-center justify-center rounded-[var(--radius-md)] text-[var(--accent)] transition-colors duration-500 group-hover/engine:text-[var(--on-accent)] sm:h-14 sm:w-14"
+            className="relative flex h-14 w-14 shrink-0 items-center justify-center rounded-[var(--radius-md)] text-[var(--accent)] shadow-[var(--shadow-contact)] transition-colors duration-500 group-hover/engine:text-[var(--on-accent)] sm:h-16 sm:w-16"
             style={{ background: 'var(--accent-wash)', border: '1px solid var(--accent-ring)' }}
           >
             <span
@@ -313,85 +386,122 @@ function EngineCard({
             <span className="relative">{icon}</span>
           </motion.span>
 
-          <h3 className="font-display-sm text-[clamp(1.25rem,2.1vw,1.6rem)] leading-tight text-[var(--on-surface)]">
+          <h3 className="font-display-sm flex-1 text-[clamp(1.25rem,2.1vw,1.6rem)] leading-tight text-[var(--on-surface)]">
             {label}
           </h3>
+
+          <span
+            aria-hidden
+            className="relative flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-[var(--muted)] transition-colors duration-300 group-hover/engine:text-[var(--accent)]"
+            style={{ border: '1px solid var(--rule)' }}
+          >
+            <ChevronIcon expanded={expanded} still={still} />
+          </span>
         </div>
 
-        {/* Bus — the hairline the shortlist hangs off, with a bright segment
-            sliding along it. */}
-        <div className="relative mx-6 h-px overflow-hidden sm:mx-9" style={{ background: 'var(--rule)' }}>
-          {!still && (
-            <motion.span
-              className="absolute inset-y-0 w-1/4"
-              style={{ background: 'linear-gradient(90deg, transparent, var(--accent-vivid), transparent)' }}
-              initial={{ left: '-25%' }}
-              animate={{ left: ['-25%', '100%'] }}
-              transition={{ duration: 3.8, repeat: Infinity, ease: 'easeInOut', delay: delay + 0.6 }}
-            />
-          )}
-        </div>
-
-        {/* ── Shortlist ───────────────────────────────────────────────── */}
-        <ul className="relative flex flex-col gap-2 px-5 py-6 sm:gap-2.5 sm:px-7 sm:py-7">
-          {nodes.map((node, i) => (
-            <motion.li
-              key={node.id}
-              initial={{ opacity: 0, x: side === 'left' ? -12 : 12 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={VIEWPORT}
-              whileHover={still ? undefined : { y: -3 }}
-              onHoverStart={() => setHoveredId(node.id)}
-              onHoverEnd={() => setHoveredId((id) => (id === node.id ? null : id))}
-              transition={still ? { duration: 0 } : { duration: 0.5, delay: delay + 0.18 + i * 0.055, ease: EASE }}
-              className={cn(
-                'group/row relative flex min-h-[52px] items-center gap-3.5 overflow-hidden rounded-[var(--radius-md)] px-4 py-3 transition-[box-shadow,border-color] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] sm:min-h-[56px] sm:px-5',
-                node.accent
-                  ? 'border border-[var(--accent-ring)]'
-                  : 'border border-[var(--rule)] hover:border-[var(--accent-ring)]'
-              )}
-              style={{
-                background: node.accent
-                  ? 'var(--accent-wash)'
-                  : 'linear-gradient(180deg, var(--gloss), transparent 60%), var(--surface)',
-                boxShadow: 'var(--shadow-inset-top)',
-              }}
-            >
-              {/* Wash wiping in from the left edge. Transform, not width — six
-                  of these animating at once on a width transition drops frames. */}
-              <span
-                aria-hidden
-                className="pointer-events-none absolute inset-0 origin-left scale-x-0 transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover/row:scale-x-100"
-                style={{
-                  background:
-                    'linear-gradient(90deg, color-mix(in oklch, var(--accent-vivid) 10%, transparent), transparent 66%)',
-                }}
+        {/* ── Bus + shortlist, collapsed to zero height by default ───────
+           Animating `height` to/from `auto` rather than the bus-and-list
+           pair being conditionally rendered, so the transition measures and
+           tweens the real content height instead of jump-cutting between
+           0 and whatever the list happens to be. */}
+        <motion.div
+          id={listId}
+          initial={false}
+          animate={{ height: expanded ? 'auto' : 0 }}
+          transition={still ? { duration: 0 } : { duration: 0.5, ease: EASE }}
+          className="overflow-hidden"
+        >
+          {/* Bus — the hairline the shortlist hangs off, with a bright segment
+              sliding along it. */}
+          <div className="relative mx-6 h-px overflow-hidden sm:mx-9" style={{ background: 'var(--rule)' }}>
+            {!still && expanded && (
+              <motion.span
+                className="absolute inset-y-0 w-1/4"
+                style={{ background: 'linear-gradient(90deg, transparent, var(--accent-vivid), transparent)' }}
+                initial={{ left: '-25%' }}
+                animate={{ left: ['-25%', '100%'] }}
+                transition={{ duration: 3.8, repeat: Infinity, ease: 'easeInOut', delay: delay + 0.6 }}
               />
+            )}
+          </div>
 
-              <span
-                aria-hidden
+          {/* ── Shortlist ───────────────────────────────────────────────── */}
+          <ul className="relative flex flex-col gap-2.5 px-5 py-6 sm:gap-3 sm:px-7 sm:py-7">
+            {nodes.map((node, i) => (
+              <motion.li
+                key={node.id}
+                initial={false}
+                animate={
+                  expanded
+                    ? { opacity: 1, x: 0 }
+                    : { opacity: 0, x: side === 'left' ? -12 : 12 }
+                }
+                whileHover={still ? undefined : { y: -3 }}
+                onHoverStart={() => setHoveredId(node.id)}
+                onHoverEnd={() => setHoveredId((id) => (id === node.id ? null : id))}
+                transition={
+                  still
+                    ? { duration: 0 }
+                    : { duration: 0.45, delay: expanded ? 0.15 + i * 0.05 : 0, ease: EASE }
+                }
                 className={cn(
-                  'relative h-[7px] w-[7px] shrink-0 rounded-full transition-all duration-[420ms] ease-[cubic-bezier(0.16,1,0.3,1)]',
-                  node.accent ? 'bg-[var(--accent-vivid)]' : 'bg-[var(--rule-strong)]',
-                  'group-hover/row:scale-[1.45] group-hover/row:bg-[var(--accent-vivid)]',
-                  hoveredId === node.id && 'scale-[1.45] bg-[var(--accent-vivid)]'
+                  'group/row relative flex min-h-[52px] items-center gap-3.5 overflow-hidden rounded-[var(--radius-md)] px-4 py-3 transition-[box-shadow,border-color,background-color] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] sm:min-h-[56px] sm:px-5',
+                  node.accent
+                    ? 'border-[1.5px] border-[var(--accent-vivid)]/45'
+                    : 'border border-[var(--rule)] hover:border-[var(--accent-ring)]'
                 )}
                 style={{
-                  boxShadow:
-                    hoveredId === node.id
-                      ? '0 0 10px color-mix(in oklch, var(--accent-vivid) 65%, transparent)'
-                      : undefined,
+                  background: node.accent
+                    ? 'linear-gradient(180deg, color-mix(in oklch, var(--gloss) 60%, var(--accent-wash)), var(--accent-wash) 65%)'
+                    : 'linear-gradient(180deg, var(--gloss), transparent 60%), var(--surface)',
+                  boxShadow: node.accent
+                    ? 'var(--shadow-inset-top), 0 0 0 1px color-mix(in oklch, var(--accent-vivid) 14%, transparent)'
+                    : 'var(--shadow-inset-top)',
                 }}
-              />
-              <span className="font-body relative flex-1 text-[14px] leading-snug tracking-[-0.005em] text-[var(--on-surface)] sm:text-[15px]">
-                {node.label}
-              </span>
-            </motion.li>
-          ))}
-        </ul>
+              >
+                {/* Wash wiping in from the left edge. Transform, not width — six
+                    of these animating at once on a width transition drops frames. */}
+                <span
+                  aria-hidden
+                  className="pointer-events-none absolute inset-0 origin-left scale-x-0 transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover/row:scale-x-100"
+                  style={{
+                    background:
+                      'linear-gradient(90deg, color-mix(in oklch, var(--accent-vivid) 10%, transparent), transparent 66%)',
+                  }}
+                />
+
+                <span
+                  aria-hidden
+                  className={cn(
+                    'relative h-[7px] w-[7px] shrink-0 rounded-full transition-all duration-[420ms] ease-[cubic-bezier(0.16,1,0.3,1)]',
+                    node.accent ? 'bg-[var(--accent-vivid)]' : 'bg-[var(--rule-strong)]',
+                    'group-hover/row:scale-[1.45] group-hover/row:bg-[var(--accent-vivid)]',
+                    hoveredId === node.id && 'scale-[1.45] bg-[var(--accent-vivid)]'
+                  )}
+                  style={{
+                    boxShadow:
+                      hoveredId === node.id
+                        ? '0 0 10px color-mix(in oklch, var(--accent-vivid) 65%, transparent)'
+                        : undefined,
+                  }}
+                />
+                <span className="font-body relative flex-1 text-[14px] leading-snug tracking-[-0.005em] text-[var(--on-surface)] sm:text-[15px]">
+                  {node.label}
+                </span>
+              </motion.li>
+            ))}
+          </ul>
+        </motion.div>
 
         {/* ── Output ──────────────────────────────────────────────────── */}
-        <div className="relative mt-auto px-6 pb-8 pt-6 sm:px-9 sm:pb-9">
+        {/* Also a toggle trigger — this is the summary line the collapsed
+           card rests on, so it is as much "the card" as the header is. Not
+           a separate tab stop: the header above is the one focusable control,
+           this is a mouse convenience that fires the same handler. */}
+        <div
+          onClick={onToggle}
+          className="relative mt-auto cursor-pointer px-6 pb-8 pt-6 transition-colors duration-300 hover:bg-[var(--accent-wash)] sm:px-9 sm:pb-9"
+        >
           <span aria-hidden className="absolute inset-x-6 top-0 h-px sm:inset-x-9" style={{ background: 'var(--rule)' }} />
           <p className="font-display-sm text-[clamp(1.02rem,1.5vw,1.2rem)] leading-[1.32] text-[var(--on-surface)]">
             {outputLabel}
@@ -416,10 +526,13 @@ function OutcomeCard({ still }: { still: boolean }) {
       whileTap={{ scale: 0.985 }}
       className="group/outcome relative mx-auto w-fit max-w-full"
     >
+      {/* Same 46% strength as the two Terminal dots, just spread wider to
+         suit the button's footprint — one light source at three sizes,
+         rather than three independently tuned glows. */}
       <span
         aria-hidden
-        className="pointer-events-none absolute inset-x-4 -bottom-6 h-16 opacity-70 blur-3xl transition-opacity duration-700 group-hover/outcome:opacity-100"
-        style={{ background: 'color-mix(in oklch, var(--color-brand) 60%, transparent)' }}
+        className="pointer-events-none absolute inset-x-4 -bottom-6 h-16 opacity-60 blur-2xl transition-opacity duration-700 group-hover/outcome:opacity-90"
+        style={{ background: 'color-mix(in oklch, var(--color-brand) 46%, transparent)' }}
       />
 
       {/* Halo rings trace the plate's own shape. The three orbiting sparks
@@ -530,6 +643,11 @@ export default function FrameworkEngines({ className }: { className?: string }) 
   const [content, outreach] = FRAMEWORK_TRACKS;
   const still = !!useReducedMotion();
   const rootRef = useRef<HTMLDivElement>(null);
+  /* One flag for both cards, not one each — see EngineCard's own note. Either
+     card's header (or its summary line) can flip it, but there is exactly one
+     open/closed state, so the two panels can never end up mismatched. */
+  const [expanded, setExpanded] = useState(false);
+  const toggleExpanded = () => setExpanded((v) => !v);
 
   /* Scroll-reactive ambient. Small amplitudes on purpose — this should read
      as the light settling as you scroll, not as a parallax effect. */
@@ -564,8 +682,8 @@ export default function FrameworkEngines({ className }: { className?: string }) 
         >
           The Framework
         </motion.p>
-        <span className="mt-7 block">
-          <Stub h={34} still={still} />
+        <span className="mt-9 block">
+          <Stub h={38} still={still} />
         </span>
         <Terminal still={still} />
         <div className="hidden w-full md:block">
@@ -576,7 +694,11 @@ export default function FrameworkEngines({ className }: { className?: string }) 
         </div>
       </div>
 
-      {/* Two engines, one gutter */}
+      {/* Two engines, one gutter. `items-stretch` (grid's default) matters
+          here specifically because the two cards share one `expanded` flag —
+          they always hold identical content height, so stretching never has
+          to paper over a mismatch the way it would if either card could open
+          on its own. */}
       <div className="grid grid-cols-1 items-stretch gap-8 md:grid-cols-[1fr_1fr] md:gap-10 lg:gap-14">
         <EngineCard
           label={content.label}
@@ -586,6 +708,8 @@ export default function FrameworkEngines({ className }: { className?: string }) 
           side="left"
           delay={0.06}
           still={still}
+          expanded={expanded}
+          onToggle={toggleExpanded}
         />
         <EngineCard
           label={outreach.label}
@@ -595,6 +719,8 @@ export default function FrameworkEngines({ className }: { className?: string }) 
           side="right"
           delay={0.18}
           still={still}
+          expanded={expanded}
+          onToggle={toggleExpanded}
         />
       </div>
 
@@ -607,8 +733,8 @@ export default function FrameworkEngines({ className }: { className?: string }) 
           <Fork direction="merge" still={still} />
         </div>
         <Terminal still={still} />
-        <span className="mb-12 mt-1 block">
-          <Stub h={34} still={still} />
+        <span className="mb-12 mt-2 block">
+          <Stub h={38} still={still} />
         </span>
         <OutcomeCard still={still} />
       </div>
