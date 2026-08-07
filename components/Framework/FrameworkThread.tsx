@@ -6,19 +6,14 @@
  * The homepage's account of the business, as a single continuous thread with
  * dot nodes hanging off it. It has two states and they are the same drawing:
  *
- *   CLOSED  four milestones a side
- *   OPEN    the same four, with that track's six steps threaded in between
+ *   SIMPLE    four milestones a side
+ *   COMPLETE  the same four, with seven detail nodes threaded in between
  *
- * The two tracks open independently — Content Production and Researched
- * Outreach each carry their own disclosure — so a reader can hold one branch
- * open and read it without the other branch competing for the same glance.
- *
- * The open state introduces nothing the closed state does not already use
- * except the chevron on those two milestones: no cards, no second accent, no
- * per branch colour, no arrowheads. More nodes appear on the same thread,
- * smaller and lighter, and the thread grows to hold them. That constraint is
- * the whole specification: two densities of one design system rather than two
- * diagrams.
+ * The Complete state introduces nothing the Simple state does not already
+ * use — no cards, no second accent, no per branch colour, no arrowheads, no
+ * per node expand affordances. More nodes appear on the same thread, smaller
+ * and lighter, and the thread grows to hold them. That constraint is the whole
+ * specification: two densities of one design system rather than two diagrams.
  *
  * ── WHY THE THREAD IS PER ROW AND NOT ONE MEASURED PATH ───────────────────
  * The obvious build is one SVG path measured against the live boxes of the
@@ -71,9 +66,7 @@ import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { MonoLabel } from '@/components/System/System';
 import {
-  THREAD_DETAILS_CONTENT,
-  THREAD_DETAILS_OUTREACH,
-  THREAD_DETAIL_ROWS,
+  THREAD_DETAILS,
   THREAD_MILESTONES_BOTTOM,
   THREAD_MILESTONES_TOP,
   THREAD_ORIGIN,
@@ -83,16 +76,6 @@ import {
   type ThreadRow,
   type ThreadStat,
 } from '@/content/framework';
-
-/** Which milestone carries a disclosure, and the list it opens. */
-const TRACK_DETAILS: Record<'left' | 'right', ThreadNode[]> = {
-  left: THREAD_DETAILS_CONTENT,
-  right: THREAD_DETAILS_OUTREACH,
-};
-const TRACK_OF: Record<string, 'left' | 'right'> = {
-  'content-production': 'left',
-  'researched-outreach': 'right',
-};
 
 const EASE = [0.16, 1, 0.3, 1] as const;
 
@@ -179,66 +162,19 @@ function Stat({ stat, align }: { stat: ThreadStat; align: 'left' | 'right' }) {
   );
 }
 
-/* ─── A track's disclosure ─────────────────────────────────────────────────
-   Sits on the two track milestones and opens that track's steps. There are
-   exactly two of these in the drawing — one per branch — so the reader can
-   open a branch and read it without the opposite branch's six nodes arriving
-   at the same time. The chevron is the only new mark the Complete state
-   introduces, and it is on the two nodes that name the tracks. */
-function Disclosure({
-  open,
-  onClick,
-  controls,
-  align,
-}: {
-  open: boolean;
-  onClick: () => void;
-  controls: string;
-  align: 'left' | 'right';
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      aria-expanded={open}
-      aria-controls={controls}
-      className={cn(
-        'group/toggle -mx-2 mt-1 inline-flex cursor-pointer items-center gap-2 rounded-[var(--radius-sm)] px-2 py-1',
-        'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)]',
-        align === 'right' ? 'flex-row-reverse' : 'flex-row',
-      )}
-    >
-      <motion.span
-        aria-hidden
-        animate={{ rotate: open ? 180 : 0 }}
-        transition={{ duration: 0.3, ease: EASE }}
-        className="flex h-5 w-5 items-center justify-center rounded-full border border-[var(--rule)] text-[var(--accent)] transition-colors duration-300 group-hover/toggle:border-[var(--accent-ring)]"
-      >
-        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-          <path d="m6 9 6 6 6-6" />
-        </svg>
-      </motion.span>
-      <MonoLabel className="transition-colors duration-300 group-hover/toggle:text-[var(--on-surface)]">
-        {open ? THREAD_TOGGLE.close : THREAD_TOGGLE.open}
-      </MonoLabel>
-    </button>
-  );
-}
-
 /* ─── One node's text ──────────────────────────────────────────────────────
    The whole cell is the hover target, which is why the dot is a child of it.
-   The only button in here is the disclosure the two track milestones carry. */
+   Nothing here is a button: the toggle at the top drives both branches and
+   there is nothing else on this drawing to open. */
 function NodeText({
   node,
   side,
   className,
   reveal,
-  disclosure,
 }: {
   node: ThreadNode;
   side: 'left' | 'right';
   className?: string;
-  disclosure?: { open: boolean; onToggle: () => void; controls: string };
   /**
    * Set on the detail rows only. The strands grow with the wrapper's height;
    * the text arrives just behind them, so the thread reads as being drawn and
@@ -296,15 +232,6 @@ function NodeText({
       )}
 
       {node.stat && <Stat stat={node.stat} align={right ? 'right' : 'left'} />}
-
-      {disclosure && (
-        <Disclosure
-          open={disclosure.open}
-          onClick={disclosure.onToggle}
-          controls={disclosure.controls}
-          align={right ? 'right' : 'left'}
-        />
-      )}
     </motion.div>
   );
 }
@@ -314,66 +241,18 @@ function Row({
   row,
   pad,
   reveal,
-  disclosures,
 }: {
   row: ThreadRow;
   pad: string;
   reveal?: { delay: number; still: boolean };
-  /** Keyed by milestone id, so only the two track nodes get one. */
-  disclosures?: Record<string, { open: boolean; onToggle: () => void; controls: string }>;
 }) {
   return (
     <>
-      <NodeText
-        node={row.left}
-        side="left"
-        className={pad}
-        reveal={reveal}
-        disclosure={disclosures?.[row.left.id]}
-      />
+      <NodeText node={row.left} side="left" className={pad} reveal={reveal} />
       <div className={THREAD_W}>
         <Strands />
       </div>
-      <NodeText
-        node={row.right}
-        side="right"
-        className={pad}
-        reveal={reveal}
-        disclosure={disclosures?.[row.right.id]}
-      />
-    </>
-  );
-}
-
-/* ─── A detail row ─────────────────────────────────────────────────────────
-   Either side may be absent, because the branches open independently. The
-   empty cell still occupies its grid column so the strands stay straight and
-   the open branch's nodes stay on their own side of the drawing. */
-function DetailRow({
-  left,
-  right,
-  reveal,
-}: {
-  left?: ThreadNode;
-  right?: ThreadNode;
-  reveal: { delay: number; still: boolean };
-}) {
-  const pad = 'py-3.5';
-  return (
-    <>
-      {left ? (
-        <NodeText node={left} side="left" className={pad} reveal={reveal} />
-      ) : (
-        <div className={pad} aria-hidden />
-      )}
-      <div className={THREAD_W}>
-        <Strands />
-      </div>
-      {right ? (
-        <NodeText node={right} side="right" className={pad} reveal={reveal} />
-      ) : (
-        <div className={pad} aria-hidden />
-      )}
+      <NodeText node={row.right} side="right" className={pad} reveal={reveal} />
     </>
   );
 }
@@ -424,18 +303,46 @@ function Terminal() {
   );
 }
 
+/* ─── The toggle ───────────────────────────────────────────────────────────
+   One button for both branches. Not a card, not an icon, and deliberately not
+   a `+` circle: the drawing has fourteen detail nodes and fourteen identical
+   affordances beside them would be fourteen decisions to make instead of one.
+   The rule under it is the affordance; it extends on hover. */
+function Toggle({
+  open,
+  onClick,
+}: {
+  open: boolean;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      aria-expanded={open}
+      aria-controls="framework-details"
+      className={cn(
+        'group inline-flex cursor-pointer flex-col items-center gap-2 rounded-[var(--radius-sm)] px-2 py-1',
+        'focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--accent)]',
+      )}
+    >
+      <MonoLabel className="font-label-wide text-[var(--on-surface)]">
+        {open ? THREAD_TOGGLE.close : THREAD_TOGGLE.open}
+      </MonoLabel>
+      <span
+        aria-hidden
+        className="block h-px w-10 bg-[var(--accent-vivid)] transition-all duration-500 [transition-timing-function:var(--ease-expo)] group-hover:w-20"
+      />
+    </button>
+  );
+}
+
 /* ─── Narrow layout ────────────────────────────────────────────────────────
    Below the medium breakpoint the two strands become one rule down the left
    edge and the branches stack. The dots stay, the hierarchy stays, and the
    thread is still one continuous line — it is the same drawing with the fork
    removed, because a fork needs two columns and there is only one. */
-function NarrowNode({
-  node,
-  disclosure,
-}: {
-  node: ThreadNode;
-  disclosure?: { open: boolean; onToggle: () => void; controls: string };
-}) {
+function NarrowNode({ node }: { node: ThreadNode }) {
   return (
     <div className="group relative pl-8">
       <span
@@ -466,14 +373,6 @@ function NarrowNode({
           <MonoLabel>{node.label}</MonoLabel>
         )}
         {node.stat && <Stat stat={node.stat} align="left" />}
-        {disclosure && (
-          <Disclosure
-            open={disclosure.open}
-            onClick={disclosure.onToggle}
-            controls={disclosure.controls}
-            align="left"
-          />
-        )}
       </div>
     </div>
   );
@@ -482,17 +381,13 @@ function NarrowNode({
 function NarrowBranch({
   side,
   open,
-  onToggle,
   still,
 }: {
   side: 'left' | 'right';
   open: boolean;
-  onToggle: () => void;
   still: boolean;
 }) {
   const pick = (row: ThreadRow) => (side === 'left' ? row.left : row.right);
-  const trackId = side === 'left' ? 'content-production' : 'researched-outreach';
-  const controls = `framework-steps-${side}`;
 
   return (
     /* No border of its own. The rule belongs to the wrapper holding both
@@ -500,24 +395,14 @@ function NarrowBranch({
        breaking into two at the seam between them. */
     <div className="relative">
       <div className="flex flex-col gap-7">
-        {THREAD_MILESTONES_TOP.map((row) => {
-          const node = pick(row);
-          return (
-            <NarrowNode
-              key={node.id}
-              node={node}
-              disclosure={
-                node.id === trackId ? { open, onToggle, controls } : undefined
-              }
-            />
-          );
-        })}
+        {THREAD_MILESTONES_TOP.map((row) => (
+          <NarrowNode key={pick(row).id} node={pick(row)} />
+        ))}
       </div>
 
       <AnimatePresence initial={false}>
         {open && (
           <motion.div
-            id={controls}
             className="overflow-hidden"
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: 'auto', opacity: 1 }}
@@ -525,8 +410,8 @@ function NarrowBranch({
             transition={still ? { duration: 0 } : { duration: 0.5, ease: EASE }}
           >
             <div className="flex flex-col gap-4 pt-7">
-              {TRACK_DETAILS[side].map((node) => (
-                <NarrowNode key={node.id} node={node} />
+              {THREAD_DETAILS.map((row) => (
+                <NarrowNode key={pick(row).id} node={pick(row)} />
               ))}
             </div>
           </motion.div>
@@ -543,30 +428,18 @@ function NarrowBranch({
 }
 
 export default function FrameworkThread({ className }: { className?: string }) {
-  /* One flag per branch, so either can be read on its own. */
-  const [openLeft, setOpenLeft] = useState(false);
-  const [openRight, setOpenRight] = useState(false);
+  const [open, setOpen] = useState(false);
   const still = !!useReducedMotion();
-
-  const openOf = { left: openLeft, right: openRight };
-  const toggleOf = {
-    left: () => setOpenLeft((v) => !v),
-    right: () => setOpenRight((v) => !v),
-  };
-
-  /* Attached to the two track milestones by id, so no other node can grow a
-     disclosure by accident. */
-  const disclosures = Object.fromEntries(
-    Object.entries(TRACK_OF).map(([nodeId, side]) => [
-      nodeId,
-      { open: openOf[side], onToggle: toggleOf[side], controls: `framework-steps-${side}` },
-    ]),
-  );
 
   return (
     <div className={cn('mx-auto max-w-[1160px] px-6 md:px-10', className)}>
+      {/* ── The toggle, above the drawing ───────────────────────────────── */}
+      <div className="flex justify-center">
+        <Toggle open={open} onClick={() => setOpen((v) => !v)} />
+      </div>
+
       {/* ── Wide: three columns, one thread ─────────────────────────────── */}
-      <div className="hidden flex-col items-center md:flex">
+      <div className="mt-16 hidden flex-col items-center md:flex">
         {/* Origin */}
         <Stat stat={THREAD_ORIGIN} align="left" />
         <span className="mt-4 block h-8 w-px bg-[var(--accent-ring)]" aria-hidden />
@@ -576,46 +449,42 @@ export default function FrameworkThread({ className }: { className?: string }) {
         <div className="w-full">
           <div className={GRID}>
             {THREAD_MILESTONES_TOP.map((row) => (
-              <Row key={row.left.id} row={row} pad="py-9" disclosures={disclosures} />
+              <Row key={row.left.id} row={row} pad="py-9" />
             ))}
           </div>
 
-          {/* The detail nodes. The wrapper animates height, so the strands
-              inside it grow at the rate the rows arrive and the thread
-              stretches instead of the nodes popping into a gap. Both branches
-              share the wrapper — opening either one grows the same stretch of
-              thread, which is what keeps the two sides aligned. */}
-          <div id="framework-steps-left">
-            <div id="framework-steps-right">
-              <AnimatePresence initial={false}>
-                {(openLeft || openRight) && (
-                  <motion.div
-                    className="overflow-hidden"
-                    initial={{ height: 0 }}
-                    animate={{ height: 'auto' }}
-                    exit={{ height: 0 }}
-                    transition={
-                      still ? { duration: 0 } : { duration: 0.62, ease: EASE }
-                    }
-                  >
-                    <div className={GRID}>
-                      {Array.from({ length: THREAD_DETAIL_ROWS }, (_, i) => (
-                        <DetailRow
-                          key={i}
-                          left={openLeft ? THREAD_DETAILS_CONTENT[i] : undefined}
-                          right={openRight ? THREAD_DETAILS_OUTREACH[i] : undefined}
-                          /* The rows arrive just behind the thread that carries
-                             them, offset by index, so the drawing reads as being
-                             drawn top to bottom rather than as a block that
-                             appeared. */
-                          reveal={{ delay: 0.1 + i * 0.05, still }}
-                        />
-                      ))}
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
+          {/* The seven detail nodes. The wrapper animates height, so the
+              strands inside it grow at the rate the rows arrive and the
+              thread stretches instead of the nodes popping into a gap. */}
+          <div id="framework-details">
+            <AnimatePresence initial={false}>
+              {open && (
+                <motion.div
+                  className="overflow-hidden"
+                  initial={{ height: 0 }}
+                  animate={{ height: 'auto' }}
+                  exit={{ height: 0 }}
+                  transition={
+                    still ? { duration: 0 } : { duration: 0.62, ease: EASE }
+                  }
+                >
+                  <div className={GRID}>
+                    {THREAD_DETAILS.map((row, i) => (
+                      <Row
+                        key={row.left.id}
+                        row={row}
+                        pad="py-3.5"
+                        /* The rows arrive just behind the thread that carries
+                           them, offset by index, so the drawing reads as being
+                           drawn top to bottom rather than as a block that
+                           appeared. */
+                        reveal={{ delay: 0.1 + i * 0.05, still }}
+                      />
+                    ))}
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
 
           <div className={GRID}>
@@ -638,8 +507,8 @@ export default function FrameworkThread({ className }: { className?: string }) {
       <div className="mt-12 flex flex-col gap-10 md:hidden">
         <Stat stat={THREAD_ORIGIN} align="left" />
         <div className="flex flex-col gap-10 border-l border-[var(--accent-ring)]">
-          <NarrowBranch side="left" open={openLeft} onToggle={toggleOf.left} still={still} />
-          <NarrowBranch side="right" open={openRight} onToggle={toggleOf.right} still={still} />
+          <NarrowBranch side="left" open={open} still={still} />
+          <NarrowBranch side="right" open={open} still={still} />
         </div>
         <h3 className="font-display-md text-[1.75rem] text-[var(--on-surface)]">
           {THREAD_OUTCOME}

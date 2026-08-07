@@ -462,7 +462,7 @@ export default function Hero() {
                 glow. Orange stays an accent — never the surface. */}
             <Magnetic disabled={still} className="block w-full sm:inline-block sm:w-auto">
               <a
-                href="/steps#framework"
+                href="/process"
                 className="btn-premium group flex w-full cursor-pointer items-center justify-center gap-2.5 rounded-2xl px-7 py-4 text-[15px] font-medium text-paper-25 sm:inline-flex sm:w-auto"
                 style={{
                   background: 'linear-gradient(180deg,var(--color-graphite-800) 0%,var(--color-ink) 100%)',
@@ -477,37 +477,6 @@ export default function Hero() {
                   fill="none"
                   aria-hidden
                   style={{ color: ACCENT_VIVID }}
-                  className="transition-transform duration-500 ease-out group-hover:translate-x-1"
-                >
-                  <path
-                    d="M3 7.5h9M8 3.5l4 4-4 4"
-                    stroke="currentColor"
-                    strokeWidth="1.6"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
-              </a>
-            </Magnetic>
-
-            {/* Secondary: See the whole process */}
-            <Magnetic disabled={still} className="block w-full sm:inline-block sm:w-auto">
-              <a
-                href="/process"
-                className="btn-premium group flex w-full cursor-pointer items-center justify-center gap-2.5 rounded-2xl px-7 py-4 text-[15px] font-medium text-[var(--on-surface)] sm:inline-flex sm:w-auto"
-                style={{
-                  background: 'var(--surface)',
-                  border: '1px solid var(--rule-strong)',
-                }}
-              >
-                See the whole process
-                <svg
-                  width="15"
-                  height="15"
-                  viewBox="0 0 15 15"
-                  fill="none"
-                  aria-hidden
-                  style={{ color: ACCENT_TEXT }}
                   className="transition-transform duration-500 ease-out group-hover:translate-x-1"
                 >
                   <path

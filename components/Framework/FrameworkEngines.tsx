@@ -23,52 +23,19 @@
  * headline version of the same seventeen service nodes /steps draws in full
  * — so trimming what the homepage shows can never quietly change what
  * /steps promises.
- *
- * ── THE VISUAL PASS ────────────────────────────────────────────────────────
- * Structure, wording, node order and node count are all exactly what they
- * were. What changed is everything about how it is drawn:
- *
- *  · AMBIENT, NOT A PANEL. Three stacked layers behind the drawing — a
- *    masked dot grid, two low-alpha brand washes, and a fine noise plate —
- *    each dissolving to nothing before its own bounds, and the washes drift
- *    on scroll. There is no edge anywhere, so the band reads as light falling
- *    on the page rather than as a coloured section sitting on it.
- *
- *  · THE CONNECTORS ARE THE PROCESS PAGE'S CONNECTORS. Three layers per
- *    curve: a static rail, a scroll-triggered draw-on, and a bright pulse
- *    travelling it forever. Both diagrams on the site now speak the same
- *    language. The fork SVG scales UNIFORMLY (default preserveAspectRatio) —
- *    with `none` the geometry stretches on X while a dash pattern is still
- *    measured in device pixels, which shatters the pulse into fragments. Same
- *    trap Hero.tsx documents for its accent underline.
- *
- *  · CARDS ARE PANELS. Frosted glass over a gloss gradient, a hairline ring,
- *    two-layer elevation, corner brackets, and a slow float that is offset
- *    per card so the two never breathe in sync (in sync reads as a page-wide
- *    CSS animation; offset reads as two objects).
- *
- *  · ROWS ARE MODULES. Real hit-height, a wash that wipes in from the left
- *    edge on hover, a lift that carries its own shadow, and a leading dot
- *    that fills brand orange — the accent arrives, rather than sitting there
- *    as a permanent outline.
  */
 
-import { useRef, useState } from 'react';
-import {
-  motion,
-  useReducedMotion,
-  useScroll,
-  useTransform,
-  type MotionValue,
-} from 'framer-motion';
+import { useState } from 'react';
+import { motion, useReducedMotion } from 'framer-motion';
 import { cn } from '@/lib/utils';
+import { MonoLabel } from '@/components/System/System';
 import {
   FRAMEWORK_OUTCOME,
   FRAMEWORK_TRACKS,
 } from '@/content/framework';
 
 const EASE = [0.16, 1, 0.3, 1] as const;
-const VIEWPORT = { once: true, margin: '-70px' } as const;
+const GUTTER = 'md:w-28';
 
 type HomeNode = {
   id: string;
@@ -102,26 +69,26 @@ const HOME_OUTREACH_NODES: HomeNode[] = [
   { id: 'sending', label: 'Sending & Follow-Ups' },
 ];
 
-function LayersIcon({ size = 20 }: { size?: number }) {
+function LayersIcon() {
   return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
       <path d="m12 3 9 5-9 5-9-5z" />
       <path d="m3 13 9 5 9-5" opacity={0.55} />
     </svg>
   );
 }
 
-function SendIcon({ size = 20 }: { size?: number }) {
+function SendIcon() {
   return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
       <path d="M21 3 3 10.5l7.5 3M21 3l-7.5 18-3-7.5M21 3 10.5 13.5" />
     </svg>
   );
 }
 
-function RocketIcon({ size = 23 }: { size?: number }) {
+function RocketIcon() {
   return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
       <path d="M12 2.5c3 2 5 5.7 5 9.8 0 2.1-.5 3.9-1.2 5.4l-1 2.1h-5.6l-1-2.1C7.5 16.2 7 14.4 7 12.3c0-4.1 2-7.8 5-9.8z" />
       <circle cx="12" cy="10.2" r="1.7" fill="currentColor" stroke="none" />
       <path d="M7.3 15c-1.6.3-2.6 1.8-2.9 4.4 1.9-.2 3.4-1.1 4.2-2.6M16.7 15c1.6.3 2.6 1.8 2.9 4.4-1.9-.2-3.4-1.1-4.2-2.6" />
@@ -129,109 +96,66 @@ function RocketIcon({ size = 23 }: { size?: number }) {
   );
 }
 
-/** The single point at each end of the drawing — origin and merge. Kept from
-   FrameworkThread's own vocabulary. Now sits in a soft bloom, so the place
-   two branches meet is lit rather than merely marked. */
-function Terminal({ size = 10, still }: { size?: number; still: boolean }) {
+/** The single point at each end of the drawing — origin and, before this
+   file existed, the merge. Kept from FrameworkThread's own vocabulary. Now
+   breathes gently so the two nodes that connect both engines read as live
+   rather than static. */
+function Terminal() {
+  const reduceMotion = useReducedMotion();
   return (
-    <span className="relative flex items-center justify-center" style={{ height: size, width: size }}>
-      <span
-        aria-hidden
-        className="pointer-events-none absolute rounded-full blur-md"
-        style={{
-          height: size * 4,
-          width: size * 4,
-          background: 'color-mix(in oklch, var(--accent-vivid) 42%, transparent)',
-        }}
-      />
-      {!still && (
+    <span className="relative flex h-[9px] w-[9px] items-center justify-center">
+      {!reduceMotion && (
         <motion.span
           aria-hidden
           className="absolute inline-flex h-full w-full rounded-full bg-[var(--accent-vivid)]"
-          animate={{ scale: [1, 2.6, 1], opacity: [0.45, 0, 0.45] }}
-          transition={{ duration: 2.8, repeat: Infinity, ease: EASE }}
+          animate={{ scale: [1, 2.2, 1], opacity: [0.5, 0, 0.5] }}
+          transition={{ duration: 2.4, repeat: Infinity, ease: EASE }}
         />
       )}
-      <span
-        aria-hidden
-        className="relative block rounded-full bg-[var(--accent-vivid)]"
-        style={{ height: size, width: size, boxShadow: '0 0 12px color-mix(in oklch, var(--accent-vivid) 60%, transparent)' }}
-      />
+      <span aria-hidden className="relative block h-[9px] w-[9px] rounded-full bg-[var(--accent-vivid)]" />
     </span>
   );
 }
 
-/** A short vertical stub — fixed-height connective tissue with a highlight
-   falling down it, so a straight run reads as flowing rather than as a rule. */
-function Stub({ h = 30, still }: { h?: number; still: boolean }) {
-  return (
-    <span aria-hidden className="relative block w-px overflow-hidden bg-[var(--accent-ring)]" style={{ height: h }}>
-      {!still && (
-        <motion.span
-          className="absolute inset-x-0 h-1/3 bg-[var(--accent-vivid)]"
-          initial={{ top: '-40%' }}
-          animate={{ top: ['-40%', '120%'] }}
-          transition={{ duration: 2.4, repeat: Infinity, ease: 'linear' }}
-        />
-      )}
-    </span>
-  );
+/** A short vertical stub, the fixed-height connective tissue between a
+   terminal/fork and whatever it hands off to. Never a measured line: every
+   piece of this drawing is either a fixed-height stub or a column that
+   stretches on its own, so nothing here needs a ResizeObserver. */
+function Stub({ h = 28 }: { h?: number }) {
+  return <span aria-hidden className="block w-px bg-[var(--accent-ring)]" style={{ height: h }} />;
 }
 
-/** Splits one line into two, landing on the centre of each engine column
-   (x=250 and x=750 of a 1000-wide box). Three layers per curve: a static
-   rail, a draw-on that fires when the section enters the viewport, and a
-   bright dash travelling the path forever after. */
-function Fork({ direction, still }: { direction: 'split' | 'merge'; still: boolean }) {
-  const H = 118;
-  const paths =
+/** Splits one line into two, landing on the gutter's own edges — which is
+   exactly where the two engine columns begin, so the fork's curves and the
+   card columns always meet regardless of how wide those columns render. The
+   two curves are drawn once, then a bright pulse travels along each on loop —
+   the two nodes visibly connecting Content Production and Researched
+   Outreach to the same origin and the same outcome. */
+function Fork({ direction }: { direction: 'split' | 'merge' }) {
+  const reduceMotion = useReducedMotion();
+  const W = 176;
+  const H = 64;
+  const d =
     direction === 'split'
-      ? [`M500,0 C500,${H * 0.55} 250,${H * 0.42} 250,${H}`, `M500,0 C500,${H * 0.55} 750,${H * 0.42} 750,${H}`]
-      : [`M250,0 C250,${H * 0.58} 500,${H * 0.45} 500,${H}`, `M750,0 C750,${H * 0.58} 500,${H * 0.45} 500,${H}`];
+      ? [`M88 0 C 88 ${H * 0.55}, 0 ${H * 0.45}, 0 ${H}`, `M88 0 C 88 ${H * 0.55}, ${W} ${H * 0.45}, ${W} ${H}`]
+      : [`M0 0 C 0 ${H * 0.55}, 88 ${H * 0.45}, 88 ${H}`, `M${W} 0 C ${W} ${H * 0.55}, 88 ${H * 0.45}, 88 ${H}`];
 
   return (
-    <svg
-      aria-hidden
-      viewBox={`0 0 1000 ${H}`}
-      className="w-full"
-      style={{ aspectRatio: `1000 / ${H}` }}
-      fill="none"
-    >
-      {paths.map((d, i) => (
-        <g key={d}>
-          <path d={d} stroke="var(--accent-ring)" strokeWidth={1.4} strokeLinecap="round" opacity={0.5} />
-          <motion.path
-            d={d}
-            stroke="var(--accent-ring)"
-            strokeWidth={1.6}
-            strokeLinecap="round"
-            initial={{ pathLength: 0 }}
-            whileInView={{ pathLength: 1 }}
-            viewport={VIEWPORT}
-            transition={still ? { duration: 0 } : { duration: 1.1, delay: 0.12 + i * 0.12, ease: EASE }}
-          />
-          {!still && (
-            <>
-              <motion.path
-                d={d}
-                stroke="var(--accent-vivid)"
-                strokeWidth={5}
-                strokeLinecap="round"
-                opacity={0.16}
-                strokeDasharray="38 462"
-                animate={{ strokeDashoffset: [0, -500] }}
-                transition={{ duration: 3.4, repeat: Infinity, ease: 'linear', delay: i * 0.55 }}
-              />
-              <motion.path
-                d={d}
-                stroke="var(--accent-vivid)"
-                strokeWidth={2}
-                strokeLinecap="round"
-                strokeDasharray="24 476"
-                animate={{ strokeDashoffset: [0, -500] }}
-                transition={{ duration: 3.4, repeat: Infinity, ease: 'linear', delay: i * 0.55 }}
-              />
-            </>
+    <svg aria-hidden viewBox={`0 0 ${W} ${H}`} className={cn(GUTTER, 'hidden md:block')} style={{ height: H }} fill="none" preserveAspectRatio="none">
+      {d.map((path, i) => (
+        <g key={path}>
+          <path d={path} stroke="var(--accent-ring)" strokeWidth={1} vectorEffect="non-scaling-stroke" />
+          {!reduceMotion && (
+            <motion.path
+              d={path}
+              stroke="var(--accent-vivid)"
+              strokeWidth={1.5}
+              strokeLinecap="round"
+              vectorEffect="non-scaling-stroke"
+              strokeDasharray="14 220"
+              animate={{ strokeDashoffset: [0, -234] }}
+              transition={{ duration: 2.6, repeat: Infinity, ease: 'linear', delay: i * 0.5 }}
+            />
           )}
         </g>
       ))}
@@ -239,9 +163,9 @@ function Fork({ direction, still }: { direction: 'split' | 'merge'; still: boole
   );
 }
 
-/** One engine card, its shortlist read top to bottom. A frosted panel that
-   floats gently, lifts under the pointer, and warms from a floor light —
-   never a colour change on the type, which stays ink at full contrast. */
+/** One engine card, its shortlist read top to bottom. Lifts and glows on
+   hover/focus, and each row brightens under the pointer, so the drawing
+   feels like a surface a reader can explore rather than a flat diagram. */
 function EngineCard({
   label,
   icon,
@@ -249,7 +173,6 @@ function EngineCard({
   outputLabel,
   side,
   delay,
-  still,
 }: {
   label: string;
   icon: React.ReactNode;
@@ -257,335 +180,167 @@ function EngineCard({
   outputLabel: string;
   side: 'left' | 'right';
   delay: number;
-  still: boolean;
 }) {
   const [hoveredId, setHoveredId] = useState<string | null>(null);
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 26 }}
+      initial={{ opacity: 0, y: 18 }}
       whileInView={{ opacity: 1, y: 0 }}
-      viewport={VIEWPORT}
-      transition={still ? { duration: 0 } : { duration: 0.85, delay, ease: EASE }}
-      className="group/engine relative flex flex-col overflow-hidden rounded-[calc(var(--radius-md)*1.7)]"
-      style={{
-        background: 'linear-gradient(180deg, var(--gloss), transparent 34%), var(--surface-glass)',
-        border: '1px solid var(--rule)',
-        boxShadow: 'var(--shadow-inset-top), var(--shadow-raised)',
-        backdropFilter: 'blur(22px) saturate(1.25)',
-        WebkitBackdropFilter: 'blur(22px) saturate(1.25)',
-      }}
+      viewport={{ once: true, margin: '-80px' }}
+      whileHover={{ y: -6 }}
+      transition={{ duration: 0.55, delay, ease: EASE }}
+      className="group flex flex-col rounded-2xl border border-[var(--rule)] bg-[var(--surface)] shadow-[0_10px_30px_color-mix(in_oklch,var(--on-surface)_6%,transparent)] transition-shadow duration-300 hover:shadow-[0_24px_48px_color-mix(in_oklch,var(--accent)_18%,transparent)]"
     >
-      {/* Float. Offset per card by the same delay that staggers the entrance,
-          so the two panels never rise and fall together. */}
-      <motion.div
-        className="flex h-full flex-col"
-        animate={still ? undefined : { y: [0, -7, 0] }}
-        transition={{ duration: 9, repeat: Infinity, ease: 'easeInOut', delay: delay * 6 }}
-      >
-        {/* Floor light — barely there at rest, warms as the pointer enters. */}
-        <span
-          aria-hidden
-          className="pointer-events-none absolute inset-x-12 -bottom-20 h-32 opacity-25 blur-3xl transition-opacity duration-700 group-hover/engine:opacity-80"
-          style={{ background: 'color-mix(in oklch, var(--accent-vivid) 20%, transparent)' }}
-        />
+      {/* Header */}
+      <div className="flex items-center gap-3 border-b border-[var(--rule)] px-6 py-5">
+        <motion.span
+          whileHover={{ rotate: -8, scale: 1.08 }}
+          transition={{ duration: 0.25, ease: EASE }}
+          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[var(--accent-wash)] text-[var(--accent)] transition-colors duration-300 group-hover:bg-[var(--accent-vivid)] group-hover:text-[var(--on-accent)]"
+        >
+          {icon}
+        </motion.span>
+        <h3 className="font-display-sm truncate text-[1.15rem] text-[var(--on-surface)]">{label}</h3>
+      </div>
 
-        {/* Corner brackets — the site's blueprint vocabulary, and they cost no
-            contrast the way a heavier border would. */}
-        <span aria-hidden className="pointer-events-none absolute left-3.5 top-3.5 h-3.5 w-3.5 border-l border-t border-[var(--rule-strong)]" />
-        <span aria-hidden className="pointer-events-none absolute right-3.5 top-3.5 h-3.5 w-3.5 border-r border-t border-[var(--rule-strong)]" />
-        <span aria-hidden className="pointer-events-none absolute bottom-3.5 left-3.5 h-3.5 w-3.5 border-b border-l border-[var(--rule-strong)]" />
-        <span aria-hidden className="pointer-events-none absolute bottom-3.5 right-3.5 h-3.5 w-3.5 border-b border-r border-[var(--rule-strong)]" />
-
-        {/* ── Header ──────────────────────────────────────────────────── */}
-        <div className="relative flex items-center gap-4 px-6 pb-6 pt-8 sm:px-9 sm:pb-7 sm:pt-10">
-          <motion.span
-            whileHover={still ? undefined : { rotate: -8, scale: 1.06 }}
-            transition={{ duration: 0.35, ease: EASE }}
-            className="relative flex h-12 w-12 shrink-0 items-center justify-center rounded-[var(--radius-md)] text-[var(--accent)] transition-colors duration-500 group-hover/engine:text-[var(--on-accent)] sm:h-14 sm:w-14"
-            style={{ background: 'var(--accent-wash)', border: '1px solid var(--accent-ring)' }}
+      {/* Shortlist */}
+      <ul className="flex flex-col gap-2 px-4 py-4">
+        {nodes.map((node, i) => (
+          <motion.li
+            key={node.id}
+            initial={{ opacity: 0, x: side === 'left' ? -10 : 10 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true, margin: '-80px' }}
+            whileHover={{ x: side === 'left' ? 4 : -4, scale: 1.015 }}
+            onHoverStart={() => setHoveredId(node.id)}
+            onHoverEnd={() => setHoveredId((id) => (id === node.id ? null : id))}
+            transition={{ duration: 0.4, delay: delay + 0.15 + i * 0.035, ease: EASE }}
+            className={cn(
+              'flex items-center gap-3 rounded-lg border px-4 py-2.5 transition-colors duration-200',
+              node.accent
+                ? 'border-[var(--accent-ring)] bg-[var(--accent-wash)]'
+                : 'border-[var(--rule)] bg-[var(--surface-2)] hover:border-[var(--accent-ring)] hover:bg-[var(--accent-wash)]'
+            )}
           >
             <span
-              aria-hidden
-              className="absolute inset-0 scale-90 rounded-[var(--radius-md)] opacity-0 transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover/engine:scale-100 group-hover/engine:opacity-100"
-              style={{ background: 'linear-gradient(160deg, var(--color-brand-lift), var(--color-brand))' }}
-            />
-            <span className="relative">{icon}</span>
-          </motion.span>
-
-          <h3 className="font-display-sm text-[clamp(1.25rem,2.1vw,1.6rem)] leading-tight text-[var(--on-surface)]">
-            {label}
-          </h3>
-        </div>
-
-        {/* Bus — the hairline the shortlist hangs off, with a bright segment
-            sliding along it. */}
-        <div className="relative mx-6 h-px overflow-hidden sm:mx-9" style={{ background: 'var(--rule)' }}>
-          {!still && (
-            <motion.span
-              className="absolute inset-y-0 w-1/4"
-              style={{ background: 'linear-gradient(90deg, transparent, var(--accent-vivid), transparent)' }}
-              initial={{ left: '-25%' }}
-              animate={{ left: ['-25%', '100%'] }}
-              transition={{ duration: 3.8, repeat: Infinity, ease: 'easeInOut', delay: delay + 0.6 }}
-            />
-          )}
-        </div>
-
-        {/* ── Shortlist ───────────────────────────────────────────────── */}
-        <ul className="relative flex flex-col gap-2 px-5 py-6 sm:gap-2.5 sm:px-7 sm:py-7">
-          {nodes.map((node, i) => (
-            <motion.li
-              key={node.id}
-              initial={{ opacity: 0, x: side === 'left' ? -12 : 12 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={VIEWPORT}
-              whileHover={still ? undefined : { y: -3 }}
-              onHoverStart={() => setHoveredId(node.id)}
-              onHoverEnd={() => setHoveredId((id) => (id === node.id ? null : id))}
-              transition={still ? { duration: 0 } : { duration: 0.5, delay: delay + 0.18 + i * 0.055, ease: EASE }}
               className={cn(
-                'group/row relative flex min-h-[52px] items-center gap-3.5 overflow-hidden rounded-[var(--radius-md)] px-4 py-3 transition-[box-shadow,border-color] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] sm:min-h-[56px] sm:px-5',
-                node.accent
-                  ? 'border border-[var(--accent-ring)]'
-                  : 'border border-[var(--rule)] hover:border-[var(--accent-ring)]'
+                'h-1.5 w-1.5 shrink-0 rounded-full transition-transform duration-200',
+                node.accent ? 'bg-[var(--accent-vivid)]' : 'bg-[var(--rule-strong)]',
+                hoveredId === node.id && 'scale-150 bg-[var(--accent-vivid)]'
               )}
-              style={{
-                background: node.accent
-                  ? 'var(--accent-wash)'
-                  : 'linear-gradient(180deg, var(--gloss), transparent 60%), var(--surface)',
-                boxShadow: 'var(--shadow-inset-top)',
-              }}
-            >
-              {/* Wash wiping in from the left edge. Transform, not width — six
-                  of these animating at once on a width transition drops frames. */}
-              <span
-                aria-hidden
-                className="pointer-events-none absolute inset-0 origin-left scale-x-0 transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover/row:scale-x-100"
-                style={{
-                  background:
-                    'linear-gradient(90deg, color-mix(in oklch, var(--accent-vivid) 10%, transparent), transparent 66%)',
-                }}
-              />
+            />
+            <span className="font-body flex-1 text-[13px] text-[var(--on-surface)]">{node.label}</span>
+          </motion.li>
+        ))}
+      </ul>
 
-              <span
-                aria-hidden
-                className={cn(
-                  'relative h-[7px] w-[7px] shrink-0 rounded-full transition-all duration-[420ms] ease-[cubic-bezier(0.16,1,0.3,1)]',
-                  node.accent ? 'bg-[var(--accent-vivid)]' : 'bg-[var(--rule-strong)]',
-                  'group-hover/row:scale-[1.45] group-hover/row:bg-[var(--accent-vivid)]',
-                  hoveredId === node.id && 'scale-[1.45] bg-[var(--accent-vivid)]'
-                )}
-                style={{
-                  boxShadow:
-                    hoveredId === node.id
-                      ? '0 0 10px color-mix(in oklch, var(--accent-vivid) 65%, transparent)'
-                      : undefined,
-                }}
-              />
-              <span className="font-body relative flex-1 text-[14px] leading-snug tracking-[-0.005em] text-[var(--on-surface)] sm:text-[15px]">
-                {node.label}
-              </span>
-            </motion.li>
-          ))}
-        </ul>
+      {/* Output */}
+      <div className="mt-auto border-t border-[var(--rule)] px-6 py-5">
+        <p className="font-display-sm text-[1.05rem] leading-snug text-[var(--on-surface)]">{outputLabel}</p>
+      </div>
+    </motion.div>
+  );
+}
 
-        {/* ── Output ──────────────────────────────────────────────────── */}
-        <div className="relative mt-auto px-6 pb-8 pt-6 sm:px-9 sm:pb-9">
-          <span aria-hidden className="absolute inset-x-6 top-0 h-px sm:inset-x-9" style={{ background: 'var(--rule)' }} />
-          <p className="font-display-sm text-[clamp(1.02rem,1.5vw,1.2rem)] leading-[1.32] text-[var(--on-surface)]">
-            {outputLabel}
-          </p>
-        </div>
+/** The one thing every phase of both engines is for. Same gradient, rings
+   and rocket the process page's own outcome node uses, so the payoff reads
+   as the same idea wherever a visitor meets it on the site. Now also lifts
+   and brightens under the pointer. */
+function OutcomeCard() {
+  return (
+    <motion.div whileHover={{ scale: 1.05 }} transition={{ duration: 0.3, ease: EASE }} className="relative mx-auto w-fit">
+      <motion.div
+        className="pointer-events-none absolute inset-0"
+        animate={{ rotate: 360 }}
+        transition={{ duration: 10, repeat: Infinity, ease: 'linear' }}
+      >
+        {[0, 120, 240].map((deg) => (
+          <span
+            key={deg}
+            className="absolute left-1/2 top-1/2 h-[5px] w-[5px] rounded-full bg-[var(--color-brand)] shadow-[0_0_8px_var(--color-brand)]"
+            style={{ transform: `rotate(${deg}deg) translateX(96px)` }}
+          />
+        ))}
+      </motion.div>
+
+      {[0, 0.7].map((ringDelay, i) => (
+        <motion.span
+          key={i}
+          className="pointer-events-none absolute inset-0 rounded-[28px] border-2 border-[var(--color-brand)]"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: [0, 0.5, 0], scale: [1, 1.12, 1.24] }}
+          transition={{ duration: 2.6, repeat: Infinity, delay: 0.4 + ringDelay, ease: EASE }}
+        />
+      ))}
+
+      <motion.div
+        initial={{ opacity: 0, y: 16, scale: 0.94 }}
+        whileInView={{ opacity: 1, y: 0, scale: 1 }}
+        viewport={{ once: true, margin: '-80px' }}
+        transition={{ duration: 0.55, ease: EASE }}
+        className="relative flex flex-col items-center gap-2 overflow-hidden rounded-[28px] bg-gradient-to-br from-[var(--color-brand)] to-[var(--color-brand-lift)] px-12 py-7 shadow-[0_20px_50px_color-mix(in_oklch,var(--color-brand)_35%,transparent)]"
+      >
+        <motion.span
+          className="pointer-events-none absolute inset-y-0 w-1/3 -skew-x-12 bg-gradient-to-r from-transparent via-white/35 to-transparent"
+          initial={{ left: '-40%' }}
+          animate={{ left: ['-40%', '140%'] }}
+          transition={{ duration: 1.1, repeat: Infinity, repeatDelay: 2.6, ease: 'easeInOut', delay: 1 }}
+        />
+        <motion.span
+          whileHover={{ rotate: 12 }}
+          className="flex h-11 w-11 items-center justify-center rounded-full bg-white/20 text-[var(--on-accent)]"
+        >
+          <RocketIcon />
+        </motion.span>
+        <span className="font-display-sm whitespace-nowrap text-[22px] text-[var(--on-accent)]">
+          {FRAMEWORK_OUTCOME.label}
+        </span>
       </motion.div>
     </motion.div>
   );
 }
 
-/** The one thing every phase of both engines is for. Same plate the process
-   page's outcome node uses, so the payoff reads as the same idea wherever a
-   visitor meets it on the site. */
-function OutcomeCard({ still }: { still: boolean }) {
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 22, scale: 0.94 }}
-      whileInView={{ opacity: 1, y: 0, scale: 1 }}
-      viewport={VIEWPORT}
-      transition={still ? { duration: 0 } : { duration: 0.75, ease: EASE }}
-      whileHover={still ? undefined : { y: -4, scale: 1.025 }}
-      whileTap={{ scale: 0.985 }}
-      className="group/outcome relative mx-auto w-fit max-w-full"
-    >
-      <span
-        aria-hidden
-        className="pointer-events-none absolute inset-x-4 -bottom-6 h-16 opacity-70 blur-3xl transition-opacity duration-700 group-hover/outcome:opacity-100"
-        style={{ background: 'color-mix(in oklch, var(--color-brand) 60%, transparent)' }}
-      />
-
-      {/* Halo rings trace the plate's own shape. The three orbiting sparks
-          that used to sit here circled a pill four times wider than it is
-          tall, so they spent most of the loop off the ends and read as stray
-          marks on the page rather than as an orbit. */}
-      {!still &&
-        [0, 0.75].map((ringDelay, i) => (
-          <motion.span
-            key={i}
-            aria-hidden
-            className="pointer-events-none absolute inset-0 rounded-[var(--radius-pill)] border border-[var(--color-brand)]"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: [0, 0.45, 0], scale: [1, 1.1, 1.2] }}
-            transition={{ duration: 3, repeat: Infinity, delay: 0.5 + ringDelay, ease: EASE }}
-          />
-        ))}
-
-      <div
-        className="relative flex items-center gap-4 overflow-hidden rounded-[var(--radius-pill)] px-7 py-5 transition-shadow duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] sm:gap-5 sm:px-12 sm:py-7"
-        style={{
-          background: 'linear-gradient(150deg, var(--color-brand-lift) 0%, var(--color-brand) 58%)',
-          boxShadow:
-            '0 1px 0 color-mix(in oklch, var(--color-paper-25) 34%, transparent) inset, 0 26px 60px -22px color-mix(in oklch, var(--color-brand) 78%, transparent)',
-        }}
-      >
-        {!still && (
-          <motion.span
-            aria-hidden
-            className="pointer-events-none absolute inset-y-0 w-1/3 -skew-x-12"
-            style={{
-              background:
-                'linear-gradient(90deg, transparent, color-mix(in oklch, var(--color-paper-25) 42%, transparent), transparent)',
-            }}
-            initial={{ left: '-40%' }}
-            animate={{ left: ['-40%', '150%'] }}
-            transition={{ duration: 1.25, repeat: Infinity, repeatDelay: 3.2, ease: 'easeInOut', delay: 1.2 }}
-          />
-        )}
-
-        <span
-          className="relative flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-[var(--on-accent)] transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover/outcome:scale-110 sm:h-13 sm:w-13"
-          style={{ background: 'color-mix(in oklch, var(--color-paper-25) 22%, transparent)' }}
-        >
-          <RocketIcon />
-        </span>
-
-        <span className="font-display-sm relative text-[clamp(1.1rem,2.6vw,1.65rem)] leading-none text-[var(--on-accent)]">
-          {FRAMEWORK_OUTCOME.label}
-        </span>
-      </div>
-    </motion.div>
-  );
-}
-
-/** Ambient plate. Three layers, all masked to nothing before their own
-   bounds so there is no edge for the eye to catch, and the two brand washes
-   drift on scroll — the light moves as the page does. */
-function Ambient({ driftA, driftB }: { driftA: MotionValue<number>; driftB: MotionValue<number> }) {
-  return (
-    <div aria-hidden className="pointer-events-none absolute -inset-x-24 -inset-y-32 -z-10 overflow-hidden">
-      {/* Engineering dot grid */}
-      <div
-        className="absolute inset-0 opacity-70"
-        style={{
-          backgroundImage: 'radial-gradient(circle, var(--grid-dot, var(--rule)) 1px, transparent 1px)',
-          backgroundSize: '30px 30px',
-          maskImage: 'radial-gradient(ellipse 62% 56% at 50% 46%, black 5%, transparent 82%)',
-          WebkitMaskImage: 'radial-gradient(ellipse 62% 56% at 50% 46%, black 5%, transparent 82%)',
-        }}
-      />
-
-      {/* Two brand washes, drifting in opposite directions on scroll */}
-      <motion.div
-        className="absolute inset-0"
-        style={{
-          y: driftA,
-          background:
-            'radial-gradient(56% 44% at 20% 22%, color-mix(in oklch, var(--accent-vivid) 6.5%, transparent), transparent 70%)',
-          maskImage: 'radial-gradient(ellipse 76% 68% at 50% 50%, black 8%, transparent 88%)',
-          WebkitMaskImage: 'radial-gradient(ellipse 76% 68% at 50% 50%, black 8%, transparent 88%)',
-        }}
-      />
-      <motion.div
-        className="absolute inset-0"
-        style={{
-          y: driftB,
-          background:
-            'radial-gradient(50% 42% at 84% 76%, color-mix(in oklch, var(--accent-vivid) 5.5%, transparent), transparent 70%)',
-          maskImage: 'radial-gradient(ellipse 76% 68% at 50% 50%, black 8%, transparent 88%)',
-          WebkitMaskImage: 'radial-gradient(ellipse 76% 68% at 50% 50%, black 8%, transparent 88%)',
-        }}
-      />
-
-      {/* Fine grain. 1.4% — felt as tooth on the paper, never seen as noise. */}
-      <div
-        className="absolute inset-0 opacity-[0.014]"
-        style={{
-          backgroundImage:
-            "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E\")",
-        }}
-      />
-    </div>
-  );
-}
-
 export default function FrameworkEngines({ className }: { className?: string }) {
   const [content, outreach] = FRAMEWORK_TRACKS;
-  const still = !!useReducedMotion();
-  const rootRef = useRef<HTMLDivElement>(null);
-
-  /* Scroll-reactive ambient. Small amplitudes on purpose — this should read
-     as the light settling as you scroll, not as a parallax effect. */
-  const { scrollYProgress } = useScroll({
-    target: rootRef,
-    offset: ['start end', 'end start'],
-  });
-  /* The reduced-motion branch is inside the RANGE, not around the hook. A
-     `still ? useTransform(...) : x` in the JSX is a conditional hook call and
-     reorders the hook list the moment the preference differs between server
-     and client — which it always does, since useReducedMotion is false during
-     SSR for everyone. Zero-amplitude output, hooks always called. */
-  const ampA = still ? 0 : 46;
-  const ampB = still ? 0 : 40;
-  const driftA = useTransform(scrollYProgress, [0, 1], [-ampA, ampA]);
-  const driftB = useTransform(scrollYProgress, [0, 1], [ampB, -ampB]);
 
   return (
-    <div ref={rootRef} className={cn('relative mx-auto max-w-[1160px] px-6 md:px-10', className)}>
-      <Ambient driftA={driftA} driftB={driftB} />
+    <div className={cn('relative mx-auto max-w-[1160px] px-6 md:px-10', className)}>
+      {/* A faint drifting glow behind the whole drawing, purely decorative */}
+      <motion.div
+        aria-hidden
+        className="pointer-events-none absolute -inset-x-10 -inset-y-16 -z-10 opacity-40"
+        animate={{ opacity: [0.25, 0.45, 0.25] }}
+        transition={{ duration: 6, repeat: Infinity, ease: EASE }}
+        style={{
+          background:
+            'radial-gradient(60% 50% at 20% 20%, color-mix(in oklch, var(--accent) 14%, transparent), transparent), radial-gradient(50% 45% at 85% 75%, color-mix(in oklch, var(--color-brand) 12%, transparent), transparent)',
+        }}
+      />
 
       {/* Origin. Was FRAMEWORK_ORIGIN.label ("One session a week") — now the
           section's own headline, since the page no longer repeats "The
           Framework" in a second section below this one. */}
       <div className="flex flex-col items-center">
-        <motion.p
-          initial={{ opacity: 0, y: 14 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={VIEWPORT}
-          transition={still ? { duration: 0 } : { duration: 0.8, ease: EASE }}
-          className="font-display-md text-center text-[clamp(1.7rem,3.4vw,2.5rem)] leading-none text-[var(--on-surface)]"
-        >
-          The Framework
-        </motion.p>
-        <span className="mt-7 block">
-          <Stub h={34} still={still} />
-        </span>
-        <Terminal still={still} />
-        <div className="hidden w-full md:block">
-          <Fork direction="split" still={still} />
-        </div>
-        <div className="md:hidden">
-          <Stub h={40} still={still} />
-        </div>
+        <MonoLabel className="text-[var(--muted)]">
+          <span className="font-display-sm tnum text-[1.125em] leading-none text-[var(--on-surface)]">
+            The Framework
+          </span>
+        </MonoLabel>
+        <span className="mt-4 block h-8 w-px bg-[var(--accent-ring)]" aria-hidden />
+        <Terminal />
+        <Fork direction="split" />
       </div>
 
       {/* Two engines, one gutter */}
-      <div className="grid grid-cols-1 items-stretch gap-8 md:grid-cols-[1fr_1fr] md:gap-10 lg:gap-14">
+      <div className="grid grid-cols-1 items-stretch gap-8 md:grid-cols-[1fr_1fr] md:gap-8">
         <EngineCard
           label={content.label}
           icon={<LayersIcon />}
           nodes={HOME_CONTENT_NODES}
           outputLabel={content.output.label}
           side="left"
-          delay={0.06}
-          still={still}
+          delay={0.1}
         />
         <EngineCard
           label={outreach.label}
@@ -593,24 +348,21 @@ export default function FrameworkEngines({ className }: { className?: string }) 
           nodes={HOME_OUTREACH_NODES}
           outputLabel={outreach.output.label}
           side="right"
-          delay={0.18}
-          still={still}
+          delay={0.25}
         />
+      </div>
+
+      {/* Mobile: single column */}
+      <div className="flex flex-col items-center gap-2 py-6 md:hidden">
+        <span className="h-8 w-px bg-[var(--accent-ring)]" aria-hidden />
       </div>
 
       {/* Merge into the outcome */}
       <div className="flex flex-col items-center">
-        <div className="md:hidden">
-          <Stub h={40} still={still} />
-        </div>
-        <div className="hidden w-full md:block">
-          <Fork direction="merge" still={still} />
-        </div>
-        <Terminal still={still} />
-        <span className="mb-12 mt-1 block">
-          <Stub h={34} still={still} />
-        </span>
-        <OutcomeCard still={still} />
+        <Fork direction="merge" />
+        <Terminal />
+        <span className="mb-10 mt-1 block h-8 w-px bg-[var(--accent-ring)]" aria-hidden />
+        <OutcomeCard />
       </div>
     </div>
   );
