@@ -7,13 +7,16 @@
  * presentation of this data, not a place to write more of it.
  *
  * ── SOCIAL LINKS ────────────────────────────────────────────────────────────
- * `href` is the ONE thing this file is waiting on. The cards, the icons, the
- * hover motion and the responsive grid are all built; each entry goes live the
- * moment its URL lands here. Entries with an empty `href` are filtered out at
- * render time on purpose — a dead `#` link on the contact page is worse than a
- * missing one, so the page never ships a link that goes nowhere.
+ * Only profiles that actually exist are listed. Entries with an empty `href`
+ * are filtered out at render time — a dead link on the contact page is worse
+ * than a missing one, so the page never ships a link that goes nowhere. To add
+ * X, Instagram or YouTube later, add a row here plus a glyph and a brand colour
+ * in components/Contact/SocialGlyphs.tsx.
  *
- *   { id: 'linkedin', label: 'LinkedIn', href: 'https://www.linkedin.com/in/…' }
+ * EVERY href CARRIES ITS PROTOCOL. A bare `www.linkedin.com/in/…` in an <a
+ * href> is parsed as a RELATIVE path, so the link resolves to
+ * slidein.com/contact/www.linkedin.com/in/… and 404s. The scheme is not
+ * decoration.
  */
 
 export const PROFILE = {
@@ -37,20 +40,30 @@ export const EMAILS: EmailEntry[] = [
   { id: 'social', address: 'hello@tanim.social' },
 ];
 
-export type SocialId = 'linkedin' | 'x' | 'instagram' | 'github' | 'youtube';
+export type SocialId = 'linkedin' | 'github' | 'website';
 
 export interface SocialEntry {
   id: SocialId;
   /** Platform name. The only label a social card carries. */
   label: string;
-  /** Fill me in. Empty = the card is not rendered. See the header note. */
+  /** Absolute URL, scheme included. Empty = the card is not rendered. */
   href: string;
 }
 
 export const SOCIALS: SocialEntry[] = [
-  { id: 'linkedin', label: 'LinkedIn', href: '' },
-  { id: 'x', label: 'X', href: '' },
-  { id: 'instagram', label: 'Instagram', href: '' },
-  { id: 'github', label: 'GitHub', href: '' },
-  { id: 'youtube', label: 'YouTube', href: '' },
+  {
+    id: 'linkedin',
+    label: 'LinkedIn',
+    href: 'https://www.linkedin.com/in/sheikh-md-nasrullah-910b203b3',
+  },
+  {
+    id: 'github',
+    label: 'GitHub',
+    href: 'https://github.com/sheikhmdnasrullah-dotcom',
+  },
+  {
+    id: 'website',
+    label: 'tanim.social',
+    href: 'https://www.tanim.social',
+  },
 ];

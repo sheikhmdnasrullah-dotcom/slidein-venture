@@ -43,7 +43,7 @@ import {
 } from 'framer-motion';
 import { Section } from '@/components/Section';
 import AmbientEnvironment from '@/components/AmbientEnvironment/AmbientEnvironment';
-import { SocialGlyph } from './SocialGlyphs';
+import { SocialGlyph, SOCIAL_BRAND } from './SocialGlyphs';
 import type { SocialEntry } from '@/content/contact';
 import {
   PROFILE,
@@ -341,9 +341,20 @@ function EmailCard({ address, delay, still }: { address: string; delay: number; 
 }
 
 /* ─── Social card ─────────────────────────────────────────────────────────
-   A square-ish tile per platform: glyph over name. The glyph plate fills
-   with brand orange on hover and the tile lifts — the same two-part gesture
-   the email cards use, so the page has one hover language rather than five. */
+   A tile per platform: the mark over its name.
+
+   THE MARK IS ITS OWN COLOUR, at rest and on hover. An earlier pass drew all
+   of these in --on-surface and filled the plate with brand orange on hover,
+   which is consistent but wrong: it turned a row of recognisable logos into a
+   row of identical orange chips, and recognition is the entire job of a social
+   icon. So the glyph sits in LinkedIn blue / GitHub near-black from the start,
+   and hover fills the plate with that SAME colour while the glyph flips to
+   paper — the platform's own two-tone, not the site's.
+
+   The lift, the bloom and the border are still the page's shared hover
+   language; only the hue is the platform's. `--brand` / `--on-brand` are set
+   per card as custom properties so the Tailwind hover variants can reach them
+   without a style object per state. */
 function SocialCard({
   entry,
   delay,
@@ -353,6 +364,8 @@ function SocialCard({
   delay: number;
   still: boolean;
 }) {
+  const { brand, on } = SOCIAL_BRAND[entry.id];
+
   return (
     <motion.div {...rise(delay, still, 12)}>
       <Link
@@ -360,29 +373,53 @@ function SocialCard({
         target="_blank"
         rel="noopener noreferrer"
         aria-label={entry.label}
-        className="group relative flex h-full flex-col items-center justify-center gap-3 overflow-hidden rounded-[var(--radius-md)] px-3 py-5 transition-[transform,box-shadow,border-color] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] hover:-translate-y-1.5 hover:border-[var(--accent-ring)]"
+        className="group relative flex h-full flex-col items-center justify-center gap-3 overflow-hidden rounded-[var(--radius-md)] px-3 py-5 transition-[transform,box-shadow,border-color] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] hover:-translate-y-1.5"
         style={{
           background: 'linear-gradient(180deg, var(--gloss), transparent 50%), var(--surface-glass)',
           border: '1px solid var(--rule)',
           boxShadow: 'var(--shadow-inset-top), var(--shadow-contact)',
+          ['--brand' as string]: brand,
+          ['--on-brand' as string]: on,
         }}
       >
+        {/* Floor bloom, in the platform's colour rather than orange. */}
         <span
           aria-hidden
           className="pointer-events-none absolute inset-x-0 -bottom-8 h-16 opacity-0 blur-2xl transition-opacity duration-500 group-hover:opacity-100"
-          style={{ background: 'color-mix(in oklch, var(--accent-vivid) 34%, transparent)' }}
+          style={{ background: 'color-mix(in oklch, var(--brand) 40%, transparent)' }}
+        />
+        {/* Border tints to the platform colour on hover. A second layer rather
+            than a border-color transition, so the base hairline never flickers
+            through at low alpha mid-transition. */}
+        <span
+          aria-hidden
+          className="pointer-events-none absolute inset-0 rounded-[var(--radius-md)] opacity-0 transition-opacity duration-500 group-hover:opacity-100"
+          style={{ border: '1px solid color-mix(in oklch, var(--brand) 55%, transparent)' }}
         />
 
         <span
-          className="relative flex h-11 w-11 items-center justify-center rounded-full text-[var(--on-surface)] transition-[color,transform] duration-[400ms] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:-translate-y-0.5 group-hover:text-[var(--on-accent)]"
-          style={{ background: 'var(--surface-2)', border: '1px solid var(--rule)' }}
+          className="relative flex h-11 w-11 items-center justify-center rounded-full transition-[color,transform] duration-[400ms] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:-translate-y-0.5"
+          style={{
+            background: 'color-mix(in oklch, var(--brand) 10%, var(--surface-2))',
+            border: '1px solid color-mix(in oklch, var(--brand) 22%, var(--rule))',
+            color: 'var(--brand)',
+          }}
         >
           <span
             aria-hidden
             className="absolute inset-0 scale-[0.4] rounded-full opacity-0 transition-all duration-[400ms] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-100 group-hover:opacity-100"
-            style={{ background: 'var(--accent-vivid)' }}
+            style={{ background: 'var(--brand)' }}
           />
-          <span className="relative">
+          {/* Two stacked glyphs cross-fade: the coloured one out, the paper one
+              in, both in the same box. Animating `color` through the midpoint
+              would pass the mark through a muddy blend of blue and paper. */}
+          <span className="relative transition-opacity duration-[400ms] group-hover:opacity-0">
+            <SocialGlyph id={entry.id} size={19} />
+          </span>
+          <span
+            className="absolute opacity-0 transition-opacity duration-[400ms] group-hover:opacity-100"
+            style={{ color: 'var(--on-brand)' }}
+          >
             <SocialGlyph id={entry.id} size={19} />
           </span>
         </span>
@@ -496,7 +533,10 @@ export default function ContactSurface() {
                       'linear-gradient(to right, var(--rule-strong), color-mix(in oklch, var(--rule) 40%, transparent) 65%, transparent)',
                   }}
                 />
-                <div className="mt-8 grid grid-cols-3 gap-3 sm:grid-cols-4 lg:grid-cols-5">
+                {/* Capped at three columns. `lg:grid-cols-5` left two empty
+                    tracks and squeezed three cards into 60% of the rail; the
+                    row should fill its width whatever the count. */}
+                <div className="mt-8 grid grid-cols-3 gap-3 sm:gap-4">
                   {socials.map((entry, i) => (
                     <SocialCard key={entry.id} entry={entry} delay={0.78 + i * 0.06} still={still} />
                   ))}
