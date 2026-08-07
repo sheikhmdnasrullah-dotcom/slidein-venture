@@ -179,7 +179,7 @@ export default function ContentProcessModal({ open, phaseId, onClose }: ContentP
                 whileHover={{ rotate: 90, scale: 1.06 }}
                 whileTap={{ scale: 0.92 }}
                 transition={{ duration: 0.35, ease: EASE }}
-                className="flex h-10 w-10 items-center justify-center rounded-full border border-[var(--rule)] bg-[var(--surface)] text-[var(--muted)] transition-colors duration-300 hover:border-[var(--accent-ring)] hover:text-[var(--on-surface)]"
+                className="flex h-11 w-11 items-center justify-center rounded-full border border-[var(--rule)] bg-[var(--surface)] text-[var(--muted)] transition-colors duration-300 hover:border-[var(--accent-ring)] hover:text-[var(--on-surface)] md:h-10 md:w-10"
                 aria-label="Close"
                 style={{ boxShadow: 'inset 0 1px 0 var(--gloss)' }}
               >

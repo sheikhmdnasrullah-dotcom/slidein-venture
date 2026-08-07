@@ -316,7 +316,7 @@ function ScrollCue({ still, onDepart }: { still: boolean; onDepart: () => void }
           seventeen service nodes in it. */}
       <a
         href="#framework"
-        className="group inline-flex items-center gap-3 text-[var(--muted)] transition-colors duration-300 hover:text-[var(--on-surface)]"
+        className="group -my-3 inline-flex items-center gap-3 py-3 text-[var(--muted)] transition-colors duration-300 hover:text-[var(--on-surface)]"
       >
         {/* The rest slot. The travelling dot animates INTO this box, so the
             landing point is wherever the label actually sits — no magic
@@ -530,7 +530,7 @@ export default function Hero() {
                 expectation and asks for an unknown length of attention. */}
             <button
               onClick={() => setVideoOpen(true)}
-              className="group inline-flex w-fit cursor-pointer items-center gap-2.5 py-2 text-[15px] font-medium text-[var(--muted)] transition-colors duration-300 hover:text-[var(--on-surface)] sm:py-4"
+              className="group inline-flex w-fit cursor-pointer items-center gap-2.5 py-3.5 text-[15px] font-medium text-[var(--muted)] transition-colors duration-300 hover:text-[var(--on-surface)] sm:py-4"
             >
               <svg
                 width="11"

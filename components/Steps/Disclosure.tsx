@@ -143,7 +143,12 @@ export function DisclosureTrigger({
       aria-expanded={isOpen}
       aria-controls={`${id}-detail`}
       className={cn(
-        'group flex w-full cursor-pointer items-start gap-5 text-left',
+        /* min-h-11 (44px) is a floor, not a fixed height — current callers
+           (PipelineStep, Figure) already run taller than this from their own
+           title+description content, so it changes nothing for them today.
+           It exists so a future terser trigger can't silently ship a sub-44px
+           touch target with no guardrail. */
+        'group flex w-full min-h-11 cursor-pointer items-start gap-5 text-left',
         className,
       )}
     >

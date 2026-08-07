@@ -18,7 +18,7 @@
  */
 
 import { useEffect } from 'react';
-import { motion, useMotionValue, useSpring } from 'framer-motion';
+import { motion, useMotionValue, useSpring, useReducedMotion } from 'framer-motion';
 
 const PARTICLES = [
   { l: '8%', t: '18%', s: 3, d: 0, dr: 18, o: 0.14 },
@@ -32,6 +32,7 @@ const PARTICLES = [
 ];
 
 export default function AmbientEnvironment() {
+  const still = !!useReducedMotion();
   const mx = useMotionValue(-600);
   const my = useMotionValue(-600);
   const sx = useSpring(mx, { stiffness: 40, damping: 18 });
@@ -106,16 +107,21 @@ export default function AmbientEnvironment() {
              centre sits BEHIND and slightly ABOVE the headline — the type is
              what appears illuminated. Parked over empty canvas, the same
              gradient reads as a stray blob rather than as a light source. */}
+      {/* Sized down below `sm` — the parent clips overflow visually, but the
+         browser still has to paint and transform-animate the full box every
+         frame regardless of what's clipped, so a 900px blob on a 375px phone
+         is pure wasted GPU work. `still` (prefers-reduced-motion) freezes the
+         drift entirely, matching how Hero.tsx gates its own motion. */}
       <motion.div
-        className="absolute w-[900px] h-[900px] rounded-full"
+        className="absolute h-[480px] w-[480px] rounded-full sm:h-[900px] sm:w-[900px]"
         style={{ background: 'radial-gradient(circle, var(--ambient-a) 0%, transparent 65%)', top: '-28%', left: '-16%' }}
-        animate={{ x: [0, 120, 0], y: [0, 60, 0] }}
+        animate={still ? undefined : { x: [0, 120, 0], y: [0, 60, 0] }}
         transition={{ duration: 38, repeat: Infinity, ease: 'easeInOut' }}
       />
       <motion.div
-        className="absolute w-[760px] h-[760px] rounded-full"
+        className="absolute h-[400px] w-[400px] rounded-full sm:h-[760px] sm:w-[760px]"
         style={{ background: 'radial-gradient(circle, var(--ambient-b) 0%, transparent 62%)', top: '-16%', left: '4%' }}
-        animate={{ x: [0, 64, 0], y: [0, 38, 0] }}
+        animate={still ? undefined : { x: [0, 64, 0], y: [0, 38, 0] }}
         transition={{ duration: 46, repeat: Infinity, ease: 'easeInOut', delay: 6 }}
       />
       {/* 5 — blueprint construction guides.
@@ -141,8 +147,8 @@ export default function AmbientEnvironment() {
              on a brand-orange field is nothing at all. Reading the tone makes
              them ink here and would make them orange on any paper band. */
           className="absolute rounded-full bg-[var(--accent-vivid)]"
-          style={{ left: p.l, top: p.t, width: p.s, height: p.s }}
-          animate={{ y: [0, -p.dr, 0], opacity: [0, p.o, 0] }}
+          style={{ left: p.l, top: p.t, width: p.s, height: p.s, opacity: still ? p.o : undefined }}
+          animate={still ? undefined : { y: [0, -p.dr, 0], opacity: [0, p.o, 0] }}
           transition={{ duration: 14 + i * 2, repeat: Infinity, ease: 'easeInOut', delay: p.d }}
         />
       ))}

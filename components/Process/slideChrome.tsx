@@ -245,7 +245,7 @@ export function Eyebrow({ children, delay = 0 }: { children: ReactNode; delay?: 
       initial={{ opacity: 0, y: -6 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.55, delay, ease: EASE }}
-      className="mx-auto flex w-[560px] items-center gap-4"
+      className="mx-auto flex w-full max-w-[560px] items-center gap-4"
     >
       <span className="h-px flex-1 bg-gradient-to-r from-transparent to-[var(--rule-strong)]" aria-hidden />
       <span className="font-label whitespace-nowrap text-[10.5px] tracking-[0.32em] text-[var(--accent)]">

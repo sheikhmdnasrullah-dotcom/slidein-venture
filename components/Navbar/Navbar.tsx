@@ -130,9 +130,21 @@ export default function Navbar() {
           deliberate, so the nav commits to being a detached floating object:
           more air under the top edge than a docked bar would ever have, which
           stops it reading as a failed attempt to align with the headline. */}
+      {/* `inset-x-0` + `flex flex-col items-center` rather than the old
+          `left-1/2 -translate-x-1/2` — a `position: fixed` element that ALSO carries
+          its own `transform` is a known mobile Safari fault line: the fixed
+          box can detach from the viewport during momentum scroll and ride
+          away with the page instead of staying pinned, which reads exactly
+          like "the navbar disappears on scroll." Centring via flexbox keeps
+          this element transform-free; the pill's OWN entrance/scale
+          transform lives one level down on the motion.div child, where a
+          transform is safe because that child was never the fixed element.
+          `pointer-events: none` on this full-width strip stops the empty
+          space either side of the pill from swallowing taps meant for the
+          page under it; the pill opts back in below. */}
       <nav
-        className="fixed top-7 left-1/2 z-[1000] -translate-x-1/2"
-        style={{ width: 'auto' }}
+        className="fixed inset-x-0 top-7 z-[1000] flex flex-col items-center px-4"
+        style={{ pointerEvents: 'none' }}
       >
         <motion.div
           className="flex items-center gap-1 pl-3 pr-3 py-2.5"
@@ -143,6 +155,13 @@ export default function Navbar() {
             borderRadius: 'var(--radius-pill)',
             border: '1px solid var(--rule)',
             boxShadow: scrolled ? 'var(--shadow-float)' : 'var(--shadow-raised)',
+            pointerEvents: 'auto',
+            /* Its own compositing layer — cheap insurance against the same
+               class of mobile browser fixed+blur repaint glitches, on the
+               one element that is safe to give a transform to. */
+            transform: 'translateZ(0)',
+            WebkitTransform: 'translateZ(0)',
+            willChange: 'transform',
           }}
           initial={{ y: -20, opacity: 0 }}
           animate={{ y: 0, opacity: 1, scale: scrolled ? 0.955 : 1 }}
@@ -266,7 +285,7 @@ export default function Navbar() {
         <AnimatePresence>
           {mobileOpen && (
             <motion.div
-              className="lg:hidden mt-2 overflow-hidden"
+              className="lg:hidden mt-2 w-[min(92vw,320px)] overflow-hidden"
               style={{
                 background: 'var(--surface-glass)',
                 backdropFilter: 'blur(24px) saturate(1.4)',
@@ -274,6 +293,7 @@ export default function Navbar() {
                 borderRadius: 'var(--radius-md)',
                 border: '1px solid var(--rule)',
                 boxShadow: 'var(--shadow-float)',
+                pointerEvents: 'auto',
               }}
               initial={{ opacity: 0, height: 0, scale: 0.95 }}
               animate={{ opacity: 1, height: 'auto', scale: 1 }}

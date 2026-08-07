@@ -13,9 +13,19 @@ export const metadata: Metadata = {
 
 /* One theme, so one colour. This is the paper the page is made of — it tells
    the browser what to tint form controls, the scrollbar and mobile chrome
-   with, and it must track --color-paper-50 in app/styles/tokens.css. */
+   with, and it must track --color-paper-50 in app/styles/tokens.css.
+
+   `colorScheme: "light"` renders the <meta name="color-scheme" content="light">
+   tag the CSS `color-scheme: light` in globals.css (html selector) already
+   sets at the stylesheet level — belt and suspenders. Mobile Chrome/Samsung
+   Internet's "Auto Dark Theme" algorithmically re-colours any page that does
+   not explicitly declare a supported scheme, which is what reads as "the
+   homepage switches to dark mode on mobile": nothing in this codebase asked
+   for that, the OS-level dark-mode heuristic did it TO the page. This tag is
+   the documented opt-out, independent of any `dark:` class or media query. */
 export const viewport = {
   themeColor: "#f6f4f0",
+  colorScheme: "light",
 };
 
 export default function RootLayout({

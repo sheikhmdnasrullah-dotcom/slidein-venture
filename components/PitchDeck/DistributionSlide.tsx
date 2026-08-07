@@ -202,8 +202,41 @@ export default function DistributionSlide() {
       <span className="pointer-events-none absolute left-5 top-5 h-3 w-3 border-l-2 border-t-2 border-[var(--accent-vivid)]/70" />
       <span className="pointer-events-none absolute bottom-5 right-5 h-3 w-3 border-b-2 border-r-2 border-[var(--accent-vivid)]/70" />
 
+      {/* ------------------------------ mobile fallback ------------------------------
+          The canvas below is a single 1440-wide viewBox scaled to fit — on a
+          375px phone that's roughly a 0.24x scale, which puts the 10-15px SVG
+          labels at 2-4px effective size: illegible, and the routing
+          interaction is hover-only anyway, which touch has no equivalent for.
+          Below `md` this renders the same DASHBOARD_ROWS data (no new copy —
+          `destination` is already a plain-text field on each row) as a
+          straightforward stacked list instead of asking a diagram built for a
+          desktop canvas to also be a mobile list. */}
+      <div className="px-5 pb-8 pt-6 md:hidden">
+        <div className="divide-y divide-[var(--rule)] overflow-hidden rounded-[var(--radius-md)] border border-[var(--rule)] bg-[var(--surface)]">
+          {DASHBOARD_ROWS.map((row) => (
+            <div key={row.asset} className="flex items-center justify-between gap-4 px-4 py-3.5">
+              <div className="min-w-0">
+                <p className="truncate text-[13px] font-semibold leading-snug text-[var(--on-surface)]">
+                  {row.asset.replace(/^EP \d+ · /, '')}
+                </p>
+                <p className="truncate text-[11px] leading-snug text-[var(--muted)]">{row.destination}</p>
+              </div>
+              <span
+                className="shrink-0 rounded-full px-2.5 py-1 text-[9px] font-semibold uppercase tracking-[0.1em]"
+                style={{
+                  background: row.state === 'READY' ? 'var(--accent-wash)' : 'var(--surface-2)',
+                  color: row.state === 'READY' ? 'var(--accent)' : 'var(--muted)',
+                }}
+              >
+                {row.state}
+              </span>
+            </div>
+          ))}
+        </div>
+      </div>
+
       {/* ------------------------------ canvas ------------------------------ */}
-      <div className="relative">
+      <div className="relative hidden md:block">
         <svg viewBox="0 80 1440 675" className="block h-auto w-full" role="img"
           aria-label="Episode 14 delivered: six finished assets on the left, each routed through smart routing to the video, social and owned channels it publishes to.">
           <defs>

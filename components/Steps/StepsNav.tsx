@@ -49,8 +49,13 @@ export default function StepsNav() {
     return () => obs.disconnect();
   }, []);
 
+  /* Navbar.tsx's mobile pill runs from `top-7` (28px) to roughly 92px
+     (28 + 44px hamburger + 2×10px padding) — top-[112px] (the desktop
+     value, sized for a taller pill) left only ~20px of air below it on a
+     phone, reading as two stacked glass toolbars. top-[104px] restores a
+     comfortable ~12px gap on mobile; md:top-[112px] is untouched. */
   return (
-    <div className="pointer-events-none sticky top-[112px] z-40 flex justify-center">
+    <div className="pointer-events-none sticky top-[104px] z-40 flex justify-center md:top-[112px]">
       <nav
         aria-label="Sections"
         className="pointer-events-auto flex items-center gap-1 rounded-[var(--radius-pill)] border border-[var(--rule)] p-1"
@@ -69,7 +74,7 @@ export default function StepsNav() {
               href={segment.hash}
               aria-current={on ? 'true' : undefined}
               className={cn(
-                'font-label cursor-pointer rounded-[var(--radius-pill)] px-4 py-2 transition-colors duration-300',
+                'font-label flex min-h-11 cursor-pointer items-center rounded-[var(--radius-pill)] px-4 py-2 transition-colors duration-300',
                 on
                   ? 'bg-[var(--accent-wash)] text-[var(--accent)]'
                   : 'text-[var(--muted)] hover:text-[var(--on-surface)]',

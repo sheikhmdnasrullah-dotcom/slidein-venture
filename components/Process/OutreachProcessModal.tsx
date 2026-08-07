@@ -322,7 +322,7 @@ export default function OutreachProcessModal({ open, phaseId, onClose }: Outreac
                   onClick={() => setActiveIndex(i)}
                   aria-label={p.subtitle}
                   aria-current={i === activeIndex ? 'true' : undefined}
-                  className="group/dot flex h-5 w-5 items-center justify-center"
+                  className="group/dot flex h-11 w-11 items-center justify-center md:h-5 md:w-5"
                 >
                   <span
                     className="block rounded-full transition-all duration-[420ms] ease-[cubic-bezier(0.16,1,0.3,1)]"

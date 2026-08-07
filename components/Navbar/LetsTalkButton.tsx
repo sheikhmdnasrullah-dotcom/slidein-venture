@@ -52,7 +52,7 @@ export default function LetsTalkButton({ isMobile = false }: { isMobile?: boolea
         href="/contact"
         aria-current={isHere ? 'page' : undefined}
         className={`btn-premium group relative inline-flex items-center gap-2 overflow-hidden rounded-full px-5 py-2.5 text-[14px] font-[600] whitespace-nowrap outline-none ${
-          isMobile ? 'w-full justify-center py-3' : ''
+          isMobile ? 'w-full justify-center py-3.5' : ''
         }`}
         style={{
           background: isHere
