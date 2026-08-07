@@ -10,14 +10,29 @@ interface VideoEmbedModalProps {
 
 function getEmbedUrl(url: string): string {
   if (url.includes('youtube.com') || url.includes('youtu.be')) {
-    const videoId = url.includes('youtu.be')
-      ? url.split('/').pop()?.split('?')[0]
-      : new URL(url).searchParams.get('v');
+    /* youtube.com/shorts/<id> carries the id in the PATH, not in a `v` query
+       param — the old `searchParams.get('v')` branch silently returned null
+       for every short, and the modal embedded `/embed/` with no id at all. */
+    let videoId: string | null = null;
+    if (url.includes('youtu.be')) {
+      videoId = url.split('/').pop()?.split('?')[0] ?? null;
+    } else if (url.includes('/shorts/')) {
+      videoId = url.split('/shorts/')[1]?.split('?')[0] ?? null;
+    } else {
+      videoId = new URL(url).searchParams.get('v');
+    }
     return `https://www.youtube.com/embed/${videoId || ''}?autoplay=1&rel=0`;
   }
   if (url.includes('vimeo.com')) {
-    const videoId = url.split('vimeo.com/')[1]?.split('?')[0];
-    return `https://player.vimeo.com/video/${videoId || ''}?autoplay=1`;
+    /* Unlisted/private Vimeo videos need their `h` privacy hash forwarded to
+       the player — dropping the query string (as the old version did) plays
+       fine for public videos but silently fails to load a hashed one. */
+    const idMatch = url.match(/vimeo\.com\/(?:video\/)?(\d+)/);
+    const videoId = idMatch?.[1] ?? '';
+    const hash = new URL(url).searchParams.get('h');
+    const params = new URLSearchParams({ autoplay: '1' });
+    if (hash) params.set('h', hash);
+    return `https://player.vimeo.com/video/${videoId}?${params.toString()}`;
   }
   return url;
 }

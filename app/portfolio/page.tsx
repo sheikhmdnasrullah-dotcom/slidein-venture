@@ -2,8 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import Link from 'next/link';
-import { ArrowLeft01Icon as ArrowLeft, PlayIcon as Play } from 'hugeicons-react';
+import { PlayIcon as Play } from 'hugeicons-react';
 import VideoEmbedModal from '@/components/VideoModal/VideoEmbedModal';
 import { Rise } from '@/components/PitchDeck/ScrollReveal';
 import { Button } from '@/components/ui/button';
@@ -21,11 +20,10 @@ const podcastEdits = [
 ];
 
 const guestAppearances = [
-  { name: 'Callum', url: 'https://vimeo.com/1167002467?fl=ip&fe=ec', platform: 'Vimeo' as const, guest: 'Jono Carrol', youtubeId: undefined },
-  { name: 'Jeff', url: 'https://vimeo.com/1167000278?fl=ip&fe=ec', platform: 'Vimeo' as const, guest: 'Pilot', youtubeId: undefined },
-  { name: 'Callum', url: 'https://vimeo.com/1167001646?fl=ip&fe=ec', platform: 'Vimeo' as const, guest: 'Raja Zahoor', youtubeId: undefined },
-  { name: 'Callum', url: 'https://youtube.com/shorts/QfKsH8sp1RI', platform: 'YouTube' as const, guest: 'Kelly Marie', youtubeId: 'QfKsH8sp1RI' },
-  { name: 'Callum', url: 'https://youtube.com/shorts/g_D2BvQIAkw?feature=share', platform: 'YouTube' as const, guest: 'Harry Sharpe', youtubeId: 'g_D2BvQIAkw' },
+  { id: 'g1', title: 'Guest Appearance 01', url: 'https://vimeo.com/1167001198?h=fb68203a66' },
+  { id: 'g2', title: 'Guest Appearance 02', url: 'https://vimeo.com/1166998887?h=6259a13502' },
+  { id: 'g3', title: 'Guest Appearance 03', url: 'https://vimeo.com/1167000278?h=aa6196d98d' },
+  { id: 'g4', title: 'Guest Appearance 04', url: 'https://vimeo.com/1167001646?h=9b60678a75' },
 ];
 
 const reelEdits = [
@@ -148,11 +146,6 @@ export default function PortfolioPage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
           >
-            <Link href="/solutions" className="inline-flex items-center gap-2 text-[13px] font-[500] text-[var(--muted)] hover:text-[var(--accent)] transition-colors mb-10">
-              <ArrowLeft size={16} strokeWidth={2} />
-              Back to Solutions
-            </Link>
-
             <h1 className="section-headline text-[clamp(2.5rem,6vw,4.5rem)] text-[var(--on-surface)] mb-5">
               Our work
             </h1>
@@ -205,17 +198,16 @@ export default function PortfolioPage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
             {guestAppearances.map((item, index) => (
               <motion.div
-                key={`${item.name}-${item.guest}`}
+                key={item.id}
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: '-40px' }}
                 transition={{ duration: 0.5, delay: index * 0.05, ease: [0.16, 1, 0.3, 1] }}
               >
                 <VideoCard
-                  title={`${item.name} — ${item.guest}`}
-                  subtitle={item.platform}
+                  title={item.title}
+                  subtitle="Vimeo"
                   url={item.url}
-                  thumbnail={item.platform === 'YouTube' && item.youtubeId ? getYouTubeThumbnail(item.youtubeId) : undefined}
                   onClick={() => setVideoUrl(item.url)}
                 />
               </motion.div>
