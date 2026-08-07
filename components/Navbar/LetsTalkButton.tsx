@@ -71,7 +71,7 @@ function VerifiedBadge({ size = 18 }: { size?: number }) {
    A row, not a card: the address is the thing being read, so it gets the size
    and the surface stays quiet. Whole row is the link — a 13px "Send" chip as
    the only target was a small hit area for the panel's primary action. */
-function EmailRow({ email, label }: { email: string; label: string }) {
+function EmailRow({ email, label }: { email: string; label?: string }) {
   return (
     <Link
       href={`mailto:${email}`}
@@ -79,7 +79,7 @@ function EmailRow({ email, label }: { email: string; label: string }) {
       style={{ border: '1px solid var(--rule)' }}
     >
       <span className="flex min-w-0 flex-col gap-1">
-        <span className="font-label text-[var(--muted)]">{label}</span>
+        {label && <span className="font-label text-[var(--muted)]">{label}</span>}
         <span
           className="truncate text-[15px] font-semibold sm:text-[17px]"
           style={{ color: 'var(--on-surface)', letterSpacing: '-0.01em' }}
@@ -191,29 +191,6 @@ function ContactPanel({
             <motion.div
               initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ ...SPRING_FAST, delay: 0.06 }}
-              className="mt-6 flex flex-col gap-2"
-            >
-              <span className="flex items-center gap-2">
-                <span className="relative flex h-2.5 w-2.5">
-                  <span
-                    className="absolute inline-flex h-full w-full animate-ping rounded-full"
-                    style={{ backgroundColor: 'var(--status-live)', opacity: 0.7 }}
-                  />
-                  <span className="relative inline-flex h-2.5 w-2.5 rounded-full" style={{ backgroundColor: 'var(--status-live)' }} />
-                </span>
-                <span className="font-label text-[var(--status-live)]">Available for work</span>
-              </span>
-
-              <h2 className="font-display-sm text-[clamp(1.5rem,3vw,2.1rem)] text-[var(--on-surface)]">
-                Nasrullah Tanim
-              </h2>
-              <p className="font-body text-[15px] text-[var(--muted)]">Founder, SlideIn Venture</p>
-            </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
               transition={{ ...SPRING_FAST, delay: 0.14 }}
               className="mt-7"
             >
@@ -233,19 +210,15 @@ function ContactPanel({
             </motion.div>
           </div>
 
-          {/* ── How to reach him ──────────────────────────────────────── */}
+          {/* ── Contact ────────────────────────────────────────────────── */}
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ ...SPRING_FAST, delay: 0.2 }}
             className="flex flex-col justify-center gap-3"
           >
-            <p className="font-body mb-1 text-[15px] leading-relaxed text-[var(--muted)]">
-              Book a call, or just email — whichever is easier. Replies land the
-              same day, most days.
-            </p>
-            <EmailRow label="Direct email" email="nasrullahtanim@gmail.com" />
-            <EmailRow label="Social email" email="hello@tanim.social" />
+            <EmailRow email="nasrullahtanim@gmail.com" />
+            <EmailRow email="hello@tanim.social" />
           </motion.div>
         </div>
       </motion.div>

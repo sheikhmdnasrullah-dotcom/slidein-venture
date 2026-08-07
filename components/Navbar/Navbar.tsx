@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import LetsTalkButton from './LetsTalkButton';
+import { usePathname } from 'next/navigation';
 
 const navLinks = [
   { label: 'Process', href: '/process' },
@@ -13,9 +14,13 @@ const navLinks = [
 
 // ─── Main Navbar ──────────────────────────────────────────────────────────────
 export default function Navbar() {
+  const pathname = usePathname();
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [hoveredLink, setHoveredLink] = useState<string | null>(null);
+
+  const isHome = pathname === '/';
+  const activeLink = pathname === '/process' ? 'Process' : pathname === '/pricing' ? 'Pricing' : pathname === '/portfolio' ? 'Portfolio' : null;
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 10);
@@ -59,11 +64,11 @@ export default function Navbar() {
           {/* ── Home Pill ──────────────────────────────────────────────── */}
           <Link
             href="/"
-            className="group flex h-[48px] flex-shrink-0 items-center rounded-full px-6 transition-all duration-300 hover:bg-[var(--surface)]"
+            className="group flex h-[48px] flex-shrink-0 items-center rounded-full px-6 transition-all duration-300"
             style={{
-              background: 'var(--surface-glass)',
-              border: '1px solid var(--rule)',
-              boxShadow: 'var(--shadow-contact)',
+              background: isHome ? 'var(--surface-glass)' : 'transparent',
+              border: isHome ? '1px solid var(--rule)' : '1px solid transparent',
+              boxShadow: isHome ? 'var(--shadow-contact)' : 'none',
             }}
             aria-label="Home"
           >
@@ -74,14 +79,19 @@ export default function Navbar() {
 
           {/* ── Desktop Nav Links ─────────────────────────────────────── */}
           <div className="hidden lg:flex items-center gap-0.5 px-3" onMouseLeave={() => setHoveredLink(null)}>
-            {navLinks.map((link) => (
+            {navLinks.map((link) => {
+              const isActive = activeLink === link.label;
+              return (
               <Link
                 key={link.label}
                 href={link.href}
                 onMouseEnter={() => setHoveredLink(link.label)}
-                className="relative inline-flex items-center whitespace-nowrap rounded-full px-5 py-2.5 text-[16px] font-[500] text-[var(--muted)] transition-colors duration-150 hover:text-[var(--on-surface)]"
+                className="relative inline-flex items-center whitespace-nowrap rounded-full px-5 py-2.5 text-[16px] font-[500] transition-colors duration-150"
+                style={{
+                  color: isActive ? 'var(--on-surface)' : 'var(--muted)',
+                }}
               >
-                {hoveredLink === link.label && (
+                {(isActive || hoveredLink === link.label) && (
                   <motion.span
                     layoutId="nav-liquid-pill"
                     className="absolute inset-0 rounded-full bg-[var(--rule)]"
@@ -90,7 +100,8 @@ export default function Navbar() {
                 )}
                 <span className="relative">{link.label}</span>
               </Link>
-            ))}
+              );
+            })}
           </div>
 
           {/* ── CTA Button (right side) ───────────────────────────────── */}
@@ -141,16 +152,23 @@ export default function Navbar() {
               transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
             >
               <div className="px-4 py-4 flex flex-col gap-0.5 max-h-[calc(100vh-120px)] overflow-y-auto">
-                {navLinks.map((link) => (
+                {navLinks.map((link) => {
+                  const isActive = activeLink === link.label;
+                  return (
                   <Link
                     key={link.label}
                     href={link.href}
-                    className="block rounded-[var(--radius-md)] px-4 py-3 text-[15px] font-[500] text-[var(--muted)] transition-colors hover:bg-[var(--rule)] hover:text-[var(--on-surface)]"
+                    className="block rounded-[var(--radius-md)] px-4 py-3 text-[15px] font-[500] transition-colors"
+                    style={{
+                      color: isActive ? 'var(--on-surface)' : 'var(--muted)',
+                      background: isActive ? 'var(--rule)' : 'transparent',
+                    }}
                     onClick={() => setMobileOpen(false)}
                   >
                     {link.label}
                   </Link>
-                ))}
+                  );
+                })}
 
                 {/* Mobile CTA */}
                 <div className="pt-3 mt-2 pb-4 flex justify-center" style={{ borderTop: '1px solid var(--rule)' }}>
