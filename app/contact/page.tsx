@@ -7,10 +7,8 @@ export const metadata: Metadata = {
 };
 
 export default function ContactPage() {
-  /* id="top" so the navbar's scroll spy resolves this route the same way the
-     other pages do. */
   return (
-    <div id="top">
+    <div>
       <ContactSurface />
     </div>
   );

@@ -29,7 +29,7 @@ export const metadata: Metadata = {
  */
 export default function PricingPage() {
   return (
-    <div id="top">
+    <div>
       {/* ── The statement ────────────────────────────────────────────── */}
       <Section
         tone="hero"

@@ -75,7 +75,7 @@ export default function StepsPage() {
     /* One provider for the whole page, because the tier 3 rule is "one open at
        a time" page wide rather than per section. See Disclosure.tsx. */
     <DisclosureProvider>
-    <div id="top">
+    <div>
       {/* ── Hero ───────────────────────────────────────────────────────── */}
       <Section tone="hero" pad="base" className="pt-[calc(96px+clamp(3rem,6vw,6rem))]">
         <StepsHero />

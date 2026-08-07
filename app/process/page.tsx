@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 
 export default function ProcessPage() {
   return (
-    <div id="top">
+    <div>
       <Section tone="hero" pad="base" className="pt-[calc(96px+clamp(3rem,6vw,6rem))]">
         <ProcessFlowChart />
       </Section>

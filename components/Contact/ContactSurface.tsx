@@ -50,7 +50,6 @@ import {
   EMAILS,
   SOCIALS,
   CALENDAR_URL,
-  CONTACT_LEAD,
   BOOK_LABEL,
   SEND_LABEL,
 } from '@/content/contact';
@@ -274,32 +273,12 @@ function Portrait({ still }: { still: boolean }) {
   );
 }
 
-/* ─── Status ──────────────────────────────────────────────────────────────
-   The live dot is the only thing on the page allowed to blink. */
-function StatusPill() {
-  return (
-    <span
-      className="inline-flex items-center gap-2.5 rounded-full px-3.5 py-1.5"
-      style={{ background: 'var(--surface)', border: '1px solid var(--rule)', boxShadow: 'var(--shadow-contact)' }}
-    >
-      <span className="relative flex h-2 w-2">
-        <span
-          className="absolute inline-flex h-full w-full animate-ping rounded-full"
-          style={{ backgroundColor: 'var(--status-live)', opacity: 0.7 }}
-        />
-        <span className="relative inline-flex h-2 w-2 rounded-full" style={{ backgroundColor: 'var(--status-live)' }} />
-      </span>
-      <span className="font-label font-label-wide text-[var(--status-live)]">{PROFILE.status}</span>
-    </span>
-  );
-}
-
 /* ─── Email card ──────────────────────────────────────────────────────────
    The whole card is the link. The old panel put the only target inside a
    13px "Send" chip; the address is the thing being read, so the address is
    the thing being clicked. The chip stays as an affordance, not as the hit
    area. */
-function EmailCard({ label, address, delay, still }: { label: string; address: string; delay: number; still: boolean }) {
+function EmailCard({ address, delay, still }: { address: string; delay: number; still: boolean }) {
   return (
     <motion.div {...rise(delay, still, 14)}>
       <Link
@@ -336,8 +315,7 @@ function EmailCard({ label, address, delay, still }: { label: string; address: s
           </span>
         </span>
 
-        <span className="relative flex min-w-0 flex-1 flex-col gap-1.5">
-          <span className="font-label font-label-wide text-[var(--muted)]">{label}</span>
+        <span className="relative flex min-w-0 flex-1 items-center">
           <span className="truncate text-[16px] font-semibold tracking-[-0.012em] text-[var(--on-surface)] sm:text-[19px]">
             {address}
           </span>
@@ -442,13 +420,9 @@ export default function ContactSurface() {
               <Portrait still={still} />
             </motion.div>
 
-            <motion.div {...rise(0.22, still)} className="mt-9">
-              <StatusPill />
-            </motion.div>
-
             <motion.h1
               {...rise(0.3, still)}
-              className="font-display-xl mt-5 text-[clamp(2.1rem,4.4vw,3.4rem)] text-[var(--on-surface)]"
+              className="font-display-xl mt-9 text-[clamp(2.1rem,4.4vw,3.4rem)] text-[var(--on-surface)]"
             >
               {PROFILE.name}
             </motion.h1>
@@ -460,19 +434,9 @@ export default function ContactSurface() {
 
           {/* ── Right: how ─────────────────────────────────────────────── */}
           <div className="flex flex-col">
-            <motion.p
-              {...rise(0.32, still)}
-              /* Centred on phones so it agrees with the identity block above
-                 it, left-aligned from lg where the two columns sit side by
-                 side and the rail has its own axis. */
-              className="font-body-lead mx-auto max-w-[46ch] text-center text-[clamp(1.05rem,1.6vw,1.3rem)] leading-[1.6] text-[var(--muted)] lg:mx-0 lg:text-left"
-            >
-              {CONTACT_LEAD}
-            </motion.p>
-
             {/* Primary action. The one solid orange object on the page, so it
                 is unambiguously the thing to do first. */}
-            <motion.div {...rise(0.44, still)} className="mt-9 flex">
+            <motion.div {...rise(0.44, still)} className="flex">
               <Magnetic disabled={still} className="block w-full sm:inline-block sm:w-auto">
                 <Link
                   href={CALENDAR_URL}
@@ -511,7 +475,6 @@ export default function ContactSurface() {
               {EMAILS.map((entry, i) => (
                 <EmailCard
                   key={entry.id}
-                  label={entry.label}
                   address={entry.address}
                   delay={0.58 + i * 0.08}
                   still={still}

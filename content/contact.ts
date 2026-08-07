@@ -19,28 +19,22 @@
 export const PROFILE = {
   name: 'Nasrullah Tanim',
   role: 'Founder, SlideIn Venture',
-  status: 'Available for work',
   image: '/profile.png',
 } as const;
 
 export const CALENDAR_URL = 'https://calendar.notion.so/meet/nasrullah_tanim/schedule';
-
-/** The panel's own line, unchanged. */
-export const CONTACT_LEAD =
-  'Book a call, or just email — whichever is easier. Replies land the same day, most days.';
 
 export const BOOK_LABEL = 'Book a call';
 export const SEND_LABEL = 'Send';
 
 export interface EmailEntry {
   id: string;
-  label: string;
   address: string;
 }
 
 export const EMAILS: EmailEntry[] = [
-  { id: 'direct', label: 'Direct email', address: 'nasrullahtanim@gmail.com' },
-  { id: 'social', label: 'Social email', address: 'hello@tanim.social' },
+  { id: 'direct', address: 'nasrullahtanim@gmail.com' },
+  { id: 'social', address: 'hello@tanim.social' },
 ];
 
 export type SocialId = 'linkedin' | 'x' | 'instagram' | 'github' | 'youtube';

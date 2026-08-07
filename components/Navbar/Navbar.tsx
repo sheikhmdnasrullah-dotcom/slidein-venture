@@ -63,10 +63,19 @@ export default function Navbar() {
     /* In-page sections that correspond to a nav entry, if this page has any.
        Resolved once per route rather than on every scroll tick — a
        getElementById per link per frame is the kind of thing that shows up as
-       jank on a page with a diagram animating in it. */
+       jank on a page with a diagram animating in it.
+
+       Home is deliberately excluded here. It used to look for `id="top"`,
+       but /process, /pricing, /contact and /steps all wrap their ENTIRE page
+       in a `<div id="top">` (unrelated to this spy — a leftover from another
+       convention). That div's bounding rect spans nearly the whole page, so
+       it satisfied the match on any scroll position past 120px and the nav
+       snapped to "Home" on every other route. The route already resolves to
+       the right label via `routeLabel`, so Home never needed a spy entry. */
     const spy = navLinks
+      .filter((l) => l.href !== '/')
       .map((l) => {
-        const id = l.href === '/' ? 'top' : l.href.replace(/^\//, '');
+        const id = l.href.replace(/^\//, '');
         const el = document.getElementById(id);
         return el ? { label: l.label, el } : null;
       })
