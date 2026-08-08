@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import LetsTalkButton from './LetsTalkButton';
+import { LogoMark } from '@/components/Brand/LogoMark';
 
 /* Four items and the CTA. /steps is deliberately NOT here — the route still
    exists and still resolves, it just no longer takes a slot in the nav. */
@@ -177,7 +178,14 @@ export default function Navbar() {
 
               Home now lives in the link row like every other destination, and
               the bar is exactly the five controls it should be: Home, Process,
-              Portfolio, Pricing, Let's Talk. */}
+              Portfolio, Pricing, Let's Talk.
+
+              THE LOGO IS INSIDE THE HOME LINK, not beside it. Adding the mark
+              as its own left-hand anchor would put a sixth clickable thing in
+              the bar that also goes to `/` — the exact duplicate that was just
+              removed, wearing a different coat. As part of the Home control it
+              is the brand chip on the button that already means "back to the
+              start", and the count stays at five. */}
           {/* ── Desktop Nav Links ───────────────────────────────────────
               TWO INDICATORS, NOT ONE. There used to be a single shared
               `layoutId` driving both hover and active, which meant hovering
@@ -200,7 +208,9 @@ export default function Navbar() {
                   href={link.href}
                   aria-current={isActive ? 'page' : undefined}
                   onMouseEnter={() => setHoveredLink(link.label)}
-                  className={`relative inline-flex items-center whitespace-nowrap rounded-full px-5 py-2.5 text-[16px] transition-colors duration-200 ${
+                  className={`relative inline-flex items-center whitespace-nowrap rounded-full py-2.5 text-[16px] transition-colors duration-200 ${
+                    link.href === '/' ? 'gap-2 pl-2.5 pr-5' : 'px-5'
+                  } ${
                     isActive
                       ? 'font-[600] text-[var(--on-surface)]'
                       : 'font-[500] text-[var(--muted)] hover:text-[var(--on-surface)]'
@@ -231,6 +241,23 @@ export default function Navbar() {
                     />
                   )}
 
+                  {/* The brand chip, on the Home control only. It lifts and
+                      brightens with the link rather than sitting inert, so it
+                      reads as part of the button instead of a sticker on it. */}
+                  {link.href === '/' && (
+                    <motion.span
+                      className="relative flex shrink-0 items-center"
+                      whileHover={{ scale: 1.06, rotate: -3 }}
+                      transition={{ type: 'spring', stiffness: 380, damping: 22 }}
+                    >
+                      <LogoMark
+                        size={26}
+                        rounded={9}
+                        className="drop-shadow-[0_2px_5px_color-mix(in_oklch,var(--color-brand)_38%,transparent)]"
+                      />
+                    </motion.span>
+                  )}
+
                   <span className="relative">{link.label}</span>
 
                   {/* The lit terminal. Same 42.28 orange the rest of the site
@@ -258,6 +285,20 @@ export default function Navbar() {
           </div>
 
           {/* ── Mobile Hamburger ─────────────────────────────────────── */}
+          {/* ── Mobile brand ──────────────────────────────────────────────
+              Below lg the four links collapse into the sheet, which left the
+              bar as a lone hamburger in a pill with nothing identifying it.
+              This is not a duplicate of the Home link the way a desktop
+              left-anchor would be — that link is not on screen at this width. */}
+          <Link
+            href="/"
+            className="lg:hidden flex items-center pl-1 pr-2"
+            aria-label="SlideIn Venture — home"
+            onClick={() => setMobileOpen(false)}
+          >
+            <LogoMark size={30} rounded={10} />
+          </Link>
+
           <button
             className="lg:hidden flex items-center justify-center w-[44px] h-[44px] rounded-full transition-colors duration-150"
             style={{ background: mobileOpen ? 'var(--rule)' : 'transparent' }}
