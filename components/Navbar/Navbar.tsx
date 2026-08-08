@@ -180,12 +180,13 @@ export default function Navbar() {
               the bar is exactly the five controls it should be: Home, Process,
               Portfolio, Pricing, Let's Talk.
 
-              THE LOGO IS INSIDE THE HOME LINK, not beside it. Adding the mark
-              as its own left-hand anchor would put a sixth clickable thing in
-              the bar that also goes to `/` — the exact duplicate that was just
-              removed, wearing a different coat. As part of the Home control it
-              is the brand chip on the button that already means "back to the
-              start", and the count stays at five. */}
+              NO BRAND CHIP ON THE DESKTOP HOME BUTTON. One was tried and taken
+              back out: at the 26px a nav pill allows, a two-line wordmark is a
+              smudge, and pairing a logo with the word "Home" reads as a sticker
+              on a button rather than as branding. The desktop bar stays five
+              plain text controls. The mark still appears in the MOBILE bar,
+              where the links collapse into the sheet and there is nothing else
+              identifying the site. */}
           {/* ── Desktop Nav Links ───────────────────────────────────────
               TWO INDICATORS, NOT ONE. There used to be a single shared
               `layoutId` driving both hover and active, which meant hovering
@@ -208,9 +209,7 @@ export default function Navbar() {
                   href={link.href}
                   aria-current={isActive ? 'page' : undefined}
                   onMouseEnter={() => setHoveredLink(link.label)}
-                  className={`relative inline-flex items-center whitespace-nowrap rounded-full py-2.5 text-[16px] transition-colors duration-200 ${
-                    link.href === '/' ? 'gap-2 pl-2.5 pr-5' : 'px-5'
-                  } ${
+                  className={`relative inline-flex items-center whitespace-nowrap rounded-full px-5 py-2.5 text-[16px] transition-colors duration-200 ${
                     isActive
                       ? 'font-[600] text-[var(--on-surface)]'
                       : 'font-[500] text-[var(--muted)] hover:text-[var(--on-surface)]'
@@ -239,23 +238,6 @@ export default function Navbar() {
                       }}
                       transition={{ type: 'spring', stiffness: 380, damping: 32 }}
                     />
-                  )}
-
-                  {/* The brand chip, on the Home control only. It lifts and
-                      brightens with the link rather than sitting inert, so it
-                      reads as part of the button instead of a sticker on it. */}
-                  {link.href === '/' && (
-                    <motion.span
-                      className="relative flex shrink-0 items-center"
-                      whileHover={{ scale: 1.06, rotate: -3 }}
-                      transition={{ type: 'spring', stiffness: 380, damping: 22 }}
-                    >
-                      <LogoMark
-                        size={26}
-                        rounded={9}
-                        className="drop-shadow-[0_2px_5px_color-mix(in_oklch,var(--color-brand)_38%,transparent)]"
-                      />
-                    </motion.span>
                   )}
 
                   <span className="relative">{link.label}</span>
