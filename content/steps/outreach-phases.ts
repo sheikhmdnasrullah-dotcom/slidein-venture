@@ -156,7 +156,7 @@ export const OUTREACH_PHASES: OutreachPhase[] = [
         index: '2.2',
         title: 'Verified Research',
         whatWeDo:
-          'We use AI to find prospects at scale, then a person verifies every finding before it can be used.',
+          'We manually research and find prospects according to your ICP.',
         whyItMatters:
           'Research agents produce confident errors, and a wrong personalisation detail is worse than no personalisation at all. Referencing an episode the prospect did not record does not cost you a reply, it ends the conversation permanently. The differentiator is human verification, not human labour.',
         technicalDetail:
