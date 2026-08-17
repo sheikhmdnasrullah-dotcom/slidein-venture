@@ -2,6 +2,7 @@ import 'server-only'
 import { createServerClient } from '@supabase/ssr'
 import { createClient as createSupabaseClient } from '@supabase/supabase-js'
 import { cookies } from 'next/headers'
+import { redirect } from 'next/navigation'
 
 // Session-aware client for Server Components, Server Actions, and Route
 // Handlers. Respects the logged-in user's cookies and RLS policies.
@@ -29,6 +30,19 @@ export async function createClient() {
       },
     }
   )
+}
+
+// Redirects to /login if there's no session. Use at the top of any
+// /workspace page instead of duplicating the getUser()+redirect check.
+export async function requireUser() {
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  if (!user) {
+    redirect('/login')
+  }
+  return user
 }
 
 // Admin client bypassing RLS. No user session — use only for trusted
