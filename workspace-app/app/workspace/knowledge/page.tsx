@@ -1,5 +1,18 @@
 import Link from "next/link";
 import { requireUser, createServiceClient } from "@/lib/supabase/server";
+import { uploadPdf } from "./actions";
+import { AnimatedSection } from "@/components/knowledge/animated-section";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 
 type KnowledgeRow = {
   slug: string;
@@ -49,24 +62,73 @@ export default async function KnowledgeListPage({
 
   return (
     <div className="flex flex-1 flex-col gap-6 p-6 max-w-4xl">
-      <div className="flex items-baseline justify-between">
+      <AnimatedSection className="flex items-baseline justify-between">
         <h1 className="text-sm font-medium tracking-wide text-foreground/60 uppercase">
           Knowledge
         </h1>
         <span className="text-xs text-foreground/40 tabular-nums">
           {items.length} {items.length === 1 ? "item" : "items"}
         </span>
-      </div>
+      </AnimatedSection>
 
-      <form className="flex" action="/workspace/knowledge">
-        <input
-          type="text"
-          name="q"
-          defaultValue={query}
-          placeholder="Search knowledge..."
-          className="w-full border-b border-foreground/15 bg-transparent py-1.5 text-sm outline-none focus:border-foreground/40"
-        />
-      </form>
+      <AnimatedSection className="flex flex-col gap-4">
+        <form className="flex" action="/workspace/knowledge">
+          <input
+            type="text"
+            name="q"
+            defaultValue={query}
+            placeholder="Search knowledge..."
+            className="w-full border-b border-foreground/15 bg-transparent py-1.5 text-sm outline-none focus:border-signal"
+          />
+        </form>
+
+        <Card>
+          <CardContent>
+            <form
+              action={uploadPdf}
+              className="flex flex-wrap items-end gap-3 text-sm"
+            >
+              <div className="flex flex-col gap-1">
+                <label className="text-xs text-foreground/40">PDF</label>
+                <input type="file" name="file" accept="application/pdf" required className="text-sm" />
+              </div>
+              <div className="flex flex-col gap-1">
+                <label className="text-xs text-foreground/40">Title</label>
+                <input
+                  type="text"
+                  name="title"
+                  className="border-b border-foreground/15 bg-transparent py-1 outline-none focus:border-signal"
+                />
+              </div>
+              <div className="flex flex-col gap-1">
+                <label className="text-xs text-foreground/40">Type</label>
+                <select
+                  name="type"
+                  defaultValue="research"
+                  className="border-b border-foreground/15 bg-transparent py-1 outline-none focus:border-signal"
+                >
+                  <option value="research">research</option>
+                  <option value="prospects">prospects</option>
+                  <option value="sops">sops</option>
+                  <option value="decisions">decisions</option>
+                  <option value="system">system</option>
+                </select>
+              </div>
+              <div className="flex flex-col gap-1">
+                <label className="text-xs text-foreground/40">Tags (comma-separated)</label>
+                <input
+                  type="text"
+                  name="tags"
+                  className="border-b border-foreground/15 bg-transparent py-1 outline-none focus:border-signal"
+                />
+              </div>
+              <Button type="submit" className="bg-brand text-white hover:bg-brand/85">
+                Upload
+              </Button>
+            </form>
+          </CardContent>
+        </Card>
+      </AnimatedSection>
 
       {error && (
         <p className="text-sm text-foreground/60">
@@ -81,46 +143,52 @@ export default async function KnowledgeListPage({
       )}
 
       {!error && items.length > 0 && (
-        <table className="w-full border-collapse text-sm">
-          <thead>
-            <tr className="border-b border-foreground/15 text-left text-xs text-foreground/40">
-              <th className="py-2 pr-4 font-normal">Title</th>
-              <th className="py-2 pr-4 font-normal">Type</th>
-              <th className="py-2 pr-4 font-normal">Status</th>
-              <th className="py-2 pr-4 font-normal">Source</th>
-              <th className="py-2 pr-0 font-normal text-right">Updated</th>
-            </tr>
-          </thead>
-          <tbody>
-            {items.map((item) => (
-              <tr
-                key={item.slug}
-                className="border-b border-foreground/8 hover:bg-foreground/[0.03]"
-              >
-                <td className="py-2 pr-4">
-                  <Link
-                    href={`/workspace/knowledge/${item.slug}`}
-                    className="hover:underline"
-                  >
-                    {item.title}
-                  </Link>
-                </td>
-                <td className="py-2 pr-4 font-mono text-xs text-foreground/60">
-                  {item.type}
-                </td>
-                <td className="py-2 pr-4 font-mono text-xs text-foreground/60">
-                  {item.status}
-                </td>
-                <td className="py-2 pr-4 text-foreground/60 truncate max-w-48">
-                  {item.source}
-                </td>
-                <td className="py-2 pr-0 text-right text-foreground/40 tabular-nums">
-                  {dateFormat.format(new Date(item.updated_at))}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+        <AnimatedSection delay={0.1}>
+          <Card>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Title</TableHead>
+                  <TableHead>Type</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead>Source</TableHead>
+                  <TableHead className="text-right">Updated</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {items.map((item) => (
+                  <TableRow key={item.slug}>
+                    <TableCell className="whitespace-normal">
+                      <Link
+                        href={`/workspace/knowledge/${item.slug}`}
+                        className="hover:underline"
+                      >
+                        {item.title}
+                      </Link>
+                    </TableCell>
+                    <TableCell>
+                      <Badge
+                        variant="outline"
+                        className="border-brand/30 bg-brand-soft text-signal"
+                      >
+                        {item.type}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant="outline">{item.status}</Badge>
+                    </TableCell>
+                    <TableCell className="max-w-48 truncate text-foreground/60">
+                      {item.source}
+                    </TableCell>
+                    <TableCell className="text-right tabular-nums text-foreground/40">
+                      {dateFormat.format(new Date(item.updated_at))}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </Card>
+        </AnimatedSection>
       )}
     </div>
   );

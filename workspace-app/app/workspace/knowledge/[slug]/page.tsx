@@ -1,6 +1,9 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { requireUser, createServiceClient } from "@/lib/supabase/server";
+import { AnimatedSection } from "@/components/knowledge/animated-section";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent } from "@/components/ui/card";
 
 const dateFormat = new Intl.DateTimeFormat("en-US", {
   year: "numeric",
@@ -23,7 +26,7 @@ export default async function KnowledgeDetailPage({
   const { data: item, error } = await supabase
     .from("knowledge_items")
     .select(
-      "id, type, title, status, source, author, tags, content_path, body, created_at, updated_at"
+      "id, type, title, status, source, author, tags, content_path, file_path, content_type, body, created_at, updated_at"
     )
     .eq("slug", slug)
     .maybeSingle();
@@ -49,6 +52,8 @@ export default async function KnowledgeDetailPage({
     { label: "Author", value: item.author },
     { label: "Source", value: item.source },
     { label: "Path", value: item.content_path },
+    { label: "Content type", value: item.content_type },
+    ...(item.file_path ? [{ label: "File", value: item.file_path }] : []),
     { label: "Created", value: dateFormat.format(new Date(item.created_at)) },
     { label: "Updated", value: dateFormat.format(new Date(item.updated_at)) },
   ];
@@ -62,34 +67,43 @@ export default async function KnowledgeDetailPage({
         ← Knowledge
       </Link>
 
-      <div className="flex flex-col gap-2">
+      <AnimatedSection className="flex flex-col gap-2">
         <h1 className="text-lg font-medium">{item.title}</h1>
         {item.tags?.length > 0 && (
           <div className="flex gap-2 flex-wrap">
             {item.tags.map((tag: string) => (
-              <span
+              <Badge
                 key={tag}
-                className="font-mono text-xs text-foreground/50 border border-foreground/15 rounded px-1.5 py-0.5"
+                variant="outline"
+                className="border-brand/30 bg-brand-soft font-mono text-signal"
               >
                 {tag}
-              </span>
+              </Badge>
             ))}
           </div>
         )}
-      </div>
+      </AnimatedSection>
 
-      <dl className="grid grid-cols-[max-content_1fr] gap-x-4 gap-y-1 text-sm border-y border-foreground/10 py-3">
-        {meta.map(({ label, value }) => (
-          <div key={label} className="contents">
-            <dt className="text-foreground/40">{label}</dt>
-            <dd className="font-mono text-xs self-center">{value}</dd>
-          </div>
-        ))}
-      </dl>
+      <AnimatedSection delay={0.05}>
+        <Card>
+          <CardContent>
+            <dl className="grid grid-cols-[max-content_1fr] gap-x-4 gap-y-1 text-sm">
+              {meta.map(({ label, value }) => (
+                <div key={label} className="contents">
+                  <dt className="text-foreground/40">{label}</dt>
+                  <dd className="font-mono text-xs self-center">{value}</dd>
+                </div>
+              ))}
+            </dl>
+          </CardContent>
+        </Card>
+      </AnimatedSection>
 
-      <pre className="whitespace-pre-wrap text-sm leading-relaxed font-sans">
-        {item.body}
-      </pre>
+      <AnimatedSection delay={0.1}>
+        <pre className="whitespace-pre-wrap text-sm leading-relaxed font-sans">
+          {item.body}
+        </pre>
+      </AnimatedSection>
     </div>
   );
 }
