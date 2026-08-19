@@ -12,6 +12,9 @@ export default async function WorkspacePage() {
       <Link href="/workspace/knowledge" className="text-sm underline">
         Knowledge base →
       </Link>
+      <Link href="/workspace/strategy" className="text-sm underline">
+        Strategy board →
+      </Link>
       <form action={signOut}>
         <button type="submit" className="border rounded px-3 py-2">
           Sign out

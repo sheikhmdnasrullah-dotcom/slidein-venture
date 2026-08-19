@@ -45,6 +45,53 @@ export default async function KnowledgeDetailPage({
     notFound();
   }
 
+  // Relation endpoints are entity ids, which for vault notes are set equal
+  // to the note's own knowledge_items.id by the sync script — so this
+  // catches links pointing at or away from this item.
+  const { data: relations } = await supabase
+    .from("relations")
+    .select("from_entity_id, to_entity_id, relation_type")
+    .or(`from_entity_id.eq.${item.id},to_entity_id.eq.${item.id}`);
+
+  const linkedNotes: {
+    direction: "outgoing" | "incoming";
+    relationType: string;
+    entityId: string;
+    title: string;
+    slug: string | null;
+  }[] = [];
+
+  if (relations && relations.length > 0) {
+    const otherIds = [
+      ...new Set(
+        relations.map((r) => (r.from_entity_id === item.id ? r.to_entity_id : r.from_entity_id))
+      ),
+    ];
+
+    const [{ data: entities }, { data: linkedItems }] = await Promise.all([
+      supabase.from("entities").select("id, name").in("id", otherIds),
+      supabase.from("knowledge_items").select("id, slug, title").in("id", otherIds),
+    ]);
+
+    const entityNames = new Map((entities ?? []).map((e) => [e.id, e.name]));
+    const knowledgeBySlug = new Map((linkedItems ?? []).map((k) => [k.id, k]));
+
+    for (const r of relations) {
+      const otherId = r.from_entity_id === item.id ? r.to_entity_id : r.from_entity_id;
+      const linkedItem = knowledgeBySlug.get(otherId);
+      linkedNotes.push({
+        direction: r.from_entity_id === item.id ? "outgoing" : "incoming",
+        relationType: r.relation_type,
+        entityId: otherId,
+        title: linkedItem?.title ?? entityNames.get(otherId) ?? otherId,
+        slug: linkedItem?.slug ?? null,
+      });
+    }
+  }
+
+  const outgoing = linkedNotes.filter((n) => n.direction === "outgoing");
+  const incoming = linkedNotes.filter((n) => n.direction === "incoming");
+
   const meta: { label: string; value: string }[] = [
     { label: "ID", value: item.id },
     { label: "Type", value: item.type },
@@ -104,6 +151,54 @@ export default async function KnowledgeDetailPage({
           {item.body}
         </pre>
       </AnimatedSection>
+
+      {linkedNotes.length > 0 && (
+        <AnimatedSection delay={0.15}>
+          <Card>
+            <CardContent className="flex flex-col gap-3">
+              <h2 className="text-sm font-medium text-foreground/60">Linked notes</h2>
+              {outgoing.length > 0 && (
+                <div className="flex flex-col gap-1">
+                  <p className="text-xs text-foreground/40">Links to</p>
+                  {outgoing.map((n) => (
+                    <LinkedNoteRow key={`out-${n.entityId}`} note={n} />
+                  ))}
+                </div>
+              )}
+              {incoming.length > 0 && (
+                <div className="flex flex-col gap-1">
+                  <p className="text-xs text-foreground/40">Linked from</p>
+                  {incoming.map((n) => (
+                    <LinkedNoteRow key={`in-${n.entityId}`} note={n} />
+                  ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </AnimatedSection>
+      )}
+    </div>
+  );
+}
+
+function LinkedNoteRow({
+  note,
+}: {
+  note: { relationType: string; title: string; slug: string | null };
+}) {
+  return (
+    <div className="flex items-center gap-2 text-sm">
+      {note.slug ? (
+        <Link
+          href={`/workspace/knowledge/${note.slug}`}
+          className="hover:underline hover:text-signal"
+        >
+          {note.title}
+        </Link>
+      ) : (
+        <span className="text-foreground/60">{note.title}</span>
+      )}
+      <span className="text-xs font-mono text-foreground/30">{note.relationType}</span>
     </div>
   );
 }
