@@ -1,6 +1,11 @@
 import { createServiceClient } from "@/lib/supabase/server";
+import { verifyInternalSecret } from "@/lib/auth/verify-internal-secret";
 
 export async function POST(request: Request) {
+  if (!verifyInternalSecret(request)) {
+    return Response.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   const supabase = createServiceClient();
   const body = await request.json().catch(() => ({}));
 

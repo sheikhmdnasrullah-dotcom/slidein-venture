@@ -1,6 +1,11 @@
-import { createServiceClient } from "@/lib/supabase/server";
+import { createServiceClient, getSessionUser } from "@/lib/supabase/server";
 
 export async function GET() {
+  const user = await getSessionUser();
+  if (!user) {
+    return Response.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   const supabase = createServiceClient();
   const { data, error } = await supabase
     .from("task_runs")

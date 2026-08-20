@@ -1,4 +1,4 @@
-import { createServiceClient } from "@/lib/supabase/server";
+import { createServiceClient, getSessionUser } from "@/lib/supabase/server";
 import { randomUUID } from "node:crypto";
 
 type TaskType = "script" | "research" | "cold_email" | "automation" | "system";
@@ -12,6 +12,11 @@ type TaskRunInput = {
 };
 
 export async function POST(request: Request) {
+  const user = await getSessionUser();
+  if (!user) {
+    return Response.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   const supabase = createServiceClient();
   const body = (await request.json()) as TaskRunInput;
   const id = randomUUID();

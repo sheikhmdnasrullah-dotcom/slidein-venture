@@ -32,13 +32,20 @@ export async function createClient() {
   )
 }
 
-// Redirects to /login if there's no session. Use at the top of any
-// root-level route instead of duplicating the getUser()+redirect check.
-export async function requireUser() {
+// Returns the logged-in user, or null. Use in API routes, which must return
+// 401 JSON instead of redirecting.
+export async function getSessionUser() {
   const supabase = await createClient()
   const {
     data: { user },
   } = await supabase.auth.getUser()
+  return user
+}
+
+// Redirects to /login if there's no session. Use at the top of any
+// root-level page instead of duplicating the getSessionUser()+redirect check.
+export async function requireUser() {
+  const user = await getSessionUser()
   if (!user) {
     redirect('/login')
   }

@@ -1,7 +1,12 @@
 import { createServiceClient } from "@/lib/supabase/server";
+import { verifyInternalSecret } from "@/lib/auth/verify-internal-secret";
 import { randomUUID } from "node:crypto";
 
 export async function POST(request: Request) {
+  if (!verifyInternalSecret(request)) {
+    return Response.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   const supabase = createServiceClient();
   const payload = await request.json().catch(() => ({}));
 
