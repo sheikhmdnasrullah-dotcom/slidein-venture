@@ -68,10 +68,10 @@ export function KnowledgeSearchPanel({ initialItems }: { initialItems?: Knowledg
     try {
       const result = await syncKnowledgeBase();
       if (result.success) {
-        toast.success("Knowledge base synced");
+        toast.success(`Synced: ${result.output}`);
         window.location.reload();
       } else {
-        toast.error(result.error ?? "Sync failed");
+        toast.error(result.output ?? "Sync failed");
       }
     } catch {
       toast.error("Sync failed");

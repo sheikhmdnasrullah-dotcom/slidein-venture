@@ -1,4 +1,5 @@
 import { verifyInternalSecret } from "@/lib/auth/verify-internal-secret";
+import { syncKnowledge } from "@/lib/knowledge/sync";
 
 export async function POST(request: Request) {
   if (!verifyInternalSecret(request)) {
@@ -6,17 +7,11 @@ export async function POST(request: Request) {
   }
 
   try {
-    const { execSync } = await import("node:child_process");
-    const output = execSync("npm run sync", {
-      cwd: process.cwd(),
-      encoding: "utf-8",
-      stdio: "pipe",
-      timeout: 120000,
-    });
-
+    const result = await syncKnowledge(process.cwd());
     return Response.json({
-      status: "completed",
-      output: output.slice(-5000),
+      status: result.success ? "completed" : "failed",
+      output: result.output,
+      counters: result.counters,
     });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Sync failed";

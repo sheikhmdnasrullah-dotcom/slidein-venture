@@ -1,4 +1,5 @@
 #!/usr/bin/env tsx
+import { watch } from "node:fs";
 import fs from "node:fs/promises";
 import path from "node:path";
 import { execSync } from "node:child_process";
@@ -17,7 +18,7 @@ async function runSync() {
   }
 }
 
-async function watch() {
+async function watchDir() {
   console.log("Watching for changes in knowledge/ and SecondBrain/...");
   console.log("Press Ctrl+C to stop\n");
 
@@ -28,7 +29,7 @@ async function watch() {
   for (const dir of dirs) {
     try {
       await fs.access(dir);
-      fs.watch(dir, { recursive: true }, async () => {
+      watch(dir, { recursive: true }, () => {
         if (timeout) clearTimeout(timeout);
         timeout = setTimeout(async () => {
           await runSync();
@@ -40,4 +41,4 @@ async function watch() {
   }
 }
 
-watch().catch(console.error);
+watchDir().catch(console.error);
