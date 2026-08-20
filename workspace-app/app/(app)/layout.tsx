@@ -1,5 +1,4 @@
 import { AppSidebar } from "@/components/dashboard/app-sidebar";
-import { CopilotShell } from "@/components/dashboard/copilot-shell";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -14,7 +13,7 @@ export default async function AppLayout({
     <TooltipProvider>
       <SidebarProvider>
         <AppSidebar userEmail={user.email ?? "unknown"} />
-        <CopilotShell>{children}</CopilotShell>
+        {children}
         <Toaster />
       </SidebarProvider>
     </TooltipProvider>

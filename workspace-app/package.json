@@ -10,11 +10,7 @@
     "sync": "tsx --env-file=.env.local scripts/sync-knowledge.ts"
   },
   "dependencies": {
-    "@anthropic-ai/sdk": "^0.120.0",
     "@base-ui/react": "^1.7.0",
-    "@copilotkit/react-core": "^1.68.1",
-    "@copilotkit/react-ui": "^1.68.1",
-    "@copilotkit/runtime": "^1.68.1",
     "@supabase/ssr": "^0.12.4",
     "@supabase/supabase-js": "^2.112.3",
     "class-variance-authority": "^0.7.1",
