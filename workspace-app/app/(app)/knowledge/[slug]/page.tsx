@@ -2,12 +2,17 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { requireUser, createServiceClient } from "@/lib/supabase/server";
 import { Badge } from "@/components/ui/badge";
+import { HighlightedBody } from "@/components/knowledge/highlighted-body";
 
 export default async function KnowledgeItemPage(
   props: PageProps<"/knowledge/[slug]">
 ) {
   await requireUser();
   const { slug } = await props.params;
+  const searchParams = await props.searchParams;
+  const q = typeof searchParams.q === "string" ? searchParams.q : undefined;
+  const chunkParam = typeof searchParams.chunk === "string" ? Number(searchParams.chunk) : undefined;
+  const chunk = chunkParam !== undefined && Number.isFinite(chunkParam) ? chunkParam : undefined;
 
   const supabase = createServiceClient();
   const { data: item } = await supabase
@@ -45,9 +50,7 @@ export default async function KnowledgeItemPage(
         </p>
       </div>
 
-      <div className="whitespace-pre-wrap text-sm leading-relaxed text-foreground/80">
-        {item.body}
-      </div>
+      <HighlightedBody body={item.body} query={q} chunk={chunk} />
     </div>
   );
 }

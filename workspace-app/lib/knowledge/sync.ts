@@ -4,6 +4,7 @@ import matter from "gray-matter";
 import { createClient, SupabaseClient } from "@supabase/supabase-js";
 import { randomUUID } from "node:crypto";
 import { recordVersion } from "./versioning";
+import { reindexChunks } from "./reindex";
 
 export type SyncCounters = {
   created: string[];
@@ -205,6 +206,13 @@ async function upsertKnowledgeItem(
       counters.failed.push(relPath);
       return "failed";
     }
+    try {
+      await reindexChunks(supabase, parsed.id, parsed.body);
+    } catch (err) {
+      console.log(`FAILED  ${relPath}: ${(err as Error).message}`);
+      counters.failed.push(relPath);
+      return "failed";
+    }
     console.log(`CREATED ${relPath} (${parsed.id})`);
     counters.created.push(relPath);
     return "created";
@@ -230,6 +238,13 @@ async function upsertKnowledgeItem(
     .eq("id", parsed.id);
   if (error) {
     console.log(`FAILED  ${relPath}: ${error.message}`);
+    counters.failed.push(relPath);
+    return "failed";
+  }
+  try {
+    await reindexChunks(supabase, parsed.id, parsed.body);
+  } catch (err) {
+    console.log(`FAILED  ${relPath}: ${(err as Error).message}`);
     counters.failed.push(relPath);
     return "failed";
   }

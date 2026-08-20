@@ -1,6 +1,7 @@
 import { createServiceClient } from "@/lib/supabase/server";
 import { verifyInternalSecret } from "@/lib/auth/verify-internal-secret";
 import { recordVersion } from "@/lib/knowledge/versioning";
+import { reindexChunks } from "@/lib/knowledge/reindex";
 
 export async function POST(request: Request) {
   if (!verifyInternalSecret(request)) {
@@ -51,6 +52,12 @@ export async function POST(request: Request) {
 
   if (error) {
     return Response.json({ error: error.message }, { status: 500 });
+  }
+
+  try {
+    await reindexChunks(supabase, id, content ?? "");
+  } catch (err) {
+    return Response.json({ error: (err as Error).message }, { status: 500 });
   }
 
   return Response.json({ id, status: "created" }, { status: 201 });

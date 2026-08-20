@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { requireUser, createServiceClient } from "@/lib/supabase/server";
 import { recordVersion } from "@/lib/knowledge/versioning";
+import { reindexChunks } from "@/lib/knowledge/reindex";
 
 const STRATEGY_TYPES = ["decision", "plan"];
 const STRATEGY_STATUSES = ["proposed", "in_progress", "confirmed", "deprecated"];
@@ -96,6 +97,8 @@ export async function createCard(formData: FormData) {
   if (error) {
     throw new Error(`Database insert failed: ${error.message}`);
   }
+
+  await reindexChunks(supabase, id, body);
 
   revalidatePath("/strategy");
 }
