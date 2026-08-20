@@ -1,14 +1,12 @@
 import { spawn } from "node:child_process";
 import { startTaskRun, completeTaskRun, failTaskRun, type TaskType } from "./logger";
 
-export async function runCommand(command: string, args: string[] = [], options: { task_type?: TaskType; cwd?: string } = {}) {
-  const runId = await startTaskRun({
-    task_type: options.task_type ?? "script",
-    command: `${command} ${args.join(" ")}`,
-  });
-
+// Spawns `command`, captures stdout/stderr, and records the result onto an
+// already-started task_runs row. Shared by the CLI runner and the API
+// execute route so both use the same capture/truncation logic.
+export async function execAndRecord(runId: string, command: string, cwd?: string) {
   return new Promise<void>((resolve, reject) => {
-    const child = spawn(command, args, { cwd: options.cwd, shell: true });
+    const child = spawn(command, { cwd, shell: true });
     const stdout: string[] = [];
     const stderr: string[] = [];
 
@@ -40,4 +38,14 @@ export async function runCommand(command: string, args: string[] = [], options: 
       }
     });
   });
+}
+
+export async function runCommand(command: string, args: string[] = [], options: { task_type?: TaskType; cwd?: string } = {}) {
+  const fullCommand = `${command} ${args.join(" ")}`.trim();
+  const runId = await startTaskRun({
+    task_type: options.task_type ?? "script",
+    command: fullCommand,
+  });
+
+  return execAndRecord(runId, fullCommand, options.cwd);
 }

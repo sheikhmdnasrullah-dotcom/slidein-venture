@@ -1,5 +1,7 @@
 import { createServiceClient, getSessionUser } from "@/lib/supabase/server";
+import { execAndRecord } from "@/lib/tasks/runner";
 import { randomUUID } from "node:crypto";
+import { after } from "next/server";
 
 type TaskType = "script" | "research" | "cold_email" | "automation" | "system";
 
@@ -33,6 +35,13 @@ export async function POST(request: Request) {
     });
   } catch {
     return Response.json({ error: "Database unavailable" }, { status: 503 });
+  }
+
+  // Only "script" rows are user-typed shell commands. "research"/"cold_email"
+  // commands are free-text descriptions — executing those would be a command
+  // injection vector, so they stay log-only.
+  if (body.task_type === "script" && body.command) {
+    after(() => execAndRecord(id, body.command!));
   }
 
   return Response.json({ id, status: "running" }, { status: 201 });
