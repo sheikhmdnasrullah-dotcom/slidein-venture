@@ -8,7 +8,7 @@ if (!command) {
 }
 
 const args = process.argv.slice(3);
-runCommand(command, args, { task_type: "script", triggered_by: "cli" }).then(
+runCommand(command, args, { task_type: "script" }).then(
   () => {
     console.log("Task completed");
     process.exit(0);
