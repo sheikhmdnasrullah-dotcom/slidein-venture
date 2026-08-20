@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { requireUser, createServiceClient } from "@/lib/supabase/server";
+import { recordVersion } from "@/lib/knowledge/versioning";
 
 const STRATEGY_TYPES = ["decision", "plan"];
 const STRATEGY_STATUSES = ["proposed", "in_progress", "confirmed", "deprecated"];
@@ -14,12 +15,23 @@ function slugify(input: string) {
 }
 
 export async function updateCardStatus(id: string, status: string) {
-  await requireUser();
+  const user = await requireUser();
   if (!STRATEGY_STATUSES.includes(status)) {
     throw new Error(`Invalid status: ${status}`);
   }
 
   const supabase = createServiceClient();
+
+  const { data: existing } = await supabase
+    .from("knowledge_items")
+    .select("id, type, title, slug, content_path, content_type, body, status, source, author, tags, created_at, updated_at")
+    .eq("id", id)
+    .maybeSingle();
+
+  if (existing) {
+    await recordVersion(supabase, id, existing, "strategy-board", user.email);
+  }
+
   const { error } = await supabase
     .from("knowledge_items")
     .update({ status, updated_at: new Date().toISOString() })

@@ -1,4 +1,5 @@
-import { createServiceClient } from "@/lib/supabase/server";
+import { createServiceClient, getSessionUser } from "@/lib/supabase/server";
+import { recordVersion } from "@/lib/knowledge/versioning";
 import { randomUUID } from "node:crypto";
 
 function slugify(text: string): string {
@@ -11,6 +12,11 @@ function slugify(text: string): string {
 }
 
 export async function POST(request: Request) {
+  const user = await getSessionUser();
+  if (!user) {
+    return Response.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   try {
     const body = await request.json().catch(() => ({}));
 
@@ -41,6 +47,17 @@ export async function POST(request: Request) {
     const slug = slugify(title);
 
     const supabase = createServiceClient();
+
+    const { data: existing } = await supabase
+      .from("knowledge_items")
+      .select("id, type, title, slug, content_path, content_type, body, status, source, author, tags, created_at, updated_at")
+      .eq("id", id)
+      .maybeSingle();
+
+    if (existing) {
+      await recordVersion(supabase, id, existing, "ingest", user.email);
+    }
+
     const { error } = await supabase.from("knowledge_items").upsert({
       id,
       type,

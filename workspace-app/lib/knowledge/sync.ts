@@ -3,6 +3,7 @@ import path from "node:path";
 import matter from "gray-matter";
 import { createClient, SupabaseClient } from "@supabase/supabase-js";
 import { randomUUID } from "node:crypto";
+import { recordVersion } from "./versioning";
 
 export type SyncCounters = {
   created: string[];
@@ -187,7 +188,7 @@ async function upsertKnowledgeItem(
 
   const { data: existing, error: fetchError } = await supabase
     .from("knowledge_items")
-    .select("type, title, slug, content_path, body, status, source, author, tags")
+    .select("id, type, title, slug, content_path, content_type, body, status, source, author, tags, created_at, updated_at")
     .eq("id", parsed.id)
     .maybeSingle();
 
@@ -213,6 +214,14 @@ async function upsertKnowledgeItem(
     console.log(`SKIPPED ${relPath} (${parsed.id}) — unchanged`);
     counters.skipped.push(relPath);
     return "skipped";
+  }
+
+  try {
+    await recordVersion(supabase, parsed.id, existing, "sync");
+  } catch (err) {
+    console.log(`FAILED  ${relPath}: ${(err as Error).message}`);
+    counters.failed.push(relPath);
+    return "failed";
   }
 
   const { error } = await supabase

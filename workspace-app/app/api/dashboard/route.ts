@@ -1,15 +1,25 @@
 import { createServiceClient, getSessionUser } from "@/lib/supabase/server";
 import type { DashboardResponse, ChartPoint, ActivityRow, KpiCard } from "@/lib/dashboard/types";
 
-function buildChart(days: number): ChartPoint[] {
+function buildChart(days: number, runs: any[]): ChartPoint[] {
   const points: ChartPoint[] = [];
   const today = new Date();
 
+  const sentByDate = new Map<string, number>();
+  for (const run of runs) {
+    if (run.task_type !== "cold_email" || run.status !== "completed") continue;
+    const date = (run.completed_at ?? run.started_at)?.slice(0, 10);
+    if (!date) continue;
+    sentByDate.set(date, (sentByDate.get(date) ?? 0) + 1);
+  }
+
   for (let i = days - 1; i >= 0; i--) {
     const date = new Date(today.getTime() - i * 24 * 60 * 60 * 1000);
+    const key = date.toISOString().slice(0, 10);
     points.push({
-      date: date.toISOString().slice(0, 10),
-      sent: 0,
+      date: key,
+      sent: sentByDate.get(key) ?? 0,
+      // ponytail: no reply-tracking data source exists yet (task_runs has no reply field); add when reply capture ships
       replies: 0,
     });
   }
@@ -110,7 +120,7 @@ export async function GET() {
 
   const response: DashboardResponse = {
     kpis,
-    chart: buildChart(7),
+    chart: buildChart(7, runs),
     activity,
     syncedAt: new Date().toISOString(),
   };

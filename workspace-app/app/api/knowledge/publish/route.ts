@@ -1,5 +1,6 @@
 import { createServiceClient } from "@/lib/supabase/server";
 import { verifyInternalSecret } from "@/lib/auth/verify-internal-secret";
+import { recordVersion } from "@/lib/knowledge/versioning";
 
 export async function POST(request: Request) {
   if (!verifyInternalSecret(request)) {
@@ -22,6 +23,16 @@ export async function POST(request: Request) {
 
   if (!id || !type || !title) {
     return Response.json({ error: "id, type, and title are required" }, { status: 400 });
+  }
+
+  const { data: existing } = await supabase
+    .from("knowledge_items")
+    .select("id, type, title, slug, content_path, content_type, body, status, source, author, tags, created_at, updated_at")
+    .eq("id", id)
+    .maybeSingle();
+
+  if (existing) {
+    await recordVersion(supabase, id, existing, "publish", author);
   }
 
   const { error } = await supabase.from("knowledge_items").upsert({
