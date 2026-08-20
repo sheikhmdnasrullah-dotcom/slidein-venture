@@ -10,6 +10,7 @@ import { ActivityTable } from "@/components/dashboard/activity-table";
 import { ExecutionPanel } from "@/components/dashboard/execution-panel";
 import { ResearchPanel } from "@/components/dashboard/research-panel";
 import { ColdEmailPanel } from "@/components/dashboard/cold-email-panel";
+import { KnowledgeSearchPanel } from "@/components/knowledge/search-panel";
 import { Skeleton } from "@/components/ui/skeleton";
 import type { DashboardResponse } from "@/lib/dashboard/types";
 

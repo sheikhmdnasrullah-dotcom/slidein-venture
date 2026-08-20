@@ -19,15 +19,19 @@ type KnowledgeItem = {
   updated_at: string;
 };
 
-export function KnowledgeSearchPanel({ initialItems }: { initialItems: KnowledgeItem[] }) {
-  const [items, setItems] = useState<KnowledgeItem[]>(initialItems);
+export function KnowledgeSearchPanel({ initialItems }: { initialItems?: KnowledgeItem[] }) {
+  const [items, setItems] = useState<KnowledgeItem[]>(initialItems ?? []);
   const [query, setQuery] = useState("");
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    setItems(initialItems ?? []);
+  }, [initialItems]);
 
   const search = useCallback(async () => {
     const q = query.trim();
     if (!q) {
-      setItems(initialItems);
+      setItems(initialItems ?? []);
       return;
     }
     setLoading(true);
@@ -51,7 +55,7 @@ export function KnowledgeSearchPanel({ initialItems }: { initialItems: Knowledge
       if (query.trim().length >= 3) {
         search();
       } else if (query.trim().length === 0) {
-        setItems(initialItems);
+        setItems(initialItems ?? []);
       }
     }, 500);
     return () => clearTimeout(timeout);
