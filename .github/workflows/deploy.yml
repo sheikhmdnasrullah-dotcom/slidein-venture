@@ -14,7 +14,14 @@ jobs:
           host: ${{ secrets.VPS_HOST }}
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.VPS_SSH_KEY }}
-          script: /opt/scripts/deploy-website.sh
+          script: |
+            set -e
+            cd /opt/apps/slideinventure
+            git pull origin main
+            cd website
+            npm install
+            npm run build
+            pm2 restart website
 
       - name: Deploy workspace
         uses: appleboy/ssh-action@v1.0.3
@@ -22,7 +29,14 @@ jobs:
           host: ${{ secrets.VPS_HOST }}
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.VPS_SSH_KEY }}
-          script: /opt/scripts/deploy-workspace.sh
+          script: |
+            set -e
+            cd /opt/apps/slideinventure
+            git pull origin main
+            cd workspace-app
+            npm install
+            npm run build
+            pm2 restart workspace
 
       - name: Sync knowledge base to Supabase
         uses: appleboy/ssh-action@v1.0.3
@@ -30,4 +44,6 @@ jobs:
           host: ${{ secrets.VPS_HOST }}
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.VPS_SSH_KEY }}
-          script: cd /opt/apps/slideinventure/workspace-app && npm run sync
+          script: |
+            cd /opt/apps/slideinventure/workspace-app
+            npm run sync
