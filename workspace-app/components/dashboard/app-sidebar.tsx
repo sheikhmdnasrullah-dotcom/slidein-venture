@@ -2,15 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import {
-  LayoutDashboard,
-  Send,
-  GitBranch,
-  Newspaper,
-  BookOpen,
-  Cable,
-  Settings2,
-} from "lucide-react";
+import { LayoutDashboard, Send, BookOpen, Cable } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -35,17 +27,12 @@ const NAV_GROUPS = [
     label: "Operations",
     items: [
       { title: "Cold Outreach", url: "/cold-outreach", icon: Send },
-      { title: "Content Pipeline", url: "/content-pipeline", icon: GitBranch },
-      { title: "SRI360 Articles", url: "/sri360", icon: Newspaper },
       { title: "Knowledge Base", url: "/knowledge", icon: BookOpen },
     ],
   },
   {
     label: "Workspace",
-    items: [
-      { title: "Automations (n8n)", url: "/automations", icon: Cable },
-      { title: "Settings", url: "/settings", icon: Settings2 },
-    ],
+    items: [{ title: "Automations (n8n)", url: "/automations", icon: Cable }],
   },
 ];
 
