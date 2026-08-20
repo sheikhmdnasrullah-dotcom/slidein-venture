@@ -37,7 +37,7 @@ export default function RootLayout({
           defaultTheme="day"
           enableSystem={false}
           disableTransitionOnChange
-          value={{ day: "", night: "dark" }}
+          value={{ day: "light", night: "dark" }}
         >
           {children}
         </ThemeProvider>
