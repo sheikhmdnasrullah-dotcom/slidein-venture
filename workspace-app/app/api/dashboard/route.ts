@@ -25,20 +25,33 @@ export async function GET() {
 
   const supabase = createServiceClient();
 
-  const { data: knowledgeItems, error: knowledgeError } = await supabase
-    .from("knowledge_items")
-    .select("id, type, title, status, source, updated_at")
-    .order("updated_at", { ascending: false })
-    .limit(20);
+  let knowledgeItems: any[] = [];
+  let taskRuns: any[] = [];
 
-  const { data: taskRuns, error: tasksError } = await supabase
-    .from("task_runs")
-    .select("id, task_type, status, command, exit_code, started_at, completed_at, triggered_by")
-    .order("started_at", { ascending: false })
-    .limit(100);
+  try {
+    const { data: knowledgeItemsData } = await supabase
+      .from("knowledge_items")
+      .select("id, type, title, status, source, updated_at")
+      .order("updated_at", { ascending: false })
+      .limit(20);
+    knowledgeItems = knowledgeItemsData ?? [];
+  } catch {
+    // Supabase unreachable; degrade gracefully with empty data
+  }
 
-  const items = knowledgeItems ?? [];
-  const runs = taskRuns ?? [];
+  try {
+    const { data: taskRunsData } = await supabase
+      .from("task_runs")
+      .select("id, task_type, status, command, exit_code, started_at, completed_at, triggered_by")
+      .order("started_at", { ascending: false })
+      .limit(100);
+    taskRuns = taskRunsData ?? [];
+  } catch {
+    // Supabase unreachable; degrade gracefully with empty data
+  }
+
+  const items = knowledgeItems;
+  const runs = taskRuns;
 
   const kpis: KpiCard[] = [
     {

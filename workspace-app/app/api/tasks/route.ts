@@ -7,15 +7,18 @@ export async function GET() {
   }
 
   const supabase = createServiceClient();
-  const { data, error } = await supabase
-    .from("task_runs")
-    .select("id, task_type, status, command, exit_code, started_at, completed_at, triggered_by, knowledge_item_id")
-    .order("started_at", { ascending: false })
-    .limit(100);
+  let data: any[] = [];
 
-  if (error) {
-    return Response.json({ error: error.message }, { status: 500 });
+  try {
+    const result = await supabase
+      .from("task_runs")
+      .select("id, task_type, status, command, exit_code, started_at, completed_at, triggered_by, knowledge_item_id")
+      .order("started_at", { ascending: false })
+      .limit(100);
+    data = result.data ?? [];
+  } catch {
+    // Supabase unreachable; return empty list
   }
 
-  return Response.json(data ?? []);
+  return Response.json(data);
 }

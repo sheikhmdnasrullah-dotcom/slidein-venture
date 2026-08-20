@@ -27,7 +27,12 @@ export async function updateSession(request: NextRequest) {
 
   // Do not remove: refreshes the session cookie and must run before any
   // other check reads request.cookies.
-  await supabase.auth.getUser()
+  try {
+    await supabase.auth.getUser()
+  } catch {
+    // Supabase auth is unreachable; continue without refreshing the session.
+    // The app will still render, and API routes will degrade gracefully.
+  }
 
   return supabaseResponse
 }

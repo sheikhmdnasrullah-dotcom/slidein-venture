@@ -33,13 +33,18 @@ export async function createClient() {
 }
 
 // Returns the logged-in user, or null. Use in API routes, which must return
-// 401 JSON instead of redirecting.
+// 401 JSON instead of redirecting. Returns null if Supabase is unreachable
+// so the app degrades gracefully instead of crashing server-side.
 export async function getSessionUser() {
-  const supabase = await createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-  return user
+  try {
+    const supabase = await createClient()
+    const {
+      data: { user },
+    } = await supabase.auth.getUser()
+    return user
+  } catch {
+    return null
+  }
 }
 
 // Redirects to /login if there's no session. Use at the top of any
