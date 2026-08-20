@@ -1,5 +1,5 @@
 import { spawn } from "node:child_process";
-import { startTaskRun, completeTaskRun, failTaskRun } from "./logger";
+import { startTaskRun, completeTaskRun, failTaskRun, type TaskType } from "./logger";
 
 export async function runCommand(command: string, args: string[] = [], options: { task_type?: TaskType; cwd?: string } = {}) {
   const runId = await startTaskRun({
