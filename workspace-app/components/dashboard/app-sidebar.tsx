@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, Send, BookOpen, Cable } from "lucide-react";
+import { LayoutDashboard, Send, BookOpen, Cable, ExternalLink } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -32,7 +32,10 @@ const NAV_GROUPS = [
   },
   {
     label: "Workspace",
-    items: [{ title: "Automations (n8n)", url: "/automations", icon: Cable }],
+    items: [
+      { title: "Automations (n8n)", url: "/automations", icon: Cable },
+      { title: "Admin", url: "https://admin.tanim.tech", icon: ExternalLink, external: true },
+    ],
   },
 ];
 
@@ -69,8 +72,14 @@ export function AppSidebar({
                   <SidebarMenuItem key={item.title}>
                     <SidebarMenuButton
                       tooltip={item.title}
-                      isActive={pathname === item.url}
-                      render={<Link href={item.url} />}
+                      isActive={!item.external && pathname === item.url}
+                      render={
+                        item.external ? (
+                          <a href={item.url} target="_blank" rel="noopener noreferrer" />
+                        ) : (
+                          <Link href={item.url} />
+                        )
+                      }
                     >
                       <item.icon />
                       <span>{item.title}</span>
