@@ -67,7 +67,7 @@ export function StrategyBoard({ initialCards }: { initialCards: StrategyCard[] }
                 >
                   <CardContent className="flex flex-col gap-1 p-3">
                     <Link
-                      href={`/workspace/knowledge/${card.slug}`}
+                      href={`/knowledge/${card.slug}`}
                       className="text-sm hover:underline"
                     >
                       {card.title}

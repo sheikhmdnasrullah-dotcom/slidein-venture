@@ -28,7 +28,7 @@ export async function updateCardStatus(id: string, status: string) {
     throw new Error(`Status update failed: ${error.message}`);
   }
 
-  revalidatePath("/workspace/strategy");
+  revalidatePath("/strategy");
 }
 
 export async function createCard(formData: FormData) {
@@ -85,5 +85,5 @@ export async function createCard(formData: FormData) {
     throw new Error(`Database insert failed: ${error.message}`);
   }
 
-  revalidatePath("/workspace/strategy");
+  revalidatePath("/strategy");
 }

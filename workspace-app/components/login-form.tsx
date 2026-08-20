@@ -42,7 +42,7 @@ export function LoginForm({
       return;
     }
 
-    router.push("/workspace");
+    router.push("/");
     router.refresh();
   }
 

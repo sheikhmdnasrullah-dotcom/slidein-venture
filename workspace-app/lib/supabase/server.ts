@@ -33,7 +33,7 @@ export async function createClient() {
 }
 
 // Redirects to /login if there's no session. Use at the top of any
-// /workspace page instead of duplicating the getUser()+redirect check.
+// root-level route instead of duplicating the getUser()+redirect check.
 export async function requireUser() {
   const supabase = await createClient()
   const {
