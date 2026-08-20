@@ -29,7 +29,7 @@ type SearchHistoryEntry = {
   created_at: string;
 };
 
-type Mode = "exact" | "items";
+type Mode = "exact" | "semantic" | "hybrid" | "items";
 
 const PAGE_SIZE = 50;
 
@@ -80,10 +80,10 @@ export function KnowledgeSearchPanel({ initialItems }: { initialItems?: Knowledg
           return;
         }
         const data = await res.json();
-        if (searchMode === "exact") {
-          setExactResult({ total: data.total, page: data.page, pageSize: data.pageSize, results: data.results });
-        } else {
+        if (searchMode === "items") {
           setItems(data.results ?? []);
+        } else {
+          setExactResult({ total: data.total, page: data.page, pageSize: data.pageSize, results: data.results });
         }
         loadRecent();
       } catch {
@@ -127,9 +127,13 @@ export function KnowledgeSearchPanel({ initialItems }: { initialItems?: Knowledg
   };
 
   const runRecent = (entry: SearchHistoryEntry) => {
-    setMode(entry.mode === "items" ? "items" : "exact");
+    const mode: Mode =
+      entry.mode === "items" || entry.mode === "semantic" || entry.mode === "hybrid"
+        ? entry.mode
+        : "exact";
+    setMode(mode);
     setQuery(entry.query);
-    search(entry.query, entry.mode === "items" ? "items" : "exact", 1);
+    search(entry.query, mode, 1);
   };
 
   const removeRecent = async (id: string) => {
@@ -157,20 +161,16 @@ export function KnowledgeSearchPanel({ initialItems }: { initialItems?: Knowledg
           {loading ? <Loader2 className="size-3 animate-spin" /> : <Search className="size-3" />}
         </Button>
         <div className="flex overflow-hidden rounded-md border border-foreground/10">
-          <button
-            type="button"
-            onClick={() => setMode("exact")}
-            className={`px-2 py-1 text-xs ${mode === "exact" ? "bg-brand-soft text-signal" : "text-foreground/50"}`}
-          >
-            Exact
-          </button>
-          <button
-            type="button"
-            onClick={() => setMode("items")}
-            className={`px-2 py-1 text-xs ${mode === "items" ? "bg-brand-soft text-signal" : "text-foreground/50"}`}
-          >
-            Items
-          </button>
+          {(["exact", "semantic", "hybrid", "items"] as const).map((m) => (
+            <button
+              key={m}
+              type="button"
+              onClick={() => setMode(m)}
+              className={`px-2 py-1 text-xs capitalize ${mode === m ? "bg-brand-soft text-signal" : "text-foreground/50"}`}
+            >
+              {m}
+            </button>
+          ))}
         </div>
         <Button size="sm" variant="outline" onClick={handleSync} disabled={syncing}>
           {syncing ? <Loader2 className="size-3 animate-spin" /> : <RefreshCw className="size-3" />}
@@ -199,7 +199,7 @@ export function KnowledgeSearchPanel({ initialItems }: { initialItems?: Knowledg
         </div>
       )}
 
-      {mode === "exact" && activeQuery ? (
+      {mode !== "items" && activeQuery ? (
         exactResult ? (
           <ExactSearchResults
             query={activeQuery}
@@ -207,7 +207,7 @@ export function KnowledgeSearchPanel({ initialItems }: { initialItems?: Knowledg
             page={exactResult.page}
             pageSize={exactResult.pageSize}
             results={exactResult.results}
-            onPageChange={(page) => search(activeQuery, "exact", page)}
+            onPageChange={(page) => search(activeQuery, mode, page)}
           />
         ) : (
           <p className="text-sm text-muted-foreground">Type at least 3 characters to search.</p>
