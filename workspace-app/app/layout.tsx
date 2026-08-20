@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import { ThemeProvider } from "@/components/theme-provider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -24,9 +25,23 @@ export default function RootLayout({
     <html
       lang="en"
       data-scroll-behavior="smooth"
-      className={`day ${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      suppressHydrationWarning
+      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full flex flex-col">
+        {/* day → no class; night → .dark on <html>. next-themes persists the
+            choice and applies it before paint (suppressHydrationWarning
+            acknowledges that the class is set on the client). */}
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="day"
+          enableSystem={false}
+          disableTransitionOnChange
+          value={{ day: "", night: "dark" }}
+        >
+          {children}
+        </ThemeProvider>
+      </body>
     </html>
   );
 }
