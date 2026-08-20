@@ -1,19 +1,23 @@
-"use client";
+import { requireUser } from "@/lib/supabase/server";
+import { AppSidebar } from "@/components/dashboard/app-sidebar";
+import { CopilotShell } from "@/components/dashboard/copilot-shell";
+import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
+import { Toaster } from "@/components/ui/sonner";
 
-import { CopilotKit } from "@copilotkit/react-core";
-import { CopilotSidebar } from "@copilotkit/react-ui";
-import "@copilotkit/react-ui/styles.css";
-
-export default function WorkspaceLayout({
+export default async function WorkspaceLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const user = await requireUser();
+
   return (
-    <CopilotKit runtimeUrl="/api/copilotkit">
-      <CopilotSidebar labels={{ title: "Assistant" }}>
-        {children}
-      </CopilotSidebar>
-    </CopilotKit>
+    <SidebarProvider>
+      <AppSidebar userEmail={user.email ?? "unknown"} />
+      <SidebarInset>
+        <CopilotShell>{children}</CopilotShell>
+      </SidebarInset>
+      <Toaster />
+    </SidebarProvider>
   );
 }
