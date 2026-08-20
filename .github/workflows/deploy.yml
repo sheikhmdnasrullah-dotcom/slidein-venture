@@ -8,6 +8,14 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
+      - name: Reset server repository to origin/main
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          script: cd /opt/apps/slideinventure && git fetch origin main && git reset --hard origin/main
+
       - name: Deploy website
         uses: appleboy/ssh-action@v1.0.3
         with:
