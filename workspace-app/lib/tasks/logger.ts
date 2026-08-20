@@ -6,7 +6,7 @@ const supabase: SupabaseClient = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 );
 
-type TaskType = "script" | "research" | "cold_email" | "automation" | "system";
+export type TaskType = "script" | "research" | "cold_email" | "automation" | "system";
 
 interface TaskRunOptions {
   task_type: TaskType;
