@@ -63,6 +63,7 @@ export function DashboardContent() {
               <ColdEmailPanel />
             </div>
             <ExecutionPanel />
+            <KnowledgeSearchPanel />
             <ActivityTable data={data.activity} />
           </>
         )}
@@ -85,6 +86,7 @@ function DashboardSkeleton() {
         <Skeleton className="h-64" />
       </div>
       <Skeleton className="h-48" />
+      <Skeleton className="h-64" />
       <Skeleton className="h-72" />
     </>
   );
