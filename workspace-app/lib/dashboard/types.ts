@@ -18,8 +18,8 @@ export type ChartPoint = {
   replies: number;
 };
 
-export type ActivityType = "research" | "prospects" | "sops" | "decisions" | "system";
-export type ActivityStatus = "ai_inferred" | "proposed" | "active";
+export type ActivityType = "research" | "prospects" | "sops" | "decisions" | "system" | "script" | "cold_email" | "automation";
+export type ActivityStatus = "ai_inferred" | "proposed" | "active" | "completed" | "failed" | "running";
 
 export type ActivityRow = {
   id: string;

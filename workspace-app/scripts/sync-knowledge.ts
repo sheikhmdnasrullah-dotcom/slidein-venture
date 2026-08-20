@@ -3,6 +3,11 @@ import path from "node:path";
 import matter from "gray-matter";
 import { createClient, SupabaseClient } from "@supabase/supabase-js";
 
+const supabase: SupabaseClient = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
+);
+
 const KNOWLEDGE_DIR = path.join(process.cwd(), "knowledge");
 const VAULT_DIR = path.join(process.cwd(), "SecondBrain");
 
@@ -280,6 +285,7 @@ async function main() {
     process.env.SUPABASE_SERVICE_ROLE_KEY!
   );
 
+  const startedAt = new Date().toISOString();
   const knowledgeFiles = await findMarkdownFiles(KNOWLEDGE_DIR);
   const vaultFiles = await findMarkdownFiles(VAULT_DIR).catch(() => [] as string[]);
 
@@ -327,6 +333,19 @@ async function main() {
   console.log(
     `Done. ${counters.created.length} created, ${counters.updated.length} updated, ${counters.skipped.length} skipped, ${counters.failed.length} failed.`
   );
+
+  await supabase.from("task_runs").insert({
+    id: crypto.randomUUID(),
+    task_type: "system",
+    status: counters.failed.length > 0 ? "failed" : "completed",
+    command: "npm run sync",
+    output: `${counters.created.length} created, ${counters.updated.length} updated, ${counters.skipped.length} skipped, ${counters.failed.length} failed.`,
+    exit_code: counters.failed.length > 0 ? 1 : 0,
+    started_at: startedAt,
+    completed_at: new Date().toISOString(),
+    triggered_by: "cli",
+    metadata: { counters },
+  });
 
   if (counters.failed.length > 0) {
     process.exit(1);

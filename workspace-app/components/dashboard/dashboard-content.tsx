@@ -7,6 +7,9 @@ import { SiteHeader } from "@/components/dashboard/site-header";
 import { KpiCard } from "@/components/dashboard/kpi-card";
 import { OutreachChart } from "@/components/dashboard/outreach-chart";
 import { ActivityTable } from "@/components/dashboard/activity-table";
+import { ExecutionPanel } from "@/components/dashboard/execution-panel";
+import { ResearchPanel } from "@/components/dashboard/research-panel";
+import { ColdEmailPanel } from "@/components/dashboard/cold-email-panel";
 import { Skeleton } from "@/components/ui/skeleton";
 import type { DashboardResponse } from "@/lib/dashboard/types";
 
@@ -30,6 +33,8 @@ export function DashboardContent() {
 
   useEffect(() => {
     load(false);
+    const interval = setInterval(() => load(false), 10000);
+    return () => clearInterval(interval);
   }, [load]);
 
   return (
@@ -53,6 +58,11 @@ export function DashboardContent() {
               ))}
             </div>
             <OutreachChart data={data.chart} />
+            <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+              <ResearchPanel />
+              <ColdEmailPanel />
+            </div>
+            <ExecutionPanel />
             <ActivityTable data={data.activity} />
           </>
         )}
@@ -70,6 +80,11 @@ function DashboardSkeleton() {
         ))}
       </div>
       <Skeleton className="h-80" />
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+        <Skeleton className="h-64" />
+        <Skeleton className="h-64" />
+      </div>
+      <Skeleton className="h-48" />
       <Skeleton className="h-72" />
     </>
   );

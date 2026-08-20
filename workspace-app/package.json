@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "sync": "tsx --env-file=.env.local scripts/sync-knowledge.ts"
+    "sync": "tsx --env-file=.env.local scripts/sync-knowledge.ts",
+    "task": "tsx --env-file=.env.local scripts/task.ts"
   },
   "dependencies": {
     "@base-ui/react": "^1.7.0",

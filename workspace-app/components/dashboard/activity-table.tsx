@@ -21,18 +21,27 @@ const TYPE_LABELS: Record<ActivityType, string> = {
   sops: "SOP",
   decisions: "Decision",
   system: "System",
+  script: "Script",
+  cold_email: "Cold Email",
+  automation: "Automation",
 };
 
 const STATUS_STYLES: Record<ActivityStatus, string> = {
   ai_inferred: "border-border bg-muted text-muted-foreground",
   proposed: "border-brand/30 bg-brand-soft text-signal",
   active: "border-signal/30 bg-signal/10 text-signal",
+  completed: "border-signal/30 bg-signal/10 text-signal",
+  failed: "border-red-500/30 bg-red-500/10 text-red-500",
+  running: "border-brand/30 bg-brand-soft text-signal",
 };
 
 const STATUS_LABELS: Record<ActivityStatus, string> = {
   ai_inferred: "AI inferred",
   proposed: "Proposed",
   active: "Active",
+  completed: "Completed",
+  failed: "Failed",
+  running: "Running",
 };
 
 const dateFormat = new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric" });
