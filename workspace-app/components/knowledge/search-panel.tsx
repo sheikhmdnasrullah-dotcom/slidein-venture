@@ -7,7 +7,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
-import { Loader2, Search } from "lucide-react";
+import { Loader2, Search, RefreshCw } from "lucide-react";
+import { syncKnowledgeBase } from "@/app/actions/sync-knowledge";
 
 type KnowledgeItem = {
   id: string;
@@ -23,6 +24,7 @@ export function KnowledgeSearchPanel({ initialItems }: { initialItems?: Knowledg
   const [items, setItems] = useState<KnowledgeItem[]>(initialItems ?? []);
   const [query, setQuery] = useState("");
   const [loading, setLoading] = useState(false);
+  const [syncing, setSyncing] = useState(false);
 
   useEffect(() => {
     setItems(initialItems ?? []);
@@ -61,6 +63,23 @@ export function KnowledgeSearchPanel({ initialItems }: { initialItems?: Knowledg
     return () => clearTimeout(timeout);
   }, [query, search, initialItems]);
 
+  const handleSync = async () => {
+    setSyncing(true);
+    try {
+      const result = await syncKnowledgeBase();
+      if (result.success) {
+        toast.success("Knowledge base synced");
+        window.location.reload();
+      } else {
+        toast.error(result.error ?? "Sync failed");
+      }
+    } catch {
+      toast.error("Sync failed");
+    } finally {
+      setSyncing(false);
+    }
+  };
+
   return (
     <div className="flex flex-col gap-4">
       <div className="flex gap-2">
@@ -72,6 +91,9 @@ export function KnowledgeSearchPanel({ initialItems }: { initialItems?: Knowledg
         />
         <Button size="sm" variant="outline" onClick={search} disabled={loading}>
           {loading ? <Loader2 className="size-3 animate-spin" /> : <Search className="size-3" />}
+        </Button>
+        <Button size="sm" variant="outline" onClick={handleSync} disabled={syncing}>
+          {syncing ? <Loader2 className="size-3 animate-spin" /> : <RefreshCw className="size-3" />}
         </Button>
       </div>
 
