@@ -2,7 +2,18 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, Send, BookOpen, Cable, ExternalLink } from "lucide-react";
+import {
+  Activity,
+  BookOpen,
+  Cable,
+  LayoutDashboard,
+  Lightbulb,
+  Send,
+  Settings,
+  Sparkles,
+  Target,
+  Terminal,
+} from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -17,24 +28,80 @@ import {
   SidebarRail,
 } from "@/components/ui/sidebar";
 import { NavUser } from "@/components/dashboard/nav-user";
+import { commandMenuStore } from "@/lib/command-menu-store";
+import { cn } from "@/lib/utils";
 
-const NAV_GROUPS = [
+/**
+ * Active state: segment-match, not exact-match.
+ *   /knowledge/x          keeps "Knowledge" active
+ *   /prospects/y          keeps "Prospects" active
+ * The audit flagged the previous `pathname === url` check as breaking on
+ * detail pages; this segment comparison fixes it in one place.
+ */
+function useIsActive() {
+  const pathname = usePathname();
+  return (url: string) => {
+    if (url === "/") return pathname === "/";
+    const seg = url.split("/")[1] ?? "";
+    const pathSeg = pathname.split("/")[1] ?? "";
+    return seg !== "" && seg === pathSeg;
+  };
+}
+
+type NavItem = {
+  title: string;
+  url: string;
+  icon: React.ComponentType<{ className?: string }>;
+  badge?: string;
+  external?: boolean;
+};
+
+type NavGroup = { label: string; items: NavItem[] };
+
+/**
+ * The IA from AUDIT.md §PROPOSED INFORMATION ARCHITECTURE: four groups, ≤10
+ * leaves. Routes that don't exist yet are still listed so the structure is
+ * discoverable — they render a "coming soon" page (existing pattern) until
+ * their data layer lands. The grouping replaces the earlier Overview /
+ * Operations / Workspace split with labels that answer the brief's six
+ * questions (what's happening / what do we know / what changed / what did AI
+ * discover / what needs attention / what next).
+ */
+const NAV_GROUPS: NavGroup[] = [
   {
-    label: "Overview",
-    items: [{ title: "Dashboard", url: "/", icon: LayoutDashboard }],
-  },
-  {
-    label: "Operations",
+    label: "Command",
     items: [
-      { title: "Cold Outreach", url: "/cold-outreach", icon: Send },
-      { title: "Knowledge Base", url: "/knowledge", icon: BookOpen },
+      { title: "Command Center", url: "/", icon: LayoutDashboard },
+      { title: "Activity", url: "/activity", icon: Activity },
     ],
   },
   {
-    label: "Workspace",
+    label: "Work",
     items: [
-      { title: "Automations (n8n)", url: "/automations", icon: Cable },
-      { title: "Admin", url: "https://admin.tanim.tech", icon: ExternalLink, external: true },
+      { title: "Knowledge", url: "/knowledge", icon: BookOpen },
+      { title: "Prospects", url: "/prospects", icon: Target },
+      { title: "Outreach", url: "/cold-outreach", icon: Send },
+      { title: "Strategy", url: "/strategy", icon: Sparkles },
+    ],
+  },
+  {
+    label: "Intelligence",
+    items: [
+      { title: "Research", url: "/research", icon: BookOpen },
+      { title: "Insights", url: "/insights", icon: Lightbulb },
+      { title: "Agents", url: "/agents", icon: Terminal },
+    ],
+  },
+  {
+    label: "System",
+    items: [
+      { title: "Integrations", url: "/automations", icon: Cable },
+      {
+        title: "Admin",
+        url: "https://admin.tanim.tech",
+        icon: Settings,
+        external: true,
+      },
     ],
   },
 ];
@@ -43,7 +110,11 @@ export function AppSidebar({
   userEmail,
   ...props
 }: React.ComponentProps<typeof Sidebar> & { userEmail: string }) {
-  const pathname = usePathname();
+  const isActive = useIsActive();
+  // Opening the ⌘K menu is a fire-and-forget action on the store, not state
+  // the sidebar needs to subscribe to — so call the store method directly
+  // rather than reading a snapshot through useCommandMenu.
+  const openCommand = commandMenuStore.open;
 
   return (
     <Sidebar collapsible="icon" {...props}>
@@ -56,13 +127,37 @@ export function AppSidebar({
               </div>
               <div className="grid flex-1 text-left leading-tight">
                 <span className="truncate text-sm font-medium">SlideIn Venture</span>
-                <span className="truncate text-xs text-sidebar-foreground/60">Ops console</span>
+                <span className="truncate text-xs text-ink-muted">Ops console</span>
               </div>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarHeader>
+
       <SidebarContent>
+        {/* ⌘K trigger sits inside the rail so it is reachable from both the
+            expanded and icon-collapsed states. The widget FAB it replaces
+            floated over content; this is part of the chrome instead. */}
+        <SidebarGroup>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              <SidebarMenuItem>
+                <SidebarMenuButton
+                  size="sm"
+                  onClick={() => openCommand()}
+                  tooltip="Command menu  ⌘K"
+                >
+                  <Sparkles className="size-4 text-flame" />
+                  <span className="flex-1 text-left">Ask · Search · Run</span>
+                  <kbd className="hidden h-5 items-center rounded-xs border border-rule bg-[var(--surface-2)] px-1 font-mono text-[10px] text-ink-faint group-data-[state=collapsed]:inline-flex xl:inline-flex">
+                    ⌘K
+                  </kbd>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+
         {NAV_GROUPS.map((group) => (
           <SidebarGroup key={group.label}>
             <SidebarGroupLabel>{group.label}</SidebarGroupLabel>
@@ -72,16 +167,24 @@ export function AppSidebar({
                   <SidebarMenuItem key={item.title}>
                     <SidebarMenuButton
                       tooltip={item.title}
-                      isActive={!item.external && pathname === item.url}
+                      isActive={isActive(item.url)}
+                      className={cn(
+                        "data-[active]:bg-[var(--accent-wash)] data-[active]:text-[var(--text-accent)]"
+                      )}
                       render={
                         item.external ? (
-                          <a href={item.url} target="_blank" rel="noopener noreferrer" />
+                          <a
+                            href={item.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            aria-label={`${item.title} (opens in a new tab)`}
+                          />
                         ) : (
                           <Link href={item.url} />
                         )
                       }
                     >
-                      <item.icon />
+                      <item.icon className={cn(isActive(item.url) && "text-flame")} />
                       <span>{item.title}</span>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
@@ -91,6 +194,7 @@ export function AppSidebar({
           </SidebarGroup>
         ))}
       </SidebarContent>
+
       <SidebarFooter>
         <NavUser userEmail={userEmail} />
       </SidebarFooter>

@@ -66,7 +66,7 @@ export function DataTable<T extends Record<string, unknown>>({
   const sorted = useMemo(() => {
     if (!sortKey) return data;
     const col = columns.find((c) => String(c.key) === sortKey);
-    const accessor = col?.sortAccessor ?? ((r: T) => r[col?.key as keyof T] as any);
+    const accessor = col?.sortAccessor ?? ((r: T) => r[col?.key as keyof T] as string | number | undefined);
     const rows = [...data];
     rows.sort((a, b) => {
       const av = accessor(a);

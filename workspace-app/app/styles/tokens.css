@@ -50,6 +50,7 @@
        signal   on paper-50      4.50:1  ✓ AA at any size                  */
   --color-brand:        oklch(0.691 0.207 42.28);  /* exact #FF6200 */
   --color-brand-hi:     oklch(0.700 0.198 42.28);  /* orange text on dark */
+  --color-brand-soft:   oklch(0.691 0.207 42.28 / 8%);  /* legacy bg-brand-soft tint */
   --color-signal:       oklch(0.563 0.168 42.28);  /* only orange for small text on light */
   --color-signal-deep:  oklch(0.542 0.163 42.28);  /* one step down, AA on paper-100 */
   --color-signal-deeper: oklch(0.522 0.158 42.28); /* AA on paper-200 */
@@ -171,6 +172,20 @@
   --dur-slow:    420ms;
   --dur-reveal:  620ms;
   --ring-width:  2px;
+
+  /* Easings: --ease-* is a Tailwind namespace, but unused easings get tree-
+     shaken from :root, so any component that does `transition: var(--ease-expo)`
+     would get nothing back. Mirror them here as real custom properties. */
+  --ease-expo: cubic-bezier(0.16, 1, 0.30, 1);
+  --ease-std:  cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* @theme won't expose the spring as a :root var because Tailwind doesn't
+     alias `--ease-spring` here automatically, mirror it for code use. */
+  --ease-spring: linear(
+    0, 0.0057 1.2%, 0.0225 2.5%, 0.0888 5%, 0.199 7.6%,
+    0.6082 15.5%, 0.8602 21.1%, 1.0231 26.9%, 1.0684 31.2%,
+    1.0257 41.3%, 0.9903 50.5%, 1.0009 68.4%, 1
+  );
 }
 
 /* ── Focus ring — one visible treatment, everywhere ────────────────────── */

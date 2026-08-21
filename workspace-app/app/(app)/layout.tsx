@@ -2,7 +2,7 @@ import { AppSidebar } from "@/components/dashboard/app-sidebar";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { KnowledgeChatWidget } from "@/components/knowledge/knowledge-chat-widget";
+import { CommandMenu } from "@/components/system/command-menu";
 import { requireUser } from "@/lib/supabase/server";
 
 export default async function AppLayout({
@@ -16,7 +16,10 @@ export default async function AppLayout({
         <AppSidebar userEmail={user.email ?? "unknown"} />
         {children}
         <Toaster />
-        <KnowledgeChatWidget />
+        {/* ⌘K global surface. Replaces the floating KnowledgeChatWidget FAB —
+            one command surface for navigation, search, ask, and actions,
+            reachable from the sidebar trigger, the header, or ⌘K anywhere. */}
+        <CommandMenu />
       </SidebarProvider>
     </TooltipProvider>
   );

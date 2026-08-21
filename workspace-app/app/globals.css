@@ -85,15 +85,14 @@
   --color-card-foreground: var(--card-foreground);
   --color-card: var(--card);
 
-  /* ── brand (legacy primitive aliases — existing components read
-     bg-brand / text-signal / bg-brand-soft; keep them working) ─────── */
-  --color-brand: var(--color-brand);
-  --color-signal: var(--color-signal);
-  --color-brand-soft: color-mix(in oklch, var(--color-brand) 8%, transparent);
+  /* ── brand primitives (`--color-brand`, `--color-signal-deep`,
+     `--color-brand-soft`, the orange family) are declared in
+     app/styles/tokens.css `@theme` and emitted to :root from that block.
+     Aliasing them here as `var(--color-brand)` self-references and resolves
+     to nothing — do not re-declare them here. ──────────────────────── */
 
-  /* ── radii (deliberate scale in tokens.css; collapse legacy names) ─── */
-  --radius-sm: calc(var(--radius-md) * 0.625);
-  --radius-md: var(--radius-md);
+  /* ── radii (deliberate scale in tokens.css; collapse legacy names onto
+     it — `md`/`sm` are primitives there, don't re-alias them here) ──── */
   --radius-lg: var(--radius-md);
   --radius-xl: var(--radius-lg);
   --radius-2xl: var(--radius-lg);
