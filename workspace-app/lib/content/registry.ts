@@ -364,7 +364,6 @@ export const CONTENT_SCHEMAS: Record<ContentType, z.ZodType<any>> = {
   [ContentType.PDF]: PDFContentSchema,
   [ContentType.IMAGE]: ImageContentSchema,
   [ContentType.LINK]: LinkContentSchema,
-  [ContentType.WEB_RESEARCH]: WebResearchContentSchema,
   [ContentType.UNKNOWN]: UnknownContentSchema,
 };
 

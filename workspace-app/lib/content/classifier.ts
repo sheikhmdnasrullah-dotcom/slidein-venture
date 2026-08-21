@@ -8,8 +8,7 @@
  */
 
 import { AnyContent, ContentType, CONTENT_SCHEMAS, validateContent } from "./registry";
-
-export type ClassifiedContent = AnyContent & { raw_payload?: unknown };
+import pdfParse from "pdf-parse";
 
 /**
  * Input artifact from an upload, agent output, import, or research.
@@ -26,8 +25,8 @@ export type ArtifactInput =
  * Result of classification.
  */
 export type ClassificationResult =
-  | { success: true; content: ClassifiedContent }
-  | { success: false; error: string; fallback: ClassifiedContent };
+  | { success: true; content: ReturnType<typeof validateContent>["data"] }
+  | { success: false; error: string; fallback: ReturnType<typeof validateContent>["fallback"] };
 
 /**
  * Detect content type from filename + mime type (rule-based, no LLM).
@@ -35,14 +34,14 @@ export type ClassificationResult =
 function detectByMimeAndFilename(filename: string, mimeType: string): ContentType {
   const ext = filename.toLowerCase().split(".").pop() ?? "";
 
-  if (ext === "csv" || mimeType === "text/csv") return ContentType.CSV;
-  if (ext === "pdf" || mimeType === "application/pdf") return ContentType.PDF;
-  if (mimeType.startsWith("image/")) return ContentType.IMAGE;
-  if (ext === "md" || ext === "txt" || mimeType === "text/plain" || mimeType === "text/markdown") return ContentType.TEXT;
-  if (ext === "json" || mimeType === "application/json") return ContentType.DOCUMENT;
-  if (ext === "xlsx" || ext === "xls" || mimeType.includes("spreadsheet")) return ContentType.SPREADSHEET;
+  if (ext === "csv" || mimeType === "text/csv") return "CSV";
+  if (ext === "pdf" || mimeType === "application/pdf") return "PDF";
+  if (mimeType.startsWith("image/")) return "IMAGE";
+  if (ext === "md" || ext === "txt" || mimeType === "text/plain" || mimeType === "text/markdown") return "TEXT";
+  if (ext === "json" || mimeType === "application/json") return "DOCUMENT";
+  if (ext === "xlsx" || ext === "xls" || mimeType.includes("spreadsheet")) return "SPREADSHEET";
 
-  return ContentType.UNKNOWN;
+  return "UNKNOWN";
 }
 
 /**
@@ -61,28 +60,28 @@ function analyzeTextContent(text: string, hintType?: ContentType): { type: Conte
   const hasEmail = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/.test(text);
   const hasCompany = /company|organization|firm|startup/i.test(text);
 
-  if (hintType && hintType !== ContentType.TEXT && hintType !== ContentType.DOCUMENT && hintType !== ContentType.UNKNOWN) {
+  if (hintType && hintType !== "TEXT" && hintType !== "DOCUMENT" && hintType !== "UNKNOWN") {
     return { type: hintType, extracted: {} };
   }
 
   if (hasCitations && hasFindings && lines.length > 10) {
-    return { type: ContentType.RESEARCH, extracted: {} };
+    return { type: "RESEARCH", extracted: {} };
   }
   if (hasSteps && /procedure|process|standard|operating/i.test(text)) {
-    return { type: ContentType.SOP, extracted: {} };
+    return { type: "SOP", extracted: {} };
   }
   if (hasDecision && lines.length < 50) {
-    return { type: ContentType.DECISION, extracted: {} };
+    return { type: "DECISION", extracted: {} };
   }
   if (looksLikeCSV) {
     const headers = lines[0].split(",").map((h) => h.trim());
     const rows = lines.slice(1).map((l) => l.split(",").map((c) => c.trim()));
-    return { type: ContentType.CSV, extracted: { headers, rows, row_count: rows.length } };
+    return { type: "CSV", extracted: { headers, rows, row_count: rows.length } };
   }
   if (hasEmail && hasCompany && lines.length < 30) {
-    return { type: ContentType.LEAD, extracted: {} };
+    return { type: "LEAD", extracted: {} };
   }
-  return { type: ContentType.DOCUMENT, extracted: {} };
+  return { type: "DOCUMENT", extracted: {} };
 }
 
 /**
@@ -103,34 +102,44 @@ export async function classifyTextArtifact(
     author: metadata?.author as string | undefined,
     tags: (metadata?.tags as string[]) ?? [],
     metadata: { ...metadata, ...extracted },
-  } as ClassifiedContent;
+  };
 
-  let content: ClassifiedContent;
+  // Build content object based on type
+  let content: Record<string, unknown> = { ...base };
 
   switch (type) {
-    case ContentType.RESEARCH:
+    case "RESEARCH":
       content = { ...base, body: text, findings: [], entities: [] };
       break;
-    case ContentType.SOP:
+    case "SOP":
       content = { ...base, body: text, version: "1.0" };
       break;
-    case ContentType.DECISION:
+    case "DECISION":
       content = { ...base, body: text, status: "proposed", related: [] };
       break;
-    case ContentType.CSV:
-      content = { ...base, headers: extracted.headers as string[], rows: extracted.rows as string[][], row_count: extracted.row_count as number, delimiter: "," };
+    case "CSV":
+      content = { ...base, headers: extracted.headers, rows: extracted.rows, row_count: extracted.row_count, delimiter: "," };
       break;
-    case ContentType.LEAD:
+    case "LEAD":
       content = { ...base, email: text.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/)?.[0] };
       break;
-    case ContentType.SOP:
-      content = { ...base, body: text, version: "1.0" };
-      break;
-    case ContentType.DECISION:
-      content = { ...base, body: text, status: "proposed", related: [] };
-      break;
-    case ContentType.INSIGHT:
+    case "INSIGHT":
       content = { ...base, body: text, evidence_refs: [], confidence: 0.8 };
+      break;
+    case "SOURCE":
+      content = { ...base, body: text };
+      break;
+    case "AGENT_EXECUTION":
+      content = { ...base, body: text, agent_type: "unknown", task_id: undefined, status: "completed" };
+      break;
+    case "WEB_RESEARCH":
+      content = { ...base, body: text, queries: [], sources: [] };
+      break;
+    case "CLAUDE_SESSION":
+      content = { ...base, body: text, session_id: undefined, project: undefined };
+      break;
+    case "CLIENT":
+      content = { ...base, name: title, email: undefined, company: undefined, status: "active" };
       break;
     default:
       content = { ...base, body: text };
@@ -152,16 +161,16 @@ export async function classifyFileArtifact(
 ): Promise<ClassificationResult> {
   const hintType = detectByMimeAndFilename(filename, mimeType);
 
-  if (hintType === ContentType.PDF) {
+  if (hintType === "PDF") {
     return classifyPDF(buffer, filename, metadata);
   }
-  if (hintType === ContentType.IMAGE) {
+  if (hintType === "IMAGE") {
     return classifyImage(buffer, filename, metadata);
   }
-  if (hintType === ContentType.SPREADSHEET) {
+  if (hintType === "SPREADSHEET") {
     return classifySpreadsheet(buffer, filename, metadata);
   }
-  if (hintType === ContentType.CSV) {
+  if (hintType === "CSV") {
     return classifyCSV(buffer, filename, metadata);
   }
 
@@ -174,11 +183,11 @@ export async function classifyFileArtifact(
       success: false,
       error: "Unable to decode file as text",
       fallback: {
-        content_type: ContentType.UNKNOWN,
+        content_type: "UNKNOWN",
         title: filename,
         tags: [],
-        metadata,
-        raw_payload: { filename, mimeType, size: buffer.length },
+        metadata: metadata ?? {},
+        raw: { filename, mimeType, size: buffer.length },
       },
     };
   }
@@ -189,15 +198,14 @@ export async function classifyFileArtifact(
  */
 async function classifyPDF(buffer: Buffer, filename: string, metadata?: Record<string, unknown>): Promise<ClassificationResult> {
   try {
-    const pdfParse = await import("pdf-parse");
-    const data = await pdfParse.default(buffer);
+    const data = await pdfParse(buffer);
     const text = data.text || "";
     const pageCount = data.numpages || 0;
 
-    const { type } = analyzeTextContent(text, ContentType.PDF);
+    const { type } = analyzeTextContent(text, "PDF");
 
-    const content: ClassifiedContent = {
-      content_type: ContentType.PDF,
+    const content = {
+      content_type: "PDF",
       title: filename.replace(/\.pdf$/i, ""),
       source: metadata?.source as string | undefined,
       author: metadata?.author as string | undefined,
@@ -216,11 +224,12 @@ async function classifyPDF(buffer: Buffer, filename: string, metadata?: Record<s
       success: false,
       error: `PDF parsing failed: ${error}`,
       fallback: {
-        content_type: ContentType.PDF,
+        content_type: "PDF",
         title: filename.replace(/\.pdf$/i, ""),
         tags: [],
         metadata: { ...metadata, error: String(error) },
         page_count: 0,
+        raw: { error: String(error), filename },
       },
     };
   }
@@ -230,8 +239,8 @@ async function classifyPDF(buffer: Buffer, filename: string, metadata?: Record<s
  * Classify image — metadata only (OCR later).
  */
 async function classifyImage(buffer: Buffer, filename: string, metadata?: Record<string, unknown>): Promise<ClassificationResult> {
-  const content: ClassifiedContent = {
-    content_type: ContentType.IMAGE,
+  const content = {
+    content_type: "IMAGE",
     title: filename.replace(/\.[^.]+$/, ""),
     source: metadata?.source as string | undefined,
     author: metadata?.author as string | undefined,
@@ -247,19 +256,18 @@ async function classifyImage(buffer: Buffer, filename: string, metadata?: Record
 }
 
 /**
- * Classify spreadsheet (xlsx/xls) — basic extraction without xlsx dep.
- * For now, falls back to UNKNOWN with metadata.
+ * Classify spreadsheet — not implemented (no xlsx dep due to vulns).
  */
 async function classifySpreadsheet(buffer: Buffer, filename: string, metadata?: Record<string, unknown>): Promise<ClassificationResult> {
   return {
     success: false,
     error: "Spreadsheet parsing requires 'xlsx' package (not installed due to security advisories). Use CSV instead.",
     fallback: {
-      content_type: ContentType.UNKNOWN,
+      content_type: "UNKNOWN",
       title: filename,
       tags: [],
       metadata: { ...metadata, error: "xlsx not installed", original_type: "spreadsheet" },
-      raw_payload: { filename, size: buffer.length },
+      raw: { filename, size: buffer.length },
     },
   };
 }
@@ -275,8 +283,8 @@ async function classifyCSV(buffer: Buffer, filename: string, metadata?: Record<s
     const headers = lines[0]?.split(delimiter).map((h) => h.trim()) || [];
     const rows = lines.slice(1).map((l) => l.split(delimiter).map((c) => c.trim()));
 
-    const content: ClassifiedContent = {
-      content_type: ContentType.CSV,
+    const content = {
+      content_type: "CSV",
       title: filename.replace(/\.csv$/i, ""),
       source: metadata?.source as string | undefined,
       author: metadata?.author as string | undefined,
@@ -296,10 +304,11 @@ async function classifyCSV(buffer: Buffer, filename: string, metadata?: Record<s
       success: false,
       error: `CSV parsing failed: ${error}`,
       fallback: {
-        content_type: ContentType.UNKNOWN,
+        content_type: "UNKNOWN",
         title: filename,
         tags: [],
         metadata: { ...metadata, error: String(error) },
+        raw: { error: String(error), filename },
       },
     };
   }
@@ -315,8 +324,8 @@ export function classifyAgentExecution(
   progress?: { current: number; total: number; current_item?: string },
   metadata?: Record<string, unknown>
 ): ClassificationResult {
-  const content: ClassifiedContent = {
-    content_type: ContentType.AGENT_EXECUTION,
+  const content = {
+    content_type: "AGENT_EXECUTION",
     title: `${agentType} execution${taskId ? ` — ${taskId}` : ""}`,
     source: "agent",
     author: "system",
@@ -344,8 +353,8 @@ export function classifyWebResearch(
   sources: Array<{ url: string; title: string; snippet: string }>,
   metadata?: Record<string, unknown>
 ): ClassificationResult {
-  const content: ClassifiedContent = {
-    content_type: ContentType.WEB_RESEARCH,
+  const content = {
+    content_type: "WEB_RESEARCH",
     title: `Web research: ${queries.slice(0, 3).join(", ")}`,
     source: "web",
     author: "system",
@@ -402,10 +411,11 @@ export async function classifyArtifact(input: ArtifactInput): Promise<Classifica
         success: false,
         error: "Unknown artifact kind",
         fallback: {
-          content_type: ContentType.UNKNOWN,
+          content_type: "UNKNOWN",
           title: "Unknown",
           tags: [],
-          raw_payload: input,
+          metadata: {},
+          raw: input,
         },
       };
   }
