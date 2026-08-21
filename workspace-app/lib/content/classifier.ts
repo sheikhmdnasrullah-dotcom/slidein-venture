@@ -7,8 +7,7 @@
  * validates via Zod before persisting.
  */
 
-import { AnyContent, ContentType, CONTENT_SCHEMAS, validateContent } from "./registry";
-import pdfParse from "pdf-parse";
+import { ContentType, validateContent } from "./registry";
 
 /**
  * Input artifact from an upload, agent output, import, or research.
@@ -48,10 +47,8 @@ function detectByMimeAndFilename(filename: string, mimeType: string): ContentTyp
  * Heuristic content analysis for text-based artifacts.
  */
 function analyzeTextContent(text: string, hintType?: ContentType): { type: ContentType; extracted: Record<string, unknown> } {
-  const lower = text.toLowerCase();
   const lines = text.split("\n").filter((l) => l.trim().length > 0);
 
-  const hasFrontmatter = text.startsWith("---") && text.indexOf("---", 3) > 0;
   const hasCitations = /\[\d+\]|\(https?:\/\//.test(text);
   const hasFindings = /findings?|conclusion|evidence|source:/i.test(text);
   const hasSteps = /^(\d+\.|-\s|step\s*\d)/im.test(text);
@@ -198,11 +195,12 @@ export async function classifyFileArtifact(
  */
 async function classifyPDF(buffer: Buffer, filename: string, metadata?: Record<string, unknown>): Promise<ClassificationResult> {
   try {
+    const pdfParse = (await import("pdf-parse")) as unknown as (buf: Buffer) => Promise<{ text: string; numpages: number }>;
     const data = await pdfParse(buffer);
     const text = data.text || "";
     const pageCount = data.numpages || 0;
 
-    const { type } = analyzeTextContent(text, "PDF");
+    analyzeTextContent(text, "PDF");
 
     const content = {
       content_type: "PDF",
@@ -229,7 +227,6 @@ async function classifyPDF(buffer: Buffer, filename: string, metadata?: Record<s
         tags: [],
         metadata: { ...metadata, error: String(error) },
         page_count: 0,
-        raw: { error: String(error), filename },
       },
     };
   }

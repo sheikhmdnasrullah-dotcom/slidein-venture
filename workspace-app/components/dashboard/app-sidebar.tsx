@@ -8,6 +8,7 @@ import {
   Cable,
   LayoutDashboard,
   Lightbulb,
+  MessageSquare,
   Send,
   Settings,
   Sparkles,
@@ -84,14 +85,15 @@ const NAV_GROUPS: NavGroup[] = [
       { title: "Strategy", url: "/strategy", icon: Sparkles },
     ],
   },
-  {
-    label: "Intelligence",
-    items: [
-      { title: "Research", url: "/research", icon: BookOpen },
-      { title: "Insights", url: "/insights", icon: Lightbulb },
-      { title: "Agents", url: "/agents", icon: Terminal },
-    ],
-  },
+{
+        label: "Intelligence",
+        items: [
+          { title: "Research", url: "/research", icon: BookOpen },
+          { title: "Insights", url: "/insights", icon: Lightbulb },
+          { title: "Agents", url: "/agents", icon: Terminal },
+          { title: "Chat", url: "/chat", icon: MessageSquare },
+        ],
+      },
   {
     label: "System",
     items: [

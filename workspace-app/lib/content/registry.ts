@@ -64,7 +64,7 @@ const BaseContentSchema = z.object({
   source: z.string().url().or(z.string().min(1)).optional(),
   author: z.string().optional(),
   tags: z.array(z.string()).default([]),
-  metadata: z.record(z.unknown()).default({}),
+  metadata: z.record(z.string(), z.unknown()).default({}),
 });
 
 /**
@@ -339,7 +339,7 @@ export type ContentSchema = z.ZodType<AnyContent>;
  * Map from ContentType to its Zod schema. Used by the classifier to pick
  * the right validator, and by the registry to validate before persisting.
  */
-export const CONTENT_SCHEMAS: Record<ContentType, z.ZodType<any>> = {
+export const CONTENT_SCHEMAS: Record<ContentType, z.ZodType<z.infer<typeof AnyContentSchema>>> = {
   [ContentType.TEXT]: TextContentSchema,
   [ContentType.DOCUMENT]: DocumentContentSchema,
   [ContentType.RESEARCH]: ResearchContentSchema,

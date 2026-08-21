@@ -1,5 +1,3 @@
-import "server-only";
-
 // NVIDIA NIM client for embeddings + reranking. Every function here returns
 // null instead of throwing on missing key / API failure — semantic search is
 // an optional enhancement over lexical search, never a hard dependency.
