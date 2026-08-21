@@ -4,7 +4,6 @@
  * creates audit trail.
  */
 
-import { createServiceClient } from "@/lib/supabase/server";
 import { SupabaseClient } from "@supabase/supabase-js";
 
 export interface WorkingMemoryEntry {
@@ -147,14 +146,14 @@ export async function getWorkingMemoryStats(
     .select("source, expires_at, promoted_to_knowledge_item_id")
     .eq("user_email", userEmail);
 
-  const entries = all ?? [];
+  const entries = (all ?? []) as Array<{ source: string; expires_at: string; promoted_to_knowledge_item_id: string | null }>;
   const now = new Date().toISOString();
 
   return {
     total: entries.length,
-    expired: entries.filter((e: WorkingMemoryEntry) => e.expires_at < now).length,
-    promoted: entries.filter((e: WorkingMemoryEntry) => e.promoted_to_knowledge_item_id).length,
-    by_source: entries.reduce((acc: Record<string, number>, e: WorkingMemoryEntry) => {
+    expired: entries.filter((e) => e.expires_at < now).length,
+    promoted: entries.filter((e) => e.promoted_to_knowledge_item_id).length,
+    by_source: entries.reduce((acc: Record<string, number>, e) => {
       acc[e.source] = (acc[e.source] ?? 0) + 1;
       return acc;
     }, {} as Record<string, number>),

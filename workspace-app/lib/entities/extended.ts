@@ -3,7 +3,6 @@
  * Provides typed entity types, properties, and relation kinds.
  */
 
-import { createServiceClient } from "@/lib/supabase/server";
 import { SupabaseClient } from "@supabase/supabase-js";
 
 export type EntityType = "company" | "person" | "project" | "campaign" | "deal" | "document" | "tag";
@@ -150,8 +149,8 @@ export async function getEntityWithRelations(
 
   return {
     entity: entity.data,
-    outgoing: outgoing.data ?? [],
-    incoming: incoming.data ?? [],
+    outgoing: outgoing ?? [],
+    incoming: incoming ?? [],
   };
 }
 
@@ -164,7 +163,7 @@ export async function findEntities(
   propertyFilter?: Record<string, unknown>,
   limit = 100
 ): Promise<Entity[]> {
-  let query = supabase
+  const query = supabase
     .from("entities")
     .select("*")
     .eq("entity_type", entityType)

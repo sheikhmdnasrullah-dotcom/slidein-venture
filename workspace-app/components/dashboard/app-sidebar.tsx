@@ -6,6 +6,7 @@ import {
   Activity,
   BookOpen,
   Cable,
+  FileText,
   LayoutDashboard,
   Lightbulb,
   MessageSquare,
@@ -14,6 +15,7 @@ import {
   Sparkles,
   Target,
   Terminal,
+  Users,
 } from "lucide-react";
 import {
   Sidebar,
@@ -82,6 +84,8 @@ const NAV_GROUPS: NavGroup[] = [
       { title: "Knowledge", url: "/knowledge", icon: BookOpen },
       { title: "Prospects", url: "/prospects", icon: Target },
       { title: "Outreach", url: "/cold-outreach", icon: Send },
+      { title: "Leads", url: "/leads", icon: Users },
+      { title: "Documents", url: "/documents", icon: FileText },
       { title: "Strategy", url: "/strategy", icon: Sparkles },
     ],
   },

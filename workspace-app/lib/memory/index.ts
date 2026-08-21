@@ -1,2 +1,2 @@
 export * from "./working-memory";
-export * from "./extended";
+export * from "../entities/extended";
