@@ -10,6 +10,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Loader2, Search, RefreshCw, X } from "lucide-react";
 import { syncKnowledgeBase } from "@/app/actions/sync-knowledge";
 import { ExactSearchResults, type ChunkHit } from "@/components/knowledge/exact-search-results";
+import { FilterBar } from "@/components/system";
 
 type KnowledgeItem = {
   id: string;
@@ -29,7 +30,7 @@ type SearchHistoryEntry = {
   created_at: string;
 };
 
-type Mode = "exact" | "semantic" | "hybrid" | "items";
+type Mode = "exact" | "items";
 
 const PAGE_SIZE = 50;
 
@@ -127,13 +128,10 @@ export function KnowledgeSearchPanel({ initialItems }: { initialItems?: Knowledg
   };
 
   const runRecent = (entry: SearchHistoryEntry) => {
-    const mode: Mode =
-      entry.mode === "items" || entry.mode === "semantic" || entry.mode === "hybrid"
-        ? entry.mode
-        : "exact";
-    setMode(mode);
+    const m: Mode = entry.mode === "items" ? "items" : "exact";
+    setMode(m);
     setQuery(entry.query);
-    search(entry.query, mode, 1);
+    search(entry.query, m, 1);
   };
 
   const removeRecent = async (id: string) => {
@@ -148,34 +146,35 @@ export function KnowledgeSearchPanel({ initialItems }: { initialItems?: Knowledg
 
   const activeQuery = query.trim();
 
+  const handleAskAI = (hit: ChunkHit) => {
+    // Open command menu in ask mode with this chunk as context
+    // This will be wired up when Phase G (AI chat) lands
+    console.log("Ask AI about:", hit);
+    toast("Ask AI coming in Phase G");
+  };
+
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex flex-wrap items-center gap-2">
-        <Input
+      <FilterBar>
+        <FilterBar.Search
           value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          placeholder="Search knowledge base..."
-          className="h-8 w-64 text-xs"
+          onChange={setQuery}
+          placeholder="Search knowledge base…"
         />
-        <Button size="sm" variant="outline" onClick={() => search(activeQuery, mode, 1)} disabled={loading}>
-          {loading ? <Loader2 className="size-3 animate-spin" /> : <Search className="size-3" />}
-        </Button>
-        <div className="flex overflow-hidden rounded-md border border-foreground/10">
-          {(["exact", "semantic", "hybrid", "items"] as const).map((m) => (
-            <button
-              key={m}
-              type="button"
-              onClick={() => setMode(m)}
-              className={`px-2 py-1 text-xs capitalize ${mode === m ? "bg-brand-soft text-signal" : "text-foreground/50"}`}
-            >
-              {m}
-            </button>
-          ))}
-        </div>
-        <Button size="sm" variant="outline" onClick={handleSync} disabled={syncing}>
-          {syncing ? <Loader2 className="size-3 animate-spin" /> : <RefreshCw className="size-3" />}
-        </Button>
-      </div>
+        <FilterBar.Button
+          active={mode === "exact"}
+          onClick={() => setMode("exact")}
+        >
+          Exact
+        </FilterBar.Button>
+        <FilterBar.Button
+          active={mode === "items"}
+          onClick={() => setMode("items")}
+        >
+          Items
+        </FilterBar.Button>
+        <FilterBar.Clear onClick={handleSync} label="Sync" />
+      </FilterBar>
 
       {recent.length > 0 && (
         <div className="flex flex-wrap items-center gap-1 text-xs text-foreground/40">
@@ -208,6 +207,7 @@ export function KnowledgeSearchPanel({ initialItems }: { initialItems?: Knowledg
             pageSize={exactResult.pageSize}
             results={exactResult.results}
             onPageChange={(page) => search(activeQuery, mode, page)}
+            onAskAI={handleAskAI}
           />
         ) : (
           <p className="text-sm text-muted-foreground">Type at least 3 characters to search.</p>

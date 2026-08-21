@@ -1,7 +1,9 @@
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Highlight } from "@/components/knowledge/highlight";
+import { Sparkles } from "lucide-react";
 
 export type ChunkHit = {
   id: string;
@@ -28,6 +30,7 @@ export function ExactSearchResults({
   pageSize,
   results,
   onPageChange,
+  onAskAI,
 }: {
   query: string;
   total: number;
@@ -35,6 +38,7 @@ export function ExactSearchResults({
   pageSize: number;
   results: ChunkHit[];
   onPageChange: (page: number) => void;
+  onAskAI?: (hit: ChunkHit) => void;
 }) {
   if (results.length === 0) {
     return <p className="text-sm text-muted-foreground">No matches for &ldquo;{query}&rdquo;.</p>;
@@ -71,14 +75,27 @@ export function ExactSearchResults({
                 </p>
                 <div className="flex items-center justify-between">
                   <span className="truncate text-xs text-foreground/40">{item?.source}</span>
-                  {item && (
-                    <Link
-                      href={`/knowledge/${item.slug}?q=${encodeURIComponent(query)}&chunk=${hit.chunk_index}`}
-                      className="text-xs text-signal hover:underline"
-                    >
-                      Open source →
-                    </Link>
-                  )}
+                  <div className="flex items-center gap-2">
+                    {item && (
+                      <Link
+                        href={`/knowledge/${item.slug}?q=${encodeURIComponent(query)}&chunk=${hit.chunk_index}`}
+                        className="text-xs text-signal hover:underline"
+                      >
+                        Open source →
+                      </Link>
+                    )}
+                    {onAskAI && (
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="text-xs gap-1"
+                        onClick={() => onAskAI(hit)}
+                      >
+                        <Sparkles className="size-3" />
+                        Ask AI
+                      </Button>
+                    )}
+                  </div>
                 </div>
               </CardContent>
             </Card>

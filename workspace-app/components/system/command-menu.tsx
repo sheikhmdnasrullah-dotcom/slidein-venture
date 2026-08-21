@@ -99,7 +99,6 @@ function CommandMenuInner() {
     if (inputRef.current && document.activeElement !== inputRef.current) {
       commandMenuStore.close();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pathname]);
 
   // Escape closes the menu cleanly.
@@ -140,11 +139,11 @@ function CommandMenuInner() {
     );
   }, [entries, query]);
 
-  // Clamp the active cursor whenever the filtered list changes so it never
-  // points past the end (which would make Enter do nothing).
-  useEffect(() => {
-    setActive((i) => Math.min(i, Math.max(0, filtered.length - 1)));
-  }, [filtered]);
+  // Derive a clamped active index at render time — no setState in effect.
+  // When the user types and filtered shrinks, safeActive auto-corrects
+  // without touching state. Keyboard handlers and onMouseEnter mutate `active`;
+  // safeActive is used for rendering + Enter execution.
+  const safeActive = Math.min(active, Math.max(0, filtered.length - 1));
 
   // Attach an arrow-nav handler to the input. Keystrokes the input should
   // handle itself (typing) are left alone.
@@ -157,7 +156,7 @@ function CommandMenuInner() {
       setActive((i) => Math.max(i - 1, 0));
     } else if (e.key === "Enter") {
       e.preventDefault();
-      filtered[active]?.run();
+      filtered[safeActive]?.run();
     }
   }
 
@@ -220,7 +219,7 @@ function CommandMenuInner() {
                   {grouped[group].map((entry) => {
                     flatIndex += 1;
                     const idx = flatIndex;
-                    const isActive = idx === active;
+                    const isActive = idx === safeActive;
                     return (
                       <button
                         key={entry.id}
