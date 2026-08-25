@@ -3,11 +3,10 @@
 /**
  * HERO — SlideIn Venture
  * ---------------------------------------------------------------------------
- * The above-the-fold moment. A full-bleed apricot band — the brand hue read at
- * the light end — with ink type on it, running edge to edge and up to y=0 with
- * the nav pill floating on top of it. The page never uses a coloured surface
- * again, which is what makes this one read as the opening rather than as a
- * decorated section.
+ * The above-the-fold moment. A full-bleed apricot band with ink type on it,
+ * running edge to edge and up to y=0 with the nav pill floating on top.
+ * The guarantee is the headline. The number is the hero graphic. The system
+ * is the scroll.
  *
  * The band is `tone="hero"` (app/styles/tone.css), which re-points the whole
  * tone contract rather than swapping a background. Nothing in this file names a
@@ -58,7 +57,7 @@ const EASE = [0.16, 1, 0.3, 1] as const;
 const ACCENT_TEXT = 'var(--accent)';
 const ACCENT_VIVID = 'var(--accent-vivid)';
 
-const PHRASES = ['Content Production.', 'Outreach Systems.', 'Backend Tasks.'];
+const PHRASES = ['in 90 days.', 'guaranteed.', 'or free.'];
 const PHRASE_MS = 3400;
 
 
@@ -314,8 +313,8 @@ function ScrollCue({ still, onDepart }: { still: boolean; onDepart: () => void }
           another route is the one thing it must not do. The primary CTA still
           goes to /steps#framework, which is the same drawing with all
           seventeen service nodes in it. */}
-      <a
-        href="#framework"
+         <a
+           href="#system"
         className="group -my-3 inline-flex items-center gap-3 py-3 text-[var(--muted)] transition-colors duration-300 hover:text-[var(--on-surface)]"
       >
         {/* The rest slot. The travelling dot animates INTO this box, so the
@@ -364,7 +363,7 @@ function ScrollCue({ still, onDepart }: { still: boolean; onDepart: () => void }
         </span>
 
         <span className="font-mono text-[10px] uppercase tracking-[0.22em]">
-          Scroll · the framework
+          Scroll · the system
         </span>
 
         <svg
@@ -445,13 +444,19 @@ export default function Hero() {
             className="font-display-xl mt-8 max-w-[16ch] text-[length:var(--text-hero)] text-[var(--on-surface)] md:max-w-[18ch]"
           >
             <Line delay={0.2} still={still}>
-              Helping founders with
+              100 qualified
             </Line>
             <Line delay={0.3} still={still}>
               <RotatingPhrase still={still} />
             </Line>
           </h1>
 
+          <motion.p
+            {...fade(0.45)}
+            className="mt-6 max-w-[48ch] font-body text-[15px] leading-[1.65] text-[var(--muted)]"
+          >
+            One acquisition engine. One point of contact. One guarantee.
+          </motion.p>
 
           {/* ── CTAs ──────────────────────────────────────────────────── */}
           <motion.div
@@ -462,14 +467,14 @@ export default function Hero() {
                 glow. Orange stays an accent — never the surface. */}
             <Magnetic disabled={still} className="block w-full sm:inline-block sm:w-auto">
               <a
-                href="/steps#framework"
+                href="/contact"
                 className="btn-premium group flex w-full cursor-pointer items-center justify-center gap-2.5 rounded-2xl px-7 py-4 text-[15px] font-medium text-paper-25 sm:inline-flex sm:w-auto"
                 style={{
                   background: 'linear-gradient(180deg,var(--color-graphite-800) 0%,var(--color-ink) 100%)',
                   border: '1px solid var(--color-seam)',
                 }}
               >
-                The Framework
+                Book a fit call
                 <svg
                   width="15"
                   height="15"
@@ -500,7 +505,7 @@ export default function Hero() {
                   border: '1px solid var(--rule-strong)',
                 }}
               >
-                See the whole process
+                See the system
                 <svg
                   width="15"
                   height="15"

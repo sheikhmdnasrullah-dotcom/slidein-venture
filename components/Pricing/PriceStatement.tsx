@@ -93,9 +93,9 @@ export default function PriceStatement() {
         {...rise(0.05, still)}
         className="font-display-xl max-w-[16ch] text-[clamp(2.2rem,5.4vw,4.1rem)] text-[var(--on-surface)]"
       >
-        We will handle your
+        We guarantee
         <br />
-        <span className="text-[var(--accent)]">content and outreach</span>
+        <span className="text-[var(--accent)]">100 qualified appointments</span>
       </motion.h1>
 
       {/* Hairline. Short and centred — the only divider in the band, and it
@@ -125,9 +125,9 @@ export default function PriceStatement() {
         />
 
         <p className="tnum flex items-baseline justify-center gap-3 leading-none text-[var(--on-surface)]">
-          {/* Bridges the sentence above into the figure, so the two read as
-              one claim ("...content and outreach for $3,999 / month")
-              instead of a statement over an unrelated number. */}
+           {/* Bridges the sentence above into the figure, so the two read as
+               one claim ("...100 qualified appointments for $9,999, flat fee")
+               instead of a statement over an unrelated number. */}
           <span className="translate-y-[-0.4em] text-[15px] font-semibold tracking-[0.02em] text-[var(--muted)]">
             For
           </span>
@@ -139,19 +139,19 @@ export default function PriceStatement() {
             >
               $
             </span>
-            3,999
+             9,999
           </span>
           {/* Lowercase, as it has always been. `font-label` would uppercase it
               to "/ MONTH", and a CSS text-transform is still a change to what
               the page says. */}
           <span className="translate-y-[-0.4em] text-[15px] font-semibold tracking-[0.02em] text-[var(--muted)]">
-            / month
+            / flat
           </span>
         </p>
         {/* The `$` is aria-hidden above and restored here, so assistive tech
             reads "For $3,999 / month" as one string instead of announcing a
             floating dollar sign ahead of the figure. */}
-        <span className="sr-only">For $3,999 / month</span>
+        <span className="sr-only">For $9,999, flat fee</span>
       </motion.div>
 
       {/* ── The way to book ──────────────────────────────────────────── */}

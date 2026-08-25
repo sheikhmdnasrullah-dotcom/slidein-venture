@@ -7,12 +7,10 @@ import { motion, AnimatePresence } from 'framer-motion';
 import LetsTalkButton from './LetsTalkButton';
 import { LogoMark } from '@/components/Brand/LogoMark';
 
-/* Four items and the CTA. /steps is deliberately NOT here — the route still
-   exists and still resolves, it just no longer takes a slot in the nav. */
+/* Three items and the CTA. Portfolio and Command Center removed; Command Center content moved into /process. */
 const navLinks = [
   { label: 'Home', href: '/' },
   { label: 'Process', href: '/process' },
-  { label: 'Portfolio', href: '/portfolio' },
   { label: 'Pricing', href: '/pricing' },
 ];
 
@@ -168,25 +166,25 @@ export default function Navbar() {
           animate={{ y: 0, opacity: 1, scale: scrolled ? 0.955 : 1 }}
           transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
         >
-          {/* THE STANDALONE HOME PILL IS GONE. It rendered a second "Home"
-              button immediately to the left of the Home in the link row, so
-              the desktop nav read Home · Home · Process · Portfolio · Pricing.
-              Two controls with the same label going to the same route is a
-              duplicate whichever one you call the anchor, and only one of them
-              could ever carry the active marker — which made the marker look
-              broken rather than the nav look wrong.
+{/* THE STANDALONE HOME PILL IS GONE. It rendered a second "Home"
+    button immediately to the left of the Home in the link row, so
+    the desktop nav read Home · Home · Process · Portfolio · Pricing.
+    Two controls with the same label going to the same route is a
+    duplicate whichever one you call the anchor, and only one of them
+    could ever carry the active marker — which made the marker look
+    broken rather than the nav look wrong.
 
-              Home now lives in the link row like every other destination, and
-              the bar is exactly the five controls it should be: Home, Process,
-              Portfolio, Pricing, Let's Talk.
+    Home now lives in the link row like every other destination, and
+    the bar is exactly the four controls it should be: Home, Process,
+    Pricing, Let's Talk.
 
-              NO BRAND CHIP ON THE DESKTOP HOME BUTTON. One was tried and taken
-              back out: at the 26px a nav pill allows, a two-line wordmark is a
-              smudge, and pairing a logo with the word "Home" reads as a sticker
-              on a button rather than as branding. The desktop bar stays five
-              plain text controls. The mark still appears in the MOBILE bar,
-              where the links collapse into the sheet and there is nothing else
-              identifying the site. */}
+    NO BRAND CHIP ON THE DESKTOP HOME BUTTON. One was tried and taken
+    back out: at the 26px a nav pill allows, a two-line wordmark is a
+    smudge, and pairing a logo with the word "Home" reads as a sticker
+    on a button rather than as branding. The desktop bar stays four
+    plain text controls. The mark still appears in the MOBILE bar,
+    where the links collapse into the sheet and there is nothing else
+    identifying the site. */}
           {/* ── Desktop Nav Links ───────────────────────────────────────
               TWO INDICATORS, NOT ONE. There used to be a single shared
               `layoutId` driving both hover and active, which meant hovering

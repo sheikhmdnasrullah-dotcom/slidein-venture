@@ -6,7 +6,7 @@ import RolesTable from '@/components/Pricing/RolesTable';
 
 export const metadata: Metadata = {
   title: 'Pricing · SlideIn Venture',
-  description: 'We will handle your content and outreach operation for $3,999/month.',
+  description: '100 qualified sales appointments in 90 days, or we keep working free until we hit it.',
 };
 
 /**

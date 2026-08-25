@@ -58,7 +58,7 @@ export default function Home() {
           invisible run-up rather than a join. The warmth survives; the edge
           does not. */}
       <Section
-        id="framework"
+        id="system"
         tone="base"
         pad="tall"
         bleed
@@ -82,7 +82,7 @@ export default function Home() {
             className="btn-premium group inline-flex items-center gap-2.5 rounded-[var(--radius-pill)] px-7 py-4 text-[15px] font-medium text-[var(--on-surface)] transition-[border-color] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] hover:border-[var(--accent-ring)]"
             style={{ background: 'var(--surface)', border: '1px solid var(--rule-strong)' }}
           >
-            See the whole process
+            See the system
             <svg
               width="15"
               height="15"

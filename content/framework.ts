@@ -136,7 +136,7 @@ export const FRAMEWORK_CROSS = [
 ];
 
 export const FRAMEWORK_OUTCOME = {
-  label: 'More clients, faster',
+  label: '100 qualified appointments',
 };
 
 /** `YOU` or `SLIDEIN`. One place, so the two variants cannot disagree. */
@@ -260,13 +260,13 @@ export const THREAD_MILESTONES_TOP: ThreadRow[] = [
     left: {
       id: 'content-production',
       kind: 'milestone',
-      label: 'Content Production',
+    label: 'Content Acquisition Engine',
       stat: { pre: 'Every week ·', figure: '72', post: 'hour turnaround' },
     },
     right: {
       id: 'researched-outreach',
       kind: 'milestone',
-      label: 'Researched Outreach',
+    label: 'Outbound Acquisition Engine',
       stat: { pre: 'Continuous · first sends day', figure: '17' },
     },
   },

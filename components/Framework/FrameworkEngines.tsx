@@ -680,7 +680,7 @@ export default function FrameworkEngines({ className }: { className?: string }) 
           transition={still ? { duration: 0 } : { duration: 0.8, ease: EASE }}
           className="font-display-md text-center text-[clamp(1.7rem,3.4vw,2.5rem)] leading-none text-[var(--on-surface)]"
         >
-          The Framework
+          The system
         </motion.p>
         <span className="mt-9 block">
           <Stub h={38} still={still} />
