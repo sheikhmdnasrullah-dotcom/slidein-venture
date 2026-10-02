@@ -1,86 +1,103 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import LetsTalkButton from './LetsTalkButton';
 import { LogoMark } from '@/components/Brand/LogoMark';
 
-/* Navigation destinations. Portfolio and Command Center removed; Command Center
-   content moved into /process. */
-const navLinks = [
+export interface ServiceOption {
+  title: string;
+  description: string;
+  href: string;
+  badge: string;
+  iconType: 'acquisition' | 'marketing' | 'transactional';
+}
+
+export const SERVICE_OPTIONS: ServiceOption[] = [
+  {
+    title: 'Client Acquisition System',
+    description: 'Autonomous multi-channel engine delivering qualified sales calls',
+    href: '/process',
+    badge: 'Core System',
+    iconType: 'acquisition',
+  },
+  {
+    title: 'Marketing Emails',
+    description: 'Targeted nurture sequences and high-converting campaign funnels',
+    href: '/contact?service=marketing-emails',
+    badge: 'Outbound',
+    iconType: 'marketing',
+  },
+  {
+    title: 'Transactional Emails',
+    description: 'High-deliverability onboarding, notifications, and event triggers',
+    href: '/contact?service=transactional-emails',
+    badge: 'Lifecycle',
+    iconType: 'transactional',
+  },
+];
+
+const mainNavLinks = [
   { label: 'Home', href: '/' },
+  { label: 'Services', href: '#services', isDropdown: true },
   { label: 'Process', href: '/process' },
   { label: 'Pricing', href: '/pricing' },
 ];
 
-const serviceLinks = [
-  { label: 'Client Acquisition System', href: '/process' },
-  { label: 'Marketing Emails', href: '/process' },
-  { label: 'Transactional Emails', href: '/process' },
-];
-
-/* ─── Where am I? ───────────────────────────────────────────────────────────
-   THE ROUTE IS THE TRUTH, NOT THE SCROLL POSITION.
-
-   This used to be scroll-only: it looked for elements with ids `steps`,
-   `process`, `portfolio` and `pricing` in the current document and picked the
-   one crossing y=150. Those are separate ROUTES, not sections — no page has
-   ever contained all four ids — so the loop found nothing, fell through to its
-   `'Home'` default, and the nav highlighted Home on every page of the site.
-
-   So: pathname decides, and an in-page scroll spy only refines the answer when
-   the current page actually contains a section matching another nav entry.
-   Longest-prefix match, so `/steps/anything` still resolves to Steps.
-
-   Returns '' — no active item — for a route that is not in the nav at all
-   (/contact, /solutions). Falling back to 'Home' there would light up Home on
-   a page that is not Home, which is the same lie the old scroll-only version
-   told on every page of the site. */
-function routeLabel(pathname: string): string {
-  if (pathname === '/') return 'Home';
-  const match = navLinks
-    .filter((l) => l.href !== '/' && (pathname === l.href || pathname.startsWith(`${l.href}/`)))
-    .sort((a, b) => b.href.length - a.href.length)[0];
-  return match ? match.label : '';
+function renderServiceIcon(type: ServiceOption['iconType']) {
+  if (type === 'acquisition') {
+    return (
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+        <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+        <circle cx="9" cy="7" r="4" />
+        <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+        <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+      </svg>
+    );
+  }
+  if (type === 'marketing') {
+    return (
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+        <rect width="20" height="16" x="2" y="4" rx="2" />
+        <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
+      </svg>
+    );
+  }
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M22 13V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v12c0 1.1.9 2 2 2h9" />
+      <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
+      <path d="m16 19 2 2 4-4" />
+    </svg>
+  );
 }
 
-// ─── Main Navbar ──────────────────────────────────────────────────────────────
+function routeLabel(pathname: string): string {
+  if (pathname === '/') return 'Home';
+  if (pathname.startsWith('/process')) return 'Process';
+  if (pathname.startsWith('/pricing')) return 'Pricing';
+  return '';
+}
+
 export default function Navbar() {
   const pathname = usePathname() || '/';
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [hoveredLink, setHoveredLink] = useState<string | null>(null);
   const [mobileServicesOpen, setMobileServicesOpen] = useState(false);
+  const [hoveredLink, setHoveredLink] = useState<string | null>(null);
+  const [servicesOpen, setServicesOpen] = useState(false);
+  const leaveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  /* THE SCROLL SPY IS A REFINEMENT OF THE ROUTE, NOT A SECOND SOURCE OF TRUTH.
-     It is stored WITH the path it was measured on, and the active item is
-     derived during render — so a route change settles the highlight
-     immediately, on the very first render of the new page, without an effect
-     that calls setState (which React 19 flags as a cascading render, and which
-     would show the previous page's item lit for one frame). */
   const base = routeLabel(pathname);
   const [spyHit, setSpyHit] = useState<{ path: string; label: string } | null>(null);
   const activeLink = spyHit && spyHit.path === pathname ? spyHit.label : base;
 
   useEffect(() => {
     const currentPath = pathname;
-
-    /* In-page sections that correspond to a nav entry, if this page has any.
-       Resolved once per route rather than on every scroll tick — a
-       getElementById per link per frame is the kind of thing that shows up as
-       jank on a page with a diagram animating in it.
-
-       Home is deliberately excluded here. It used to look for `id="top"`,
-       but /process, /pricing, /contact and /steps all wrap their ENTIRE page
-       in a `<div id="top">` (unrelated to this spy — a leftover from another
-       convention). That div's bounding rect spans nearly the whole page, so
-       it satisfied the match on any scroll position past 120px and the nav
-       snapped to "Home" on every other route. The route already resolves to
-       the right label via `routeLabel`, so Home never needed a spy entry. */
-    const spy = navLinks
-      .filter((l) => l.href !== '/')
+    const spy = mainNavLinks
+      .filter((l) => l.href !== '/' && !l.isDropdown)
       .map((l) => {
         const id = l.href.replace(/^\//, '');
         const el = document.getElementById(id);
@@ -95,8 +112,6 @@ export default function Navbar() {
         frame = 0;
         setScrolled(window.scrollY > 10);
 
-        /* Scrolled back to the very top of any page — the hero — is always
-           the page's own entry, whatever a section boundary says. */
         if (window.scrollY < 120) {
           setSpyHit(null);
           return;
@@ -122,33 +137,22 @@ export default function Navbar() {
     };
   }, [pathname]);
 
+  const handleServicesMouseEnter = () => {
+    if (leaveTimeoutRef.current) clearTimeout(leaveTimeoutRef.current);
+    setServicesOpen(true);
+    setHoveredLink('Services');
+  };
+
+  const handleServicesMouseLeave = () => {
+    if (leaveTimeoutRef.current) clearTimeout(leaveTimeoutRef.current);
+    leaveTimeoutRef.current = setTimeout(() => {
+      setServicesOpen(false);
+      setHoveredLink(null);
+    }, 160);
+  };
+
   return (
     <>
-      {/* NO SPACER. There used to be an `h-[88px]` div here, and because the
-          nav is fixed, that spacer was 88px of bare page-fill above whatever
-          the page's first band was — a white stripe sitting on top of the
-          hero's colour, with a hard horizontal join right under the nav pill.
-          The nav floats OVER the first band now; every page pads its own first
-          section to clear it (the pill's bottom edge is at 96px). */}
-
-      {/* ── Floating Pill Navbar ─────────────────────────────────────────── */}
-      {/* The nav is centred while the page content is left-aligned. Two
-          alignment logics on one screen only work if one of them is clearly
-          deliberate, so the nav commits to being a detached floating object:
-          more air under the top edge than a docked bar would ever have, which
-          stops it reading as a failed attempt to align with the headline. */}
-      {/* `inset-x-0` + `flex flex-col items-center` rather than the old
-          `left-1/2 -translate-x-1/2` — a `position: fixed` element that ALSO carries
-          its own `transform` is a known mobile Safari fault line: the fixed
-          box can detach from the viewport during momentum scroll and ride
-          away with the page instead of staying pinned, which reads exactly
-          like "the navbar disappears on scroll." Centring via flexbox keeps
-          this element transform-free; the pill's OWN entrance/scale
-          transform lives one level down on the motion.div child, where a
-          transform is safe because that child was never the fixed element.
-          `pointer-events: none` on this full-width strip stops the empty
-          space either side of the pill from swallowing taps meant for the
-          page under it; the pill opts back in below. */}
       <nav
         className="fixed inset-x-0 top-7 z-[1000] flex flex-col items-center px-4"
         style={{ pointerEvents: 'none' }}
@@ -163,9 +167,6 @@ export default function Navbar() {
             border: '1px solid var(--rule)',
             boxShadow: scrolled ? 'var(--shadow-float)' : 'var(--shadow-raised)',
             pointerEvents: 'auto',
-            /* Its own compositing layer — cheap insurance against the same
-               class of mobile browser fixed+blur repaint glitches, on the
-               one element that is safe to give a transform to. */
             transform: 'translateZ(0)',
             WebkitTransform: 'translateZ(0)',
             willChange: 'transform',
@@ -174,41 +175,137 @@ export default function Navbar() {
           animate={{ y: 0, opacity: 1, scale: scrolled ? 0.955 : 1 }}
           transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
         >
-{/* THE STANDALONE HOME PILL IS GONE. It rendered a second "Home"
-    button immediately to the left of the Home in the link row, so
-    the desktop nav read Home · Home · Process · Portfolio · Pricing.
-    Two controls with the same label going to the same route is a
-    duplicate whichever one you call the anchor, and only one of them
-    could ever carry the active marker — which made the marker look
-    broken rather than the nav look wrong.
-
-    Home now lives in the link row like every other destination, and
-    the bar is exactly the four controls it should be: Home, Process,
-    Pricing, Let's Talk.
-
-    NO BRAND CHIP ON THE DESKTOP HOME BUTTON. One was tried and taken
-    back out: at the 26px a nav pill allows, a two-line wordmark is a
-    smudge, and pairing a logo with the word "Home" reads as a sticker
-    on a button rather than as branding. The desktop bar stays four
-    plain text controls. The mark still appears in the MOBILE bar,
-    where the links collapse into the sheet and there is nothing else
-    identifying the site. */}
-          {/* ── Desktop Nav Links ───────────────────────────────────────
-              TWO INDICATORS, NOT ONE. There used to be a single shared
-              `layoutId` driving both hover and active, which meant hovering
-              any item STOLE the marker off the active one — the nav forgot
-              where you were for as long as your pointer was in it, then
-              sprang back when you left.
-
-              So the active state is its own persistent layer (a raised paper
-              chip with an orange underline and a lit dot) and hover is a
-              separate, much quieter wash that glides between items on its own
-              layoutId. They can occupy the same item without fighting, and
-              the active marker never leaves. */}
-          <div className="hidden lg:flex items-center gap-0.5 px-3" onMouseLeave={() => setHoveredLink(null)}>
-            {navLinks.map((link) => {
+          {/* ── Desktop Nav Links ─────────────────────────────────────── */}
+          <div className="hidden lg:flex items-center gap-0.5 px-3">
+            {mainNavLinks.map((link) => {
               const isActive = activeLink === link.label;
               const isHovered = hoveredLink === link.label;
+
+              if (link.isDropdown) {
+                return (
+                  <div
+                    key={link.label}
+                    className="relative"
+                    onMouseEnter={handleServicesMouseEnter}
+                    onMouseLeave={handleServicesMouseLeave}
+                  >
+                    <button
+                      type="button"
+                      onClick={() => setServicesOpen((prev) => !prev)}
+                      onMouseEnter={() => setHoveredLink(link.label)}
+                      className={`group relative inline-flex items-center gap-1.5 whitespace-nowrap rounded-full px-5 py-2.5 text-[16px] transition-colors duration-200 ${
+                        servicesOpen || isActive
+                          ? 'font-[600] text-[var(--on-surface)]'
+                          : 'font-[500] text-[var(--muted)] hover:text-[var(--on-surface)]'
+                      }`}
+                    >
+                      {/* Hover wash */}
+                      {isHovered && !servicesOpen && (
+                        <motion.span
+                          layoutId="nav-hover-wash"
+                          className="absolute inset-0 rounded-full bg-[var(--rule)]"
+                          style={{ opacity: 0.65 }}
+                          transition={{ type: 'spring', stiffness: 420, damping: 34 }}
+                        />
+                      )}
+
+                      {/* Active chip if open */}
+                      {servicesOpen && (
+                        <motion.span
+                          layoutId="nav-active-chip"
+                          className="absolute inset-0 rounded-full"
+                          style={{
+                            background: 'var(--surface)',
+                            border: '1px solid var(--rule)',
+                            boxShadow: 'var(--shadow-contact)',
+                          }}
+                          transition={{ type: 'spring', stiffness: 380, damping: 32 }}
+                        />
+                      )}
+
+                      <span className="relative z-10">{link.label}</span>
+
+                      <svg
+                        width="12"
+                        height="12"
+                        viewBox="0 0 12 12"
+                        fill="none"
+                        aria-hidden="true"
+                        className={`relative z-10 transition-transform duration-200 ${
+                          servicesOpen
+                            ? 'rotate-180 text-[var(--accent)]'
+                            : 'text-[var(--muted)] group-hover:text-[var(--on-surface)]'
+                        }`}
+                      >
+                        <path
+                          d="M2.5 4.5L6 8L9.5 4.5"
+                          stroke="currentColor"
+                          strokeWidth="1.6"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                      </svg>
+                    </button>
+
+                    {/* ── Services Dropdown Panel ───────────────────────────── */}
+                    <AnimatePresence>
+                      {servicesOpen && (
+                        <motion.div
+                          initial={{ opacity: 0, y: 10, scale: 0.96 }}
+                          animate={{ opacity: 1, y: 0, scale: 1 }}
+                          exit={{ opacity: 0, y: 8, scale: 0.96 }}
+                          transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
+                          className="absolute top-[calc(100%+12px)] left-1/2 -translate-x-1/2 w-[370px] p-2.5 rounded-[calc(var(--radius-md)*1.4)] before:absolute before:-top-4 before:left-0 before:right-0 before:h-4"
+                          style={{
+                            background: 'var(--surface-glass)',
+                            backdropFilter: 'blur(32px) saturate(1.5)',
+                            WebkitBackdropFilter: 'blur(32px) saturate(1.5)',
+                            border: '1px solid var(--rule)',
+                            boxShadow: 'var(--shadow-float), 0 24px 48px -12px rgba(0,0,0,0.18)',
+                            pointerEvents: 'auto',
+                          }}
+                        >
+                          <div className="px-3 py-2 border-b border-[var(--rule)] mb-1 flex items-center justify-between">
+                            <span className="text-[11px] font-mono uppercase tracking-wider text-[var(--muted)]">
+                              Core Deliverables
+                            </span>
+                            <span className="h-1.5 w-1.5 rounded-full bg-[var(--accent-vivid)] animate-pulse" />
+                          </div>
+
+                          <div className="flex flex-col gap-1">
+                            {SERVICE_OPTIONS.map((item) => (
+                              <Link
+                                key={item.title}
+                                href={item.href}
+                                onClick={() => setServicesOpen(false)}
+                                className="group relative flex items-start gap-3 rounded-[var(--radius-md)] p-2.5 transition-all duration-200 hover:bg-[var(--rule)]"
+                              >
+                                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[var(--radius-md)] bg-[var(--surface)] text-[var(--accent)] border border-[var(--rule)] transition-colors duration-200 group-hover:border-[var(--accent-ring)] group-hover:text-[var(--accent-vivid)]">
+                                  {renderServiceIcon(item.iconType)}
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                  <div className="flex items-center justify-between gap-2">
+                                    <span className="text-[14px] font-semibold text-[var(--on-surface)] group-hover:text-[var(--accent-vivid)] transition-colors">
+                                      {item.title}
+                                    </span>
+                                    <span className="text-[9px] font-mono uppercase tracking-wider px-1.5 py-0.5 rounded-full bg-[var(--surface)] text-[var(--muted)] border border-[var(--rule)]">
+                                      {item.badge}
+                                    </span>
+                                  </div>
+                                  <p className="mt-0.5 text-[12px] leading-snug text-[var(--muted)] line-clamp-2">
+                                    {item.description}
+                                  </p>
+                                </div>
+                              </Link>
+                            ))}
+                          </div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
+                );
+              }
+
               return (
                 <Link
                   key={link.label}
@@ -221,8 +318,6 @@ export default function Navbar() {
                       : 'font-[500] text-[var(--muted)] hover:text-[var(--on-surface)]'
                   }`}
                 >
-                  {/* Hover wash — under the active chip, so an active item you
-                      happen to be pointing at does not double up. */}
                   {isHovered && !isActive && (
                     <motion.span
                       layoutId="nav-hover-wash"
@@ -232,7 +327,6 @@ export default function Navbar() {
                     />
                   )}
 
-                  {/* Active chip — a real raised surface, not a colour change. */}
                   {isActive && (
                     <motion.span
                       layoutId="nav-active-chip"
@@ -248,9 +342,6 @@ export default function Navbar() {
 
                   <span className="relative">{link.label}</span>
 
-                  {/* The lit terminal. Same 42.28 orange the rest of the site
-                      uses for a live indicator, scaled in rather than faded so
-                      it reads as arriving. */}
                   {isActive && (
                     <motion.span
                       layoutId="nav-active-dot"
@@ -265,76 +356,14 @@ export default function Navbar() {
                 </Link>
               );
             })}
-
-            <div
-              className="relative"
-              onMouseEnter={() => setHoveredLink('Services')}
-              onFocus={() => setHoveredLink('Services')}
-            >
-              <button
-                type="button"
-                aria-expanded={hoveredLink === 'Services'}
-                aria-haspopup="true"
-                className="relative inline-flex items-center gap-2 whitespace-nowrap rounded-full px-5 py-2.5 text-[16px] font-[500] text-[var(--muted)] transition-colors duration-200 hover:text-[var(--on-surface)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]"
-              >
-                <span>Services</span>
-                <span
-                  aria-hidden
-                  className={`text-[12px] transition-transform duration-200 ${
-                    hoveredLink === 'Services' ? 'rotate-180' : ''
-                  }`}
-                >
-                  ↓
-                </span>
-              </button>
-
-              <AnimatePresence>
-                {hoveredLink === 'Services' && (
-                  <motion.div
-                    className="absolute left-1/2 top-full z-20 mt-2 w-[250px] -translate-x-1/2 overflow-hidden rounded-[var(--radius-md)] border border-[var(--rule)] p-1.5"
-                    style={{
-                      background: 'var(--surface-glass)',
-                      backdropFilter: 'blur(24px) saturate(1.4)',
-                      WebkitBackdropFilter: 'blur(24px) saturate(1.4)',
-                      boxShadow: 'var(--shadow-float)',
-                    }}
-                    initial={{ opacity: 0, y: -6, scale: 0.97 }}
-                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                    exit={{ opacity: 0, y: -6, scale: 0.97 }}
-                    transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
-                  >
-                    {serviceLinks.map((service) => (
-                      <Link
-                        key={service.label}
-                        href={service.href}
-                        className="group flex items-center justify-between rounded-[var(--radius-sm)] px-3.5 py-3 text-[14px] font-[500] text-[var(--muted)] transition-colors duration-200 hover:bg-[var(--rule)] hover:text-[var(--on-surface)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]"
-                      >
-                        {service.label}
-                        <span
-                          aria-hidden
-                          className="translate-x-[-4px] opacity-0 transition-all duration-200 group-hover:translate-x-0 group-hover:opacity-100"
-                        >
-                          →
-                        </span>
-                      </Link>
-                    ))}
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
           </div>
 
-          {/* ── CTA Button (right side) ───────────────────────────────── */}
+          {/* ── CTA Button ────────────────────────────────────────────── */}
           <div className="hidden lg:block">
             <LetsTalkButton />
           </div>
 
-          {/* ── Mobile Hamburger ─────────────────────────────────────── */}
-          {/* ── Mobile brand ──────────────────────────────────────────────
-              Below lg the four links collapse into the sheet, which left the
-              bar as a lone hamburger in a pill with nothing identifying it.
-              This is not a duplicate of the Home link the way a desktop
-              left-anchor would be — that link is not on screen at this width. */}
+          {/* ── Mobile brand & Hamburger ───────────────────────────────── */}
           <Link
             href="/"
             className="lg:hidden flex items-center pl-1 pr-2"
@@ -345,24 +374,25 @@ export default function Navbar() {
           </Link>
 
           <button
+            type="button"
             className="lg:hidden flex items-center justify-center w-[44px] h-[44px] rounded-full transition-colors duration-150"
             style={{ background: mobileOpen ? 'var(--rule)' : 'transparent' }}
             onClick={() => setMobileOpen(!mobileOpen)}
             aria-label="Toggle menu"
           >
             <div className="w-[18px] flex flex-col gap-[4px]">
-                <span
-                  className="block h-[2px] bg-[var(--on-surface)] rounded-full origin-center transition-transform duration-200"
-                  style={{ transform: mobileOpen ? 'translateY(6px) rotate(45deg)' : 'none' }}
-                />
-                <span
-                  className="block h-[2px] bg-[var(--on-surface)] rounded-full transition-opacity duration-200"
-                  style={{ opacity: mobileOpen ? 0 : 1 }}
-                />
-                <span
-                  className="block h-[2px] bg-[var(--on-surface)] rounded-full origin-center transition-transform duration-200"
-                  style={{ transform: mobileOpen ? 'translateY(-6px) rotate(-45deg)' : 'none' }}
-                />
+              <span
+                className="block h-[2px] bg-[var(--on-surface)] rounded-full origin-center transition-transform duration-200"
+                style={{ transform: mobileOpen ? 'translateY(6px) rotate(45deg)' : 'none' }}
+              />
+              <span
+                className="block h-[2px] bg-[var(--on-surface)] rounded-full transition-opacity duration-200"
+                style={{ opacity: mobileOpen ? 0 : 1 }}
+              />
+              <span
+                className="block h-[2px] bg-[var(--on-surface)] rounded-full origin-center transition-transform duration-200"
+                style={{ transform: mobileOpen ? 'translateY(-6px) rotate(-45deg)' : 'none' }}
+              />
             </div>
           </button>
         </motion.div>
@@ -371,7 +401,7 @@ export default function Navbar() {
         <AnimatePresence>
           {mobileOpen && (
             <motion.div
-              className="lg:hidden mt-2 w-[min(92vw,320px)] overflow-hidden"
+              className="lg:hidden mt-2 w-[min(92vw,340px)] overflow-hidden"
               style={{
                 background: 'var(--surface-glass)',
                 backdropFilter: 'blur(24px) saturate(1.4)',
@@ -386,8 +416,67 @@ export default function Navbar() {
               exit={{ opacity: 0, height: 0, scale: 0.95 }}
               transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
             >
-              <div className="px-4 py-4 flex flex-col gap-0.5 max-h-[calc(100vh-120px)] overflow-y-auto">
-                {navLinks.map((link) => {
+              <div className="px-4 py-4 flex flex-col gap-1 max-h-[calc(100vh-120px)] overflow-y-auto">
+                {mainNavLinks.map((link) => {
+                  if (link.isDropdown) {
+                    return (
+                      <div key={link.label} className="flex flex-col">
+                        <button
+                          type="button"
+                          onClick={() => setMobileServicesOpen((prev) => !prev)}
+                          className="flex items-center justify-between rounded-[var(--radius-md)] px-4 py-3 text-[15px] font-[500] text-[var(--muted)] hover:bg-[var(--rule)] hover:text-[var(--on-surface)] transition-colors"
+                        >
+                          <span>{link.label}</span>
+                          <svg
+                            width="14"
+                            height="14"
+                            viewBox="0 0 12 12"
+                            fill="none"
+                            className={`transition-transform duration-200 ${
+                              mobileServicesOpen ? 'rotate-180 text-[var(--accent)]' : 'text-[var(--muted)]'
+                            }`}
+                          >
+                            <path
+                              d="M2.5 4.5L6 8L9.5 4.5"
+                              stroke="currentColor"
+                              strokeWidth="1.6"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            />
+                          </svg>
+                        </button>
+
+                        <AnimatePresence>
+                          {mobileServicesOpen && (
+                            <motion.div
+                              initial={{ opacity: 0, height: 0 }}
+                              animate={{ opacity: 1, height: 'auto' }}
+                              exit={{ opacity: 0, height: 0 }}
+                              className="pl-3 pr-1 py-1 flex flex-col gap-1 overflow-hidden"
+                            >
+                              {SERVICE_OPTIONS.map((sub) => (
+                                <Link
+                                  key={sub.title}
+                                  href={sub.href}
+                                  onClick={() => {
+                                    setMobileOpen(false);
+                                    setMobileServicesOpen(false);
+                                  }}
+                                  className="flex items-center gap-2.5 rounded-[var(--radius-md)] p-2 text-[14px] text-[var(--on-surface)] hover:bg-[var(--rule)] transition-colors"
+                                >
+                                  <div className="flex h-7 w-7 items-center justify-center rounded-md bg-[var(--surface)] text-[var(--accent)] border border-[var(--rule)] shrink-0">
+                                    {renderServiceIcon(sub.iconType)}
+                                  </div>
+                                  <span className="font-medium text-[13px]">{sub.title}</span>
+                                </Link>
+                              ))}
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
+                      </div>
+                    );
+                  }
+
                   const isActive = activeLink === link.label;
                   return (
                     <Link
@@ -421,53 +510,6 @@ export default function Navbar() {
                     </Link>
                   );
                 })}
-
-                <div className="rounded-[var(--radius-md)]">
-                  <button
-                    type="button"
-                    aria-expanded={mobileServicesOpen}
-                    aria-controls="mobile-services-menu"
-                    className="flex w-full items-center justify-between rounded-[var(--radius-md)] px-4 py-3 text-[15px] font-[500] text-[var(--muted)] transition-colors hover:bg-[var(--rule)] hover:text-[var(--on-surface)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]"
-                    onClick={() => setMobileServicesOpen(!mobileServicesOpen)}
-                  >
-                    <span>Services</span>
-                    <span
-                      aria-hidden
-                      className={`text-[12px] transition-transform duration-200 ${
-                        mobileServicesOpen ? 'rotate-180' : ''
-                      }`}
-                    >
-                      ↓
-                    </span>
-                  </button>
-
-                  <AnimatePresence initial={false}>
-                    {mobileServicesOpen && (
-                      <motion.div
-                        id="mobile-services-menu"
-                        className="overflow-hidden pl-3"
-                        initial={{ height: 0, opacity: 0 }}
-                        animate={{ height: 'auto', opacity: 1 }}
-                        exit={{ height: 0, opacity: 0 }}
-                        transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
-                      >
-                        {serviceLinks.map((service) => (
-                          <Link
-                            key={service.label}
-                            href={service.href}
-                            className="block rounded-[var(--radius-sm)] px-4 py-2.5 text-[14px] text-[var(--muted)] transition-colors hover:bg-[var(--rule)] hover:text-[var(--on-surface)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]"
-                            onClick={() => {
-                              setMobileServicesOpen(false);
-                              setMobileOpen(false);
-                            }}
-                          >
-                            {service.label}
-                          </Link>
-                        ))}
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </div>
 
                 {/* Mobile CTA */}
                 <div className="pt-3 mt-2 pb-4 flex justify-center" style={{ borderTop: '1px solid var(--rule)' }}>
