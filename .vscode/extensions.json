@@ -1,5 +1,6 @@
 {
     "recommendations": [
-        "kimi-ext.kimi-copilot-provider"
+        "kimi-ext.kimi-copilot-provider",
+        "kilocode.kilo-code"
     ]
 }

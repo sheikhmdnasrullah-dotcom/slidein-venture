@@ -7,11 +7,18 @@ import { motion, AnimatePresence } from 'framer-motion';
 import LetsTalkButton from './LetsTalkButton';
 import { LogoMark } from '@/components/Brand/LogoMark';
 
-/* Three items and the CTA. Portfolio and Command Center removed; Command Center content moved into /process. */
+/* Navigation destinations. Portfolio and Command Center removed; Command Center
+   content moved into /process. */
 const navLinks = [
   { label: 'Home', href: '/' },
   { label: 'Process', href: '/process' },
   { label: 'Pricing', href: '/pricing' },
+];
+
+const serviceLinks = [
+  { label: 'Client Acquisition System', href: '/process' },
+  { label: 'Marketing Emails', href: '/process' },
+  { label: 'Transactional Emails', href: '/process' },
 ];
 
 /* ─── Where am I? ───────────────────────────────────────────────────────────
@@ -45,6 +52,7 @@ export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [hoveredLink, setHoveredLink] = useState<string | null>(null);
+  const [mobileServicesOpen, setMobileServicesOpen] = useState(false);
 
   /* THE SCROLL SPY IS A REFINEMENT OF THE ROUTE, NOT A SECOND SOURCE OF TRUTH.
      It is stored WITH the path it was measured on, and the active item is
@@ -257,6 +265,63 @@ export default function Navbar() {
                 </Link>
               );
             })}
+
+            <div
+              className="relative"
+              onMouseEnter={() => setHoveredLink('Services')}
+              onFocus={() => setHoveredLink('Services')}
+            >
+              <button
+                type="button"
+                aria-expanded={hoveredLink === 'Services'}
+                aria-haspopup="true"
+                className="relative inline-flex items-center gap-2 whitespace-nowrap rounded-full px-5 py-2.5 text-[16px] font-[500] text-[var(--muted)] transition-colors duration-200 hover:text-[var(--on-surface)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]"
+              >
+                <span>Services</span>
+                <span
+                  aria-hidden
+                  className={`text-[12px] transition-transform duration-200 ${
+                    hoveredLink === 'Services' ? 'rotate-180' : ''
+                  }`}
+                >
+                  ↓
+                </span>
+              </button>
+
+              <AnimatePresence>
+                {hoveredLink === 'Services' && (
+                  <motion.div
+                    className="absolute left-1/2 top-full z-20 mt-2 w-[250px] -translate-x-1/2 overflow-hidden rounded-[var(--radius-md)] border border-[var(--rule)] p-1.5"
+                    style={{
+                      background: 'var(--surface-glass)',
+                      backdropFilter: 'blur(24px) saturate(1.4)',
+                      WebkitBackdropFilter: 'blur(24px) saturate(1.4)',
+                      boxShadow: 'var(--shadow-float)',
+                    }}
+                    initial={{ opacity: 0, y: -6, scale: 0.97 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: -6, scale: 0.97 }}
+                    transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
+                  >
+                    {serviceLinks.map((service) => (
+                      <Link
+                        key={service.label}
+                        href={service.href}
+                        className="group flex items-center justify-between rounded-[var(--radius-sm)] px-3.5 py-3 text-[14px] font-[500] text-[var(--muted)] transition-colors duration-200 hover:bg-[var(--rule)] hover:text-[var(--on-surface)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]"
+                      >
+                        {service.label}
+                        <span
+                          aria-hidden
+                          className="translate-x-[-4px] opacity-0 transition-all duration-200 group-hover:translate-x-0 group-hover:opacity-100"
+                        >
+                          →
+                        </span>
+                      </Link>
+                    ))}
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
           </div>
 
           {/* ── CTA Button (right side) ───────────────────────────────── */}
@@ -356,6 +421,53 @@ export default function Navbar() {
                     </Link>
                   );
                 })}
+
+                <div className="rounded-[var(--radius-md)]">
+                  <button
+                    type="button"
+                    aria-expanded={mobileServicesOpen}
+                    aria-controls="mobile-services-menu"
+                    className="flex w-full items-center justify-between rounded-[var(--radius-md)] px-4 py-3 text-[15px] font-[500] text-[var(--muted)] transition-colors hover:bg-[var(--rule)] hover:text-[var(--on-surface)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]"
+                    onClick={() => setMobileServicesOpen(!mobileServicesOpen)}
+                  >
+                    <span>Services</span>
+                    <span
+                      aria-hidden
+                      className={`text-[12px] transition-transform duration-200 ${
+                        mobileServicesOpen ? 'rotate-180' : ''
+                      }`}
+                    >
+                      ↓
+                    </span>
+                  </button>
+
+                  <AnimatePresence initial={false}>
+                    {mobileServicesOpen && (
+                      <motion.div
+                        id="mobile-services-menu"
+                        className="overflow-hidden pl-3"
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: 'auto', opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
+                      >
+                        {serviceLinks.map((service) => (
+                          <Link
+                            key={service.label}
+                            href={service.href}
+                            className="block rounded-[var(--radius-sm)] px-4 py-2.5 text-[14px] text-[var(--muted)] transition-colors hover:bg-[var(--rule)] hover:text-[var(--on-surface)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]"
+                            onClick={() => {
+                              setMobileServicesOpen(false);
+                              setMobileOpen(false);
+                            }}
+                          >
+                            {service.label}
+                          </Link>
+                        ))}
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
 
                 {/* Mobile CTA */}
                 <div className="pt-3 mt-2 pb-4 flex justify-center" style={{ borderTop: '1px solid var(--rule)' }}>
