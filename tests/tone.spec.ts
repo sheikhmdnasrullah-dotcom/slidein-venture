@@ -19,7 +19,9 @@ import { test, expect } from '@playwright/test';
  * fact a broken test.
  */
 
-const ROUTES = ['/', '/solutions', '/pricing', '/steps'];
+/* Routes that exist in app/. /solutions and /steps were removed from the
+   router; the tests that named them were asserting contrast on a 404. */
+const ROUTES = ['/', '/pricing', '/process'];
 const THEMES = ['day', 'night'] as const;
 
 function srgbToLin(v: number) {

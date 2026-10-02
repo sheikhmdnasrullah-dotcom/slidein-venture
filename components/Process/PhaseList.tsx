@@ -51,7 +51,7 @@ export function PhaseList() {
                 <MonoLabel className="mr-1 text-[var(--muted)]">Published to</MonoLabel>
                 {phase.distribution.map((channel, j) => (
                   <span key={channel} className="flex items-center gap-3">
-                    {j > 0 && <span aria-hidden className="text-[var(--faint)]">·</span>}
+                    {j > 0 && <span aria-hidden className="text-[var(--muted)]">·</span>}
                     <span className="text-[14px] font-[500] text-[var(--on-surface)]">{channel}</span>
                   </span>
                 ))}

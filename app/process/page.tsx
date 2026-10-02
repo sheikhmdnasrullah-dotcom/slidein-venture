@@ -91,7 +91,7 @@ export default function ProcessPage() {
               {HERO.meta.map((item, i) => (
                 <span key={item} className="flex items-center gap-3">
                   {i > 0 && (
-                    <span aria-hidden className="text-[var(--on-surface)]/45">
+                    <span aria-hidden className="text-[var(--muted)]">
                       ·
                     </span>
                   )}
@@ -280,7 +280,7 @@ export default function ProcessPage() {
               {CLOSING.meta.map((item, i) => (
                 <span key={item} className="flex items-center gap-3">
                   {i > 0 && (
-                    <span aria-hidden className="text-[var(--faint)]">
+                    <span aria-hidden className="text-[var(--muted)]">
                       ·
                     </span>
                   )}
