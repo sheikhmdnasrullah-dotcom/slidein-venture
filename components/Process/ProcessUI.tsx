@@ -95,11 +95,25 @@ function isRich(point: string | RichPoint): point is RichPoint {
   return typeof point !== 'string';
 }
 
-export function PointList({ items, className }: { items: (string | RichPoint)[]; className?: string }) {
+export function PointList({
+  items,
+  className,
+  dense,
+}: {
+  items: (string | RichPoint)[];
+  className?: string;
+  dense?: boolean;
+}) {
   return (
-    <ul className={cn('mt-4 flex flex-col gap-2.5', className)}>
+    <ul className={cn('mt-4 flex flex-col gap-2.5', dense && 'gap-2', className)}>
       {items.map((item, i) => (
-        <li key={i} className="flex items-start gap-3 text-[15px] leading-[1.62] text-[var(--muted)]">
+        <li
+          key={i}
+          className={cn(
+            'flex items-start gap-3 text-[15px] leading-[1.62] text-[var(--muted)]',
+            dense && 'gap-2.5 text-[14px] leading-[1.5]'
+          )}
+        >
           <Dot />
           <span>
             {isRich(item) && item.lead && (
@@ -113,16 +127,34 @@ export function PointList({ items, className }: { items: (string | RichPoint)[];
   );
 }
 
-export function NumberedList({ items, className }: { items: { num: string; text: string }[]; className?: string }) {
+export function NumberedList({
+  items,
+  className,
+  dense,
+}: {
+  items: { num: string; text: string }[];
+  className?: string;
+  dense?: boolean;
+}) {
   return (
-    <ol className={cn('mt-4 flex flex-col', className)}>
+    <ol className={cn('mt-4 flex flex-col', dense && 'gap-0', className)}>
       {items.map((item) => (
         <li
           key={item.num}
-          className="flex items-baseline gap-4 border-b border-[var(--rule)] py-2.5 last:border-b-0"
+          className={cn(
+            'flex items-baseline gap-4 border-b border-[var(--rule)] py-2.5 last:border-b-0',
+            dense && 'gap-3 py-1.5'
+          )}
         >
           <span className="font-label text-[var(--accent)]">{item.num}</span>
-          <span className="text-[15px] leading-[1.55] text-[var(--muted)]">{item.text}</span>
+          <span
+            className={cn(
+              'text-[15px] leading-[1.55] text-[var(--muted)]',
+              dense && 'text-[14px] leading-[1.45]'
+            )}
+          >
+            {item.text}
+          </span>
         </li>
       ))}
     </ol>
@@ -130,11 +162,25 @@ export function NumberedList({ items, className }: { items: { num: string; text:
 }
 
 /** Numbered prose: a step that reads as a sentence, not a table row. */
-export function StepList({ items, className }: { items: string[]; className?: string }) {
+export function StepList({
+  items,
+  className,
+  dense,
+}: {
+  items: string[];
+  className?: string;
+  dense?: boolean;
+}) {
   return (
-    <ol className={cn('mt-4 flex flex-col gap-3', className)}>
+    <ol className={cn('mt-4 flex flex-col gap-3', dense && 'gap-2', className)}>
       {items.map((item, i) => (
-        <li key={i} className="flex items-start gap-3 text-[15px] leading-[1.62] text-[var(--muted)]">
+        <li
+          key={i}
+          className={cn(
+            'flex items-start gap-3 text-[15px] leading-[1.62] text-[var(--muted)]',
+            dense && 'gap-2.5 text-[14px] leading-[1.5]'
+          )}
+        >
           <span className="font-label mt-[0.3em] text-[var(--accent)]">{`0${i + 1}`}</span>
           <span>{item}</span>
         </li>

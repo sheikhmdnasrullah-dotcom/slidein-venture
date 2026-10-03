@@ -42,7 +42,7 @@ import LetsTalkButton from '@/components/Navbar/LetsTalkButton';
      · every word arrives from content/process.ts. The deck only composes.
 
    The stage is a fixed 1280×720 box. Fitting it is a transform, not a reflow:
-   reflowing sixteen distinct layouts to every viewport is where a deck starts
+   reflowing fourteen distinct layouts to every viewport is where a deck starts
    to look assembled. Scaling keeps the composition constant and the type
    readable — the whole reason a deck is a fixed stage.
 --------------------------------------------------------------------------- */
@@ -50,7 +50,7 @@ import LetsTalkButton from '@/components/Navbar/LetsTalkButton';
 const STAGE_W = 1280;
 const STAGE_H = 720;
 const EASE = [0.16, 1, 0.3, 1] as const;
-const TOTAL = 16;
+const TOTAL = 14;
 
 /* The slide frame: the section rule up top, the counter and a hairline at the
    base. Same language as the page, so the deck never reads as a different thing. */
@@ -120,8 +120,18 @@ function SlideTitle({
 }
 
 /* One renderer for every CardSpec the deck needs, at the tighter spacing a
-   16:9 stage allows. Reads the same shapes as the page's SpecCard. */
-function DeckCard({ spec, className }: { spec: CardSpec; className?: string }) {
+   16:9 stage allows. Reads the same shapes as the page's SpecCard. `dense`
+   tightens the list spacing/line-height one step further — used by the phase
+   slides, where equal-height cards make one tall card raise all three. */
+function DeckCard({
+  spec,
+  className,
+  dense,
+}: {
+  spec: CardSpec;
+  className?: string;
+  dense?: boolean;
+}) {
   return (
     <ProcessCard label={spec.label} title={spec.title} className={cn('p-4', className)}>
       {spec.metric ? (
@@ -140,9 +150,13 @@ function DeckCard({ spec, className }: { spec: CardSpec; className?: string }) {
         </div>
       ) : null}
 
-      {spec.points ? <PointList items={spec.points} className="mt-3 gap-2" /> : null}
-      {spec.numbered ? <NumberedList items={spec.numbered} className="mt-3 gap-2" /> : null}
-      {spec.steps ? <StepList items={spec.steps} className="mt-3 gap-2" /> : null}
+      {spec.points ? (
+        <PointList items={spec.points} className="mt-3 gap-2" dense={dense} />
+      ) : null}
+      {spec.numbered ? (
+        <NumberedList items={spec.numbered} className="mt-3 gap-2" dense={dense} />
+      ) : null}
+      {spec.steps ? <StepList items={spec.steps} className="mt-3 gap-2" dense={dense} /> : null}
       {spec.tagLines ? <TagLines items={spec.tagLines} className="mt-3 gap-2" /> : null}
       {spec.tags ? <TagRow items={spec.tags} className="mt-3 gap-1.5" /> : null}
       {spec.note ? (
@@ -196,16 +210,16 @@ function DeckFunnel() {
                 : 'grid grid-cols-[5.5rem_9rem_1fr] overflow-hidden rounded-[var(--radius-md)] border border-[var(--rule)] bg-[var(--surface)]'
             }
           >
-            <div className="flex items-center gap-2 border-r border-[var(--rule)] px-3.5 py-2.5">
+            <div className="flex items-center gap-2 border-r border-[var(--rule)] px-3.5 py-2">
               {row.goal ? (
                 <span aria-hidden className="h-[7px] w-[7px] shrink-0 bg-[var(--accent-vivid)]" />
               ) : null}
               <span className="font-label text-[var(--accent)]">{row.stage}</span>
             </div>
-            <div className="border-r border-[var(--rule)] px-3.5 py-2.5">
+            <div className="border-r border-[var(--rule)] px-3.5 py-2">
               <span className="font-label text-[var(--muted)]">{row.name}</span>
             </div>
-            <div className="px-3.5 py-2.5">
+            <div className="px-3.5 py-2">
               <p className="text-[12.5px] leading-[1.5] text-[var(--on-surface)]">
                 <span className="font-[600] text-[var(--muted)]">{row.phase}</span>
                 {' — '}
@@ -214,7 +228,7 @@ function DeckFunnel() {
             </div>
           </div>
           {i < FUNNEL.rows.length - 1 ? (
-            <div aria-hidden className="flex justify-center py-1">
+            <div aria-hidden className="flex justify-center py-0.5">
               <span className="h-[7px] w-[7px] rotate-45 border-r border-b border-[var(--accent-ring)]" />
             </div>
           ) : null}
@@ -229,7 +243,7 @@ function DeckFunnel() {
 function DeckTable() {
   return (
     <div className="overflow-hidden rounded-[var(--radius-md)] border border-[var(--rule)] bg-[var(--surface)]">
-      <div className="grid grid-cols-[4.5rem_12rem_1fr] border-b border-[var(--rule)] bg-[var(--surface-2)]">
+      <div className="grid grid-cols-[5.5rem_12rem_1fr] border-b border-[var(--rule)] bg-[var(--surface-2)]">
         {TIMELINE.table.head.map((head) => (
           <span key={head} className="font-label border-r border-[var(--rule)] px-3.5 py-2.5 text-[var(--muted)] last:border-r-0">
             {head}
@@ -237,7 +251,7 @@ function DeckTable() {
         ))}
       </div>
       {TIMELINE.table.rows.map((row, i) => (
-        <div key={i} className="grid grid-cols-[4.5rem_12rem_1fr] border-b border-[var(--rule)] last:border-b-0">
+        <div key={i} className="grid grid-cols-[5.5rem_12rem_1fr] border-b border-[var(--rule)] last:border-b-0">
           <span className="border-r border-[var(--rule)] px-3.5 py-2.5 text-[12.5px] font-[600] text-[var(--accent)]">
             {row[0] as string}
           </span>
@@ -253,7 +267,7 @@ function DeckTable() {
   );
 }
 
-/* ── The sixteen slides ─────────────────────────────────────────────────────
+/* ── The fourteen slides ────────────────────────────────────────────────────
    Each slide is self-contained. All the data lives in content/process.ts;
    this section only arranges. */
 
@@ -282,7 +296,7 @@ function TitleSlide() {
       </div>
       <div className="mt-auto flex items-center justify-between pt-10">
         <MonoLabel className="text-[var(--muted)]">THE MORTGAGE GROWTH SYSTEM</MonoLabel>
-        <MonoLabel className="text-[var(--muted)]">MGS · 16 SLIDES</MonoLabel>
+        <MonoLabel className="text-[var(--muted)]">MGS · 14 SLIDES</MonoLabel>
       </div>
     </div>
   );
@@ -342,7 +356,7 @@ function PhaseSlide({ index }: { index: number }) {
       <SlideTitle title={phase.title} titleAccent={phase.titleAccent} lead={phase.lead} />
       <div className="mt-6 grid grid-cols-3 gap-4">
         {phase.cards.map((card, i) => (
-          <DeckCard key={card.label ?? i} spec={card} />
+          <DeckCard key={card.label ?? i} spec={card} dense />
         ))}
       </div>
       <Callout lead={phase.callout.lead} body={phase.callout.body} className="mt-5" />
@@ -352,7 +366,7 @@ function PhaseSlide({ index }: { index: number }) {
 
 function FunnelSlide() {
   return (
-    <DeckChrome index={FUNNEL.rule.index} label={FUNNEL.rule.label} coordinate={FUNNEL.rule.coordinate}>
+    <DeckChrome index="10" label={FUNNEL.rule.label} coordinate={FUNNEL.rule.coordinate}>
       <SlideTitle title={FUNNEL.title} titleAccent={FUNNEL.titleAccent} lead={FUNNEL.lead} />
       <div className="mt-5">
         <DeckFunnel />
@@ -364,7 +378,7 @@ function FunnelSlide() {
 
 function WorkSlide() {
   return (
-    <DeckChrome index={WORK.rule.index} label={WORK.rule.label} coordinate={WORK.rule.coordinate}>
+    <DeckChrome index="11" label={WORK.rule.label} coordinate={WORK.rule.coordinate}>
       <SlideTitle title={WORK.title} titleAccent={WORK.titleAccent} lead={WORK.lead} />
       <div className="mt-6 grid grid-cols-2 gap-4">
         <DeckCard spec={WORK.left} />
@@ -378,7 +392,7 @@ function WorkSlide() {
 function TimelineSlide() {
   return (
     <DeckChrome
-      index={TIMELINE.rule.index}
+      index="12"
       label={TIMELINE.rule.label}
       coordinate={TIMELINE.rule.coordinate}
     >
@@ -394,7 +408,7 @@ function TimelineSlide() {
 function NextStepsSlide() {
   return (
     <DeckChrome
-      index={NEXT_STEPS.rule.index}
+      index="13"
       label={NEXT_STEPS.rule.label}
       coordinate={NEXT_STEPS.rule.coordinate}
     >
