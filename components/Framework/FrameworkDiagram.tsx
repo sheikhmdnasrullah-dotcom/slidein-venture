@@ -93,10 +93,10 @@ const EASE = [0.16, 1, 0.3, 1] as const;
 const G = {
   gap: 56,
   rail: 22,
-  stem: 34,
-  fan: 52,
-  toBand: 44,
-  toOutcome: 48,
+  stem: 12,
+  fan: 20,
+  toBand: 16,
+  toOutcome: 16,
   /* The complete variant offsets the right column by half a card, so aligned
      rows stop implying that "Short Form Clips" and "Hand-Built Prospect Lists"
      have anything to do with each other. They are parallel tracks, not a table

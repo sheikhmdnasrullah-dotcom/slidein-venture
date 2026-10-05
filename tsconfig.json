@@ -25,10 +25,15 @@
     "paths": {
       "@/*": [
         "./*"
+      ],
+      "@videos/*": [
+        "./y/*"
       ]
     }
   },
   "include": [
+    "video.d.ts",
+    "video.d.ts",
     "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx",
@@ -37,7 +42,6 @@
     "**/*.mts"
   ],
   "exclude": [
-    "node_modules",
-    "workspace-app"
+    "node_modules"
   ]
 }

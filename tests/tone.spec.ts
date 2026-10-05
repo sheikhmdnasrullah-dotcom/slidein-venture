@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 
 /**
- * TONE ACCEPTANCE — macro contrast, in both themes
+ * TONE ACCEPTANCE — macro contrast
  *
  * Three things this asserts that a screenshot cannot:
  *
@@ -19,10 +19,7 @@ import { test, expect } from '@playwright/test';
  * fact a broken test.
  */
 
-/* Routes that exist in app/. /solutions and /steps were removed from the
-   router; the tests that named them were asserting contrast on a 404. */
-const ROUTES = ['/', '/pricing', '/process'];
-const THEMES = ['day', 'night'] as const;
+const ROUTES = ['/', '/pricing', '/process', '/portfolio', '/contact'];
 
 function srgbToLin(v: number) {
   const c = v / 255;
@@ -131,77 +128,68 @@ const COLLECT = () => {
   return { texts, bands, pure: pure.slice(0, 10) };
 };
 
-for (const theme of THEMES) {
-  for (const route of ROUTES) {
-    test(`${theme} ${route} — text clears AA and no pure black/white`, async ({ page }) => {
-      await page.setViewportSize({ width: 1440, height: 900 });
-      await page.addInitScript((t) => localStorage.setItem('siv-theme', t), theme);
-      await page.goto(`http://localhost:3000${route}`);
-      await page.evaluate(() => document.fonts.ready);
-      await page.waitForTimeout(900);
-
-      const { texts, pure } = await page.evaluate(COLLECT);
-
-      const bad = texts
-        .map((t) => ({ ...t, ratio: contrast(t.fg, t.bg) }))
-        // WCAG large-text threshold: >=24px, or >=18.66px when bold.
-        .filter((t) => t.ratio < (t.size >= 24 || (t.size >= 18.66 && t.weight >= 700) ? 3 : 4.5));
-
-      expect(
-        bad,
-        `\n${bad.map((b) => `  ${b.ratio.toFixed(2)}:1  ${b.size}px/${b.weight}  "${b.text}"`).join('\n')}\n`
-      ).toHaveLength(0);
-
-      expect(pure, `Rule 2 — pure #FFF/#000 found:\n${pure.join('\n')}`).toHaveLength(0);
-    });
-  }
-}
-
-for (const theme of THEMES) {
-  test(`${theme} / — the page has a value rhythm`, async ({ page }) => {
+for (const route of ROUTES) {
+  test(`${route} — text clears AA and no pure black/white`, async ({ page }) => {
     await page.setViewportSize({ width: 1440, height: 900 });
-    await page.addInitScript((t) => localStorage.setItem('siv-theme', t), theme);
-    await page.goto('http://localhost:3000/');
-    await page.waitForTimeout(800);
-
-    const { bands } = await page.evaluate(COLLECT);
-    expect(bands.length, 'page is built from Section bands').toBeGreaterThan(1);
-
-    const ls = bands.map((b) => oklabL(b.rgb)).sort((a, b) => a - b);
-    const spread = ls[ls.length - 1] - ls[0];
-
-    // 0.04 OKLab L is roughly the point at which two large fields stop reading
-    // as the same colour. Below it the page is one value from top to bottom,
-    // which is the exact failure Stage 3 exists to fix.
-    expect(
-      spread,
-      `band lightness ${ls.map((x) => x.toFixed(3)).join(' → ')}`
-    ).toBeGreaterThan(0.04);
-  });
-}
-
-/**
- * Modals never appear in a full-page screenshot, so they are exactly where a
- * theme rots first: open the deck's service panel or the hero's video overlay
- * in night mode and a stray `bg-white` is a full-screen flash.
- */
-for (const theme of THEMES) {
-  test(`${theme} — the hero video overlay is themed`, async ({ page }) => {
-    await page.setViewportSize({ width: 1440, height: 900 });
-    await page.addInitScript((t) => localStorage.setItem('siv-theme', t), theme);
-    await page.goto('http://localhost:3000/');
-    await page.waitForTimeout(700);
-    await page.getByRole('button', { name: /watch this/i }).click();
-    await page.waitForTimeout(700);
+    await page.goto(`http://localhost:3000${route}`);
+    await page.evaluate(() => document.fonts.ready);
+    await page.waitForTimeout(900);
 
     const { texts, pure } = await page.evaluate(COLLECT);
+
     const bad = texts
       .map((t) => ({ ...t, ratio: contrast(t.fg, t.bg) }))
+      // WCAG large-text threshold: >=24px, or >=18.66px when bold.
       .filter((t) => t.ratio < (t.size >= 24 || (t.size >= 18.66 && t.weight >= 700) ? 3 : 4.5));
+
     expect(
       bad,
-      `\n${bad.map((b) => `  ${b.ratio.toFixed(2)}:1  ${b.size}px  "${b.text}"`).join('\n')}\n`
+      `\n${bad.map((b) => `  ${b.ratio.toFixed(2)}:1  ${b.size}px/${b.weight}  "${b.text}"`).join('\n')}\n`
     ).toHaveLength(0);
-    expect(pure, `Rule 2 — pure #FFF/#000:\n${pure.join('\n')}`).toHaveLength(0);
+
+    expect(pure, `Rule 2 — pure #FFF/#000 found:\n${pure.join('\n')}`).toHaveLength(0);
   });
 }
+
+test('/ — the page has a value rhythm', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto('http://localhost:3000/');
+  await page.waitForTimeout(800);
+
+  const { bands } = await page.evaluate(COLLECT);
+  expect(bands.length, 'page is built from Section bands').toBeGreaterThan(1);
+
+  const ls = bands.map((b) => oklabL(b.rgb)).sort((a, b) => a - b);
+  const spread = ls[ls.length - 1] - ls[0];
+
+  // 0.04 OKLab L is roughly the point at which two large fields stop reading
+  // as the same colour. Below it the page is one value from top to bottom,
+  // which is the exact failure Stage 3 exists to fix.
+  expect(
+    spread,
+    `band lightness ${ls.map((x) => x.toFixed(3)).join(' → ')}`
+  ).toBeGreaterThan(0.04);
+});
+
+/**
+ * Modals never appear in a full-page screenshot, so this is exactly where
+ * tone rots first: open the hero's video overlay and a stray `bg-white`
+ * would be a full-screen flash.
+ */
+test('the hero video overlay is themed', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto('http://localhost:3000/');
+  await page.waitForTimeout(700);
+  await page.getByRole('button', { name: /watch this/i }).click();
+  await page.waitForTimeout(700);
+
+  const { texts, pure } = await page.evaluate(COLLECT);
+  const bad = texts
+    .map((t) => ({ ...t, ratio: contrast(t.fg, t.bg) }))
+    .filter((t) => t.ratio < (t.size >= 24 || (t.size >= 18.66 && t.weight >= 700) ? 3 : 4.5));
+  expect(
+    bad,
+    `\n${bad.map((b) => `  ${b.ratio.toFixed(2)}:1  ${b.size}px  "${b.text}"`).join('\n')}\n`
+  ).toHaveLength(0);
+  expect(pure, `Rule 2 — pure #FFF/#000:\n${pure.join('\n')}`).toHaveLength(0);
+});

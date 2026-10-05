@@ -1,5 +1,5 @@
 import { execSync } from "node:child_process";
-import { withNextVideo } from "next-video/process";
+
 import bundleAnalyzer from "@next/bundle-analyzer";
 import type { NextConfig } from "next";
 
@@ -38,4 +38,4 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default withBundleAnalyzer(withNextVideo(nextConfig, { folder: 'videos' }));
+export default withBundleAnalyzer(nextConfig);

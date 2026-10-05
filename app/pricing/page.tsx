@@ -5,8 +5,8 @@ import PriceStatement from '@/components/Pricing/PriceStatement';
 import RolesTable from '@/components/Pricing/RolesTable';
 
 export const metadata: Metadata = {
-  title: 'Pricing · SlideIn Venture',
-  description: '100 qualified sales appointments in 90 days, or we keep working free until we hit it.',
+  title: 'Pricing · Tanim',
+  description: 'I will handle your content and outreach operation for $1,999/month.',
 };
 
 /**

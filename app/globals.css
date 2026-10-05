@@ -168,23 +168,6 @@ body {
   position: relative;
 }
 
-/* Subtle grain overlay for the whole site */
-/* Removed for cleaner minimalist look */
-
-/* ─── Background Overlay ──────────────────────────────────────────────────── */
-/* (All decorative background overlays removed to eliminate visual artifacts) */
-
-/* Glass card effect - ultra premium */
-.glass-card {
-  background: var(--surface-glass);
-  backdrop-filter: blur(24px) saturate(1.4);
-  -webkit-backdrop-filter: blur(24px) saturate(1.4);
-  border: 1px solid var(--rule);
-  box-shadow: var(--shadow-contact), var(--shadow-inset-top);
-}
-
-/* (Beam sweep and glow border effects removed - no decorative overlays) */
-
 /* ─── Scrollbar ──────────────────────────────────────────────────────────── */
 ::-webkit-scrollbar { width: 6px; height: 6px; }
 ::-webkit-scrollbar-track { background: transparent; }
@@ -211,15 +194,6 @@ body {
 /* ─── Focus ──────────────────────────────────────────────────────────────── */
 /* focus ring is defined once in app/styles/tokens.css */
 
-/* ─── Logo scroll animation ──────────────────────────────────────────────── */
-@keyframes logoScroll {
-  0% { transform: translateX(0); }
-  100% { transform: translateX(-50%); }
-}
-
-.logo-scroll { animation: logoScroll 30s linear infinite; }
-.logo-scroll:hover { animation-play-state: paused; }
-
 /* ─── Pulse animation (hero badge dot) ───────────────────────────────────── */
 @keyframes pulse-dot {
   0%, 100% { opacity: 1; transform: scale(1); }
@@ -227,73 +201,6 @@ body {
 }
 
 .pulse-dot { animation: pulse-dot 2s ease-in-out infinite; }
-
-/* ─── Gradient text utility ──────────────────────────────────────────────── */
-.gradient-text {
-  background: linear-gradient(135deg, var(--on-surface) 0%, var(--accent) 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-.gradient-text-warm {
-  background: linear-gradient(135deg, var(--accent) 0%, var(--accent-vivid) 50%, var(--on-surface) 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-/* ─── Shimmer effect for placeholders ───────────────────────────────────── */
-@keyframes shimmer {
-  0% { background-position: -200% 0; }
-  100% { background-position: 200% 0; }
-}
-
-.shimmer {
-  background: linear-gradient(90deg, var(--surface-2) 25%, var(--rule) 50%, var(--surface-2) 75%);
-  background-size: 200% 100%;
-  animation: shimmer 2s infinite;
-}
-
-/* ─── Floating animation ─────────────────────────────────────────────────── */
-@keyframes float {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-6px); }
-}
-
-.float { animation: float 4s ease-in-out infinite; }
-
-@keyframes float-delayed {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-4px); }
-}
-
-.float-delayed { animation: float-delayed 5s ease-in-out 1s infinite; }
-
-/* ─── Fade in up ─────────────────────────────────────────────────────────── */
-@keyframes fade-in-up {
-  from { opacity: 0; transform: translateY(12px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-.fade-in-up { animation: fade-in-up 0.6s var(--ease-spring) forwards; }
-
-/* ─── Reveal line ────────────────────────────────────────────────────────── */
-@keyframes reveal-line {
-  from { transform: scaleX(0); }
-  to { transform: scaleX(1); }
-}
-
-.reveal-line {
-  animation: reveal-line 0.8s var(--ease-smooth) forwards;
-  transform-origin: left;
-}
-
-/* ─── Pitch deck autoplay progress segment ──────────────────────────────── */
-@keyframes deck-progress {
-  from { width: 0%; }
-  to { width: 100%; }
-}
 
 @theme inline {
   /* `--font-sans: var(--font-sans)` used to sit here. A custom property that

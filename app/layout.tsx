@@ -1,15 +1,14 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import Navbar from "@/components/Navbar/Navbar";
-import Footer from "@/components/Footer/Footer";
 
 
 import { displayFace, bodyFace, monoFace } from "./fonts";
 import { cn } from "@/lib/utils";
 
 export const metadata: Metadata = {
-  title: "SlideIn Venture",
-  description: "We build and operate an AI-powered appointment-generation system that turns targeted prospects into qualified sales appointments.",
+  title: "Tanim",
+  description: "Helping Creators with Content Production, Outreach, and Backend Tasks.",
 };
 
 /* One theme, so one colour. This is the paper the page is made of — it tells
@@ -59,6 +58,7 @@ export default function RootLayout({
       )}
     >
       <head>
+        <link rel="preload" href="/imagethumb.jpg" as="image" />
       </head>
       {/* Roles come from the CSS layer (body { font-family: var(--font-sans) }),
           not from a face className here — that is what keeps a single place
@@ -68,10 +68,10 @@ export default function RootLayout({
           the full height of the page is the texture equivalent of one value
           from top to bottom — it flattened every band it crossed. Ambient
           light now belongs to the section that is the light source. */}
-      <body className={cn("flex flex-col antialiased")}>
+      <body className="antialiased">
         <Navbar />
-        <main className="flex-1">{children}</main>
-        <Footer />
+        <main>{children}</main>
+
       </body>
     </html>
   );

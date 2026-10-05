@@ -1,38 +1,15 @@
-<svg viewBox="15 104.45 120 120" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="SlideIn Venture">
-  <title>SlideIn Venture</title>
-  <!--
-    TAB CHIP — the browser, search-result and OS icon.
-
-    THIS IS THE "S" FROM THE WORDMARK, NOT THE WORDMARK. The full lockup was
-    here first and it did not work: "SlideIn" over "VENTURE" is roughly 273
-    units wide by 112 tall, so inside a 16px favicon each letter lands at about
-    two device pixels and the whole thing renders as a plain orange square with
-    a faint smudge on it. That is what a browser tab and a Google result were
-    actually showing.
-
-    So the icon takes the one glyph from the supplied artwork that survives the
-    size: the S, at ~64% of the tile height. It is not a drawn monogram and it
-    is not invented — it is literally the first letterform of the logo file,
-    cropped and scaled up. The full wordmark still runs in app/apple-icon.png,
-    where 180px leaves room for it, and in the site UI.
-
-    GEOMETRY MATCHES components/Brand/LogoMark.tsx. A favicon must be a
-    standalone file with no React in it, so the path is duplicated here on
-    purpose; a redraw touches both.
-
-    #FF6200 is the site's brand orange exactly and #F6F4F0 is paper-50. The
-    source file ships #ff6e29 / #f7f5f2 — within a couple of percent, which is
-    why they are not used: a chip two percent off the brand reads as a printing
-    error beside the real thing. A favicon has no cascade to read a token from,
-    so these literals are correct here and a bug anywhere else.
-
-    The inset and rounded corner give the chip a silhouette against both light
-    and dark browser chrome. favicon.ico and apple-icon.png are generated FULL
-    BLEED from this file instead, because the OS applies its own mask and would
-    otherwise round an already-rounded corner twice.
-  -->
-  <rect x="18" y="107.45" width="114" height="114" rx="25" fill="#FF6200"/>
-  <g transform="translate(47.349641, 201.706511)">
-    <path fill="#F6F4F0" d="M 25 -33 C 18.53125 -33.726562 13.363281 -35.992188 9.5 -39.796875 C 5.632812 -43.597656 3.703125 -48.429688 3.703125 -54.296875 C 3.703125 -57.429688 4.347656 -60.316406 5.640625 -62.953125 C 6.941406 -65.585938 8.660156 -67.867188 10.796875 -69.796875 C 12.929688 -71.734375 15.28125 -73.21875 17.84375 -74.25 C 20.414062 -75.28125 23 -75.796875 25.59375 -75.796875 C 29.332031 -75.796875 32.898438 -75.046875 36.296875 -73.546875 C 39.703125 -72.046875 42.835938 -69.597656 45.703125 -66.203125 L 33.5 -57.296875 C 32.5 -58.367188 31.265625 -59.253906 29.796875 -59.953125 C 28.328125 -60.648438 26.925781 -61 25.59375 -61 C 23.53125 -61 21.863281 -60.414062 20.59375 -59.25 C 19.332031 -58.082031 18.703125 -56.46875 18.703125 -54.40625 C 18.703125 -52.738281 19.453125 -51.21875 20.953125 -49.84375 C 22.453125 -48.476562 25.164062 -47.664062 29.09375 -47.40625 C 33.363281 -47.132812 37.25 -46.03125 40.75 -44.09375 C 44.25 -42.164062 47.046875 -39.46875 49.140625 -36 C 51.242188 -32.53125 52.296875 -28.394531 52.296875 -23.59375 C 52.296875 -18.800781 51.113281 -14.519531 48.75 -10.75 C 46.382812 -6.976562 43.285156 -4.023438 39.453125 -1.890625 C 35.617188 0.234375 31.5 1.296875 27.09375 1.296875 C 22.832031 1.296875 18.632812 0.445312 14.5 -1.25 C 10.363281 -2.945312 6.53125 -5.726562 3 -9.59375 L 15.796875 -19 C 17.535156 -16.863281 19.300781 -15.425781 21.09375 -14.6875 C 22.894531 -13.957031 24.894531 -13.59375 27.09375 -13.59375 C 29.632812 -13.59375 31.785156 -14.476562 33.546875 -16.25 C 35.316406 -18.019531 36.203125 -20.101562 36.203125 -22.5 C 36.203125 -25.5 35.234375 -27.898438 33.296875 -29.703125 C 31.367188 -31.503906 28.601562 -32.601562 25 -33 Z M 25 -33 "/>
-  </g>
+<svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Tanim">
+  <title>Tanim</title>
+  <!-- Orange square background with rounded corners -->
+  <rect x="3" y="3" width="114" height="114" rx="25" fill="#FF6200"/>
+  <!-- Bold "T" centred on the tile -->
+  <text
+    x="60"
+    y="88"
+    font-family="Georgia, 'Times New Roman', serif"
+    font-size="78"
+    font-weight="700"
+    fill="#F6F4F0"
+    text-anchor="middle"
+  >T</text>
 </svg>

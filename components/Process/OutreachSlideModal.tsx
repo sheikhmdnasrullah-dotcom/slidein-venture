@@ -4,14 +4,14 @@ import { useEffect, useRef } from 'react';
 import { motion, useScroll, useTransform, AnimatePresence } from 'framer-motion';
 import { OUTREACH_PHASES, type OutreachPhase } from '@/content/steps';
 import { MonoLabel } from '@/components/System/System';
-import { OwnerTag } from '@/components/Steps/PipelineStep';
+import { OwnerTag } from '@/components/Process/PipelineStep';
 import {
   DisclosureProvider,
   DisclosureTrigger,
   DisclosureMark,
   Tier3,
   StepIndex,
-} from '@/components/Steps/Disclosure';
+} from '@/components/Process/Disclosure';
 import FitScale from './FitScale';
 
 const EASE = [0.16, 1, 0.3, 1] as const;

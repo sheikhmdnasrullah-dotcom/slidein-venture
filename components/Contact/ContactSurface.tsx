@@ -234,6 +234,8 @@ function Portrait({ still }: { still: boolean }) {
               src={PROFILE.image}
               alt={PROFILE.name}
               className="block aspect-[4/5] w-full object-cover"
+              loading="eager"
+              fetchPriority="high"
             />
 
             {/* Specular sheen that follows the pointer across the image. Very
@@ -464,9 +466,7 @@ export default function ContactSurface() {
               {PROFILE.name}
             </motion.h1>
 
-            <motion.p {...rise(0.38, still)} className="font-body mt-2 text-[16px] text-[var(--muted)]">
-              {PROFILE.role}
-            </motion.p>
+
           </div>
 
           {/* ── Right: how ─────────────────────────────────────────────── */}

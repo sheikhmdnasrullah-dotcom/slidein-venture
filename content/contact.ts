@@ -21,7 +21,6 @@
 
 export const PROFILE = {
   name: 'Nasrullah Tanim',
-  role: 'Founder, SlideIn Venture',
   image: '/profile.png',
 } as const;
 

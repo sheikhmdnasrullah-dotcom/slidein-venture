@@ -147,7 +147,7 @@ export default function PortfolioPage() {
             transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
           >
             <h1 className="section-headline text-[clamp(2.5rem,6vw,4.5rem)] text-[var(--on-surface)]">
-              Our work
+              My work
             </h1>
           </motion.div>
         </div>

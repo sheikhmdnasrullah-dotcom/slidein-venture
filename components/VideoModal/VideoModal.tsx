@@ -1,8 +1,12 @@
 'use client';
 
 import { motion, AnimatePresence } from 'framer-motion';
-import Video from 'next-video';
-import getStartedVideo from '../../videos/get-started.mp4';
+
+/* ─── Replace this URL with your real Vimeo embed URL ──────────────────────
+   Format: https://player.vimeo.com/video/YOUR_VIDEO_ID
+   Optional params: ?autoplay=1&loop=0&title=0&byline=0&portrait=0
+   ────────────────────────────────────────────────────────────────────────── */
+const VIDEO_EMBED_URL = 'https://player.vimeo.com/video/1218751456?badge=0&autopause=0&player_id=0&app_id=58479&autoplay=1';
 
 interface VideoModalProps {
   open: boolean;
@@ -50,11 +54,14 @@ export default function VideoModal({ open, onClose }: VideoModalProps) {
 
             {/* Video Player */}
             <div className="aspect-video w-full">
-              <Video
-                src={getStartedVideo}
+              <iframe
+                src={VIDEO_EMBED_URL}
                 className="w-full h-full"
-                controls
-                autoPlay
+                allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media; web-share"
+                referrerPolicy="strict-origin-when-cross-origin"
+                allowFullScreen
+                title="Watch this"
+                style={{ border: 'none' }}
               />
             </div>
           </motion.div>

@@ -26,11 +26,11 @@ import { Glyph, type IconKind } from '@/components/PitchDeck/AlternativeSlide';
 const EASE = [0.16, 1, 0.3, 1] as const;
 
 const ROLES: { label: string; icon: IconKind }[] = [
-  { label: 'Offer & ICP Engineering', icon: 'strategy' },
-  { label: 'Inbox Authority & Outreach', icon: 'send' },
-  { label: '90-Video Content Engine', icon: 'film' },
-  { label: 'Branded Conversion Funnel', icon: 'pen' },
-  { label: 'Agent Ops Dashboard', icon: 'share' },
+  { label: 'Content Strategist', icon: 'strategy' },
+  { label: 'Video Editor', icon: 'film' },
+  { label: 'Copywriter', icon: 'pen' },
+  { label: 'Social Manager', icon: 'share' },
+  { label: 'Lead Researcher & Outreach Specialist', icon: 'send' },
 ];
 
 /* Parent drives ONE scroll-intersection check; rows key off the same

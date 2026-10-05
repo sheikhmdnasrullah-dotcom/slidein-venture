@@ -34,13 +34,14 @@
  *    on scroll. There is no edge anywhere, so the band reads as light falling
  *    on the page rather than as a coloured section sitting on it.
  *
- *  · THE CONNECTORS ARE THE PROCESS PAGE'S CONNECTORS. Three layers per
- *    curve: a static rail, a scroll-triggered draw-on, and a bright pulse
- *    travelling it forever. Both diagrams on the site now speak the same
- *    language. The fork SVG scales UNIFORMLY (default preserveAspectRatio) —
- *    with `none` the geometry stretches on X while a dash pattern is still
- *    measured in device pixels, which shatters the pulse into fragments. Same
- *    trap Hero.tsx documents for its accent underline.
+ *  · THE CONNECTOR IS ONE CHEVRON, NOT A WIRE DIAGRAM. This used to be a
+ *    branching SVG fork — glow-halo dots, a travelling dash pulse running
+ *    forever, three animated layers per curve — between the headline and the
+ *    cards, and again between the cards and the outcome. It read as string
+ *    lights, not as a diagram, and its geometry alone ran a few hundred
+ *    pixels of pure connective tissue on every screen size. The two-column
+ *    grid already shows "one becomes two" without a drawing insisting on it.
+ *    FlowArrow is a single small chevron, fades in once on scroll, done.
  *
  *  · CARDS ARE PANELS. Frosted glass over a gloss gradient, a hairline ring,
  *    two-layer elevation, corner brackets, and a slow float that is offset
@@ -151,137 +152,40 @@ function RocketIcon({ size = 23 }: { size?: number }) {
   );
 }
 
-/** The single point at each end of the drawing — origin and merge. Kept from
-   FrameworkThread's own vocabulary. Now sits in a soft bloom, so the place
-   two branches meet is lit rather than merely marked. */
-function Terminal({ size = 10, still }: { size?: number; still: boolean }) {
+/** The connector between a headline and what follows it, and between the two
+   engine cards and the outcome plate. Replaces the old Terminal/Stub/Fork
+   system — a three-layer animated SVG (static rail, scroll-triggered draw-on,
+   plus a bright dash travelling the path forever) with a pulsing glow-halo
+   dot at each end. Individually explainable, collectively it read as string
+   lights rather than as a diagram: too much motion for too little meaning,
+   and the branching geometry cost real vertical space on every screen size.
+
+   A single small chevron says the same thing — flow continues down — in one
+   line's height. No infinite animation: the motion budget on this section
+   already goes to the cards themselves (float, hover lift, reveal stagger),
+   so a connector that never stops moving was competing with them rather than
+   pointing at them. It still fades in on scroll like everything else here,
+   once, and stays put. */
+function FlowArrow({ still }: { still: boolean }) {
   return (
-    <span className="relative flex items-center justify-center" style={{ height: size, width: size }}>
-      {/* Same glow family as the outcome button below — accent-vivid/color-brand
-         at a matched ~45% strength, just scaled down to the dot's own size —
-         so all three lit points on the drawing read as one light source. */}
-      <span
-        aria-hidden
-        className="pointer-events-none absolute rounded-full blur-lg"
-        style={{
-          height: size * 4.4,
-          width: size * 4.4,
-          background: 'color-mix(in oklch, var(--accent-vivid) 46%, transparent)',
-        }}
-      />
-      {!still && (
-        <motion.span
-          aria-hidden
-          className="absolute inline-flex h-full w-full rounded-full bg-[var(--accent-vivid)]"
-          animate={{ scale: [1, 2.6, 1], opacity: [0.45, 0, 0.45] }}
-          transition={{ duration: 2.8, repeat: Infinity, ease: EASE }}
+    <motion.span
+      aria-hidden
+      initial={{ opacity: 0 }}
+      whileInView={{ opacity: 1 }}
+      viewport={VIEWPORT}
+      transition={still ? { duration: 0 } : { duration: 0.5, ease: EASE }}
+      className="flex items-center justify-center py-3"
+    >
+      <svg width="16" height="9" viewBox="0 0 16 9" fill="none">
+        <path
+          d="M1.5 1.5 8 7.5l6.5-6"
+          stroke="var(--muted)"
+          strokeWidth="1.6"
+          strokeLinecap="round"
+          strokeLinejoin="round"
         />
-      )}
-      <span
-        aria-hidden
-        className="relative block rounded-full bg-[var(--accent-vivid)]"
-        style={{ height: size, width: size, boxShadow: '0 0 12px color-mix(in oklch, var(--accent-vivid) 60%, transparent)' }}
-      />
-    </span>
-  );
-}
-
-/** A short vertical stub — fixed-height connective tissue with a highlight
-   falling down it, so a straight run reads as flowing rather than as a rule. */
-function Stub({ h = 30, still }: { h?: number; still: boolean }) {
-  return (
-    <span aria-hidden className="relative block w-px overflow-hidden bg-[var(--accent-ring)]" style={{ height: h }}>
-      {!still && (
-        <motion.span
-          className="absolute inset-x-0 h-1/3 bg-[var(--accent-vivid)]"
-          initial={{ top: '-40%' }}
-          animate={{ top: ['-40%', '120%'] }}
-          transition={{ duration: 2.4, repeat: Infinity, ease: 'linear' }}
-        />
-      )}
-    </span>
-  );
-}
-
-/** Splits one line into two, landing on the true centre of each engine
-   card. Each half lives in its OWN grid cell, sharing the exact
-   `grid-cols-[1fr_1fr]` + gap the card row below uses — so the curve always
-   meets the card's actual centre, at any viewport width, instead of a fixed
-   25%/75% split that only lines up when the gap happens to be zero. The two
-   halves start from the inner edge of their own column (right against the
-   gap, directly under the Terminal dot sitting above it), so they still read
-   as one point branching into two rather than two unrelated lines.
-
-   Both halves use the same control-point fractions, so `merge` is a precise
-   vertical mirror of `split` rather than a separately tuned curve — the two
-   forks on the drawing now bend by the same amount. Three layers per curve:
-   a static rail, a draw-on that fires when the section enters the viewport,
-   and a bright dash travelling the path forever after. */
-const FORK_H = 130;
-
-/** One half of a Fork — a single curve inside its own `0 0 100 FORK_H`
-   viewBox, so it exactly spans one grid cell. A top-level component (not
-   nested inside Fork's body) so its identity is stable across renders and
-   its `whileInView` draw-on never gets remounted and re-armed. */
-function ForkHalf({ d, delay, still }: { d: string; delay: number; still: boolean }) {
-  return (
-    <svg aria-hidden viewBox={`0 0 100 ${FORK_H}`} className="w-full" style={{ aspectRatio: `100 / ${FORK_H}` }} fill="none">
-      <path d={d} stroke="var(--accent-ring)" strokeWidth={1.4} strokeLinecap="round" opacity={0.5} />
-      <motion.path
-        d={d}
-        stroke="var(--accent-ring)"
-        strokeWidth={1.6}
-        strokeLinecap="round"
-        initial={{ pathLength: 0 }}
-        whileInView={{ pathLength: 1 }}
-        viewport={VIEWPORT}
-        transition={still ? { duration: 0 } : { duration: 1.1, delay: 0.12 + delay, ease: EASE }}
-      />
-      {!still && (
-        <>
-          <motion.path
-            d={d}
-            stroke="var(--accent-vivid)"
-            strokeWidth={5}
-            strokeLinecap="round"
-            opacity={0.16}
-            strokeDasharray="4 46"
-            animate={{ strokeDashoffset: [0, -50] }}
-            transition={{ duration: 2.2, repeat: Infinity, ease: 'linear', delay }}
-          />
-          <motion.path
-            d={d}
-            stroke="var(--accent-vivid)"
-            strokeWidth={2}
-            strokeLinecap="round"
-            strokeDasharray="2.5 47.5"
-            animate={{ strokeDashoffset: [0, -50] }}
-            transition={{ duration: 2.2, repeat: Infinity, ease: 'linear', delay }}
-          />
-        </>
-      )}
-    </svg>
-  );
-}
-
-function Fork({ direction, still }: { direction: 'split' | 'merge'; still: boolean }) {
-  const CTRL_NEAR = 0.56; // fraction of FORK_H for the control point at the trunk end
-  const CTRL_FAR = 0.42; // fraction of FORK_H for the control point at the card end
-
-  const leftPath =
-    direction === 'split'
-      ? `M100,0 C100,${FORK_H * CTRL_NEAR} 50,${FORK_H * CTRL_FAR} 50,${FORK_H}`
-      : `M50,0 C50,${FORK_H * CTRL_NEAR} 100,${FORK_H * CTRL_FAR} 100,${FORK_H}`;
-  const rightPath =
-    direction === 'split'
-      ? `M0,0 C0,${FORK_H * CTRL_NEAR} 50,${FORK_H * CTRL_FAR} 50,${FORK_H}`
-      : `M50,0 C50,${FORK_H * CTRL_NEAR} 0,${FORK_H * CTRL_FAR} 0,${FORK_H}`;
-
-  return (
-    <div className="grid grid-cols-[1fr_1fr] gap-10 lg:gap-14">
-      <ForkHalf d={leftPath} delay={0} still={still} />
-      <ForkHalf d={rightPath} delay={0.55} still={still} />
-    </div>
+      </svg>
+    </motion.span>
   );
 }
 
@@ -526,9 +430,8 @@ function OutcomeCard({ still }: { still: boolean }) {
       whileTap={{ scale: 0.985 }}
       className="group/outcome relative mx-auto w-fit max-w-full"
     >
-      {/* Same 46% strength as the two Terminal dots, just spread wider to
-         suit the button's footprint — one light source at three sizes,
-         rather than three independently tuned glows. */}
+      {/* The one glow left on the drawing — the outcome plate's own floor
+         light, spread to suit its footprint. */}
       <span
         aria-hidden
         className="pointer-events-none absolute inset-x-4 -bottom-6 h-16 opacity-60 blur-2xl transition-opacity duration-700 group-hover/outcome:opacity-90"
@@ -680,18 +583,9 @@ export default function FrameworkEngines({ className }: { className?: string }) 
           transition={still ? { duration: 0 } : { duration: 0.8, ease: EASE }}
           className="font-display-md text-center text-[clamp(1.7rem,3.4vw,2.5rem)] leading-none text-[var(--on-surface)]"
         >
-          The system
+          The Framework
         </motion.p>
-        <span className="mt-9 block">
-          <Stub h={38} still={still} />
-        </span>
-        <Terminal still={still} />
-        <div className="hidden w-full md:block">
-          <Fork direction="split" still={still} />
-        </div>
-        <div className="md:hidden">
-          <Stub h={40} still={still} />
-        </div>
+        <FlowArrow still={still} />
       </div>
 
       {/* Two engines, one gutter. `items-stretch` (grid's default) matters
@@ -726,17 +620,10 @@ export default function FrameworkEngines({ className }: { className?: string }) 
 
       {/* Merge into the outcome */}
       <div className="flex flex-col items-center">
-        <div className="md:hidden">
-          <Stub h={40} still={still} />
+        <FlowArrow still={still} />
+        <div className="mt-3">
+          <OutcomeCard still={still} />
         </div>
-        <div className="hidden w-full md:block">
-          <Fork direction="merge" still={still} />
-        </div>
-        <Terminal still={still} />
-        <span className="mb-12 mt-2 block">
-          <Stub h={38} still={still} />
-        </span>
-        <OutcomeCard still={still} />
       </div>
     </div>
   );

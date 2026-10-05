@@ -1,79 +1,75 @@
 import Hero from "@/components/Hero/Hero";
 import Section from "@/components/Section";
-import { MonoLabel, CornerBrackets } from "@/components/System/System";
+import FrameworkEngines from "@/components/Framework/FrameworkEngines";
 
-const LAYERS = [
-  { num: "01", label: "Offer Engineering" },
-  { num: "02", label: "ICP & Prospect Research" },
-  { num: "03", label: "Outbound Acquisition Engine" },
-  { num: "04", label: "Conversion Landing Page" },
-  { num: "05", label: "AI Website Agent" },
-  { num: "06", label: "AI Phone Receptionist" },
-  { num: "07", label: "Content Acquisition Engine" },
-];
-
+/**
+ * HOME — the hero, then the shape of the business.
+ *
+ * The framework band is `tone="raised"` — paper-100, one step in from the
+ * page's own value, so it reads as a panel lifted off the page rather than as
+ * more page. It is NOT `tone="stage"`, and that is a contrast decision rather
+ * than a taste one: the stage tone re-points --accent to --color-brand, which
+ * measures 2.73:1 on paper and fails as text at any size, and this drawing sets
+ * type in --accent in four places (the two YOU tags and the two cross link
+ * statements). `raised` re-points it to signal-deeper, which clears AA.
+ *
+ * WHAT THIS BAND HAS RENDERED, AND WHY EACH ONE MOVED ON. First
+ * FrameworkDiagram's `shape` variant — rounded cards on right-angle
+ * connectors, the default output shape of every diagramming tool, which reads
+ * as one before a single label is read. Then FrameworkWeave, which braided two
+ * threads into one cord. Then FrameworkThread: one drawing at two densities,
+ * four milestones a side by default with fourteen detail nodes behind a
+ * toggle. The toggle was the problem — the thing a visitor could see without
+ * clicking was an outline, not the business.
+ *
+ * It now renders FrameworkEngines: both engines' full node lists, always
+ * visible, as two cards a reader just reads top to bottom. The cross-link
+ * (content builds trust / outreach expands reach) shown once, centred between
+ * them, instead of duplicated as an accent row at the foot of each strand.
+ *
+ * NONE OF THE EARLIER THREE IS DELETED. FrameworkDiagram's `variant="complete"`
+ * still draws all seventeen service nodes at the top of /steps (currently
+ * pulled from navigation, see that page's own header). FrameworkWeave and
+ * FrameworkThread are no longer mounted anywhere and are kept only so a
+ * decision here can be reversed by changing one import back. All four read
+ * content/framework.ts, so no two of them can describe different businesses.
+ *
+ * THE PAGE ENDS HERE. A second section used to follow — an "The Framework"
+ * heading over InputSlide, a standalone deck slide — but that repeated the
+ * headline a beat after FrameworkEngines' own origin line already said it,
+ * and added nothing past the outcome card. The origin line now reads "The
+ * Framework" directly and the page ends on FrameworkEngines' outcome card.
+ */
 export default function Home() {
   return (
     <>
       <Hero />
 
-      <Section tone="base" pad="tall" bleed>
-        <div className="mx-auto max-w-[1160px] px-6 md:px-10">
-          <div className="flex flex-col items-center">
-            <MonoLabel className="text-[var(--accent)]">The system</MonoLabel>
-            <h2 className="mt-4 font-display-md max-w-[20ch] text-center text-[clamp(1.75rem,3.4vw,2.5rem)] leading-[1.1] text-[var(--on-surface)]">
-              Seven layers. One acquisition engine.
-            </h2>
-          </div>
+      {/* NO SEAM, AND THAT IS THE FIX FOR THE "ORANGE BAND" COMPLAINT.
+          This band is `tone="base"` — the page's own value — so there is no
+          value change to mark, and a `seam` hairline across the full width was
+          drawing a horizontal line where nothing actually joins. That line,
+          plus FrameworkEngines' own decorative glow, was what made the section
+          read as a separate warm panel dropped onto a white page.
 
-          <div className="mt-14 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {LAYERS.map((layer) => (
-              <div
-                key={layer.num}
-                className="relative overflow-hidden rounded-[calc(var(--radius-md)*1.7)]"
-                style={{
-                  background: 'linear-gradient(180deg, var(--gloss), transparent 34%), var(--surface-glass)',
-                  border: '1px solid var(--rule)',
-                  boxShadow: 'var(--shadow-inset-top), var(--shadow-raised)',
-                  backdropFilter: 'blur(22px) saturate(1.25)',
-                  WebkitBackdropFilter: 'blur(22px) saturate(1.25)',
-                }}
-              >
-                <CornerBrackets size={10} className="left-3 top-3" />
-                <CornerBrackets size={10} className="right-3 top-3" />
-                <CornerBrackets size={10} className="bottom-3 left-3" />
-                <CornerBrackets size={10} className="bottom-3 right-3" />
-
-                <div className="relative px-5 py-7">
-                  <MonoLabel className="text-[var(--accent)]">{layer.num}</MonoLabel>
-                  <p className="mt-2 font-display-sm text-[clamp(1rem,1.6vw,1.2rem)] leading-tight text-[var(--on-surface)]">
-                    {layer.label}
-                  </p>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          <div className="mt-16 flex justify-center">
-            <a
-              href="/process"
-              className="btn-premium group inline-flex items-center gap-2.5 rounded-[var(--radius-pill)] px-7 py-4 text-[15px] font-medium text-[var(--on-surface)] transition-[border-color] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] hover:border-[var(--accent-ring)]"
-              style={{ background: 'var(--surface)', border: '1px solid var(--rule-strong)' }}
-            >
-              See the full breakdown
-              <svg
-                width="15"
-                height="15"
-                viewBox="0 0 15 15"
-                fill="none"
-                aria-hidden
-                className="text-[var(--accent)] transition-transform duration-500 ease-out group-hover:translate-x-1"
-              >
-                <path d="M3 7.5h9M8 3.5l4 4-4 4" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-            </a>
-          </div>
-        </div>
+          The glow is now a low-alpha wash masked to nothing at its edges (see
+          FrameworkEngines), the seam is gone, and `bleed` stays because its
+          gradient runs to --bleed-to, which on this tone IS the page fill — an
+          invisible run-up rather than a join. The warmth survives; the edge
+          does not. */}
+      <Section
+        id="framework"
+        tone="base"
+        pad="tall"
+        bleed
+        className="scroll-mt-[120px]"
+      >
+        {/* No "See the whole process" link here anymore. It sat quietly under
+            this outcome plate and read as an afterthought — the same label
+            now lives prominently right under the hero video (see Hero.tsx),
+            where a visitor who just watched the intro is actually primed to
+            want the next thing. One clear placement beats two weak ones. */}
+        <FrameworkEngines className="mt-4 md:mt-6" />
       </Section>
     </>
   );

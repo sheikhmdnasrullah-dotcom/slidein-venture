@@ -9,7 +9,6 @@ import { LogoWordmark } from '@/components/Brand/Logo';
  * links, 22 of which 404'd.
  */
 const LIVE_LINKS = [
-  { label: 'Home', href: '/' },
   { label: 'Process', href: '/process' },
   { label: 'Pricing', href: '/pricing' },
 ];
@@ -32,7 +31,8 @@ export default function Footer() {
             </Link>
 
             <p className="max-w-[34ch] text-[15px] leading-[1.7] text-[var(--muted)]">
-              We build and operate an AI-powered appointment-generation system that turns targeted prospects into qualified sales appointments.
+              Full-cycle video production and cold outreach — built, run, and
+              measured as one system.
             </p>
           </div>
 
