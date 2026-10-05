@@ -39,7 +39,7 @@ function TLogo({ size = 30 }: { size?: number }) {
 const navLinks = [
   { label: 'Home', href: '/' },
   { label: 'Process', href: '/process' },
-  { label: 'Portfolio', href: '/portfolio' },
+  { label: 'Insights', href: '/insights' },
   { label: 'Pricing', href: '/pricing' },
 ];
 

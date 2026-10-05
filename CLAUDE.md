@@ -19,7 +19,7 @@ Marketing/portfolio site for Tanim's video editing + cold email outreach busines
 ## Folder layout
 
 ```
-app/                  Next.js App Router routes (pages only: /, /contact, /portfolio, /pricing, /process)
+app/                  Next.js App Router routes (pages only: /, /contact, /insights, /pricing, /process)
   fonts/               Self-hosted Switzer font files + license
   styles/              tokens.css (design tokens), type.css, tone.css — imported by globals.css
 components/            All React components, grouped by feature/section
