@@ -1,6 +1,7 @@
 {
     "recommendations": [
         "kimi-ext.kimi-copilot-provider",
-        "kilocode.kilo-code"
+        "kilocode.kilo-code",
+        "sst-dev.opencode"
     ]
 }
