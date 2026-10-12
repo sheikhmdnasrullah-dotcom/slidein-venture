@@ -20,33 +20,24 @@ export interface InsightSection {
 }
 
 export interface InsightArticle {
-  day: string;
   date: string;
   formattedDate: string;
   topic: string;
   slug: string;
   articleUrl: string;
-  status: string;
-  wordCount: string;
-  readTime: string;
   title: string;
   excerpt: string;
   intro: string[];
   sections: InsightSection[];
-  footerNote: string;
 }
 
 export const ARTICLES: InsightArticle[] = [
   {
-    day: '01',
     date: '2026-10-13',
     formattedDate: 'October 13, 2026',
     topic: 'Building an AI-Powered Buyer Pipeline for Executive Mortgage Advisors',
     slug: 'ai-pipeline-emas',
     articleUrl: 'www.slideinventure.com/ai-pipeline-emas',
-    status: 'FINAL',
-    wordCount: '~1,580',
-    readTime: '7 min read',
     title: 'You Have 6 Referrals This Month. Last Month It Was 11. The Month Before That, 14.',
     excerpt:
       'Marcus has been a loan officer for nine years. He is a good closer with strong agent relationships and a clear sense of his rates. Last quarter was his best in two years. This quarter has been different.',
@@ -139,7 +130,6 @@ export const ARTICLES: InsightArticle[] = [
         ],
       },
     ],
-    footerNote: '*Full version published on www.slideinventure.com/ai-pipeline-emas*',
   },
 ];
 

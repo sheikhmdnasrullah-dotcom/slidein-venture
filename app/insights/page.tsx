@@ -61,16 +61,7 @@ export default function InsightsPage() {
 
                 {/* Article Header Meta */}
                 <div className="flex flex-wrap items-center justify-between gap-4 border-b border-[var(--rule)] pb-6 mb-8">
-                  <div className="flex flex-wrap items-center gap-3">
-                    <span className="rounded bg-[var(--accent-wash)] px-2.5 py-1 font-label text-[11px] text-[var(--accent)] font-semibold border border-[var(--accent-ring)]">
-                      DAY {article.day}
-                    </span>
-                    <MonoLabel>{article.formattedDate}</MonoLabel>
-                    <span className="h-3 w-px bg-[var(--rule-strong)]" aria-hidden />
-                    <MonoLabel>{article.wordCount} words</MonoLabel>
-                    <span className="h-3 w-px bg-[var(--rule-strong)]" aria-hidden />
-                    <MonoLabel>{article.readTime}</MonoLabel>
-                  </div>
+                  <MonoLabel>{article.formattedDate}</MonoLabel>
 
                   <MonoLabel className="text-[var(--accent)] font-medium">
                     {article.topic}
@@ -90,7 +81,7 @@ export default function InsightsPage() {
                 </p>
 
                 {/* Read Link */}
-                <div className="flex items-center justify-between pt-4">
+                <div className="flex items-center pt-4">
                   <Link
                     href={`/insights/${article.slug}`}
                     className="inline-flex items-center gap-2 text-sm font-medium text-[var(--on-surface)] transition-all group-hover:text-[var(--accent)]"
@@ -100,10 +91,6 @@ export default function InsightsPage() {
                       →
                     </span>
                   </Link>
-
-                  <MonoLabel className="text-xs text-[var(--muted)]">
-                    Canonical: /{article.slug}
-                  </MonoLabel>
                 </div>
               </article>
             ))}
