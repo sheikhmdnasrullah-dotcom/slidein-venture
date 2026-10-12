@@ -51,8 +51,12 @@ const EASE = [0.16, 1, 0.3, 1] as const;
 const ACCENT_TEXT = 'var(--accent)';
 const ACCENT_VIVID = 'var(--accent-vivid)';
 
-const PHRASES = ['Content Production.', 'Outreach Systems.', 'Backend Tasks.'];
-const PHRASE_MS = 3400;
+const PHRASES = [
+  'finds the right prospects.',
+  'captures leads and reaches out.',
+  'books more meetings for you.',
+];
+const PHRASE_DURATIONS = [2000, 2500, 2000];
 
 
 
@@ -61,14 +65,16 @@ function Line({
   children,
   delay = 0,
   still,
+  className = '',
 }: {
   children: ReactNode;
   delay?: number;
   still: boolean;
+  className?: string;
 }) {
   return (
     /* pb/-mb pair gives descenders room without letting the mask clip them */
-    <span className="block overflow-hidden pb-[0.14em] -mb-[0.14em]">
+    <span className={`block overflow-hidden pb-[0.18em] -mb-[0.18em] ${className}`}>
       <motion.span
         className="block"
         initial={{ y: '112%' }}
@@ -132,9 +138,10 @@ function RotatingPhrase({ still }: { still: boolean }) {
 
   useEffect(() => {
     if (still) return;
-    const t = setInterval(() => setI((n) => (n + 1) % PHRASES.length), PHRASE_MS);
-    return () => clearInterval(t);
-  }, [still]);
+    const duration = PHRASE_DURATIONS[i] || 2000;
+    const t = setTimeout(() => setI((n) => (n + 1) % PHRASES.length), duration);
+    return () => clearTimeout(t);
+  }, [i, still]);
 
   return (
     /* `wonk` dials Fraunces' WONK axis to 1 on this phrase and nowhere else on
@@ -177,9 +184,9 @@ function RotatingPhrase({ still }: { still: boolean }) {
               opacity: 0,
               y: '-38%',
               filter: 'blur(6px)',
-              transition: { duration: still ? 0 : 0.42, ease: EASE },
+              transition: { duration: still ? 0 : 0.32, ease: EASE },
             }}
-            transition={still ? { duration: 0 } : { duration: 0.72, ease: EASE }}
+            transition={still ? { duration: 0 } : { duration: 0.52, ease: EASE }}
           >
             {PHRASES[i]}
             {/* Remounts with the phrase, so the rule redraws to the new word's
@@ -390,15 +397,12 @@ export default function Hero() {
 
           {/* ── Headline ──────────────────────────────────────────────── */}
           <h1
-            /* Two registers in one headline: Fraunces at opsz 144 / WONK 0 for
-               the statement, the same face at WONK 1 in brand orange for the
-               rotating phrase. Size floor is --text-hero, measured at 390px. */
-            className="font-display-xl mx-auto mt-8 max-w-[20ch] text-[length:var(--text-hero)] text-[var(--on-surface)]"
+            className="font-display-xl mx-auto mt-8 max-w-[26ch] text-[length:var(--text-hero)] text-[var(--on-surface)] flex flex-col gap-2.5 sm:gap-4"
           >
             <Line delay={0.2} still={still}>
-              Helping founders with
+              An end-to-end agentic system that
             </Line>
-            <Line delay={0.3} still={still}>
+            <Line delay={0.32} still={still} className="pt-1">
               <RotatingPhrase still={still} />
             </Line>
           </h1>
