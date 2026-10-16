@@ -14,13 +14,13 @@
  */
 
 export const NAV_SLOTS = {
-  /* Up to three text links, then the dark CTA pill. Labels empty by design. */
+  /* Navigation links and dark CTA button */
   links: [
-    { label: '', href: '/process' },
-    { label: '', href: '/insights' },
-    { label: '', href: '/pricing' },
+    { label: 'Process', href: '/process' },
+    { label: 'Insights', href: '/insights' },
+    { label: 'Pricing', href: '/pricing' },
   ],
-  cta: { label: '', href: '/contact' },
+  cta: { label: 'Connect', href: '/contact' },
 } as const;
 
 export const HOME = {
