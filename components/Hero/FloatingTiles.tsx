@@ -19,15 +19,15 @@
  * plus the brand accent. No text, no numbers, no initials. All decorative:
  * aria-hidden throughout.
  *
- * Placement is percentages of the hero container:
- *   upper-left 7%/24% · left-mid 24%/56% · upper-right 8%/22% ·
- *   lower-right 20%/62% · left edge -2%/82% · right edge -3%/85%
- * Responsive: >1024 all six · 769–1024 three at 75% · ≤768 two small tiles
- * above the pill + two clipped by the screen edges near the preview.
+ * Placement: tiles live ONLY inside their grid gutter (see .hero-gutter),
+ * anchored in px from the gutter edges with the inner edge 52px clear of
+ * the text column. They may never cross into the text column. Edge tiles
+ * may clip at the viewport edge, but only from inside their gutter.
+ * Below 1100px the gutters (and all tiles) are hidden by CSS.
  *
  * Motion: a slow ±6px float over 7–9s per tile, each with its own phase,
- * inside one pointer-parallax group (≤8px, desktop pointers only). Reduced
- * motion renders everything static.
+ * inside a pointer-parallax group (≤8px, desktop pointers only) per gutter.
+ * Reduced motion renders everything static.
  */
 
 import { motion, useMotionValue, useReducedMotion, useSpring } from 'framer-motion';
@@ -142,6 +142,7 @@ function Tile({
   return (
     /* Float layer — the only thing that animates per tile. */
     <motion.div
+      data-testid="hero-tile"
       className={cn('absolute', className)}
       animate={still ? undefined : { y: [0, -6, 0] }}
       transition={{
@@ -186,13 +187,13 @@ function Tile({
   );
 }
 
-/* ─── The six objects, placed per the specification ─────────────────────── */
+/* ─── One parallax group per gutter ─────────────────────────────────────── */
 
-export default function FloatingTiles() {
+function ParallaxGroup({ children }: { children: ReactNode }) {
   const still = useReducedMotion();
 
-  /* One gentle pointer parallax for the whole group: at most 8px, desktop
-     pointers (fine) at the desktop layout only. A spring keeps it soft. */
+  /* One gentle pointer parallax for the group: at most 8px, desktop
+     pointers (fine) only. A spring keeps it soft. */
   const mx = useMotionValue(0);
   const my = useMotionValue(0);
   const sx = useSpring(mx, { stiffness: 60, damping: 20 });
@@ -214,66 +215,90 @@ export default function FloatingTiles() {
   return (
     <motion.div
       aria-hidden="true"
-      className="pointer-events-none absolute inset-0 z-[5]"
+      className="pointer-events-none absolute inset-0"
       style={still ? undefined : { x: sx, y: sy }}
     >
-      {/* 1 · Envelope — upper left */}
-      <Tile
-        size={140}
-        rotate={-8}
-        tilt
-        icon={<EnvelopeIcon />}
-        floatDuration={7.2}
-        floatDelay={0}
-        className="scaffold-tile-full left-[5%] top-[15.5%] scale-[0.46] md:left-[7%] md:top-[24%] md:scale-[0.75]"
-      />
-      {/* 2 · Dot matrix — left middle, overlapping a background line */}
-      <Tile
-        size={120}
-        rotate={6}
-        icon={<DotMatrixIcon />}
-        floatDuration={8.4}
-        floatDelay={1.1}
-        className="scaffold-tile-full scaffold-tile-edge hidden md:hidden left-[19%] top-[57%]"
-      />
-      {/* 3 · Check — upper right */}
-      <Tile
-        size={130}
-        rotate={-6}
-        icon={<CheckIcon />}
-        floatDuration={7.8}
-        floatDelay={0.6}
-        className="scaffold-tile-full right-[5%] top-[16.5%] scale-[0.49] md:right-[8%] md:top-[22%] md:scale-[0.75]"
-      />
-      {/* 4 · Paper plane — lower right, clear of the subhead at every width */}
-      <Tile
-        size={130}
-        rotate={10}
-        tilt
-        icon={<PaperPlaneIcon />}
-        floatDuration={8.8}
-        floatDelay={1.6}
-        className="scaffold-tile-full hidden md:block md:right-[6%] md:top-[82%] right-[16%] top-[62%] md:scale-[0.75]"
-      />
-      {/* 5 · Magnifier — clipped by the left edge near the preview */}
-      <Tile
-        size={120}
-        rotate={-10}
-        blur
-        icon={<MagnifierIcon />}
-        floatDuration={9}
-        floatDelay={0.3}
-        className="scaffold-tile-full scaffold-tile-edge -left-[9%] top-[82%] scale-[0.5] md:hidden md:-left-[2%] md:top-[82%]"
-      />
-      {/* 6 · Stack — clipped by the right edge near the preview */}
-      <Tile
-        size={110}
-        rotate={8}
-        icon={<StackIcon />}
-        floatDuration={7.5}
-        floatDelay={2}
-        className="scaffold-tile-full scaffold-tile-edge -right-[10%] top-[86%] scale-[0.45] md:hidden md:-right-[3%] md:top-[85%]"
-      />
+      {children}
     </motion.div>
+  );
+}
+
+/* ─── The six objects, anchored inside their gutters ───────────────────────
+   Inner edges stay 52px clear of the text column (see --hero-tile-clear).
+   Vertical positions are px from the gutter top/bottom, tuned against the
+   stack — never percentages of the band. */
+
+export function GutterTilesLeft() {
+  return (
+    <div className="hero-gutter" aria-hidden="true">
+      <ParallaxGroup>
+        {/* 1 · Envelope — upper left, beside the pill */}
+        <Tile
+          size={140}
+          rotate={-8}
+          tilt
+          icon={<EnvelopeIcon />}
+          floatDuration={7.2}
+          floatDelay={0}
+          className="right-[52px] top-[190px]"
+        />
+        {/* 2 · Dot matrix — left middle, beside the headline */}
+        <Tile
+          size={120}
+          rotate={6}
+          icon={<DotMatrixIcon />}
+          floatDuration={8.4}
+          floatDelay={1.1}
+          className="right-[56px] top-[470px]"
+        />
+        {/* 5 · Magnifier — clipped by the left viewport edge, low */}
+        <Tile
+          size={120}
+          rotate={-10}
+          blur
+          icon={<MagnifierIcon />}
+          floatDuration={9}
+          floatDelay={0.3}
+          className="bottom-[48px] left-[-36px]"
+        />
+      </ParallaxGroup>
+    </div>
+  );
+}
+
+export function GutterTilesRight() {
+  return (
+    <div className="hero-gutter" aria-hidden="true">
+      <ParallaxGroup>
+        {/* 3 · Check — upper right, beside the pill */}
+        <Tile
+          size={130}
+          rotate={-6}
+          icon={<CheckIcon />}
+          floatDuration={7.8}
+          floatDelay={0.6}
+          className="left-[52px] top-[180px]"
+        />
+        {/* 4 · Paper plane — lower right, beside the subhead */}
+        <Tile
+          size={130}
+          rotate={10}
+          tilt
+          icon={<PaperPlaneIcon />}
+          floatDuration={8.8}
+          floatDelay={1.6}
+          className="left-[52px] top-[600px]"
+        />
+        {/* 6 · Stack — clipped by the right viewport edge, low */}
+        <Tile
+          size={110}
+          rotate={8}
+          icon={<StackIcon />}
+          floatDuration={7.5}
+          floatDelay={2}
+          className="bottom-[40px] right-[-32px]"
+        />
+      </ParallaxGroup>
+    </div>
   );
 }

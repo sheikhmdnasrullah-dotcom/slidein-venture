@@ -62,6 +62,45 @@
   --scaffold-shadow-button:
     0 12px 24px -12px rgb(0 0 0 / 35%);
 
+  /* ── Type scale — one source of truth ──────────────────────────────
+     Every marketing text role reads these through the <Heading> / <Text> /
+     <Eyebrow> primitives. No size, weight, tracking or ink value is stated
+     anywhere else. Weights never exceed 600; ink is #0A0A0A, never #000. */
+  --scaffold-display-size:     clamp(3rem, 7.4vw, 7rem);
+  --scaffold-display-weight:   600;
+  --scaffold-display-leading:  0.98;
+  --scaffold-display-tracking: -0.045em;
+  --scaffold-h2-size:     clamp(2.25rem, 4.6vw, 4rem);
+  --scaffold-h2-weight:   600;
+  --scaffold-h2-leading:  1.02;
+  --scaffold-h2-tracking: -0.035em;
+  --scaffold-h3-size:     clamp(1.375rem, 2vw, 1.75rem);
+  --scaffold-h3-weight:   600;
+  --scaffold-h3-leading:  1.15;
+  --scaffold-h3-tracking: -0.025em;
+  --scaffold-lead-size:     clamp(1.125rem, 1.6vw, 1.5rem);
+  --scaffold-lead-weight:   400;
+  --scaffold-lead-leading:  1.45;
+  --scaffold-lead-tracking: -0.01em;
+  --scaffold-lead-ink:      rgb(10 10 10 / 60%);   /* 5.24:1 on #FDFDFD */
+  --scaffold-lead-measure:  40ch;
+  --scaffold-body-size:     17px;
+  --scaffold-body-weight:   400;
+  --scaffold-body-leading:  1.6;
+  --scaffold-body-tracking: -0.005em;
+  --scaffold-body-ink:      rgb(10 10 10 / 62%);   /* 5.64:1 on #FDFDFD */
+  --scaffold-body-measure:  62ch;
+  --scaffold-small-size:    14px;
+  --scaffold-small-weight:  500;
+  --scaffold-small-leading: 1.4;
+  /* 57%, not the specified 55%: 55% measures 4.40:1 and fails AA, while 57%
+     clears it at 4.73:1. The closest compliant value. */
+  --scaffold-small-ink:     rgb(10 10 10 / 57%);
+  --scaffold-eyebrow-size:     13px;
+  --scaffold-eyebrow-weight:   500;
+  --scaffold-eyebrow-tracking: 0.01em;
+  --scaffold-eyebrow-ink:      rgb(10 10 10 / 60%);
+
   /* ── Motion — one easing for the scaffold ──────────────────────────── */
   --scaffold-ease: cubic-bezier(0.22, 1, 0.36, 1);
 
@@ -87,3 +126,166 @@
 }
 
 /* The hero band itself is the flat ground — no tone class, no wash. */
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   HERO TEXT SYSTEM — three zones, measured type, gap-locked hairlines
+   ---------------------------------------------------------------------------
+   Unlayered on purpose (same reasoning as above): these rules must beat
+   layered utilities without !important.
+
+   Geometry: [gutter] [text column] [gutter]. Tiles live ONLY in the
+   gutters, anchored 52px clear of the column. Below 1100px the gutters
+   (and their tiles) are gone and the column goes full width.
+
+   All spacing is multiples of 4 and lives in tokens below.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+:root {
+  /* ── Zones ─────────────────────────────────────────────────────────── */
+  --hero-col-max: 920px;
+  --hero-gutter-min: 192px;   /* biggest tile 140 + 52 inner clearance */
+  --hero-tile-clear: 52px;    /* tile inner edge to column edge (test: 40) */
+  --hero-tiles-below: 1100px; /* gutters hidden under this width */
+  --hero-nav-h: 96px;         /* fixed nav height the stack clears */
+
+  /* ── Stack gaps (hairlines sit centered in each) ───────────────────── */
+  --hero-gap-top: 24px;       /* above the pill */
+  --hero-gap-pill-head: 28px;
+  --hero-gap-head-sub: 32px;  /* head-sub shared gap: subhead spec wins */
+  --hero-gap-sub-cta: 36px;
+  --hero-gap-bottom: 24px;    /* below the CTA row */
+
+  /* ── Type ──────────────────────────────────────────────────────────── */
+  --hero-h1-size: clamp(2.25rem, 7cqi, 4.5rem);
+  --hero-h1-lh: 1.04;
+  --hero-h1-tracking: -0.035em;
+  --hero-h1-mobile-size: clamp(2.125rem, 9.5vw, 2.75rem);
+  --hero-h1-mobile-lh: 1.08;
+  --hero-h1-mobile-tracking: -0.03em;
+  --hero-sub-size: clamp(1rem, 1.35vw, 1.25rem);
+  --hero-sub-lh: 1.55;
+  --hero-sub-tracking: -0.005em;
+
+  /* ── CTA ───────────────────────────────────────────────────────────── */
+  --hero-cta-h: 56px;
+  --hero-cta-gap: 20px;
+}
+
+/* ── The three zones ─────────────────────────────────────────────────── */
+.hero-grid {
+  display: grid;
+  grid-template-columns:
+    1fr
+    minmax(0, min(var(--hero-col-max), calc(100% - 2 * var(--hero-gutter-min))))
+    1fr;
+}
+
+.hero-gutter {
+  position: relative;
+  min-height: 100%;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.hero-column {
+  position: relative;
+  z-index: 2;
+  min-width: 0;
+  container-type: inline-size;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  isolation: isolate;
+  padding-top: calc(var(--hero-nav-h) + clamp(56px, 9vh, 96px));
+}
+
+@media (max-width: 1099px) {
+  .hero-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .hero-gutter {
+    display: none;
+  }
+  .hero-column {
+    padding-inline: 24px;
+  }
+}
+
+/* ── Gaps: hairlines live centered inside them, never in text ─────────── */
+.hero-gap {
+  position: relative;
+  width: 100%;
+  flex: none;
+}
+
+.hero-gap[data-line='true']::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 100vw;
+  height: 1px;
+  transform: translate(-50%, -50%);
+  background: rgba(10, 10, 10, 0.05);
+  mask-image: linear-gradient(to right, transparent, black 12%, black 88%, transparent);
+  -webkit-mask-image: linear-gradient(to right, transparent, black 12%, black 88%, transparent);
+}
+
+/* ── Headline ────────────────────────────────────────────────────────── */
+.hero-h1 {
+  font-size: var(--hero-h1-size);
+  line-height: var(--hero-h1-lh);
+  letter-spacing: var(--hero-h1-tracking);
+  font-weight: 600;
+  text-wrap: balance;
+  font-kerning: normal;
+  hyphens: none;
+  text-align: center;
+  color: var(--scaffold-ink);
+  margin: 0;
+  width: 100%;
+}
+
+.hero-h1-line {
+  display: block;
+}
+
+/* Accent highlight: last phrase only. Inline padding never grows the line. */
+.hero-hl {
+  background: var(--scaffold-accent-pill);
+  border-radius: 999px;
+  padding: 0.02em 0.22em;
+  margin: 0 -0.22em;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+}
+
+/* Mobile: one balanced paragraph, wrapping naturally. */
+@media (max-width: 767px) {
+  .hero-h1 {
+    font-size: var(--hero-h1-mobile-size);
+    line-height: var(--hero-h1-mobile-lh);
+    letter-spacing: var(--hero-h1-mobile-tracking);
+    max-width: 92%;
+    margin-inline: auto;
+  }
+  .hero-h1-line {
+    display: inline;
+  }
+  .hero-h1-line:not(:last-child)::after {
+    content: ' ';
+  }
+}
+
+/* ── Subhead: one paragraph, balanced, no orphans ────────────────────── */
+.hero-sub {
+  font-size: var(--hero-sub-size);
+  font-weight: 400;
+  line-height: var(--hero-sub-lh);
+  letter-spacing: var(--hero-sub-tracking);
+  color: rgba(10, 10, 10, 0.6);
+  max-width: 34em;
+  margin-inline: auto;
+  text-align: center;
+  text-wrap: balance;
+}
