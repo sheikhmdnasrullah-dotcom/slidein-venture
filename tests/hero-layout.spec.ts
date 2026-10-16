@@ -45,12 +45,6 @@ type WidthRow = {
 
 const rows: WidthRow[] = [];
 
-function edgeGap(a: Rect, b: Rect): number {
-  const dx = Math.max(0, Math.max(a.x - (b.x + b.w), b.x - (a.x + a.w)));
-  const dy = Math.max(0, Math.max(a.y - (b.y + b.h), b.y - (a.y + a.h)));
-  return Math.round(Math.hypot(dx, dy) * 10) / 10;
-}
-
 async function measure(page: import('@playwright/test').Page, width: number) {
   return page.evaluate((w) => {
     const rect = (el: Element | null): Rect | null => {
@@ -93,8 +87,13 @@ async function measure(page: import('@playwright/test').Page, width: number) {
     const texts = [rect(pill), h1Box, rect(sub), rect(cta), rect(sec), rect(hl)].filter(
       (r): r is Rect => !!r && r.w > 0 && r.h > 0,
     );
+    const gap = (a: Rect, b: Rect): number => {
+      const dx = Math.max(0, Math.max(a.x - (b.x + b.w), b.x - (a.x + a.w)));
+      const dy = Math.max(0, Math.max(a.y - (b.y + b.h), b.y - (a.y + a.h)));
+      return Math.round(Math.hypot(dx, dy) * 10) / 10;
+    };
     let minTileGap = Infinity;
-    for (const t of tiles) for (const x of texts) minTileGap = Math.min(minTileGap, edgeGap(t, x));
+    for (const t of tiles) for (const x of texts) minTileGap = Math.min(minTileGap, gap(t, x));
     if (tiles.length === 0) minTileGap = -1; // no tiles: vacuously clear
     const textBoxes = [rect(pill), h1Box, rect(sub), rect(cta), rect(sec)].filter(
       (r): r is Rect => !!r && r.w > 0 && r.h > 0,
