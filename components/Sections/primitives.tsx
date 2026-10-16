@@ -214,7 +214,7 @@ export function Scene({
     return () => io.disconnect();
   }, []);
 
-  const paused = offscreen || still;
+  const paused = Boolean(offscreen || still);
 
   return (
     <ScenePauseContext.Provider value={paused}>
