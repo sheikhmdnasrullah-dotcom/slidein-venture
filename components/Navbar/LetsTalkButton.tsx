@@ -34,9 +34,16 @@ const RED_TEXT = 'var(--accent)';
 
 export default function LetsTalkButton({ isMobile = false }: { isMobile?: boolean }) {
   /* /contact is not in `navLinks`, so the nav's own active marker can never
-     land on it. The CTA carries its own: on the contact page it fills solid
-     orange instead of sitting as paper with orange type, which is the same
-     "you are here" signal the nav items get, in the CTA's vocabulary. */
+     land on it. The CTA carries its own: on the contact page it takes the
+     same accent-wash + accent-ring "you are here" treatment the nav items
+     use, which is the same signal in the CTA's vocabulary.
+
+     That used to be a solid brand-orange fill with paper type. It measured
+     2.24:1 — the brand-lift end of the gradient against --on-accent at
+     14px/600 — and no amount of "it's a brand colour" makes 14px type legible
+     at 2.2:1. Deeper orange would still fail at this size; the wash is the
+     version that both passes AA and reads as the same language as the rest
+     of the bar. The arrow keeps its rotation gesture either way. */
   const pathname = usePathname() || '/';
   const isHere = pathname === '/contact' || pathname.startsWith('/contact/');
 
@@ -55,11 +62,15 @@ export default function LetsTalkButton({ isMobile = false }: { isMobile?: boolea
           isMobile ? 'w-full justify-center py-3.5' : ''
         }`}
         style={{
-          background: isHere
-            ? 'linear-gradient(160deg, var(--color-brand-lift), var(--color-brand))'
-            : 'var(--surface)',
-          color: isHere ? 'var(--on-accent)' : RED_TEXT,
-          boxShadow: isHere ? 'var(--shadow-raised)' : 'var(--shadow-contact)',
+          background: isHere ? 'var(--accent-wash)' : 'var(--surface)',
+          /* signal-deeper, not --accent: the bar floats outside the tone
+             bands, so --accent reads signal-deep at :root — which composites
+             to 4.12:1 under the pill's glass at 14px. One step down the same
+             ramp clears AA and is the same orange. */
+          color: isHere ? 'var(--color-signal-deeper)' : RED_TEXT,
+          boxShadow: isHere
+            ? 'inset 0 0 0 1px var(--accent-ring), var(--shadow-contact)'
+            : 'var(--shadow-contact)',
           letterSpacing: '-0.01em',
         }}
       >
@@ -84,7 +95,7 @@ export default function LetsTalkButton({ isMobile = false }: { isMobile?: boolea
             <path d="M2 11L11 2M11 2H4M11 2v7" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
         </motion.span>
-        <span className="relative">Let&apos;s Talk</span>
+        <span className="relative">Book a walkthrough</span>
       </Link>
     </motion.div>
   );

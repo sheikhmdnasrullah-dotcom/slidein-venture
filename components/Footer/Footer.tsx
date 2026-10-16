@@ -1,81 +1,136 @@
 import Link from 'next/link';
 import { Section } from '@/components/Section';
-import { MonoLabel, SectionRule } from '@/components/System/System';
 import { LogoWordmark } from '@/components/Brand/Logo';
+import { CornerBrackets } from '@/components/System/System';
+
+const CALENDAR_URL =
+  'https://calendar.google.com/calendar/u/0/appointments/schedules/AcZssZ1V3_WMuJIp2gvHKgyE0NG_acjZ4zVGaeOJrQU';
 
 /**
- * Only routes that actually exist are linked. Per docs/site-architecture.md the
- * rule is: a link ships when its route ships. The previous version declared 24
- * links, 22 of which 404'd.
+ * FOOTER — the terminal band, now on every route
+ * ---------------------------------------------------------------------------
+ * Three REAL columns, mounted in app/layout.tsx so every page ends the same
+ * way. It used to be mounted per page, and the homepage simply had none —
+ * which is why the old page ended mid-sentence on the FrameworkEngines
+ * section with no colophon under it.
+ *
+ *   · The brand column — the wordmark lockup, the one line of where this is
+ *     going, and the single tagline that positions the product: outreach
+ *     software with a managed-service layer.
+ *   · NAV — the same product-oriented items the navbar carries, so the two
+ *     navigations cannot disagree about what the site is.
+ *   · CONTACT — the real CTA destination (the consultation booking link) with
+ *     its promise spelled out, and the year.
+ *
+ * The copy no longer sells an agency retainer. The bottom line names the
+ * managed-service relationship in one sentence, which is what the business
+ * actually is: software first, operated-for-you second.
  */
-const LIVE_LINKS = [
-  { label: 'Process', href: '/process' },
-  { label: 'Insights', href: '/insights' },
-  { label: 'Pricing', href: '/pricing' },
-];
-
 export default function Footer() {
-  const year = new Date().getFullYear();
-
   return (
-    /* The page ends on its darkest value. Nothing follows it, so it does not
-       need a bleed — a seam is enough to keep the join from reading printed. */
-    <Section as="footer" tone="terminal" pad="none" seam>
-      <div className="mx-auto max-w-[1200px] px-6 py-16 md:px-10 md:py-20">
-        <SectionRule index="04" label="Index" coordinate="SIV · FOOTER" />
-
-        <div className="mt-12 grid grid-cols-1 gap-12 md:grid-cols-[1.4fr_1fr]">
-          {/* ── Brand ─────────────────────────────────────────────────── */}
-          <div className="flex flex-col gap-5">
-            <Link href="/" className="group inline-flex w-fit items-center">
-              <LogoWordmark size="24px" />
-            </Link>
-
-            <p className="max-w-[34ch] text-[15px] leading-[1.7] text-[var(--muted)]">
-              Full-cycle video production and cold outreach — built, run, and
-              measured as one system.
-            </p>
-          </div>
-
-          {/* ── Live navigation ───────────────────────────────────────── */}
-          <nav className="flex flex-col gap-4" aria-label="Footer">
-            <MonoLabel>Navigate</MonoLabel>
-            <ul className="flex flex-col gap-3">
-              {LIVE_LINKS.map((l) => (
-                <li key={l.label}>
-                  <Link
-                    href={l.href}
-                    className="group inline-flex items-center gap-2.5 text-[15px] text-[var(--muted)] transition-colors duration-300 hover:text-[var(--on-surface)]"
-                  >
-                    <span
-                      aria-hidden
-                      className="h-px w-0 bg-[var(--accent)] transition-all duration-500 ease-out group-hover:w-4"
-                    />
-                    {l.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </nav>
+    <Section tone="terminal" pad="none" as="footer" className="relative px-6 md:px-10 pt-[clamp(3rem,6vw,5rem)] pb-[calc(env(safe-area-inset-bottom,0px)+clamp(1.25rem,2.5vw,2rem))]">
+      <div className="mx-auto grid w-full max-w-[1100px] grid-cols-1 gap-10 md:grid-cols-[0.24fr_1fr_0.24fr] md:gap-6">
+        {/* ── Wordmark + positioning line ───────────────────────────── */}
+        <div className="flex flex-col gap-4">
+          <Link
+            href="/"
+            className="inline-flex w-fit items-center rounded-sm outline-none transition-opacity duration-300 hover:opacity-80 focus-visible:ring-2 focus-visible:ring-[var(--accent-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface-2)]"
+          >
+            <LogoWordmark size="20px" />
+          </Link>
+          <span
+            aria-hidden
+            className="block h-[1.5px] w-8 rounded-full bg-[var(--color-brand)]"
+          />
+          <p className="font-label text-[11px] font-medium leading-[1.55] tracking-[0.16em] uppercase text-[var(--muted)]">
+            Research-led outreach,
+            <br />
+            run as software
+          </p>
         </div>
 
-        {/* ── System metadata row ─────────────────────────────────────── */}
-        <div className="mt-16 flex flex-wrap items-center justify-between gap-4 border-t border-[var(--rule)] pt-6">
-          <MonoLabel>© {year} SlideIn Venture</MonoLabel>
-          <div className="flex items-center gap-5">
-            <MonoLabel>Grid · 28px</MonoLabel>
-            <span className="h-3 w-px bg-[var(--rule-strong)]" aria-hidden />
-            <MonoLabel className="inline-flex items-center gap-2">
-              <span
-                className="pulse-dot h-1.5 w-1.5 rounded-full"
-                style={{ background: 'var(--accent-vivid)' }}
-                aria-hidden
-              />
-              Available
-            </MonoLabel>
-          </div>
+        {/* ── Nav: same items as the navbar ────────────────────────── */}
+        <nav aria-label="Site" className="flex flex-col gap-4 md:items-center">
+          <span className="font-label text-[11px] font-medium tracking-[0.18em] uppercase text-[var(--muted)]">
+            Platform
+          </span>
+          <ul className="flex flex-wrap items-center gap-x-5 gap-y-2.5 md:justify-center">
+            <li>
+              <FooterLink href="/#platform">Software</FooterLink>
+            </li>
+            <li>
+              <FooterLink href="/#managed">Managed service</FooterLink>
+            </li>
+            <li>
+              <FooterLink href="/process">How it works</FooterLink>
+            </li>
+            <li>
+              <FooterLink href="/pricing">Pricing</FooterLink>
+            </li>
+            <li>
+              <FooterLink href="/insights">Insights</FooterLink>
+            </li>
+            <li>
+              <FooterLink href="/contact">Contact</FooterLink>
+            </li>
+          </ul>
+        </nav>
+
+        {/* ── The real CTA + year ───────────────────────────────────── */}
+        <div className="flex flex-col gap-3 md:items-end md:text-right">
+          <span className="font-label text-[11px] font-medium tracking-[0.18em] uppercase text-[var(--muted)]">
+            Work with us
+          </span>
+          <a
+            href={CALENDAR_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="group inline-flex items-center gap-1.5 text-sm font-medium text-[var(--on-surface)] underline decoration-transparent underline-offset-4 transition-colors duration-300 hover:decoration-current focus-visible:decoration-current"
+          >
+            Book a walkthrough
+            <span
+              aria-hidden
+              className="transition-transform duration-300 group-hover:translate-x-0.5"
+            >
+              ↗
+            </span>
+          </a>
+          <p className="text-[12.5px] leading-relaxed text-[var(--muted)]">
+            Or run the platform yourself — the choice is yours.
+          </p>
         </div>
       </div>
+
+      {/* ── Bottom bar ─────────────────────────────────────────────── */}
+      <div className="mx-auto mt-[clamp(2.5rem,5vw,4rem)] flex w-full max-w-[1100px] flex-col-reverse gap-6 border-t border-[var(--rule-strong)] pt-6 md:flex-row md:items-center md:justify-between">
+        <div className="flex flex-col gap-2">
+          <p className="text-[12.5px] text-[var(--muted)]">
+            © {new Date().getFullYear()} SlideIn Venture. All rights reserved.
+          </p>
+          <p className="text-[12.5px] text-[var(--muted)]">
+            We only contact people who match a brief you approve. Every email carries a working
+            unsubscribe, and a no is permanent.
+          </p>
+        </div>
+
+        <span
+          aria-hidden
+          className="hidden w-fit opacity-60 transition-all duration-500 hover:opacity-100 md:block"
+        >
+          <CornerBrackets />
+        </span>
+      </div>
     </Section>
+  );
+}
+
+function FooterLink({ href, children }: { href: string; children: React.ReactNode }) {
+  return (
+    <Link
+      href={href}
+      className="text-sm font-medium text-[var(--on-surface)] underline decoration-transparent underline-offset-4 transition-colors duration-300 hover:decoration-current focus-visible:decoration-current"
+    >
+      {children}
+    </Link>
   );
 }

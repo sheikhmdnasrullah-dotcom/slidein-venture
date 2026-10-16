@@ -1,7 +1,6 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import ArticleReader from '@/components/Insights/ArticleReader';
-import Footer from '@/components/Footer/Footer';
 import { ARTICLES, getArticleBySlug } from '@/content/insights';
 
 export async function generateStaticParams() {
@@ -55,7 +54,6 @@ export default async function InsightArticlePage({
   return (
     <div>
       <ArticleReader article={article} />
-      <Footer />
     </div>
   );
 }

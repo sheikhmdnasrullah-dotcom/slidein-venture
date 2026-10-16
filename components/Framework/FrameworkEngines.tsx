@@ -457,7 +457,11 @@ function OutcomeCard({ still }: { still: boolean }) {
       <div
         className="relative flex items-center gap-4 overflow-hidden rounded-[var(--radius-pill)] px-7 py-5 transition-shadow duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] sm:gap-5 sm:px-12 sm:py-7"
         style={{
-          background: 'linear-gradient(150deg, var(--color-brand-lift) 0%, var(--color-brand) 58%)',
+          /* ember → brand, matching the process page's outcome plate: paper
+             (--on-accent) type at display size needs 3:1, and paper on brand
+             itself is 2.82:1 — the deepest stop has to be the one under the
+             type. */
+          background: 'linear-gradient(150deg, var(--color-ember) 0%, var(--color-brand) 58%)',
           boxShadow:
             '0 1px 0 color-mix(in oklch, var(--color-paper-25) 34%, transparent) inset, 0 26px 60px -22px color-mix(in oklch, var(--color-brand) 78%, transparent)',
         }}

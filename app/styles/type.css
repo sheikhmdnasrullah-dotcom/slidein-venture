@@ -193,7 +193,10 @@ p {
 }
 
 /* Paired with pathLength="100" on the path, so one dash always spans exactly
-   one word regardless of how wide that word sets. */
+   one word regardless of how wide that word sets. The rule now underlines a
+   static word — the phrase rotator it used to remount for is gone — but the
+   short delay is kept: it still reads as a line being drawn rather than a
+   border that was already there. */
 .underline-draw {
   stroke-dasharray: 100;
   stroke-dashoffset: 100;
@@ -205,46 +208,6 @@ p {
 @keyframes underline-draw {
   to {
     stroke-dashoffset: 0;
-  }
-}
-
-/* The dot the rule terminates in — the head of the deck's visual thread.
-   Positioned off the same two numbers the rule uses, so it sits exactly on the
-   line's right end: 0.105em in from the inline box (the period sidebearing
-   trim) and 0.05em below the text box bottom (the rule's own centre). */
-.accent-terminal {
-  position: absolute;
-  right: calc(0.105em - 3.5px);
-  bottom: calc(-0.05em - 3.5px);
-  width: 7px;
-  height: 7px;
-  border-radius: var(--radius-pill);
-  background: var(--accent-vivid);
-  box-shadow: 0 0 10px color-mix(in oklch, var(--accent-vivid) 60%, transparent);
-  opacity: 0;
-  pointer-events: none;
-  animation: accent-terminal-in var(--dur-base) var(--ease-std)
-    calc(var(--dur-base) + var(--dur-reveal)) forwards;
-}
-
-@keyframes accent-terminal-in {
-  to {
-    opacity: 1;
-  }
-}
-
-/* Once the thread has left, the rule simply ends. The flag lives on the root
-   element because the phrase rotator remounts this dot on every phrase change,
-   so a React prop would bring it back three seconds after it departed. */
-[data-thread-departed] .accent-terminal {
-  animation: none;
-  opacity: 0;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .accent-terminal {
-    animation: none;
-    opacity: 1;
   }
 }
 
@@ -270,14 +233,15 @@ p {
         look soft next to their print version.
      2. TIGHT TRACKING. A wordmark is read as one shape, not as words. It sets
         tighter than any running text on the site.
-     3. TWO REGISTERS. "SlideIn" is the name; "Venture" is a qualifier, so it
-        drops to the mono face, uppercase and widely tracked — the same
-        relationship the rest of the site uses between a headline and its
-        `.font-label`. The wordmark is an instance of the type system rather
-        than a separate piece of art.
-     4. OPTICAL ALIGNMENT. The mono qualifier is nudged up to sit on the
-        serif's x-height, not its baseline: aligning two faces of different
-        cap-heights on a shared baseline makes the smaller one look dropped.
+     3. ONE REGISTER, ONE ACCENT. The name carries the whole lockup — no
+        qualifier, no second voice. Its single accent is a full stop in the
+        deepest AA-safe orange, set on the baseline like a period: at rest the
+        mark reads "SlideIn.", finished. On hover the stop re-performs its
+        namesake and slides in from behind the `n`. The gesture IS the brand
+        name, so it is the only motion the mark has.
+     4. OPTICAL ALIGNMENT. A block-level dot's baseline is its bottom edge, so
+        with the flex container on `align-items: baseline` the stop sits ON the
+        serif's baseline the way a drawn period would — no nudge arithmetic.
      5. OPTICAL MARGIN. `S` is a round letter. Aligned mathematically its left
         edge reads inset, so the whole lockup hangs a hair left.
 
@@ -309,31 +273,40 @@ p {
   color: var(--on-surface);
 }
 
-.wordmark-qualifier {
-  font-family: var(--font-mono);
-  font-size: 0.5em;
-  font-weight: var(--font-weight-label);
-  letter-spacing: var(--tracking-label);
-  text-transform: uppercase;
-  line-height: 1;
-  color: var(--accent);
-  /* 0.52em clears the serif's `n` without opening a hole; the -0.34em lifts
-     the mono cap onto the serif's x-height. Both measured at 20px, and both
-     hold at any size because the wordmark is set entirely in em. */
-  margin-left: 0.52em;
-  transform: translateY(-0.34em);
-  transition: letter-spacing var(--dur-base) var(--ease-expo);
+/* THE STOP — the mark's one accent. signal-deeper, not --accent: the stop is
+   small orange type-adjacent ink, and it appears in exactly the places that
+   are NOT inside a tone band (the navbar floats over everything, so it reads
+   :root). On the navbar's glass pill signal-deep composites under AA at this
+   size; signal-deeper is the same hue one step down the ramp and clears it. */
+.wordmark-dot {
+  width: 0.115em;
+  height: 0.115em;
+  border-radius: 50%;
+  background: var(--color-signal-deeper);
+  margin-left: 0.1em;
 }
 
-/* The only motion the mark has: the qualifier opens a fraction on hover, the
-   way a letterpress lockup breathes. Nothing moves, nothing scales. */
-.group:hover .wordmark-qualifier,
-.wordmark:hover .wordmark-qualifier {
-  letter-spacing: var(--tracking-label-wide);
+/* The only motion the mark has: the stop slides in from behind the `n` and
+   comes to rest — the brand name, performed once, on hover. Nothing else
+   moves, nothing scales. */
+@keyframes wordmark-dot-slide {
+  from {
+    transform: translateX(-0.2em);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.group:hover .wordmark-dot,
+.wordmark:hover .wordmark-dot {
+  animation: wordmark-dot-slide var(--dur-reveal) var(--ease-expo);
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .wordmark-qualifier {
-    transition: none;
+  .wordmark-dot {
+    animation: none;
   }
 }

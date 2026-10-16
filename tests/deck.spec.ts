@@ -1,5 +1,9 @@
 import { test, expect } from '@playwright/test';
 
+/* The origin is configurable because another app may already hold :3000 on
+   this machine. Default stays the documented local server. */
+const ORIGIN = process.env.TEST_ORIGIN ?? 'http://localhost:3000';
+
 for (const theme of ['day', 'night'] as const) {
   for (const vp of [
     { name: 'mobile', width: 390, height: 844 },
@@ -9,7 +13,7 @@ for (const theme of ['day', 'night'] as const) {
     test(`slide 01 ${theme} ${vp.name}`, async ({ page }) => {
       await page.setViewportSize({ width: vp.width, height: vp.height });
       await page.addInitScript((t) => localStorage.setItem('siv-theme', t), theme);
-      await page.goto('http://localhost:3000/');
+      await page.goto('${ORIGIN}/');
       await page.evaluate(() => document.fonts.ready);
       await page.waitForTimeout(2600); // let the rule draw and the dot leave
       await page.locator('[data-deck-stage]').screenshot({ path: `screenshots/deck01_${theme}_${vp.name}.png` });
@@ -31,7 +35,7 @@ for (const vp of [
 ]) {
   test(`slide 01 composition holds at ${vp.n}`, async ({ page }) => {
     await page.setViewportSize({ width: vp.w, height: vp.h });
-    await page.goto('http://localhost:3000/');
+    await page.goto('${ORIGIN}/');
     await page.evaluate(() => document.fonts.ready);
     await page.waitForTimeout(1000);
 
@@ -70,7 +74,7 @@ for (const vp of [
 
 test('deck order, counter and the thread', async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
-  await page.goto('http://localhost:3000/');
+  await page.goto('${ORIGIN}/');
   await page.waitForTimeout(1200);
 
   // slide 01 chrome

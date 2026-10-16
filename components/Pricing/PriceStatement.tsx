@@ -91,11 +91,11 @@ export default function PriceStatement() {
       {/* ── The sentence ─────────────────────────────────────────────── */}
       <motion.h1
         {...rise(0.05, still)}
-        className="font-display-xl max-w-[16ch] text-[clamp(2.2rem,5.4vw,4.1rem)] text-[var(--on-surface)]"
+        className="font-display-xl max-w-[18ch] text-[clamp(2.2rem,5.4vw,4.1rem)] text-[var(--on-surface)]"
       >
-        I will handle your
+        I run your outreach platform,
         <br />
-        <span className="text-[var(--accent)]">content and outreach</span>
+        <span className="text-[var(--accent)]">and the content that feeds it</span>
       </motion.h1>
 
       {/* Hairline. Short and centred — the only divider in the band, and it
@@ -168,7 +168,7 @@ export default function PriceStatement() {
                 '0 1px 0 color-mix(in oklch, var(--color-paper-25) 34%, transparent) inset, 0 22px 50px -18px color-mix(in oklch, var(--color-brand) 72%, transparent)',
             }}
           >
-            Book a Call
+            Book a walkthrough
             <svg
               width="15"
               height="15"

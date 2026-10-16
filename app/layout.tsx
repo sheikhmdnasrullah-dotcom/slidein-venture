@@ -2,13 +2,13 @@ import type { Metadata } from "next";
 import "./globals.css";
 import Navbar from "@/components/Navbar/Navbar";
 
-
 import { displayFace, bodyFace, monoFace } from "./fonts";
 import { cn } from "@/lib/utils";
 
 export const metadata: Metadata = {
-  title: "Tanim",
-  description: "Helping Creators with Content Production, Outreach, and Backend Tasks.",
+  title: "SlideIn",
+  description:
+    "Software to research prospects, prepare personalized email, send with a controlled workflow, and monitor delivery — with a managed service for teams that would rather we run it.",
 };
 
 /* One theme, so one colour. This is the paper the page is made of — it tells
@@ -44,11 +44,10 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      /* Hero.tsx sets data-thread-departed on this element once the hero's
-         thread dot leaves its hairline, and that happens after hydration —
-         hence suppressHydrationWarning. There is no theme attribute and no
-         pre-paint script any more: the site has one theme, so nothing about
-         <html> depends on what the visitor prefers. */
+      /* suppressHydrationWarning is vestigial: the hero that used to set
+          data-thread-departed after hydration is gone. It is kept because it
+          is the right thing to have on the root if any client-only attribute
+          is ever set here again, and removing it changes nothing today. */
       suppressHydrationWarning
       className={cn(
         "font-sans",
@@ -57,12 +56,12 @@ export default function RootLayout({
         monoFace.variable
       )}
     >
-      <head>
-        <link rel="preload" href="/imagethumb.jpg" as="image" />
-      </head>
       {/* Roles come from the CSS layer (body { font-family: var(--font-sans) }),
           not from a face className here — that is what keeps a single place
-          responsible for which face plays which part. */}
+          responsible for which face plays which part.
+
+          The hero's video card — and the /imagethumb.jpg it preloaded — is
+          gone, and nothing else on the site references that asset. */}
       {/* AmbientEnvironment used to be mounted here, fixed behind the whole
           document. Stage 3 moved it into the hero band. A single wash running
           the full height of the page is the texture equivalent of one value
@@ -71,7 +70,11 @@ export default function RootLayout({
       <body className="antialiased">
         <Navbar />
         <main>{children}</main>
-
+        {/* No footer. The terminal band — wordmark, link columns, the consent
+            line and the copyright bar — was unmounted by decision, not
+            deleted: components/Footer/Footer.tsx stays in the codebase and
+            mounting it again here restores it on every route. Every page now
+            ends where its own content ends. */}
       </body>
     </html>
   );

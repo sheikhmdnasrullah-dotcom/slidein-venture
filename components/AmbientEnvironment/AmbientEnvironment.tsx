@@ -103,10 +103,16 @@ export default function AmbientEnvironment() {
       />
       {/* 4 — drifting radial light.
              A single ambient source only reads as lighting if it lights the
-             thing that matters. Both lobes are pulled up and left so the warm
+             thing that matters. The lobe is pulled up and left so the warm
              centre sits BEHIND and slightly ABOVE the headline — the type is
              what appears illuminated. Parked over empty canvas, the same
-             gradient reads as a stray blob rather than as a light source. */}
+             gradient reads as a stray blob rather than as a light source.
+
+             ONE element with a two-lobe gradient, not two stacked elements:
+             the two lobes ARE one light source, and a single element keeps
+             the overlay veil arithmetic honest — two stacked 4-5% washes
+             were enough to drag the floating nav's CTA under AA through the
+             glass in the tone gate, even though each lobe alone passes. */}
       {/* Sized down below `sm` — the parent clips overflow visually, but the
          browser still has to paint and transform-animate the full box every
          frame regardless of what's clipped, so a 900px blob on a 375px phone
@@ -114,28 +120,26 @@ export default function AmbientEnvironment() {
          drift entirely, matching how Hero.tsx gates its own motion. */}
       <motion.div
         className="absolute h-[480px] w-[480px] rounded-full sm:h-[900px] sm:w-[900px]"
-        style={{ background: 'radial-gradient(circle, var(--ambient-a) 0%, transparent 65%)', top: '-28%', left: '-16%' }}
+        style={{
+          background:
+            'radial-gradient(circle at 38% 40%, var(--ambient-a) 0%, transparent 65%), radial-gradient(circle at 64% 62%, var(--ambient-b) 0%, transparent 62%)',
+          top: '-24%',
+          left: '-12%',
+        }}
         animate={still ? undefined : { x: [0, 120, 0], y: [0, 60, 0] }}
         transition={{ duration: 38, repeat: Infinity, ease: 'easeInOut' }}
-      />
-      <motion.div
-        className="absolute h-[400px] w-[400px] rounded-full sm:h-[760px] sm:w-[760px]"
-        style={{ background: 'radial-gradient(circle, var(--ambient-b) 0%, transparent 62%)', top: '-16%', left: '4%' }}
-        animate={still ? undefined : { x: [0, 64, 0], y: [0, 38, 0] }}
-        transition={{ duration: 46, repeat: Infinity, ease: 'easeInOut', delay: 6 }}
       />
       {/* 5 — blueprint construction guides.
              The rules sit on the CONTENT axis, not on the viewport edge. Same
              max-width and padding as the page container, so the dashed line
-             marks the actual left edge of the type instead of framing a few
-             hundred pixels of nothing. */}
-      <div className="absolute inset-y-0 left-1/2 w-full max-w-[1200px] -translate-x-1/2 px-6 md:px-10">
+             marks the actual edge of the type instead of framing empty
+             canvas. They stay faint — at full strength they read as stray
+             marks rather than as guides, and the tick column tipped into
+             visual noise, so it was dropped. */}
+      <div className="absolute inset-y-0 left-1/2 w-full max-w-[1200px] -translate-x-1/2 px-6 opacity-50 md:px-10">
         <div className="relative h-full">
           <div className="absolute inset-y-0 left-0 w-px border-l border-dashed border-[var(--rule)]" />
           <div className="absolute inset-y-0 right-0 w-px border-r border-dashed border-[var(--rule)]" />
-          {[...Array(14)].map((_, i) => (
-            <span key={i} className="absolute left-0 h-px w-1.5 bg-[var(--rule)]" style={{ top: `${(i + 1) * 7}%` }} />
-          ))}
         </div>
       </div>
       {/* 6 — floating particles */}

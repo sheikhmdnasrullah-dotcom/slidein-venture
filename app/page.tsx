@@ -1,76 +1,17 @@
-import Hero from "@/components/Hero/Hero";
-import Section from "@/components/Section";
-import FrameworkEngines from "@/components/Framework/FrameworkEngines";
+import Hero from '@/components/Hero/Hero';
 
 /**
- * HOME — the hero, then the shape of the business.
- *
- * The framework band is `tone="raised"` — paper-100, one step in from the
- * page's own value, so it reads as a panel lifted off the page rather than as
- * more page. It is NOT `tone="stage"`, and that is a contrast decision rather
- * than a taste one: the stage tone re-points --accent to --color-brand, which
- * measures 2.73:1 on paper and fails as text at any size, and this drawing sets
- * type in --accent in four places (the two YOU tags and the two cross link
- * statements). `raised` re-points it to signal-deeper, which clears AA.
- *
- * WHAT THIS BAND HAS RENDERED, AND WHY EACH ONE MOVED ON. First
- * FrameworkDiagram's `shape` variant — rounded cards on right-angle
- * connectors, the default output shape of every diagramming tool, which reads
- * as one before a single label is read. Then FrameworkWeave, which braided two
- * threads into one cord. Then FrameworkThread: one drawing at two densities,
- * four milestones a side by default with fourteen detail nodes behind a
- * toggle. The toggle was the problem — the thing a visitor could see without
- * clicking was an outline, not the business.
- *
- * It now renders FrameworkEngines: both engines' full node lists, always
- * visible, as two cards a reader just reads top to bottom. The cross-link
- * (content builds trust / outreach expands reach) shown once, centred between
- * them, instead of duplicated as an accent row at the foot of each strand.
- *
- * NONE OF THE EARLIER THREE IS DELETED. FrameworkDiagram's `variant="complete"`
- * still draws all seventeen service nodes at the top of /steps (currently
- * pulled from navigation, see that page's own header). FrameworkWeave and
- * FrameworkThread are no longer mounted anywhere and are kept only so a
- * decision here can be reversed by changing one import back. All four read
- * content/framework.ts, so no two of them can describe different businesses.
- *
- * THE PAGE ENDS HERE. A second section used to follow — an "The Framework"
- * heading over InputSlide, a standalone deck slide — but that repeated the
- * headline a beat after FrameworkEngines' own origin line already said it,
- * and added nothing past the outcome card. The origin line now reads "The
- * Framework" directly and the page ends on FrameworkEngines' outcome card.
+ * HOME — a blank canvas
+ * ---------------------------------------------------------------------------
+ * The homepage currently renders only the hero: the founder's tagline with
+ * the rotating second line. Everything that was here — the problem, the
+ * workflow, the platform, the capabilities, the two ways to work with it,
+ * the honest-limits list, the use cases, and the closing band — is
+ * UNMOUNTED, not deleted. The section components in components/Product/
+ * and their copy in content/product.ts stay in the codebase untouched so
+ * any of them can be brought back by restoring one line here, but the
+ * page itself is fresh ground to design forward from.
  */
 export default function Home() {
-  return (
-    <>
-      <Hero />
-
-      {/* NO SEAM, AND THAT IS THE FIX FOR THE "ORANGE BAND" COMPLAINT.
-          This band is `tone="base"` — the page's own value — so there is no
-          value change to mark, and a `seam` hairline across the full width was
-          drawing a horizontal line where nothing actually joins. That line,
-          plus FrameworkEngines' own decorative glow, was what made the section
-          read as a separate warm panel dropped onto a white page.
-
-          The glow is now a low-alpha wash masked to nothing at its edges (see
-          FrameworkEngines), the seam is gone, and `bleed` stays because its
-          gradient runs to --bleed-to, which on this tone IS the page fill — an
-          invisible run-up rather than a join. The warmth survives; the edge
-          does not. */}
-      <Section
-        id="framework"
-        tone="base"
-        pad="tall"
-        bleed
-        className="scroll-mt-[120px]"
-      >
-        {/* No "See the whole process" link here anymore. It sat quietly under
-            this outcome plate and read as an afterthought — the same label
-            now lives prominently right under the hero video (see Hero.tsx),
-            where a visitor who just watched the intro is actually primed to
-            want the next thing. One clear placement beats two weak ones. */}
-        <FrameworkEngines className="mt-4 md:mt-6" />
-      </Section>
-    </>
-  );
+  return <Hero />;
 }

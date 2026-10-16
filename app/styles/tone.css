@@ -208,8 +208,12 @@ html {
   --bleed-to: var(--color-paper-50);
 
   /* AmbientEnvironment's washes. On a white ground the same layers read as
-     light brand glow rather than as colour-on-colour. */
-  --grid-dot:  color-mix(in oklch, var(--color-ink) 4.5%, transparent);
+     light brand glow rather than as colour-on-colour. The dot grid stays at
+     2%: at 4.5% it veiled every text region in the band — including, through
+     the floating nav's glass, the CTA — and stacked with the light lobes it
+     dragged that pairing under AA. The texture survives at 2%; the tint on
+     type does not. */
+  --grid-dot:  color-mix(in oklch, var(--color-ink) 2%, transparent);
   --ambient-a: color-mix(in oklch, var(--color-brand) 5%, transparent);
   --ambient-b: color-mix(in oklch, var(--color-brand) 4%, transparent);
   --ambient-c: color-mix(in oklch, var(--color-brand) 5%, transparent);

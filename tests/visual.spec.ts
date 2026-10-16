@@ -1,6 +1,10 @@
 import { test, expect } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 
+/* The origin is configurable because another app may already hold :3000 on
+   this machine. Default stays the documented local server. */
+const ORIGIN = process.env.TEST_ORIGIN ?? 'http://localhost:3000';
+
 /**
  * Visual + a11y harness.
  *
@@ -28,7 +32,7 @@ for (const vp of VIEWPORTS) {
   for (const route of ROUTES) {
     test(`${vp.name} ${route}`, async ({ page }) => {
       await page.setViewportSize({ width: vp.width, height: vp.height });
-      await page.goto(`http://localhost:3000${route}`);
+      await page.goto(`${ORIGIN}${route}`);
       await page.evaluate(() => document.fonts.ready);
       await page.waitForTimeout(700);
       await page.screenshot({
@@ -42,7 +46,7 @@ for (const vp of VIEWPORTS) {
 for (const route of ROUTES) {
   test(`no critical a11y violations — ${route}`, async ({ page }) => {
     await page.setViewportSize({ width: 1440, height: 900 });
-    await page.goto(`http://localhost:3000${route}`);
+    await page.goto(`${ORIGIN}${route}`);
     await page.waitForTimeout(700);
     const results = await new AxeBuilder({ page })
       .withTags(['wcag2a', 'wcag2aa'])

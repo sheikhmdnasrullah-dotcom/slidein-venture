@@ -1,7 +1,6 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import ArticleReader from '@/components/Insights/ArticleReader';
-import Footer from '@/components/Footer/Footer';
 import { getArticleBySlug } from '@/content/insights';
 
 const SLUG = 'ai-pipeline-emas';
@@ -41,7 +40,6 @@ export default function DirectArticlePage() {
   return (
     <div>
       <ArticleReader article={article} />
-      <Footer />
     </div>
   );
 }

@@ -1,10 +1,10 @@
 /**
- * BRAND — SlideIn Venture
+ * BRAND — SlideIn
  * ---------------------------------------------------------------------------
  * The identity is a WORDMARK. There is no icon mark, by decision — the drawn
- * two-tone "S" that used to live here was removed from the navbar, the footer
- * and the browser tab. Do not reintroduce one without the same decision being
- * made again on purpose.
+ * two-tone "S" and the orange "T" tile that used to live in the navbar and
+ * the browser tab are gone. Do not reintroduce one without the same decision
+ * being made again on purpose.
  *
  * The mark is live text, not an SVG outline. That is what keeps it kernable,
  * selectable, searchable, translatable and legible at any zoom — and it is why
@@ -12,7 +12,14 @@
  * contract (--on-surface, --accent), so the wordmark reads correctly on paper
  * and on graphite without a second copy.
  *
- * All the typographic decisions live in the `.wordmark*` role in
+ * The lockup is the name plus ONE accent moment: a full stop in the deepest
+ * AA-safe orange, set on the baseline like a period. At rest it reads
+ * "SlideIn." — confident, finished. On hover the stop re-performs its
+ * namesake: it slides in from behind the `n` and comes to rest. One gesture,
+ * one decision, nothing else moves. The "Venture" qualifier and the letterpress
+ * breathing motion it used to carry were retired with it.
+ *
+ * All typographic decisions live in the `.wordmark*` role in
  * app/styles/type.css. Nothing here carries a value.
  */
 
@@ -20,8 +27,8 @@ import { cn } from '@/lib/utils';
 
 /**
  * @param size  any CSS length. The whole lockup is set in `em`, so this one
- *              value scales the name, the qualifier, the gap between them and
- *              the optical corrections together.
+ *              value scales the name, the stop and the optical corrections
+ *              together.
  */
 export function LogoWordmark({
   className,
@@ -35,12 +42,10 @@ export function LogoWordmark({
       <span className="wordmark-name" aria-hidden>
         SlideIn
       </span>
-      <span className="wordmark-qualifier" aria-hidden>
-        Venture
-      </span>
-      {/* One accessible name for the pair, so a screen reader hears the brand
-          rather than "SlideIn" and "VENTURE" as two unrelated fragments. */}
-      <span className="sr-only">SlideIn Venture</span>
+      <span className="wordmark-dot" aria-hidden />
+      {/* One accessible name, so a screen reader hears the brand rather than
+          name and stop as two unrelated fragments. */}
+      <span className="sr-only">SlideIn</span>
     </span>
   );
 }

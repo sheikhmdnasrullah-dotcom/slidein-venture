@@ -26,7 +26,7 @@ export const PROFILE = {
 
 export const CALENDAR_URL = 'https://calendar.notion.so/meet/nasrullah_tanim/schedule';
 
-export const BOOK_LABEL = 'Book a call';
+export const BOOK_LABEL = 'Book a walkthrough';
 export const SEND_LABEL = 'Send';
 
 export interface EmailEntry {
