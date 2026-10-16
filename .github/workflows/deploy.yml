@@ -13,8 +13,7 @@ jobs:
 
       - name: Deploy to Vercel
         run: |
-          rm -rf .vercel
-          npx --yes vercel@latest --token ${{ secrets.VERCEL_TOKEN }} --prod --yes
+          npx --yes vercel@latest --token ${{ secrets.VERCEL_TOKEN }} --prod --yes --force
         env:
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID_SLIDEINVENTURE }}
