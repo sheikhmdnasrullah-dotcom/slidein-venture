@@ -95,7 +95,7 @@ export default function LetsTalkButton({ isMobile = false }: { isMobile?: boolea
             <path d="M2 11L11 2M11 2H4M11 2v7" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
         </motion.span>
-        <span className="relative">Book a walkthrough</span>
+        <span className="relative">Connect</span>
       </Link>
     </motion.div>
   );

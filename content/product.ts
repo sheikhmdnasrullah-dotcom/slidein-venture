@@ -297,7 +297,7 @@ export const NAV = {
     { label: 'Insights', href: '/insights' },
     { label: 'Pricing', href: '/pricing' },
   ],
-  cta: { label: 'Book a walkthrough', href: '/contact' },
+  cta: { label: 'Connect', href: '/contact' },
   /* The open-source repo behind the product. One icon in the nav, on every
      page, so a visitor who wants to run the system themselves can clone it. */
   openSource: {
