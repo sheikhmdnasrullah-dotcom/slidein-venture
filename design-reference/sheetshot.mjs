@@ -1,0 +1,11 @@
+import { chromium } from '@playwright/test';
+const b = await chromium.launch();
+const p = await b.newPage();
+await p.setViewportSize({ width: 390, height: 844 });
+await p.goto('http://localhost:3000/', { waitUntil: 'networkidle' });
+await p.waitForTimeout(1200);
+await p.click('button[aria-label="Toggle menu"]');
+await p.waitForTimeout(700);
+await p.screenshot({ path: 'design-reference/r6-sheet.png' });
+await b.close();
+console.log('sheet captured');

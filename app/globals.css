@@ -8,6 +8,9 @@
    `body { @apply bg-background }` in @layer base, or every band renders
    paper-50 and the value rhythm silently collapses back to one value. */
 @import "./styles/tone.css";
+/* Scaffold tokens for the rebuilt hero + page scaffold. Imported after the
+   tone layer so its --page-fill override (flat #FDFDFD) wins at :root. */
+@import "./styles/assemble.css";
 @import "tw-animate-css";
 /* layer() keeps xyflow in the base cascade. Wrapping an @import inside
    `@layer base { ... }` is an invalid at-rule position in CSS. */

@@ -1,0 +1,89 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   ASSEMBLE SCAFFOLD — the hero + page scaffold design tokens
+   ---------------------------------------------------------------------------
+   The token layer above (tokens.css / tone.css) carries the pre-rebuild
+   design. These tokens govern the new hero and scaffold, per the owner's
+   approved reference: flat near-white page, pure ink, hairline grid lines,
+   one orange used in exactly three places, glossy object shadows.
+
+   Values are stated in rgb()/rgba() form rather than hex because the
+   stylelint config bans hex literals in CSS; they are the exact values from
+   the design specification (rgba(10,10,10,·) == #0A0A0A at alpha, etc).
+
+   The accent reuses the existing brand ramp: --color-brand is #FF6200, the
+   SlideIn orange, converted once in tokens.css. Nothing here introduces a
+   second hue.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+:root {
+  /* ── Ground & ink ──────────────────────────────────────────────────── */
+  --scaffold-bg:        rgb(253 253 253 / 100%);   /* #FDFDFD, flat */
+  --scaffold-ink:       rgb(10 10 10 / 100%);      /* #0A0A0A */
+  --scaffold-muted:     rgb(10 10 10 / 55%);
+  --scaffold-surface:   rgb(255 255 255 / 100%);   /* #FFFFFF panels */
+  --scaffold-panel:     rgb(250 250 250 / 100%);   /* #FAFAFA inner panel */
+  --scaffold-well:      rgb(244 244 245 / 100%);   /* #F4F4F5 tile gradient end */
+  --scaffold-lip:       rgb(233 233 235 / 100%);   /* #E9E9EB tile under-layer */
+  --scaffold-button:    rgb(21 21 21 / 100%);      /* #151515 primary button */
+
+  /* ── Hairlines & skeletons ─────────────────────────────────────────── */
+  --scaffold-hairline:  rgb(10 10 10 / 6%);
+  --scaffold-rule:      rgb(10 10 10 / 10%);   /* announcement pill border */
+  --scaffold-line:      rgb(10 10 10 / 5%);   /* full-bleed hero lines */
+  --scaffold-skeleton:  rgb(10 10 10 / 8%);   /* empty text slot bars */
+  /* The primary button sits on #151515, where the standard skeleton bar
+     would be invisible — the dark-ground variant is the same idea in light. */
+  --scaffold-skeleton-on-dark: rgb(255 255 255 / 30%);
+
+  /* ── Accent — the existing SlideIn orange, three places only ─────────
+     1. the highlight pill behind the last headline word
+     2. the small dot inside the primary CTA
+     3. the chip in the announcement pill                                        */
+  --scaffold-accent:       var(--color-brand);
+  --scaffold-accent-pill:  color-mix(in oklch, var(--color-brand) 18%, transparent);
+  --scaffold-accent-chip:  color-mix(in oklch, var(--color-brand) 16%, rgb(255 255 255 / 100%));
+  --scaffold-accent-row:   color-mix(in oklch, var(--color-brand) 10%, rgb(255 255 255 / 100%));
+  --scaffold-accent-dot:   var(--color-brand);
+
+  /* ── Radii — 12 / 20 / 28 / 40 ─────────────────────────────────────── */
+  --scaffold-r-sm: 12px;
+  --scaffold-r-md: 20px;
+  --scaffold-r-lg: 28px;
+  --scaffold-r-xl: 40px;
+
+  /* ── Elevation — the three prescribed shadows ──────────────────────── */
+  --scaffold-shadow-soft:
+    0 1px 2px rgb(0 0 0 / 4%),
+    0 8px 24px -8px rgb(0 0 0 / 8%);
+  --scaffold-shadow-object:
+    0 2px 4px rgb(0 0 0 / 4%),
+    0 18px 36px -12px rgb(0 0 0 / 18%),
+    0 40px 60px -30px rgb(0 0 0 / 12%);
+  --scaffold-shadow-button:
+    0 12px 24px -12px rgb(0 0 0 / 35%);
+
+  /* ── Motion — one easing for the scaffold ──────────────────────────── */
+  --scaffold-ease: cubic-bezier(0.22, 1, 0.36, 1);
+
+  /* The new page fill replaces the warm cream --page-fill from tone.css:
+     flat #FDFDFD under and around every band, as specified. */
+  --page-fill: var(--scaffold-bg);
+}
+
+/* ── Tile breakpoint helpers ───────────────────────────────────────────
+   Unlayered on purpose (same reasoning as type.css): Tailwind sorts the
+   arbitrary min-[1025px] variants BEFORE the named md variants, so
+   md:hidden / md:scale-[0.75] silently win at desktop widths. These two
+   rules restore the desktop state at ≥1025px and, being unlayered, beat
+   the layered utilities without !important. */
+@media (width >= 1025px) {
+  .scaffold-tile-full {
+    scale: 1;
+  }
+
+  .scaffold-tile-edge {
+    display: block;
+  }
+}
+
+/* The hero band itself is the flat ground — no tone class, no wash. */

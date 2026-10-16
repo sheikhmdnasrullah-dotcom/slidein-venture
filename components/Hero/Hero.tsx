@@ -1,180 +1,209 @@
 'use client';
 
 /**
- * HERO — the tagline, and nothing else (for now)
+ * HERO — the rebuilt opening band
  * ---------------------------------------------------------------------------
- * A blank canvas. The homepage was stripped back to the founder's tagline —
- * "An agentic system that finds prospects, captures leads, and reaches out
- * to them." — with the last line rotating through the three verbs, exactly
- * as the hero used to rotate before the product-narrative page took its
- * place. Everything else (supporting copy, CTAs, trust list, workflow rail,
- * and all eight product sections) is unmounted, not deleted, so the page
- * can be redesigned forward from here.
+ * Flat #FDFDFD ground. Full-bleed hairline grid at irregular intervals with
+ * edge fades. Centered stack: announcement pill → two-line headline (last
+ * word on a soft accent pill) → two-line subhead → CTA row. Glossy
+ * text-free floating tiles sit to the sides; the text-free product preview
+ * rises out of the bottom of the band. Every text slot reads from
+ * content/home.ts and renders a skeleton bar while empty (Rule 0).
  *
- * The band is `tone="hero"` (app/styles/tone.css) and still runs edge to
- * edge under the floating nav pill. Nothing in this file names a colour.
- *
- * Craft notes:
- *  · Headline reveals by LINE, never by letter (masked overflow + upward
- *    slide).
- *  · The rotating phrase sits in a CSS grid cell shared with invisible
- *    width reservers, so the layout never reflows as the phrase changes.
- *  · The phrase stays INK with an orange hand-drawn rule beneath it: on
- *    this band --accent is the full brand hue, which measures 2.73:1 as
- *    text — under the large-display bar. The rule carries the accent.
- *  · ONE RENDER TREE whatever the motion preference: the interval that
- *    advances the phrase never starts under prefers-reduced-motion, so the
- *    phrase sits on the first phrase after hydration. Only the transition
- *    branches, and a transition is never serialised into HTML.
+ * Entrance: fade up 12px, 70ms stagger, 600ms, cubic-bezier(0.22,1,0.36,1).
+ * Reduced motion renders the final state with no entrance.
  */
 
-import { useState, useEffect, type ReactNode } from 'react';
-import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
-import { Section } from '@/components/Section';
-import AmbientEnvironment from '@/components/AmbientEnvironment/AmbientEnvironment';
-import { HERO } from '@/content/product';
+import { motion, useReducedMotion } from 'framer-motion';
+import FloatingTiles from './FloatingTiles';
+import ProductPreview from './ProductPreview';
+import { TextSlot } from './Skeleton';
+import { HOME } from '@/content/home';
 
-const EASE = [0.16, 1, 0.3, 1] as const;
+const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
-/* ─── Masked line reveal ──────────────────────────────────────────────────── */
-function Line({
-  children,
-  delay = 0,
-  still,
-  className = '',
-}: {
-  children: ReactNode;
-  delay?: number;
-  still: boolean;
-  className?: string;
-}) {
+/* Fade-up entrance with the 70ms stagger. */
+function rise(i: number, still: boolean) {
+  return {
+    initial: still ? false : { opacity: 0, y: 12 },
+    animate: { opacity: 1, y: 0 },
+    transition: { duration: 0.6, ease: EASE, delay: still ? 0 : i * 0.07 },
+  };
+}
+
+/* The full-bleed hairline grid, faded at both edges. */
+function BackgroundLines() {
   return (
-    /* pb/-mb pair gives descenders room without letting the mask clip them */
-    <span className={`block overflow-hidden pb-[0.18em] -mb-[0.18em] ${className}`}>
-      <motion.span
-        className="block"
-        initial={{ y: '112%' }}
-        animate={{ y: '0%' }}
-        transition={still ? { duration: 0 } : { duration: 1.05, delay, ease: EASE }}
-      >
-        {children}
-      </motion.span>
-    </span>
+    <div aria-hidden="true" className="pointer-events-none absolute inset-0">
+      {[14, 26, 41, 58, 73].map((top) => (
+        <div
+          key={top}
+          className="absolute inset-x-0 h-px"
+          style={{
+            top: `${top}%`,
+            background: 'var(--scaffold-line)',
+            maskImage:
+              'linear-gradient(to right, transparent, black 15%, black 85%, transparent)',
+            WebkitMaskImage:
+              'linear-gradient(to right, transparent, black 15%, black 85%, transparent)',
+          }}
+        />
+      ))}
+      {/* A barely-there white lift behind the headline (≤3% difference). */}
+      <div
+        className="absolute left-1/2 top-[38%] h-[520px] w-[min(90vw,1100px)] -translate-x-1/2 -translate-y-1/2"
+        style={{
+          background:
+            'radial-gradient(closest-side, rgba(255,255,255,0.75), rgba(255,255,255,0))',
+        }}
+      />
+    </div>
   );
 }
 
-/* ─── Hand-drawn hairline under the rotating word ────────────────────────────
-   A stroked path, never a highlighter block — the block is the tell. The
-   quadratic wobble is the point: it does not sit flat on the baseline.
-
-   pathLength="100" normalises the geometry so the draw-on dash in type.css is
-   one length for every phrase, however wide. No vector-effect here: with
-   non-scaling-stroke the dash pattern is measured in device pixels while the
-   viewBox is stretched to the word's measure, which shatters the line into
-   evenly spaced fragments. Letting the stroke scale keeps it whole — the
-   path is near-horizontal, so only the small vertical scale reaches its
-   weight. */
-function AccentRule() {
+/* Accent-tinted chip + label, both slots. */
+function AnnouncementPill({ still }: { still: boolean }) {
   return (
-    <svg
-      className="accent-underline text-[var(--accent)]"
-      viewBox="0 0 100 6"
-      preserveAspectRatio="none"
-      aria-hidden
+    <motion.div
+      {...rise(0, still)}
+      className="flex h-[52px] max-w-[calc(100vw-48px)] items-center gap-3 rounded-full border border-[var(--scaffold-rule)] bg-[var(--scaffold-surface)] pr-6"
+      style={{ paddingLeft: 6, boxShadow: 'var(--scaffold-shadow-soft)' }}
     >
-      <path
-        d="M0,3.1 Q25,1.9 50,3 T100,3.1"
-        pathLength="100"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="0.6"
-        strokeLinecap="round"
-        className="underline-draw"
+      <span
+        className="flex h-[38px] items-center rounded-full bg-[var(--scaffold-accent-chip)] px-5"
+        style={{ marginTop: 1, marginBottom: 1 }}
+      >
+        <TextSlot
+          text={HOME.announcement.chip}
+          textClassName="text-[15px] font-medium whitespace-nowrap"
+          barWidth="2.4em"
+        />
+      </span>
+      <TextSlot
+        text={HOME.announcement.label}
+        textClassName="text-[15px] text-[var(--scaffold-muted)] whitespace-nowrap"
+        barWidth="min(16em, 46vw)"
       />
+    </motion.div>
+  );
+}
+
+function Headline({ still }: { still: boolean }) {
+  const { line1, line2, highlight } = HOME.headline;
+  return (
+    <motion.h1
+      {...rise(1, still)}
+      className="text-center font-semibold text-[var(--scaffold-ink)]"
+      style={{
+        fontSize: 'clamp(3rem, 7.4vw, 7rem)',
+        lineHeight: 0.98,
+        letterSpacing: '-0.045em',
+      }}
+    >
+      <span className="block">
+        <TextSlot text={line1} barWidth="5.2em" />
+      </span>
+      <span className="mt-[0.08em] block">
+        <TextSlot text={line2} barWidth="3.1em" />
+        {(line2 || !highlight) && <span>{' '}</span>}
+        <span className="relative inline-block">
+          {/* The soft accent pill behind the last word — solid, 18%, no gradient */}
+          <span
+            aria-hidden="true"
+            className="absolute -inset-x-[0.28em] -inset-y-[0.14em] rounded-full"
+            style={{ background: 'var(--scaffold-accent-pill)' }}
+          />
+          <TextSlot text={highlight} textClassName="relative" barWidth="1.9em" />
+        </span>
+      </span>
+    </motion.h1>
+  );
+}
+
+function Subhead({ still }: { still: boolean }) {
+  return (
+    <motion.p
+      {...rise(2, still)}
+      className="mt-10 w-full max-w-[640px] text-center text-[var(--scaffold-muted)]"
+      style={{ fontSize: 'clamp(1.125rem, 1.8vw, 1.75rem)', lineHeight: 1.4 }}
+    >
+      <span className="block">
+        <TextSlot text={HOME.subhead.line1} barWidth="76%" barClassName="mx-auto" textClassName="block" />
+      </span>
+      <span className="mt-[0.15em] block">
+        <TextSlot text={HOME.subhead.line2} barWidth="52%" barClassName="mx-auto" textClassName="block" />
+      </span>
+    </motion.p>
+  );
+}
+
+function ChevronIcon() {
+  return (
+    <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+      <path d="M2.5 4.5 L6 8 L9.5 4.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   );
 }
 
-/* ─── Rotating phrase — zero layout shift ─────────────────────────────────── */
-function RotatingPhrase({ still }: { still: boolean }) {
-  const phrases = HERO.headline.phrases;
-  const durations = HERO.headline.phraseMs;
-  const [i, setI] = useState(0);
-
-  useEffect(() => {
-    if (still) return;
-    const duration = durations[i] ?? 2200;
-    const t = setTimeout(() => setI((n) => (n + 1) % phrases.length), duration);
-    return () => clearTimeout(t);
-  }, [i, still, phrases.length, durations]);
-
+function CTARow({ still }: { still: boolean }) {
   return (
-    /* `wonk` dials Fraunces' WONK axis to 1 on this phrase and nowhere else on
-       the page: single-storey g, angled terminals. One phrase, one decision.
-       `text-center` keeps the phrase centred under the centred headline on
-       every width. */
-    <span className="wonk relative inline-grid align-top text-center">
-      {/* Invisible reservers: the cell sizes to the widest / tallest phrase,
-          so swapping never reflows the headline. */}
-      {phrases.map((p) => (
-        <span key={p} aria-hidden className="col-start-1 row-start-1 invisible">
-          {p}
-        </span>
-      ))}
-
-      <span className="col-start-1 row-start-1" aria-hidden>
-        <AnimatePresence mode="wait" initial={false}>
-          <motion.span
-            key={phrases[i]}
-            className="relative inline-block"
-            initial={{ opacity: 0, y: '38%', filter: 'blur(6px)' }}
-            animate={{ opacity: 1, y: '0%', filter: 'blur(0px)' }}
-            exit={{
-              opacity: 0,
-              y: '-38%',
-              filter: 'blur(6px)',
-              transition: { duration: still ? 0 : 0.32, ease: EASE },
-            }}
-            transition={still ? { duration: 0 } : { duration: 0.52, ease: EASE }}
-          >
-            {phrases[i]}
-            {/* Remounts with the phrase, so the rule redraws to the new
-                phrase's measure instead of hanging over a shorter one. */}
-            <AccentRule />
-          </motion.span>
-        </AnimatePresence>
-      </span>
-
-      {/* Screen readers get the stable set, not a flickering word */}
-      <span className="sr-only">{phrases.join(' ')}</span>
-    </span>
+    <motion.div {...rise(3, still)} className="mt-10 flex w-full flex-col items-center gap-5 sm:w-auto sm:flex-row sm:justify-center sm:gap-8">
+      {/* Primary — wired to the existing conversion URL */}
+      <a
+        href={HOME.cta.primaryHref}
+        className="group inline-flex h-[52px] w-full max-w-[320px] items-center justify-center gap-3 rounded-full bg-[var(--scaffold-button)] px-10 text-[17px] font-medium text-white transition-[transform,box-shadow] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-px hover:shadow-[0_16px_32px_-12px_rgba(0,0,0,0.42)] active:scale-[0.98] sm:h-16 sm:w-auto"
+        style={{ boxShadow: 'var(--scaffold-shadow-button)', letterSpacing: '-0.01em' }}
+      >
+        <span className="h-2.5 w-2.5 rounded-full bg-[var(--scaffold-accent)]" aria-hidden="true" />
+        <TextSlot text={HOME.cta.primary} barWidth="4.2em" onDark />
+      </a>
+      {/* Secondary — text only, muted, chevron */}
+      <a
+        href={HOME.cta.secondaryHref}
+        className="inline-flex items-center gap-1.5 text-[17px] font-medium text-[var(--scaffold-muted)] transition-colors hover:text-[var(--scaffold-ink)]"
+        style={{ letterSpacing: '-0.01em' }}
+      >
+        <TextSlot text={HOME.cta.secondary} barWidth="6.5em" />
+        <ChevronIcon />
+      </a>
+    </motion.div>
   );
 }
 
-/* ─── Hero ────────────────────────────────────────────────────────────────── */
 export default function Hero() {
   const still = !!useReducedMotion();
 
   return (
-    /* min-h-svh, and the band starts at y=0 — the nav floats over it, so the
-       navbar's own 88px is padding INSIDE the band below, not a spacer that
-       would put a paper stripe above the colour. */
-    <Section tone="hero" pad="none" className="flex min-h-svh flex-col">
-      {/* Ambient light belongs to the band that IS the light source. */}
-      <AmbientEnvironment />
+    /* The band owns the top of the document: the fixed nav floats over it.
+       The band — lines, tiles and the centered stack — is its own relative
+       container, so the hairlines and tile positions are percentages of the
+       band, exactly as in the reference. The preview rises from below the
+       band's bottom edge, so the band never clips it. */
+    <section className="relative overflow-x-clip bg-[var(--scaffold-bg)]">
+      <div className="relative">
+        <BackgroundLines />
+        <FloatingTiles />
 
-      <div className="relative z-10 mx-auto flex w-full max-w-[1200px] flex-1 flex-col px-6 pt-[88px] md:px-10">
-        <div className="flex flex-1 flex-col items-center justify-center py-14 text-center">
-          <h1 className="font-display-xl mx-auto flex max-w-[24ch] flex-col gap-2.5 text-[clamp(2.2rem,5.2vw,4.2rem)] leading-[1.12] text-[var(--on-surface)] tracking-tight sm:gap-4">
-            <Line delay={0.18} still={still}>
-              {HERO.headline.lead}
-            </Line>
-            <Line delay={0.3} still={still} className="pt-1">
-              <RotatingPhrase still={still} />
-            </Line>
-          </h1>
+        <div className="relative z-10 mx-auto flex flex-col items-center px-6">
+          <div className="flex w-full flex-col items-center pt-[104px]">
+            <div className="mt-[10.5vh] md:mt-[11vh]">
+              <AnnouncementPill still={still} />
+            </div>
+            <div className="mt-5">
+              <Headline still={still} />
+            </div>
+            <Subhead still={still} />
+            <CTARow still={still} />
+          </div>
         </div>
       </div>
-    </Section>
+
+      {/* The preview starts ~56px below the CTA row and continues past the
+          fold — roughly the top quarter-to-third shows in the first
+          viewport, and the band above it has no hard bottom edge. */}
+      <div className="relative z-10 mt-[44px] w-full">
+        <ProductPreview />
+      </div>
+    </section>
   );
 }

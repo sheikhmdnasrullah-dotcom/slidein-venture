@@ -165,20 +165,9 @@
   --leading-tight:         1.2;
 
   /* ── WEIGHT ──────────────────────────────────────────────────────────────
-     Fraunces is variable, so these are real interpolated instances, not the
-     nine-step ladder.
-
-     These used to be 340 / 380 / 420 — the reasoning being that large type
-     carries more apparent weight per unit of stroke, so display should be set
-     LIGHTER than body. That is true of a headline set in a text face. It is the
-     wrong call for this page, which now opens on a full-bleed orange band: a
-     340-weight serif on saturated orange reads as thin and unconfident, because
-     the field is doing half the shouting and the type has to match it.
-
-     So display goes fat. 700 at opsz 144 is Fraunces at its most didone — high
-     stroke contrast, real ink traps, closed counters — and it is the single
-     decision that carries the most of the page's character. The ladder still
-     descends, so a section heading never competes with the hero. */
+     One face (Inter Tight), 400 / 500 / 600 loaded. Values outside that
+     range — the 560/700 legacy display weights below — clamp to the nearest
+     loaded instance, so old declarations render at 600 rather than failing. */
   --font-weight-display-xl: 700;
   --font-weight-display-md: 600;
   --font-weight-display-sm: 560;
@@ -186,10 +175,10 @@
   --font-weight-body-md:    500;
   --font-weight-label:      500;
 
-  /* ── OPTICAL SIZE — Fraunces `opsz` axis, in points ─────────────────────
-     Fraunces defaults to opsz 14 (a text cut). Left there, headlines get the
-     thick joins and open apertures drawn for 14px, which is exactly why most
-     variable-serif headlines look soft. These are the deliberate instances. */
+  /* ── OPTICAL SIZE — legacy Fraunces axis tokens, inert under Inter Tight ─
+     The display roles in styles/type.css still reference these; the current
+     face has no opsz axis, so the settings no-op. Retained for a future
+     variable display face. */
   --opsz-display-xl:       144;
   --opsz-display-md:       72;
   --opsz-display-sm:       36;
@@ -255,11 +244,9 @@
   --opsz-display-md: 72;
   --opsz-display-sm: 36;
 
-  /* Live Fraunces axis values. The display roles in app/styles/type.css set
-     these; .wonk overrides only --axis-wonk and inherits the rest, so an
-     accent word keeps the optical cut of the line it sits in. Defaults match
-     the face's own defaults, so a stray .wonk outside a display role degrades
-     to plain text rather than a 144pt poster cut. */
+  /* Legacy variation-axis values from the Fraunces era. Inert under Inter
+     Tight (the face carries no opsz/SOFT/WONK axes); retained so a future
+     variable display face can pick them up without a migration. */
   --axis-opsz: 14;
   --axis-soft: 0;
   --axis-wonk: 0;

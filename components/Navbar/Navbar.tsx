@@ -1,333 +1,200 @@
 'use client';
 
 /**
- * NAVBAR — the floating pill, restored from production
+ * NAVBAR — the rebuilt scaffold bar
  * ---------------------------------------------------------------------------
- * This is the navbar from the deployed site (slideinventure.com), restored
- * in full: the detached pill centred at top-7, the entrance drop, the hover
- * wash that glides between items, the raised active chip with the lit dot,
- * the scroll settle that scales the pill to 0.955, and the mobile sheet.
- * Only the identity items differ from that deploy, per decision:
+ * Full width, no background, no border, no pill container, no blur — a flat
+ * bar floating over the flat page. Left: the existing SlideIn wordmark
+ * asset, untouched. Right: up to three text-link slots (skeleton bars while
+ * empty), then a dark pill CTA with a small arrow, wired to the existing
+ * conversion URL.
  *
- *   · The "T" tile is gone. The "SlideIn." wordmark is the brand on both
- *     breakpoints — it opens the row on desktop and anchors the mobile pill.
- *   · The GitHub link (the open-source repo) sits beside the CTA — one icon,
- *     kept from the current bar.
- *   · The link row is Process / Insights / Pricing, read from
- *     content/product.ts (NAV.links) so the row can never disagree with the
- *     pages. Home is the wordmark, not a text link — a wordmark AND a "Home"
- *     item would be two controls with one destination.
+ * Mobile: logo left, one round icon button right, opening a clean
+ * full-screen sheet whose content comes from the same slots.
  *
- * ACTIVE STATE. The route is the source of truth (pathname decides, longest
- * prefix wins, so /insights/anything is Insights); an in-page scroll spy
- * refines it only when the current page actually contains a section whose id
- * matches another nav entry. The blank canvases have no such sections, so the
- * spy is inert until pages are designed again.
- *
- * `inset-x-0` + `flex flex-col items-center` rather than `left-1/2
- * -translate-x-1/2`: a position:fixed element that also carries its own
- * transform is a known mobile Safari fault line — the fixed box can detach
- * from the viewport during momentum scroll. Centring via flexbox keeps the
- * fixed element transform-free; the pill's entrance/scale transform lives on
- * the motion.div child, where a transform is safe.
+ * All labels come from content/home.ts. Every href is an existing route,
+ * unchanged.
  */
+
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import LetsTalkButton from './LetsTalkButton';
-import GitHubLink from './GitHubLink';
 import { LogoWordmark } from '@/components/Brand/Logo';
-import { NAV } from '@/content/product';
+import { TextSlot } from '@/components/Hero/Skeleton';
+import { NAV_SLOTS } from '@/content/home';
 
-const navLinks = NAV.links;
+const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
-/* ─── Where am I? ─────────────────────────────────────────────────────────── */
-function routeLabel(pathname: string): string {
-  if (pathname === '/') return 'home';
-  const match = navLinks
-    .filter((l) => pathname === l.href || pathname.startsWith(`${l.href}/`))
-    .sort((a, b) => b.href.length - a.href.length)[0];
-  return match ? match.label : '';
+function ArrowIcon({ className }: { className?: string }) {
+  return (
+    <svg width="13" height="13" viewBox="0 0 13 13" fill="none" aria-hidden="true" className={className}>
+      <path d="M2 11 L11 2 M11 2 H4.5 M11 2 v6.5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+/* Hamburger ↔ close morph (pure CSS transitions on two spans). */
+function MenuGlyph({ open }: { open: boolean }) {
+  return (
+    <span className="relative block h-[12px] w-[16px]" aria-hidden="true">
+      <span
+        className="absolute left-0 top-0 block h-[2px] w-full rounded-full bg-[var(--scaffold-ink)] transition-transform duration-200 ease-out"
+        style={{ transform: open ? 'translateY(5px) rotate(45deg)' : 'none' }}
+      />
+      <span
+        className="absolute bottom-0 left-0 block h-[2px] w-full rounded-full bg-[var(--scaffold-ink)] transition-transform duration-200 ease-out"
+        style={{ transform: open ? 'translateY(-5px) rotate(-45deg)' : 'none' }}
+      />
+    </span>
+  );
 }
 
 export default function Navbar() {
   const pathname = usePathname() || '/';
-  const [scrolled, setScrolled] = useState(false);
-  const [mobileOpen, setMobileOpen] = useState(false);
-  const [hoveredLink, setHoveredLink] = useState<string | null>(null);
+  const [open, setOpen] = useState(false);
+  const { links, cta } = NAV_SLOTS;
 
-  const base = routeLabel(pathname);
-  const [spyHit, setSpyHit] = useState<{ path: string; label: string } | null>(null);
-  const activeLink = spyHit && spyHit.path === pathname ? spyHit.label : base;
-
-  /* Keyboard: Escape closes the mobile sheet */
+  /* Keyboard: Escape closes the sheet. */
   useEffect(() => {
-    if (!mobileOpen) return;
+    if (!open) return;
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setMobileOpen(false);
+      if (e.key === 'Escape') setOpen(false);
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [mobileOpen]);
+  }, [open]);
 
-  /* Scroll state + in-page refinement, stored WITH the path it was measured
-     on so a route change settles the highlight on the first render of the new
-     page. */
+  /* The sheet is full-screen: freeze the page behind it. */
   useEffect(() => {
-    const currentPath = pathname;
-
-    const spy: { label: string; el: HTMLElement }[] = navLinks
-      .map((l): { label: string; el: HTMLElement } | null => {
-        const id = l.href.replace(/^\//, '');
-        const el = document.getElementById(id);
-        return el ? { label: l.label, el } : null;
-      })
-      .filter((s): s is { label: string; el: HTMLElement } => s !== null);
-
-    let frame = 0;
-    const onScroll = () => {
-      if (frame) return;
-      frame = window.requestAnimationFrame(() => {
-        frame = 0;
-        setScrolled(window.scrollY > 10);
-
-        if (window.scrollY < 120) {
-          setSpyHit(null);
-          return;
-        }
-
-        let current: string | null = null;
-        for (const section of spy) {
-          const rect = section.el.getBoundingClientRect();
-          if (rect.top <= 150 && rect.bottom >= 150) {
-            current = section.label;
-            break;
-          }
-        }
-        setSpyHit(current ? { path: currentPath, label: current } : null);
-      });
-    };
-
-    window.addEventListener('scroll', onScroll, { passive: true });
-    onScroll();
+    document.body.style.overflow = open ? 'hidden' : '';
     return () => {
-      window.removeEventListener('scroll', onScroll);
-      if (frame) window.cancelAnimationFrame(frame);
+      document.body.style.overflow = '';
     };
-  }, [pathname]);
-
-  /* TWO INDICATORS, NOT ONE. The active state is its own persistent layer (a
-     raised paper chip with a lit dot); hover is a separate, quieter wash that
-     glides between items on its own layoutId. Hovering an item never steals
-     the active marker. */
-  const linkClass =
-    'relative inline-flex items-center whitespace-nowrap rounded-full px-5 py-2.5 text-[16px] transition-colors duration-200';
-
-  const renderActiveChrome = (isActive: boolean, dotLayoutId: string) =>
-    isActive && (
-      <>
-        <motion.span
-          layoutId={`nav-active-chip-${dotLayoutId}`}
-          className="absolute inset-0 rounded-full"
-          style={{
-            background: 'var(--surface)',
-            border: '1px solid var(--rule)',
-            boxShadow: 'var(--shadow-contact)',
-          }}
-          transition={{ type: 'spring', stiffness: 380, damping: 32 }}
-        />
-        <motion.span
-          layoutId={`nav-active-dot-${dotLayoutId}`}
-          className="absolute left-1/2 bottom-[3px] h-[3px] w-[3px] -translate-x-1/2 rounded-full"
-          style={{
-            background: 'var(--accent-vivid)',
-            boxShadow: '0 0 7px var(--accent-vivid)',
-          }}
-          transition={{ type: 'spring', stiffness: 380, damping: 30 }}
-        />
-      </>
-    );
+  }, [open]);
 
   return (
-    <nav
-      className="fixed inset-x-0 top-7 z-[1000] flex flex-col items-center px-4"
-      style={{ pointerEvents: 'none' }}
-    >
-      <motion.div
-        className="flex items-center gap-1 pl-3 pr-3 py-2.5"
-        style={{
-          background: 'var(--surface-glass)',
-          backdropFilter: 'blur(24px) saturate(1.4)',
-          WebkitBackdropFilter: 'blur(24px) saturate(1.4)',
-          borderRadius: 'var(--radius-pill)',
-          border: '1px solid var(--rule)',
-          boxShadow: scrolled ? 'var(--shadow-float)' : 'var(--shadow-raised)',
-          pointerEvents: 'auto',
-          /* Its own compositing layer — cheap insurance against mobile
-             fixed+blur repaint glitches, on the one element that is safe to
-             give a transform to. */
-          transform: 'translateZ(0)',
-          WebkitTransform: 'translateZ(0)',
-          willChange: 'transform',
-        }}
-        initial={{ y: -20, opacity: 0 }}
-        animate={{ y: 0, opacity: 1, scale: scrolled ? 0.955 : 1 }}
-        transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+    <>
+      <motion.nav
+        aria-hidden={false}
+        className="fixed inset-x-0 top-0 z-[1000] flex items-center justify-between px-8 py-6"
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, ease: EASE }}
       >
-        {/* ── Desktop wordmark — the brand is the home link ─────────────── */}
-        <Link
-          href="/"
-          aria-current={activeLink === 'home' ? 'page' : undefined}
-          className="relative hidden items-center whitespace-nowrap rounded-full px-4 py-2.5 outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-ring)] lg:inline-flex"
-        >
-          {renderActiveChrome(activeLink === 'home', 'wordmark')}
-          <span className="relative">
-            <LogoWordmark size="16px" />
-          </span>
+        {/* Left — the existing logo asset, as it is */}
+        <Link href="/" className="inline-flex items-center" onClick={() => setOpen(false)}>
+          <LogoWordmark size="24px" />
         </Link>
 
-        {/* ── Desktop link row ─────────────────────────────────────────── */}
-        <div
-          className="hidden items-center gap-0.5 px-3 lg:flex"
-          onMouseLeave={() => setHoveredLink(null)}
-        >
-          {navLinks.map((link) => {
-            const isActive = activeLink === link.label;
-            const isHovered = hoveredLink === link.label;
+        {/* Right — links + dark CTA (desktop) */}
+        <div className="hidden items-center gap-9 lg:flex">
+          {links.map((link) => {
+            const isActive =
+              pathname === link.href || pathname.startsWith(`${link.href}/`);
             return (
               <Link
-                key={link.label}
+                key={link.href}
                 href={link.href}
                 aria-current={isActive ? 'page' : undefined}
-                onMouseEnter={() => setHoveredLink(link.label)}
-                className={`${linkClass} ${
+                className={`text-[15px] font-medium transition-colors duration-200 ${
                   isActive
-                    ? 'font-[600] text-[var(--on-surface)]'
-                    : 'font-[500] text-[var(--muted)] hover:text-[var(--on-surface)]'
+                    ? 'text-[var(--scaffold-ink)]'
+                    : 'text-[var(--scaffold-muted)] hover:text-[var(--scaffold-ink)]'
                 }`}
+                style={{ letterSpacing: '-0.01em' }}
               >
-                {/* Hover wash — under the active chip, so an active item you
-                    happen to be pointing at does not double up. */}
-                {isHovered && !isActive && (
-                  <motion.span
-                    layoutId="nav-hover-wash"
-                    className="absolute inset-0 rounded-full bg-[var(--rule)]"
-                    style={{ opacity: 0.65 }}
-                    transition={{ type: 'spring', stiffness: 420, damping: 34 }}
-                  />
-                )}
-                {renderActiveChrome(isActive, link.label)}
-                <span className="relative">{link.label}</span>
+                <TextSlot text={link.label} barWidth="3.4em" />
               </Link>
             );
           })}
-        </div>
-
-        {/* ── Open source + CTA (desktop) ──────────────────────────────── */}
-        <div className="hidden items-center gap-1 lg:flex">
-          <GitHubLink className="h-10 w-10" />
-          <LetsTalkButton />
-        </div>
-
-        {/* ── Mobile brand — wordmark, no tile ─────────────────────────── */}
-        <Link
-          href="/"
-          className="flex items-center pl-2 pr-3 lg:hidden"
-          aria-label="SlideIn — home"
-          onClick={() => setMobileOpen(false)}
-        >
-          <LogoWordmark size="15px" />
-        </Link>
-        <span className="w-1 lg:hidden" />
-        <GitHubLink className="flex h-10 w-10 items-center justify-center lg:hidden" />
-        <button
-          className="flex h-[44px] w-[44px] items-center justify-center rounded-full transition-colors duration-150 lg:hidden"
-          style={{ background: mobileOpen ? 'var(--rule)' : 'transparent' }}
-          onClick={() => setMobileOpen(!mobileOpen)}
-          aria-expanded={mobileOpen}
-          aria-label="Toggle menu"
-        >
-          <div className="flex w-[18px] flex-col gap-[4px]">
-            <span
-              className="block h-[2px] origin-center rounded-full bg-[var(--on-surface)] transition-transform duration-200"
-              style={{ transform: mobileOpen ? 'translateY(6px) rotate(45deg)' : 'none' }}
-            />
-            <span
-              className="block h-[2px] rounded-full bg-[var(--on-surface)] transition-opacity duration-200"
-              style={{ opacity: mobileOpen ? 0 : 1 }}
-            />
-            <span
-              className="block h-[2px] origin-center rounded-full bg-[var(--on-surface)] transition-transform duration-200"
-              style={{ transform: mobileOpen ? 'translateY(-6px) rotate(-45deg)' : 'none' }}
-            />
-          </div>
-        </button>
-      </motion.div>
-
-      {/* ── Mobile sheet ───────────────────────────────────────────────── */}
-      <AnimatePresence>
-        {mobileOpen && (
-          <motion.div
-            className="mt-2 w-[min(92vw,320px)] overflow-hidden lg:hidden"
-            style={{
-              background: 'var(--surface-glass)',
-              backdropFilter: 'blur(24px) saturate(1.4)',
-              WebkitBackdropFilter: 'blur(24px) saturate(1.4)',
-              borderRadius: 'var(--radius-md)',
-              border: '1px solid var(--rule)',
-              boxShadow: 'var(--shadow-float)',
-              pointerEvents: 'auto',
-            }}
-            initial={{ opacity: 0, height: 0, scale: 0.95 }}
-            animate={{ opacity: 1, height: 'auto', scale: 1 }}
-            exit={{ opacity: 0, height: 0, scale: 0.95 }}
-            transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
+          <Link
+            href={cta.href}
+            className="inline-flex h-12 items-center gap-2 rounded-full bg-[var(--scaffold-button)] px-6 text-[15px] font-medium text-white transition-transform duration-200 ease-out hover:-translate-y-px active:scale-[0.98]"
+            style={{ boxShadow: 'var(--scaffold-shadow-button)', letterSpacing: '-0.01em' }}
           >
-            <div className="flex max-h-[calc(100vh-120px)] flex-col gap-0.5 overflow-y-auto px-4 py-4">
-              {navLinks.map((link) => {
-                const isActive = activeLink === link.label;
-                return (
-                  <Link
-                    key={link.label}
-                    href={link.href}
-                    aria-current={isActive ? 'page' : undefined}
-                    className={`relative flex items-center justify-between rounded-[var(--radius-md)] px-4 py-3 text-[15px] transition-colors ${
-                      isActive
-                        ? 'font-[600] text-[var(--on-surface)]'
-                        : 'font-[500] text-[var(--muted)] hover:bg-[var(--rule)] hover:text-[var(--on-surface)]'
-                    }`}
-                    style={
-                      isActive
-                        ? { background: 'var(--surface)', boxShadow: 'var(--shadow-contact)' }
-                        : undefined
-                    }
-                    onClick={() => setMobileOpen(false)}
-                  >
-                    {link.label}
-                    {isActive && (
-                      <motion.span
-                        layoutId="nav-active-dot-mobile"
-                        className="h-[5px] w-[5px] rounded-full"
-                        style={{
-                          background: 'var(--accent-vivid)',
-                          boxShadow: '0 0 8px var(--accent-vivid)',
-                        }}
-                        transition={{ type: 'spring', stiffness: 380, damping: 30 }}
-                      />
-                    )}
-                  </Link>
-                );
-              })}
+            <TextSlot text={cta.label} barWidth="3.2em" onDark />
+            <ArrowIcon />
+          </Link>
+        </div>
 
-              {/* Mobile CTA */}
-              <div className="mt-2 flex justify-center border-t border-[var(--rule)] pb-4 pt-3">
-                <LetsTalkButton isMobile={true} />
-              </div>
+        {/* Right — one round icon button (mobile) */}
+        <button
+          type="button"
+          onClick={() => setOpen(!open)}
+          aria-expanded={open}
+          aria-label="Toggle menu"
+          className="flex h-11 w-11 items-center justify-center rounded-full border border-[var(--scaffold-hairline)] bg-[var(--scaffold-surface)] transition-colors lg:hidden"
+          style={{ boxShadow: 'var(--scaffold-shadow-soft)' }}
+        >
+          <MenuGlyph open={open} />
+        </button>
+      </motion.nav>
+
+      {/* ── Full-screen sheet ── */}
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            className="fixed inset-0 z-[1100] flex flex-col bg-[var(--scaffold-bg)] px-8 pb-10 pt-6 lg:hidden"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.25, ease: EASE }}
+          >
+            <div className="flex items-center justify-between">
+              <Link href="/" onClick={() => setOpen(false)}>
+                <LogoWordmark size="22px" />
+              </Link>
+              <button
+                type="button"
+                onClick={() => setOpen(false)}
+                aria-label="Close menu"
+                className="flex h-11 w-11 items-center justify-center rounded-full border border-[var(--scaffold-hairline)] bg-[var(--scaffold-surface)]"
+              >
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+                  <path d="M2 2 L12 12 M12 2 L2 12" stroke="rgba(10,10,10,1)" strokeWidth="1.8" strokeLinecap="round" />
+                </svg>
+              </button>
             </div>
+
+            <div className="flex flex-1 flex-col justify-center gap-8">
+              {links.map((link, i) => (
+                <motion.div
+                  key={link.href}
+                  initial={{ opacity: 0, y: 12 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, ease: EASE, delay: 0.06 * i }}
+                >
+                  <Link
+                    href={link.href}
+                    onClick={() => setOpen(false)}
+                    className="block text-[32px] font-semibold text-[var(--scaffold-ink)]"
+                    style={{ letterSpacing: '-0.03em' }}
+                  >
+                    <TextSlot text={link.label} barWidth="4em" />
+                  </Link>
+                </motion.div>
+              ))}
+            </div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, ease: EASE, delay: 0.22 }}
+            >
+              <Link
+                href={cta.href}
+                onClick={() => setOpen(false)}
+                className="flex h-[52px] w-full items-center justify-center gap-2.5 rounded-full bg-[var(--scaffold-button)] text-[16px] font-medium text-white"
+                style={{ boxShadow: 'var(--scaffold-shadow-button)' }}
+              >
+                <span className="h-2 w-2 rounded-full bg-[var(--scaffold-accent)]" aria-hidden="true" />
+                <TextSlot text={cta.label} barWidth="3.4em" onDark />
+              </Link>
+            </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
-    </nav>
+    </>
   );
 }
