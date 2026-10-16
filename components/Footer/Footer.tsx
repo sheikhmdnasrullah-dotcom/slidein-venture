@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { Section } from '@/components/Section';
 import { LogoWordmark } from '@/components/Brand/Logo';
 import { CornerBrackets } from '@/components/System/System';
+import { Text, Eyebrow } from '@/components/Type/Type';
 
 const CALENDAR_URL =
   'https://calendar.google.com/calendar/u/0/appointments/schedules/AcZssZ1V3_WMuJIp2gvHKgyE0NG_acjZ4zVGaeOJrQU';
@@ -42,18 +43,12 @@ export default function Footer() {
             aria-hidden
             className="block h-[1.5px] w-8 rounded-full bg-[var(--color-brand)]"
           />
-          <p className="font-label text-[11px] font-medium leading-[1.55] tracking-[0.16em] uppercase text-[var(--muted)]">
-            Research-led outreach,
-            <br />
-            run as software
-          </p>
+          <Eyebrow as="span" text="Research-led outreach, run as software" />
         </div>
 
         {/* ── Nav: same items as the navbar ────────────────────────── */}
         <nav aria-label="Site" className="flex flex-col gap-4 md:items-center">
-          <span className="font-label text-[11px] font-medium tracking-[0.18em] uppercase text-[var(--muted)]">
-            Platform
-          </span>
+          <Eyebrow as="span" text="Platform" />
           <ul className="flex flex-wrap items-center gap-x-5 gap-y-2.5 md:justify-center">
             <li>
               <FooterLink href="/#platform">Software</FooterLink>
@@ -78,16 +73,14 @@ export default function Footer() {
 
         {/* ── The real CTA + year ───────────────────────────────────── */}
         <div className="flex flex-col gap-3 md:items-end md:text-right">
-          <span className="font-label text-[11px] font-medium tracking-[0.18em] uppercase text-[var(--muted)]">
-            Work with us
-          </span>
+          <Eyebrow as="span" text="Work with us" />
           <a
             href={CALENDAR_URL}
             target="_blank"
             rel="noopener noreferrer"
-            className="group inline-flex items-center gap-1.5 text-sm font-medium text-[var(--on-surface)] underline decoration-transparent underline-offset-4 transition-colors duration-300 hover:decoration-current focus-visible:decoration-current"
+            className="group inline-flex items-center gap-1.5 underline decoration-transparent underline-offset-4 transition-colors duration-300 hover:decoration-current focus-visible:decoration-current"
           >
-            Book a walkthrough
+            <Text as="span" variant="small" text="Book a walkthrough" />
             <span
               aria-hidden
               className="transition-transform duration-300 group-hover:translate-x-0.5"
@@ -95,22 +88,18 @@ export default function Footer() {
               ↗
             </span>
           </a>
-          <p className="text-[12.5px] leading-relaxed text-[var(--muted)]">
-            Or run the platform yourself — the choice is yours.
-          </p>
+          <Text variant="small" text="Or run the platform yourself — the choice is yours." />
         </div>
       </div>
 
       {/* ── Bottom bar ─────────────────────────────────────────────── */}
       <div className="mx-auto mt-[clamp(2.5rem,5vw,4rem)] flex w-full max-w-[1100px] flex-col-reverse gap-6 border-t border-[var(--rule-strong)] pt-6 md:flex-row md:items-center md:justify-between">
         <div className="flex flex-col gap-2">
-          <p className="text-[12.5px] text-[var(--muted)]">
-            © {new Date().getFullYear()} SlideIn Venture. All rights reserved.
-          </p>
-          <p className="text-[12.5px] text-[var(--muted)]">
-            We only contact people who match a brief you approve. Every email carries a working
-            unsubscribe, and a no is permanent.
-          </p>
+          <Text variant="small" text={`© ${new Date().getFullYear()} SlideIn Venture. All rights reserved.`} />
+          <Text
+            variant="small"
+            text="We only contact people who match a brief you approve. Every email carries a working unsubscribe, and a no is permanent."
+          />
         </div>
 
         <span
@@ -124,13 +113,13 @@ export default function Footer() {
   );
 }
 
-function FooterLink({ href, children }: { href: string; children: React.ReactNode }) {
+function FooterLink({ href, children }: { href: string; children: string }) {
   return (
     <Link
       href={href}
-      className="text-sm font-medium text-[var(--on-surface)] underline decoration-transparent underline-offset-4 transition-colors duration-300 hover:decoration-current focus-visible:decoration-current"
+      className="underline decoration-transparent underline-offset-4 transition-colors duration-300 hover:decoration-current focus-visible:decoration-current"
     >
-      {children}
+      <Text as="span" variant="small" text={children} />
     </Link>
   );
 }

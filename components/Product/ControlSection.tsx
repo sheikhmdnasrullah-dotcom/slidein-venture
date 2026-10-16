@@ -1,6 +1,7 @@
 import { Section } from '@/components/Section';
 import Reveal from './Reveal';
 import SectionHead from './SectionHead';
+import { Heading, Text } from '@/components/Type/Type';
 import { CONTROL } from '@/content/product';
 
 /**
@@ -18,24 +19,20 @@ export default function ControlSection() {
     <Section tone="base" pad="none" className="py-[clamp(4.5rem,9vw,8rem)]">
       <div className="mx-auto w-full max-w-[1040px] px-6 md:px-10">
         <SectionHead
-          index="06"
           label={CONTROL.eyebrow}
           heading={CONTROL.heading}
           body={CONTROL.body}
-          coordinate="NO GUARANTEES"
         />
 
-        <dl className="mt-14 flex flex-col">
+        <dl className="mt-8 flex flex-col">
           {CONTROL.items.map((item, i) => (
             <Reveal
               key={item.title}
               delay={i * 0.05}
               className="grid grid-cols-1 gap-x-10 gap-y-3 border-t border-[var(--rule)] py-7 md:grid-cols-[16rem_1fr] md:py-8"
             >
-              <dt className="font-display-sm text-[clamp(1.1rem,1.8vw,1.3rem)] leading-tight text-[var(--on-surface)]">
-                {item.title}
-              </dt>
-              <dd className="max-w-[62ch] text-[15px] leading-[1.75] text-[var(--muted)]">{item.detail}</dd>
+              <Heading variant="h3" as="dt" text={item.title} />
+              <Text variant="body" as="dd" text={item.detail} />
             </Reveal>
           ))}
         </dl>

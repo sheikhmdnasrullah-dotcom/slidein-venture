@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { Section } from '@/components/Section';
 import Reveal from './Reveal';
+import { Heading, Text } from '@/components/Type/Type';
 import { CLOSING } from '@/content/product';
 
 /**
@@ -18,14 +19,10 @@ export default function ClosingSection() {
       <div className="mx-auto w-full max-w-[1040px] px-6 md:px-10">
         <Reveal>
           <div className="mx-auto flex max-w-[720px] flex-col items-center text-center">
-            <h2 className="font-display-xl text-[clamp(2rem,4.2vw,3rem)] leading-[1.12] text-[var(--on-surface)]">
-              {CLOSING.heading}
-            </h2>
-            <p className="font-body-lead mt-6 max-w-[56ch] text-[1.05rem] leading-[1.75] text-[var(--muted)]">
-              {CLOSING.body}
-            </p>
+            <Heading variant="h2" text={CLOSING.heading} align="center" />
+            <Text variant="lead" text={CLOSING.body} align="center" className="mt-5" />
 
-            <div className="mt-10 flex flex-wrap items-center justify-center gap-3.5">
+            <div className="mt-8 flex flex-wrap items-center justify-center gap-3.5">
               <Link
                 href={CLOSING.primaryCta.href}
                 className="btn-premium group inline-flex items-center gap-2.5 rounded-[var(--radius-pill)] px-7 py-[17px] text-[15px] font-[600] tracking-[-0.01em]"

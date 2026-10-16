@@ -1,9 +1,9 @@
 'use client';
 
 import { Section } from '@/components/Section';
-import { MonoLabel } from '@/components/System/System';
 import Reveal from './Reveal';
 import SectionHead from './SectionHead';
+import { Heading, Text, Eyebrow } from '@/components/Type/Type';
 import { WORKFLOW } from '@/content/product';
 
 /**
@@ -24,15 +24,13 @@ export default function WorkflowSection() {
     <Section tone="raised" pad="none" className="py-[clamp(4.5rem,9vw,8rem)]" seam>
       <div className="mx-auto w-full max-w-[1040px] px-6 md:px-10">
         <SectionHead
-          index="02"
           label={WORKFLOW.eyebrow}
           heading={WORKFLOW.heading}
           body={WORKFLOW.summary}
-          coordinate="RESEARCH → MONITOR"
         />
 
         {/* The rail */}
-        <ol className="relative mt-14 flex flex-col md:flex-row md:items-stretch md:gap-0">
+        <ol className="relative mt-8 flex flex-col md:flex-row md:items-stretch md:gap-0">
           {WORKFLOW.stages.map((stage, i) => (
             <Reveal
               as="li"
@@ -52,13 +50,9 @@ export default function WorkflowSection() {
                 </div>
 
                 <div className="flex-1 pb-9 md:pb-0 md:pr-8">
-                  <MonoLabel className="text-[var(--accent)]">{stage.index}</MonoLabel>
-                  <h3 className="font-display-sm mt-3 text-[1.3rem] leading-tight text-[var(--on-surface)]">
-                    {stage.name}
-                  </h3>
-                  <p className="mt-3 max-w-[34ch] text-[14.5px] leading-[1.7] text-[var(--muted)]">
-                    {stage.detail}
-                  </p>
+                  <Eyebrow text={stage.index} />
+                  <Heading variant="h3" text={stage.name} className="mt-3" />
+                  <Text variant="body" text={stage.detail} className="mt-3 max-w-[34ch]" />
                 </div>
 
                 {/* Horizontal connector (desktop only) */}
@@ -74,12 +68,12 @@ export default function WorkflowSection() {
 
         {/* The gate */}
         <Reveal delay={0.2}>
-          <p
-            className="mt-6 flex max-w-[76ch] items-start gap-3 border-l-2 py-1 pl-5 text-[15px] leading-[1.7] text-[var(--on-surface)]"
+          <div
+            className="mt-6 border-l-2 py-1 pl-5"
             style={{ borderColor: 'var(--accent-vivid)' }}
           >
-            {WORKFLOW.gate}
-          </p>
+            <Text variant="body" text={WORKFLOW.gate} />
+          </div>
         </Reveal>
       </div>
     </Section>

@@ -129,6 +129,10 @@
 html {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  /* The single-face contract: kerning on, legibility rendering. Tabular
+     figures stay opt-in (.tnum) — marketing text uses proportional digits. */
+  text-rendering: optimizeLegibility;
+  font-kerning: normal;
   scroll-behavior: smooth;
   /* Declared, not inferred. Without it a visitor whose OS is in dark mode gets
      dark form controls, a dark scrollbar and a dark autofill wash on a page

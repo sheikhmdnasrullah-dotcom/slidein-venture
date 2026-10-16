@@ -1,6 +1,7 @@
 import { Section } from '@/components/Section';
 import Reveal from './Reveal';
 import SectionHead from './SectionHead';
+import { Heading, Text, Eyebrow } from '@/components/Type/Type';
 import { CAPABILITIES } from '@/content/product';
 
 /**
@@ -18,14 +19,12 @@ export default function CapabilitiesSection() {
     <Section tone="raised" pad="none" className="py-[clamp(4.5rem,9vw,8rem)]" seam>
       <div className="mx-auto w-full max-w-[1040px] px-6 md:px-10">
         <SectionHead
-          index="04"
           label={CAPABILITIES.eyebrow}
           heading={CAPABILITIES.heading}
           body={CAPABILITIES.body}
-          coordinate="4 AREAS"
         />
 
-        <div className="mt-14 grid grid-cols-1 gap-6 md:grid-cols-2 md:gap-8">
+        <div className="mt-8 grid grid-cols-1 gap-6 md:grid-cols-2 md:gap-8">
           {CAPABILITIES.groups.map((group, i) => (
             <Reveal key={group.name} delay={(i % 2) * 0.08}>
               <article
@@ -44,27 +43,25 @@ export default function CapabilitiesSection() {
                 />
 
                 <div className="relative flex items-center gap-3">
-                  <span className="font-label text-[11px] text-[var(--accent)]">
-                    {String(i + 1).padStart(2, '0')}
-                  </span>
+                  <Eyebrow as="span" text={String(i + 1).padStart(2, '0')} />
                   <span className="h-px flex-1 bg-[var(--rule)]" aria-hidden />
                 </div>
 
-                <h3 className="font-display-sm relative mt-5 text-[clamp(1.25rem,2vw,1.5rem)] leading-tight text-[var(--on-surface)]">
-                  {group.name}
-                </h3>
-                <p className="relative mt-3 max-w-[46ch] text-[15px] leading-[1.7] text-[var(--muted)]">
-                  {group.detail}
-                </p>
+                <Heading variant="h3" text={group.name} className="relative mt-5" />
+                <Text
+                  variant="body"
+                  text={group.detail}
+                  className="relative mt-3 max-w-[46ch]"
+                />
 
                 <ul className="relative mt-6 flex flex-col gap-2.5 border-t border-[var(--rule)] pt-6">
                   {group.points.map((point) => (
-                    <li key={point} className="flex items-start gap-3 text-[14px] leading-[1.6] text-[var(--on-surface)]">
+                    <li key={point} className="flex items-start gap-3">
                       <span
                         aria-hidden
                         className="mt-[7px] h-1 w-1 shrink-0 rounded-full bg-[var(--accent-vivid)]"
                       />
-                      {point}
+                      <Text as="span" variant="small" text={point} />
                     </li>
                   ))}
                 </ul>

@@ -2,10 +2,10 @@
 
 import { useState, useRef } from 'react';
 import { Section } from '@/components/Section';
-import { MonoLabel } from '@/components/System/System';
 import { cn } from '@/lib/utils';
 import Reveal from './Reveal';
 import SectionHead from './SectionHead';
+import { Heading, Text, Eyebrow } from '@/components/Type/Type';
 import { PLATFORM } from '@/content/product';
 
 /**
@@ -44,16 +44,14 @@ export default function PlatformSection() {
     <Section tone="base" pad="none" className="py-[clamp(4.5rem,9vw,8rem)]">
       <div className="mx-auto w-full max-w-[1040px] px-6 md:px-10">
         <SectionHead
-          index="03"
           label={PLATFORM.eyebrow}
           heading={PLATFORM.heading}
           body={PLATFORM.body}
-          coordinate="WORKSPACE"
         />
 
         <Reveal delay={0.08}>
           <div
-            className="mt-14 overflow-hidden rounded-[calc(var(--radius-md)*1.6)]"
+            className="mt-8 overflow-hidden rounded-[calc(var(--radius-md)*1.6)]"
             style={{
               background: 'linear-gradient(180deg, var(--gloss), transparent 26%), var(--surface-glass)',
               border: '1px solid var(--rule)',
@@ -68,9 +66,9 @@ export default function PlatformSection() {
                 aria-hidden
                 className="h-1.5 w-1.5 rounded-full bg-[var(--accent-vivid)]"
               />
-              <MonoLabel>Workspace</MonoLabel>
+              <Eyebrow as="span" text="Workspace" />
               <span className="ml-auto">
-                <MonoLabel>SlideIn Venture</MonoLabel>
+                <Eyebrow as="span" text="SlideIn Venture" />
               </span>
             </div>
 
@@ -110,14 +108,15 @@ export default function PlatformSection() {
                         transform: i === active ? 'scaleY(1)' : undefined,
                       }}
                     />
-                    <span
+                    <Text
+                      as="span"
+                      variant="small"
+                      text={a.name}
                       className={cn(
-                        'font-display-sm block text-[1.02rem] leading-tight transition-colors duration-300',
-                        i === active ? 'text-[var(--on-surface)]' : 'text-[var(--muted)] group-hover:text-[var(--on-surface)]'
+                        'block transition-colors duration-300',
+                        i === active ? 'text-[var(--scaffold-ink)]' : 'group-hover:text-[var(--scaffold-ink)]'
                       )}
-                    >
-                      {a.name}
-                    </span>
+                    />
                   </button>
                 ))}
               </div>
@@ -129,15 +128,11 @@ export default function PlatformSection() {
                 aria-labelledby={`area-tab-${active}`}
                 className="flex flex-1 flex-col justify-center px-6 py-10 md:px-10 md:py-14"
               >
-                <MonoLabel className="text-[var(--accent)]">
-                  Area {String(active + 1).padStart(2, '0')} / {String(PLATFORM.areas.length).padStart(2, '0')}
-                </MonoLabel>
-                <h3 className="font-display-md mt-4 text-[clamp(1.4rem,2.6vw,1.9rem)] leading-tight text-[var(--on-surface)]">
-                  {area.name}
-                </h3>
-                <p className="mt-4 max-w-[52ch] text-[1.05rem] leading-[1.75] text-[var(--muted)]">
-                  {area.detail}
-                </p>
+                <Eyebrow
+                  text={`Area ${String(active + 1).padStart(2, '0')} / ${String(PLATFORM.areas.length).padStart(2, '0')}`}
+                />
+                <Heading variant="h3" text={area.name} className="mt-4" />
+                <Text variant="body" text={area.detail} className="mt-4 max-w-[52ch]" />
               </div>
             </div>
           </div>
@@ -145,9 +140,7 @@ export default function PlatformSection() {
 
         {/* The honest state of access */}
         <Reveal delay={0.14}>
-          <p className="mt-8 max-w-[70ch] text-[14.5px] leading-[1.7] text-[var(--muted)]">
-            {PLATFORM.accessNote}
-          </p>
+          <Text variant="small" text={PLATFORM.accessNote} className="mt-8 max-w-[70ch]" />
         </Reveal>
       </div>
     </Section>

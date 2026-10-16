@@ -1,36 +1,32 @@
-import { SectionRule } from '@/components/System/System';
+import { Heading, Text, Eyebrow } from '@/components/Type/Type';
 
 /**
- * SECTION HEAD — the site's own section header, reused per section
+ * SECTION HEAD — eyebrow, H2, lead, on the primitives
  * ---------------------------------------------------------------------------
- * The rule carries the index and the label in the language the rest of the
- * site already speaks (`NN — Label`, hairline, optional coordinate). The
- * heading and the body sit under it, so a section is three lines and a rule
- * rather than a bespoke arrangement each time.
+ * The old head was a mono uppercase rule with an index and a coordinate.
+ * The new one is three primitives at the specified rhythm: eyebrow, 16px,
+ * H2, 20px, lead. Sections put 32px (mt-8) between the head and their
+ * content. Alignment is per-section and never mixed inside one block.
  */
 export default function SectionHead({
-  index,
   label,
   heading,
   body,
-  coordinate,
+  align = 'left',
   className,
 }: {
-  index: string;
   label: string;
   heading: string;
   body?: string;
-  coordinate?: string;
+  align?: 'left' | 'center';
   className?: string;
 }) {
   return (
     <div className={className}>
-      <SectionRule index={index} label={label} coordinate={coordinate} className="mb-8" />
-      <h2 className="font-display-md max-w-[24ch] text-[clamp(1.8rem,3.6vw,2.6rem)] leading-[1.15] text-[var(--on-surface)]">
-        {heading}
-      </h2>
+      <Eyebrow text={label} barWidth="10em" align={align} />
+      <Heading variant="h2" text={heading} barWidth="18em" align={align} className="mt-4" />
       {body && (
-        <p className="mt-5 max-w-[62ch] text-[1.05rem] leading-[1.75] text-[var(--muted)]">{body}</p>
+        <Text variant="lead" text={body} barWidth="32em" align={align} className="mt-5" />
       )}
     </div>
   );

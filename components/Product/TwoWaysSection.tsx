@@ -1,8 +1,8 @@
 import Link from 'next/link';
 import { Section } from '@/components/Section';
-import { MonoLabel } from '@/components/System/System';
 import Reveal from './Reveal';
 import SectionHead from './SectionHead';
+import { Heading, Text, Eyebrow } from '@/components/Type/Type';
 import { TWO_WAYS } from '@/content/product';
 
 /**
@@ -20,14 +20,12 @@ export default function TwoWaysSection() {
     <Section id="managed" tone="anchor" pad="none" className="py-[clamp(4.5rem,9vw,8rem)]" seam>
       <div className="mx-auto w-full max-w-[1040px] px-6 md:px-10">
         <SectionHead
-          index="05"
           label={TWO_WAYS.eyebrow}
           heading={TWO_WAYS.heading}
           body={TWO_WAYS.body}
-          coordinate="SOFTWARE · MANAGED SERVICE"
         />
 
-        <div className="relative mt-14 grid grid-cols-1 gap-6 md:grid-cols-2 md:gap-8">
+        <div className="relative mt-8 grid grid-cols-1 gap-6 md:grid-cols-2 md:gap-8">
           {/* The join between the two paths — one platform, drawn once */}
           <span
             aria-hidden
@@ -46,28 +44,24 @@ export default function TwoWaysSection() {
               >
                 <div className="flex items-center gap-3">
                   <span
-                    className="rounded-full px-3 py-1 font-label text-[10px]"
+                    className="rounded-full px-3 py-1"
                     style={{
                       background: 'var(--surface-2)',
                       border: '1px solid var(--rule)',
                       color: 'var(--on-surface)',
                     }}
                   >
-                    {path.tag}
+                    <Eyebrow as="span" text={path.tag} />
                   </span>
                   <span className="h-px flex-1 bg-[var(--rule)]" aria-hidden />
                 </div>
 
-                <h3 className="font-display-md mt-6 text-[clamp(1.5rem,2.6vw,2rem)] leading-tight text-[var(--on-surface)]">
-                  {path.name}
-                </h3>
-                <p className="mt-3 max-w-[40ch] text-[1.02rem] leading-[1.7] text-[var(--muted)]">
-                  {path.summary}
-                </p>
+                <Heading variant="h3" text={path.name} className="mt-6" />
+                <Text variant="body" text={path.summary} className="mt-3 max-w-[40ch]" />
 
                 <ul className="mt-8 flex flex-col gap-4">
                   {path.points.map((point) => (
-                    <li key={point} className="flex items-start gap-3.5 text-[15px] leading-[1.65] text-[var(--on-surface)]">
+                    <li key={point} className="flex items-start gap-3.5">
                       <svg
                         width="14"
                         height="14"
@@ -84,16 +78,14 @@ export default function TwoWaysSection() {
                           strokeLinejoin="round"
                         />
                       </svg>
-                      {point}
+                      <Text as="span" variant="body" text={point} />
                     </li>
                   ))}
                 </ul>
 
                 <div className="mt-auto pt-9">
                   <span className="block h-px w-full bg-[var(--rule)]" aria-hidden />
-                  <p className="mt-5 font-label text-[11px] leading-[1.7] text-[var(--muted)]">
-                    {path.bestFor}
-                  </p>
+                  <Text variant="small" text={path.bestFor} className="mt-5" />
                 </div>
               </article>
             </Reveal>
@@ -102,9 +94,7 @@ export default function TwoWaysSection() {
 
         <Reveal delay={0.16}>
           <div className="mt-10 flex flex-col items-start justify-between gap-5 sm:flex-row sm:items-center">
-            <p className="max-w-[64ch] text-[14.5px] leading-[1.7] text-[var(--muted)]">
-              {TWO_WAYS.footnote}
-            </p>
+            <Text variant="small" text={TWO_WAYS.footnote} className="max-w-[64ch]" />
             <Link
               href="/pricing"
               className="group inline-flex shrink-0 items-center gap-2 text-[15px] font-[600] text-[var(--on-surface)] transition-colors hover:text-[var(--accent)]"
