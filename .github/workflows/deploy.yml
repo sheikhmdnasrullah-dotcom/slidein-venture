@@ -13,6 +13,9 @@ jobs:
         with:
           clean: true
 
+      - name: Remove any Vercel config
+        run: rm -rf .vercel
+
       - name: Deploy to Vercel
         uses: amondnet/vercel-action@v25
         with:
@@ -20,3 +23,4 @@ jobs:
           vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
           vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID_SLIDEINVENTURE }}
           github-comment: false
+          vercel-args: '--prod'
