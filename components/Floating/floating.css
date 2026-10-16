@@ -1,0 +1,131 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   FLOATING FIELDS — responsive tiers, still-mode fade, step grid
+   ---------------------------------------------------------------------------
+   Tiers:
+     ≥1100px  full gutter fields (hero + process steps)
+     <1100px  gutters unmount visually; the hero shows the 4-object compact
+              row instead (same tier covers 768–1099 and <768)
+     <1024px  far layer + satellites + trajectories hide (the compact row has
+              none, so this only affects ≥1100 widths in practice... and the
+              process step gutters, which hide entirely <1024)
+   Short screens (≤860px tall) scale the compact row to 0.7 so it keeps its
+   24px nav / 40px pill clearance (see config HERO_COMPACT note).
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Far layer, satellites and trajectories hide below 1024px. */
+@media (max-width: 1023.98px) {
+  .ff-hide-below-1024 {
+    display: none !important;
+  }
+}
+
+/* Full gutter fields live only at ≥1100px (mirrors .hero-gutter). */
+@media (max-width: 1099.98px) {
+  .ff-gutter-field {
+    display: none !important;
+  }
+}
+
+/* The compact row lives only below 1100px. */
+.ff-compact-field {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  transform-origin: top center;
+}
+
+@media (min-width: 1100px) {
+  .ff-compact-field {
+    display: none !important;
+  }
+}
+
+@media (max-width: 1099.98px) and (max-height: 860px) {
+  .ff-compact-field {
+    transform: translateY(30px) scale(0.7);
+  }
+}
+
+/* Reduced motion: objects rest statically with a 100ms fade. The fade is
+   applied through framer-motion props (not CSS) so server and client
+   render one identical tree. */
+
+/* ── Process step grid: [gutter] [column] [gutter] ─────────────────────
+   Same idea as .hero-grid with its own column width; gutters hide <1024. */
+
+.ff-step-grid {
+  display: grid;
+  /* Gutters never drop below 192px while visible (≥1024): the column
+     absorbs narrow widths instead, so props keep their clearance. */
+  grid-template-columns:
+    1fr
+    minmax(0, min(880px, calc(100% - 384px)))
+    1fr;
+}
+
+.ff-step-gutter {
+  position: relative;
+  min-height: 100%;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.ff-step-column {
+  position: relative;
+  z-index: 2;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding-inline: 24px;
+}
+
+@media (max-width: 1023.98px) {
+  .ff-step-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .ff-step-gutter {
+    display: none;
+  }
+}
+
+/* ── Traveling tile rail (process) ─────────────────────────────────── */
+
+.ff-travel-rail {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: calc((100% - min(880px, calc(100% - 384px))) / 2);
+  /* Above all props: the traveler transits OVER them with a defined
+     z-order (the traveling exemption in the overlap check). */
+  z-index: 10;
+  pointer-events: none;
+}
+
+.ff-travel-sticky {
+  position: sticky;
+  top: 38vh;
+  display: flex;
+  justify-content: center;
+}
+
+@media (max-width: 1023.98px) {
+  .ff-travel-rail {
+    display: none;
+  }
+}
+
+/* Docked mini tile beside the step marker: mobile only. */
+.ff-dock {
+  display: none;
+}
+
+@media (max-width: 1023.98px) {
+  .ff-dock {
+    display: block;
+  }
+}
