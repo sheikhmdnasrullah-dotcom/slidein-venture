@@ -47,8 +47,8 @@ function GitHubIcon({ className }: { className?: string }) {
 
 function ArrowIcon({ className }: { className?: string }) {
   return (
-    <svg width="13" height="13" viewBox="0 0 13 13" fill="none" aria-hidden="true" className={className}>
-      <path d="M2 11 L11 2 M11 2 H4.5 M11 2 v6.5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+    <svg width="14" height="14" viewBox="0 0 13 13" fill="none" aria-hidden="true" className={className}>
+      <path d="M2 11 L11 2 M11 2 H4.5 M11 2 v6.5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   );
 }
@@ -103,7 +103,7 @@ export default function Navbar() {
       >
         {/* Left — the existing logo asset, as it is */}
         <Link href="/" className="inline-flex items-center" onClick={() => setOpen(false)}>
-          <LogoWordmark size="24px" />
+          <LogoWordmark size="26px" />
         </Link>
 
         {/* Right — links + dark CTA (desktop) */}
@@ -116,12 +116,12 @@ export default function Navbar() {
                 key={link.href}
                 href={link.href}
                 aria-current={isActive ? 'page' : undefined}
-                className={`text-[15px] font-medium transition-colors duration-200 ${
+                className={`text-[16px] font-semibold transition-colors duration-200 ${
                   isActive
                     ? 'text-[var(--scaffold-ink)]'
-                    : 'text-[var(--scaffold-muted)] hover:text-[var(--scaffold-ink)]'
+                    : 'text-[rgb(10_10_10_/_82%)] hover:text-[var(--scaffold-ink)]'
                 }`}
-                style={{ letterSpacing: '-0.01em' }}
+                style={{ letterSpacing: '-0.015em' }}
               >
                 <TextSlot text={link.label} barWidth="3.4em" />
               </Link>
@@ -132,13 +132,13 @@ export default function Navbar() {
             target="_blank"
             rel="noopener noreferrer"
             aria-label="SlideIn GitHub repository"
-            className="inline-flex items-center text-[var(--scaffold-muted)] transition-colors duration-200 hover:text-[var(--scaffold-ink)]"
+            className="flex h-10 w-10 items-center justify-center rounded-full text-[rgb(10_10_10_/_82%)] transition-all duration-200 hover:text-[var(--scaffold-ink)] hover:bg-[rgb(10_10_10_/_6%)] active:scale-95"
           >
-            <GitHubIcon className="h-5 w-5" />
+            <GitHubIcon className="h-[23px] w-[23px]" />
           </a>
           <Link
             href={cta.href}
-            className="inline-flex h-12 items-center gap-2 rounded-full bg-[var(--scaffold-button)] px-6 text-[15px] font-medium text-white transition-transform duration-200 ease-out hover:-translate-y-px active:scale-[0.98]"
+            className="inline-flex h-[48px] items-center gap-2.5 rounded-full bg-[var(--scaffold-button)] px-7 text-[16px] font-semibold text-white transition-all duration-200 ease-out hover:-translate-y-px hover:shadow-[0_12px_24px_-8px_rgba(0,0,0,0.35)] active:scale-[0.98]"
             style={{ boxShadow: 'var(--scaffold-shadow-button)', letterSpacing: '-0.01em' }}
           >
             <TextSlot text={cta.label} barWidth="3.2em" onDark />
@@ -213,10 +213,10 @@ export default function Navbar() {
                   target="_blank"
                   rel="noopener noreferrer"
                   onClick={() => setOpen(false)}
-                  className="inline-flex items-center gap-3 text-[24px] font-semibold text-[var(--scaffold-muted)] transition-colors hover:text-[var(--scaffold-ink)]"
+                  className="inline-flex items-center gap-3 text-[26px] font-semibold text-[rgb(10_10_10_/_82%)] transition-colors hover:text-[var(--scaffold-ink)]"
                   style={{ letterSpacing: '-0.02em' }}
                 >
-                  <GitHubIcon className="h-6 w-6" />
+                  <GitHubIcon className="h-7 w-7" />
                   <span>GitHub</span>
                 </a>
               </motion.div>
