@@ -1,8 +1,8 @@
 /**
  * HOME — the single content file for the hero + page scaffold
  * ---------------------------------------------------------------------------
- * DESIGN ONLY. Every text slot the scaffold renders lives here, and every
- * slot is an empty string. When a slot is empty its component renders a
+ * DESIGN ONLY. Every text slot the scaffold renders lives here. When a
+ * slot is empty its component renders a
  * neutral skeleton bar (rgba(10,10,10,0.08), full radius, cap-height tall)
  * so the layout, spacing and scale read without a single word. The moment
  * the owner fills a string here, the real text replaces the bar with no
@@ -29,14 +29,15 @@ export const HOME = {
     label: '',
   },
   headline: {
-    line1: '',
-    line2: '',
+    line1: 'We find your prospects,',
+    line2: 'write the emails, and',
     /* The last word(s) of line 2 — they carry the soft accent pill. */
-    highlight: '',
+    highlight: 'book the calls.',
   },
   subhead: {
-    line1: '',
-    line2: '',
+    line1:
+      'We find and research each prospect, match them to your offers, and write each one a personal email.',
+    line2: 'And we keep working until your meeting is booked.',
   },
   cta: {
     primary: '',
