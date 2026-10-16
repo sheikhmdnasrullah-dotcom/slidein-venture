@@ -30,9 +30,9 @@ export const HOME = {
   },
   headline: {
     line1: 'We find your prospects,',
-    line2: 'write the emails, and',
+    line2: 'write the emails,',
     /* The last word(s) of line 2 — they carry the soft accent pill. */
-    highlight: 'book the calls.',
+    highlight: 'and book the calls.',
   },
   subhead: {
     line1:
