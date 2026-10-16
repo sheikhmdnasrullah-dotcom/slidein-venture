@@ -284,7 +284,9 @@
   line-height: var(--hero-sub-lh);
   letter-spacing: var(--hero-sub-tracking);
   color: rgba(10, 10, 10, 0.6);
-  max-width: 34em;
+  /* 40em per the longer end-to-end subline: it settles into 3 even lines
+     under the headline at desktop widths while staying balanced. */
+  max-width: 40em;
   margin-inline: auto;
   text-align: center;
   text-wrap: balance;

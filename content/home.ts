@@ -36,8 +36,8 @@ export const HOME = {
   },
   subhead: {
     line1:
-      'We find and research each prospect, match them to your offers, and write each one a personal email.',
-    line2: 'And we keep working until your meeting is booked.',
+      'An end-to-end system that finds and researches each prospect, matches them to your offers, and writes each one a personal email. It keeps working until your meeting is booked.',
+    line2: '',
   },
   cta: {
     primary: 'Connect',
@@ -46,20 +46,160 @@ export const HOME = {
     primaryHref: '/contact', // the existing conversion URL
     secondaryHref: '/process',
   },
-  /**
-   * Lower sections. The homepage currently mounts no lower sections (they
-   * are unmounted in app/page.tsx, by decision, not deleted). These slots
-   * exist so any section brought back has its title + body ready, in the
-   * order the unmounted sections already have in content/product.ts.
-   */
-  sections: [
-    { id: 'problem', title: '', body: '' },
-    { id: 'workflow', title: '', body: '' },
-    { id: 'platform', title: '', body: '' },
-    { id: 'capabilities', title: '', body: '' },
-    { id: 'managed', title: '', body: '' },
-    { id: 'control', title: '', body: '' },
-    { id: 'use-cases', title: '', body: '' },
-    { id: 'closing', title: '', body: '' },
-  ],
 } as const;
+
+/* ── Lower sections — DESIGN ONLY slot file ────────────────────────────────
+   In the order the unmounted sections already have in content/product.ts.
+   Every slot is an empty string and renders a skeleton bar. Item counts
+   match the existing section structure exactly — nothing added, nothing
+   removed. Not even the closing CTA label is real: it is a slot too.
+   hrefs are the EXISTING routes — wiring, not copy. */
+
+export type HomeSection = {
+  id:
+    | 'problem'
+    | 'workflow'
+    | 'platform'
+    | 'capabilities'
+    | 'managed'
+    | 'control'
+    | 'use-cases'
+    | 'closing';
+  eyebrow: string;
+  title: string;
+  lead: string;
+  /* One entry per repeated element in the section. */
+  items: { title: string; body: string }[];
+  /* Closing only: the primary pill label is a slot like every other
+     string; the href is the existing conversion URL. */
+  cta?: { label: string; href: string };
+};
+
+export const HOME_CONTENT: {
+  sections: HomeSection[];
+  footer: {
+    /* Three columns of link slots, headed by a slot each. A link ships only
+       when its route ships. */
+    columns: { heading: string; links: { label: string; href: string }[] }[];
+  };
+} = {
+  sections: [
+    {
+      id: 'problem',
+      eyebrow: '',
+      title: '',
+      lead: '',
+      items: [
+        { title: '', body: '' },
+        { title: '', body: '' },
+        { title: '', body: '' },
+        { title: '', body: '' },
+        { title: '', body: '' },
+      ],
+    },
+    {
+      id: 'workflow',
+      eyebrow: '',
+      title: '',
+      lead: '',
+      items: [
+        { title: '', body: '' },
+        { title: '', body: '' },
+        { title: '', body: '' },
+        { title: '', body: '' },
+        { title: '', body: '' },
+      ],
+    },
+    {
+      id: 'platform',
+      eyebrow: '',
+      title: '',
+      lead: '',
+      items: [
+        { title: '', body: '' },
+        { title: '', body: '' },
+        { title: '', body: '' },
+        { title: '', body: '' },
+        { title: '', body: '' },
+      ],
+    },
+    {
+      id: 'capabilities',
+      eyebrow: '',
+      title: '',
+      lead: '',
+      items: [
+        { title: '', body: '' },
+        { title: '', body: '' },
+        { title: '', body: '' },
+        { title: '', body: '' },
+      ],
+    },
+    {
+      id: 'managed',
+      eyebrow: '',
+      title: '',
+      lead: '',
+      items: [
+        { title: '', body: '' },
+        { title: '', body: '' },
+      ],
+    },
+    {
+      id: 'control',
+      eyebrow: '',
+      title: '',
+      lead: '',
+      items: [
+        { title: '', body: '' },
+        { title: '', body: '' },
+        { title: '', body: '' },
+        { title: '', body: '' },
+        { title: '', body: '' },
+      ],
+    },
+    {
+      id: 'use-cases',
+      eyebrow: '',
+      title: '',
+      lead: '',
+      items: [
+        { title: '', body: '' },
+        { title: '', body: '' },
+        { title: '', body: '' },
+      ],
+    },
+    {
+      id: 'closing',
+      eyebrow: '',
+      title: '',
+      lead: '',
+      items: [],
+      cta: { label: '', href: '/contact' },
+    },
+  ],
+  footer: {
+    columns: [
+      {
+        heading: '',
+        links: [
+          { label: '', href: '/process' },
+          { label: '', href: '/insights' },
+          { label: '', href: '/pricing' },
+        ],
+      },
+      {
+        heading: '',
+        links: [
+          { label: '', href: '/process' },
+          { label: '', href: '/insights' },
+          { label: '', href: '/pricing' },
+        ],
+      },
+      {
+        heading: '',
+        links: [{ label: '', href: '/contact' }],
+      },
+    ],
+  },
+};

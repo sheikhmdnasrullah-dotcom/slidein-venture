@@ -1,0 +1,243 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   SECTIONS — the shared shell + scene vocabulary for every band below the hero
+   ---------------------------------------------------------------------------
+   Surfaces alternate per band: flat #FDFDFD, a #FAFAFA band with hairlines
+   top and bottom, and at most ONE inverted dark band (#0F0F0F). The dark
+   band re-points the scaffold tokens for its descendants, so the <Heading> /
+   <Text> / <Eyebrow> primitives and the skeleton Bar invert for free.
+
+   Scenes: every looping element carries .scene-anim and renders inside a
+   .scene wrapper, which pauses animations offscreen (data-paused) and shows
+   a static final state under prefers-reduced-motion.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ── Band shells ─────────────────────────────────────────────────────────── */
+.band {
+  position: relative;
+  width: 100%;
+  padding-block: 80px;
+}
+
+@media (width >= 768px) {
+  .band { padding-block: 128px; }
+}
+
+.band-flat { background: var(--scaffold-bg); }
+.band-soft {
+  background: var(--scaffold-panel);
+  border-block: 1px solid var(--scaffold-hairline);
+}
+
+/* The one inverted band. Skeleton bars flip to white at 12%, hairlines to
+   white at 10%, and the type primitives pick up light inks — all through
+   the same --scaffold-* names, so no component needs to know. */
+.band-dark {
+  background: rgb(15 15 15 / 100%);
+  --scaffold-skeleton: rgb(255 255 255 / 12%);
+  --scaffold-hairline: rgb(255 255 255 / 10%);
+  --scaffold-rule: rgb(255 255 255 / 12%);
+  --scaffold-line: rgb(255 255 255 / 6%);
+  --scaffold-ink: rgb(253 253 253 / 100%);
+  --scaffold-lead-ink: rgb(255 255 255 / 64%);
+  --scaffold-body-ink: rgb(255 255 255 / 62%);
+  --scaffold-small-ink: rgb(255 255 255 / 60%);
+  --scaffold-eyebrow-ink: rgb(255 255 255 / 55%);
+  --scaffold-surface: rgb(255 255 255 / 4%);
+  --scaffold-panel: rgb(255 255 255 / 3%);
+  --scaffold-accent-pill: color-mix(in oklch, var(--color-brand) 26%, transparent);
+  --scaffold-accent-chip: color-mix(in oklch, var(--color-brand) 20%, rgb(23 23 23 / 100%));
+  --scaffold-accent-row: color-mix(in oklch, var(--color-brand) 14%, rgb(23 23 23 / 100%));
+}
+
+.band-inner {
+  max-width: 1200px;
+  margin-inline: auto;
+  padding-inline: 24px;
+}
+
+/* ── Section header block ──────────────────────────────────────────────────
+   eyebrow → 16 → title → 20 → lead (max 40ch) → 56 → visual. Alignment is
+   consistent within a section, chosen by the section. */
+.section-head {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.section-head[data-align='center'] {
+  align-items: center;
+  text-align: center;
+}
+
+.section-head .section-lead {
+  margin-top: 4px; /* 16 + 4 = 20 to the lead */
+}
+
+.section-visual {
+  margin-top: 56px;
+}
+
+/* ── Scene system ──────────────────────────────────────────────────────────
+   Loops pause offscreen (set by the Scene component) and freeze to their
+   final state under reduced motion. */
+.scene { position: relative; }
+.scene[data-paused='true'] .scene-anim { animation-play-state: paused; }
+
+@media (prefers-reduced-motion: reduce) {
+  .scene .scene-anim { animation: none !important; }
+  .scene .rm-hidden { opacity: 0 !important; }
+}
+
+/* ── Supporting surfaces ─────────────────────────────────────────────────── */
+
+/* Dot-grid backdrop with the edges masked away. --dot-grid-size tunes pitch. */
+.dot-grid {
+  background-image: radial-gradient(circle, rgba(10, 10, 10, 0.10) 1px, transparent 1.2px);
+  background-size: var(--dot-grid-size, 22px) var(--dot-grid-size, 22px);
+  mask-image: radial-gradient(ellipse at center, black 30%, transparent 78%);
+  -webkit-mask-image: radial-gradient(ellipse at center, black 30%, transparent 78%);
+}
+
+.band-dark .dot-grid {
+  background-image: radial-gradient(circle, rgba(255, 255, 255, 0.14) 1px, transparent 1.2px);
+}
+
+/* Edge fade masks for marquees and tracks. */
+.fade-x {
+  mask-image: linear-gradient(to right, transparent, black 12%, black 88%, transparent);
+  -webkit-mask-image: linear-gradient(to right, transparent, black 12%, black 88%, transparent);
+}
+
+/* Shine sweep across a tile face on hover (supporting effect, sparingly). */
+.shine { position: relative; overflow: hidden; }
+
+.shine::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(115deg, transparent 30%, rgba(255, 255, 255, 0.9) 50%, transparent 70%);
+  transform: translateX(-130%);
+  transition: transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+  pointer-events: none;
+}
+
+.shine:hover::after { transform: translateX(130%); }
+
+/* One shared float for tiles that drift (supporting effect). */
+@keyframes tile-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+
+/* ── Keyframes for the section scenes ────────────────────────────────────── */
+
+/* A comet dot traveling a track (offset-path set inline per scene). */
+@keyframes comet-run {
+  from { offset-distance: 0%; }
+  to { offset-distance: 100%; }
+}
+
+/* Bento: a vertical scan line sweeping rows. */
+@keyframes scan-sweep {
+  0% { top: 4%; opacity: 0; }
+  8% { opacity: 1; }
+  88% { opacity: 1; }
+  100% { top: 92%; opacity: 0; }
+}
+
+/* Bento: document bars drawing in, then holding. */
+@keyframes bar-draw {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+
+/* Bento: the accent caret in the compose scene. */
+@keyframes caret-blink {
+  0%, 46% { opacity: 1; }
+  50%, 96% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+/* Bento: a pill connector snapping between columns. */
+@keyframes link-snap {
+  0%, 12% { opacity: 0; stroke-dashoffset: var(--link-len, 60); }
+  26%, 82% { opacity: 1; stroke-dashoffset: 0; }
+  96%, 100% { opacity: 0; stroke-dashoffset: calc(var(--link-len, 60) * -1); }
+}
+
+/* Bento: a card sliding along a track toward the plane tile. */
+@keyframes queue-slide {
+  0% { transform: translateX(-8%) scale(0.92); opacity: 0; }
+  12% { opacity: 1; }
+  72% { transform: translateX(300%) scale(1); opacity: 1; }
+  86%, 100% { transform: translateX(330%) scale(0.6); opacity: 0; }
+}
+
+/* Bento: the reply bubble popping in with a spring. */
+@keyframes bubble-pop {
+  0% { transform: scale(0.4) translateY(10px); opacity: 0; }
+  55% { transform: scale(1.06) translateY(-2px); opacity: 1; }
+  75% { transform: scale(0.98) translateY(0); }
+  100% { transform: scale(1) translateY(0); opacity: 1; }
+}
+
+/* Bento: one accent pulse, used once per loop. */
+@keyframes dot-pulse {
+  0%, 55% { transform: scale(1); opacity: 1; }
+  62% { transform: scale(1.9); opacity: 0.55; }
+  70%, 100% { transform: scale(1); opacity: 1; }
+}
+
+/* Orbit: slow revolutions; icons counter-rotate to stay upright. */
+@keyframes orbit-spin { to { transform: rotate(360deg); } }
+@keyframes orbit-spin-rev { to { transform: rotate(-360deg); } }
+
+/* Beams: accent dashes travelling along an SVG path. */
+@keyframes beam-run { to { stroke-dashoffset: calc(var(--beam-len, 200) * -1); } }
+
+/* Marquee rows drifting in opposite directions. */
+@keyframes marquee-l { to { transform: translateX(-50%); } }
+@keyframes marquee-r { from { transform: translateX(-50%); } to { transform: translateX(0); } }
+
+/* Entrance for the inbox fan. */
+@keyframes fan-open {
+  from { transform: rotate(var(--fan-from, 0deg)) translateY(14px); opacity: 0; }
+  to { transform: rotate(var(--fan-to, 0deg)) translateY(0); opacity: 1; }
+}
+
+/* The calendar event pill gliding into its cell. */
+@keyframes event-glide {
+  0% { transform: translate(var(--glide-from-x, 0), var(--glide-from-y, -40px)) scale(0.8); opacity: 0; }
+  60% { opacity: 1; }
+  78% { transform: translate(var(--glide-to-x, 0), var(--glide-to-y, 0)) scale(1.04); }
+  90% { transform: translate(var(--glide-to-x, 0), var(--glide-to-y, 0)) scale(0.99); }
+  100% { transform: translate(var(--glide-to-x, 0), var(--glide-to-y, 0)) scale(1); opacity: 1; }
+}
+
+/* The split-compare handle sliding open on scroll entrance. */
+@keyframes compare-open {
+  from { clip-path: inset(0 50% 0 0); }
+  to { clip-path: inset(0 8% 0 0); }
+}
+
+/* Pointer-follow spotlight for the final CTA (desktop pointers only). */
+.spotlight {
+  --mx: 50%;
+  --my: 40%;
+}
+
+.spotlight::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image: radial-gradient(circle, rgba(10, 10, 10, 0.22) 1.2px, transparent 1.5px);
+  background-size: 20px 20px;
+  mask-image: radial-gradient(220px circle at var(--mx) var(--my), black 20%, transparent 100%);
+  -webkit-mask-image: radial-gradient(220px circle at var(--mx) var(--my), black 20%, transparent 100%);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .shine::after { display: none; }
+}
