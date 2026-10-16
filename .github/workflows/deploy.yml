@@ -19,21 +19,3 @@ jobs:
           vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID_SLIDEINVENTURE }}
           working-directory: ./
           production: true
-
-      - name: Deploy workspace to Vercel
-        uses: amondnet/vercel-action@v25
-        with:
-          vercel-token: ${{ secrets.VERCEL_TOKEN }}
-          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
-          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID_WORKSPACE }}
-          working-directory: ./workspace-app
-          production: true
-
-      - name: Sync knowledge base to Supabase
-        run: |
-          cd workspace-app
-          npm install
-          npm run sync
-        env:
-          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
-          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
