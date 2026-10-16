@@ -156,7 +156,7 @@
   --hero-gap-bottom: 24px;    /* below the CTA row */
 
   /* ── Type ──────────────────────────────────────────────────────────── */
-  --hero-h1-size: clamp(2.25rem, 7cqi, 4.5rem);
+  --hero-h1-size: clamp(2.25rem, 8cqi, 4.5rem);
   --hero-h1-lh: 1.04;
   --hero-h1-tracking: -0.035em;
   --hero-h1-mobile-size: clamp(2.125rem, 9.5vw, 2.75rem);
