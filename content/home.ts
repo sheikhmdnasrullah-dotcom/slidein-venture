@@ -40,9 +40,9 @@ export const HOME = {
     line2: 'And we keep working until your meeting is booked.',
   },
   cta: {
-    primary: '',
+    primary: 'Connect',
     /* Secondary is text-only with a chevron, wired to the existing route. */
-    secondary: '',
+    secondary: 'See how it works',
     primaryHref: '/contact', // the existing conversion URL
     secondaryHref: '/process',
   },
