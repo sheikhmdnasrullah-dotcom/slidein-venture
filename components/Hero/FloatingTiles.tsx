@@ -1,195 +1,253 @@
 'use client';
 
 /**
- * FLOATING TILES — glossy, text-free app-icon objects
+ * FLOATING TILES — the 7 stage tiles in hero reading order
  * ---------------------------------------------------------------------------
- * The reference's signature element: rounded-square tiles that read as
- * physical objects. Construction per tile, exactly as specified:
+ * Left gutter top-down: configure, discover, research. Right gutter
+ * top-down: qualify, personalize, outreach, converse (see ./heroTiles.ts).
+ * Each tile renders its stage glyph from the site registry — the same
+ * component the spine node renders, with a distinct per-instance id.
  *
- *   · square, 96–150px (varied), border-radius 28%
- *   · background linear-gradient(145deg, #FFFFFF 0%, #F4F4F5 100%)
- *   · 1px inner highlight: inset 0 1px 0 rgba(255,255,255,1),
- *     inset 0 -2px 4px rgba(0,0,0,0.04)
- *   · a second "lip" layer offset 4px down in #E9E9EB to fake thickness
- *   · the "object" elevation shadow
- *   · rotation -14°…+14°, two tiles carrying a perspective 3D tilt
- *   · one far tile softly blurred for depth
+ * Tile construction is unchanged (gloss gradient, inner highlight, 4px lip,
+ * object shadow, specular sheen on hover). New in the story pass: a
+ * stage-word pill under every tile, dashed links between consecutive tiles
+ * in each gutter, and dwell state driven by the hero loop (lift + glyph
+ * pulse). The per-tile float loops are gone — the 14s master loop is the
+ * hero's only attention animation. Click toggles a pinned label (touch);
+ * pinning one tile unpins the others.
  *
- * Every tile carries an inline-SVG icon only — shapes, at most two colours
- * plus the brand accent. No text, no numbers, no initials. All decorative:
- * aria-hidden throughout.
- *
- * Placement: tiles live ONLY inside their grid gutter (see .hero-gutter),
- * anchored in px from the gutter edges with the inner edge 52px clear of
- * the text column. They may never cross into the text column. Edge tiles
- * may clip at the viewport edge, but only from inside their gutter.
- * Below 1100px the gutters (and all tiles) are hidden by CSS.
- *
- * Motion: a slow ±6px float over 7–9s per tile, each with its own phase,
- * inside a pointer-parallax group (≤8px, desktop pointers only) per gutter.
- * Reduced motion renders everything static.
+ * Placement: flex columns inside the parallax groups, so tiles spread with
+ * the hero height and can never overlap or stack. Gutters hide below
+ * 1100px by CSS. Reduced motion renders everything static.
  */
 
-import { motion, useMotionValue, useReducedMotion, useSpring } from 'framer-motion';
-import { useEffect, type ReactNode } from 'react';
+import { AnimatePresence, motion, useMotionValue, useReducedMotion, useSpring } from 'framer-motion';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { cn } from '@/lib/utils';
+import { STAGE_WORD } from '@/content/stages';
+import { STAGE_GLYPH } from '@/components/StorySpine/icons';
+import { HERO_LINKS, HERO_TILES, type HeroTileDef } from './heroTiles';
 
-/* ─── Icons — 48×48 viewBox, ink + light grey + accent only ─────────────── */
+const LABEL_EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
-const INK = 'rgba(10,10,10,1)';
-const SOFT = 'rgba(10,10,10,0.14)';
-const FAINT = 'rgba(10,10,10,0.07)';
-
-function EnvelopeIcon() {
-  return (
-    <svg width="46%" height="46%" viewBox="0 0 48 48" fill="none" aria-hidden="true">
-      <rect x="8" y="13" width="32" height="23" rx="5" stroke={INK} strokeWidth="3" />
-      <path d="M9 17.5 L24 28 L39 17.5" stroke={INK} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
-      <circle cx="24" cy="28.5" r="3" fill="var(--scaffold-accent)" />
-    </svg>
-  );
-}
-
-function DotMatrixIcon() {
-  const dots = [];
-  for (let r = 0; r < 6; r++) {
-    for (let c = 0; c < 6; c++) {
-      const accent = r === 2 && c === 3;
-      dots.push(
-        <circle
-          key={`${r}-${c}`}
-          cx={9 + c * 6}
-          cy={9 + r * 6}
-          r="1.9"
-          fill={accent ? 'var(--scaffold-accent)' : SOFT}
-        />
-      );
-    }
-  }
-  return (
-    <svg width="52%" height="52%" viewBox="0 0 48 48" fill="none" aria-hidden="true">
-      {dots}
-    </svg>
-  );
-}
-
-function CheckIcon() {
-  return (
-    <svg width="52%" height="52%" viewBox="0 0 48 48" fill="none" aria-hidden="true">
-      <circle cx="24" cy="24" r="14" stroke={INK} strokeWidth="3" />
-      <path d="M17.5 24.5 L22 29 L30.5 19.5" stroke={INK} strokeWidth="3.2" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  );
-}
-
-function PaperPlaneIcon() {
-  return (
-    <svg width="50%" height="50%" viewBox="0 0 48 48" fill="none" aria-hidden="true">
-      <path
-        d="M9 25.5 L39 10 L27 39 L22.5 28.5 Z"
-        fill={INK}
-        stroke={INK}
-        strokeWidth="2.5"
-        strokeLinejoin="round"
-      />
-      <circle cx="33" cy="15" r="2.4" fill="var(--scaffold-accent)" />
-    </svg>
-  );
-}
-
-function MagnifierIcon() {
-  return (
-    <svg width="52%" height="52%" viewBox="0 0 48 48" fill="none" aria-hidden="true">
-      <circle cx="21" cy="21" r="11" stroke={INK} strokeWidth="3.5" />
-      <path d="M29.5 29.5 L39 39" stroke={INK} strokeWidth="3.5" strokeLinecap="round" />
-      <circle cx="17.5" cy="17.5" r="2.2" fill="var(--scaffold-accent)" />
-    </svg>
-  );
-}
-
-function StackIcon() {
-  return (
-    <svg width="50%" height="50%" viewBox="0 0 48 48" fill="none" aria-hidden="true">
-      <rect x="16" y="8" width="22" height="28" rx="4" fill={FAINT} stroke={SOFT} strokeWidth="1.5" />
-      <rect x="9" y="14" width="24" height="27" rx="4" fill="rgba(255,255,255,1)" stroke="rgba(10,10,10,0.18)" strokeWidth="1.8" />
-      <path d="M14 22 h14 M14 28 h14 M14 34 h9" stroke={SOFT} strokeWidth="2.2" strokeLinecap="round" />
-    </svg>
-  );
-}
-
-/* ─── Tile ──────────────────────────────────────────────────────────────── */
-
-function Tile({
-  size,
-  rotate = 0,
-  tilt = false,
-  blur = false,
-  icon,
-  floatDuration,
-  floatDelay,
-  className,
-}: {
-  size: number;
-  rotate?: number;
-  tilt?: boolean;
-  blur?: boolean;
-  icon: ReactNode;
-  floatDuration: number;
-  floatDelay: number;
-  className?: string;
-}) {
+function Tile({ def, index }: { def: HeroTileDef; index: number }) {
   const still = useReducedMotion();
+  const interactive = def.label != null;
+  const [hoverOpen, setHoverOpen] = useState(false);
+  const [focusOpen, setFocusOpen] = useState(false);
+  const [pinned, setPinned] = useState(false);
+  const [dwell, setDwell] = useState(false);
+  const [pulseSeq, setPulseSeq] = useState(0);
+  const Glyph = STAGE_GLYPH[def.stage];
+
+  // Loop dwell: lift while the protagonist sits on this tile; pulse the
+  // glyph once per dwell arrival.
+  useEffect(() => {
+    const onDwell = (e: Event) => {
+      const stage = (e as CustomEvent<{ stage: string | null }>).detail.stage;
+      const mine = stage === def.stage;
+      setDwell((prev) => {
+        if (mine && !prev) setPulseSeq((s) => s + 1);
+        return mine;
+      });
+    };
+    window.addEventListener('hero-loop-dwell', onDwell);
+    return () => window.removeEventListener('hero-loop-dwell', onDwell);
+  }, [def.stage]);
+
+  // Pinning one tile unpins the others (touch: never several stuck open).
+  useEffect(() => {
+    const onPin = (e: Event) => {
+      const stage = (e as CustomEvent<{ stage: string }>).detail.stage;
+      if (stage !== def.stage) setPinned(false);
+    };
+    window.addEventListener('hero-tile-pin', onPin);
+    return () => window.removeEventListener('hero-tile-pin', onPin);
+  }, [def.stage]);
+
+  const shown = interactive && (hoverOpen || focusOpen || pinned);
+  const labelX = `${def.label?.align ?? -50}%`;
+  const labelFromY = def.label?.placement === 'below' ? 6 : -6;
+  // Hover pills below the tile clear the always-visible stage pill.
+  const belowTop = 'calc(100% + 44px)';
+
   return (
-    /* Float layer — the only thing that animates per tile. */
     <motion.div
       data-testid="hero-tile"
-      className={cn('absolute', className)}
-      animate={still ? undefined : { y: [0, -6, 0] }}
+      data-hero-stage={def.stage}
+      className={cn(
+        'group relative pointer-events-auto select-none',
+        interactive && 'cursor-pointer',
+        shown && 'z-10',
+      )}
+      style={{
+        alignSelf: def.alignSelf,
+        ...(def.gutter === 'left'
+          ? def.clipOuter > 0
+            ? { marginLeft: -def.clipOuter }
+            : { marginRight: def.marginInner }
+          : def.clipOuter > 0
+            ? { marginRight: -def.clipOuter }
+            : { marginLeft: def.marginInner }),
+      }}
+      initial={still ? undefined : { opacity: 0, scale: 0.9 }}
+      animate={
+        still
+          ? undefined
+          : { opacity: 1, scale: 1, y: dwell ? -4 : 0 }
+      }
+      whileHover={
+        still || !interactive
+          ? undefined
+          : { scale: 1.05, transition: { duration: 0.22, ease: [0.16, 1, 0.3, 1] } }
+      }
       transition={{
-        duration: floatDuration,
-        repeat: Infinity,
-        ease: 'easeInOut',
-        delay: floatDelay,
+        opacity: { duration: 0.6, delay: index * 0.06 },
+        scale: { duration: 0.24, ease: [0.16, 1, 0.3, 1] },
+        y: { type: 'spring', stiffness: 300, damping: 30 },
+      }}
+      onPointerEnter={() => interactive && setHoverOpen(true)}
+      onPointerLeave={() => setHoverOpen(false)}
+      onClick={() => {
+        if (!interactive) return;
+        setPinned((p) => {
+          if (!p) window.dispatchEvent(new CustomEvent('hero-tile-pin', { detail: { stage: def.stage } }));
+          return !p;
+        });
       }}
     >
-      <div
-        aria-hidden="true"
-        className={cn('relative', blur && 'opacity-80')}
-        style={{
-          width: size,
-          height: size,
-          filter: blur ? 'blur(1.5px)' : undefined,
-          transform: tilt
-            ? 'perspective(800px) rotateX(8deg) rotateY(-10deg) rotateZ(-6deg)'
-            : `rotate(${rotate}deg)`,
-        }}
+      {/* Depth rank: idle blur by far/mid/near, razor sharp on read */}
+      <motion.div
+        className="relative"
+        animate={{ filter: shown || dwell ? 'blur(0px)' : `blur(${def.blur}px)` }}
+        transition={{ filter: { duration: 0.24, ease: 'easeOut' } }}
       >
-        {/* Lip — the 4px-offset under-layer that fakes thickness */}
         <div
-          className="absolute inset-0 translate-y-[4px]"
-          style={{ borderRadius: '28%', background: 'var(--scaffold-lip)' }}
-        />
-        {/* Face — gloss gradient + inner highlight + object shadow */}
-        <div
-          className="absolute inset-0 flex items-center justify-center"
+          aria-hidden="true"
+          className="relative transition-all duration-300"
           style={{
-            borderRadius: '28%',
-            background: 'linear-gradient(145deg, rgba(255,255,255,1) 0%, rgba(244,244,245,1) 100%)',
-            border: '1px solid rgba(10,10,10,0.03)',
-            boxShadow:
-              'inset 0 1px 0 rgba(255,255,255,1), inset 0 -2px 4px rgba(0,0,0,0.04), var(--scaffold-shadow-object)',
+            width: def.size,
+            height: def.size,
+            transform: def.tilt
+              ? 'perspective(800px) rotateX(8deg) rotateY(-10deg) rotateZ(-6deg)'
+              : `rotate(${def.rotate}deg)`,
           }}
         >
-          {icon}
+          {/* Lip — the 4px-offset under-layer that fakes thickness */}
+          <div
+            className="absolute inset-0 translate-y-[4px] transition-transform duration-300 group-hover:translate-y-[6px]"
+            style={{ borderRadius: '28%', background: 'var(--scaffold-lip)' }}
+          />
+          {/* Face — gloss gradient + inner highlight + object shadow */}
+          <div
+            className="tile-face absolute inset-0 flex items-center justify-center transition-all duration-300 group-hover:shadow-[0_28px_56px_-12px_rgba(10,10,10,0.18)]"
+            style={{
+              borderRadius: '28%',
+              background: 'linear-gradient(145deg, rgba(255,255,255,1) 0%, rgba(244,244,245,1) 100%)',
+              border: '1px solid rgba(10,10,10,0.03)',
+              boxShadow:
+                'inset 0 1px 0 rgba(255,255,255,1), inset 0 -2px 4px rgba(0,0,0,0.04), var(--scaffold-shadow-object)',
+            }}
+          >
+            <motion.span
+              key={pulseSeq}
+              className="flex items-center justify-center"
+              style={{ width: '100%', height: '100%' }}
+              initial={{ scale: 1 }}
+              animate={pulseSeq === 0 ? { scale: 1 } : { scale: [1, 1.06, 1] }}
+              transition={{ duration: still ? 0 : 0.3, ease: LABEL_EASE }}
+            >
+              {Glyph ? <Glyph id={`hero-${def.stage}`} size="52%" /> : null}
+            </motion.span>
+            {/* Specular sheen reflection sweep on hover */}
+            <div
+              className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+              style={{
+                borderRadius: '28%',
+                background: 'linear-gradient(135deg, rgba(255,255,255,0.6) 0%, rgba(255,255,255,0) 65%)',
+              }}
+            />
+          </div>
         </div>
-      </div>
+      </motion.div>
+
+      {/* Stage word pill — always visible, under the tile */}
+      <span
+        aria-hidden="true"
+        data-hero-pill={def.stage}
+        className="absolute left-1/2 top-full mt-2 h-6 -translate-x-1/2 whitespace-nowrap rounded-full border bg-white px-3 text-[12px] font-medium leading-6"
+        style={{
+          borderColor: 'rgba(10,10,10,0.08)',
+          color: 'rgba(10,10,10,0.55)',
+          boxShadow: 'var(--scaffold-shadow-soft)',
+          letterSpacing: '-0.01em',
+        }}
+      >
+        {STAGE_WORD[def.stage]}
+      </span>
+
+      {/* Accessible button for keyboard navigation & screen readers */}
+      {def.label && (
+        <button
+          type="button"
+          aria-label={def.label.text}
+          aria-expanded={shown}
+          onFocus={() => setFocusOpen(true)}
+          onBlur={() => {
+            setFocusOpen(false);
+            setPinned(false);
+          }}
+          onKeyDown={(e) => {
+            if (e.key === 'Escape') {
+              setPinned(false);
+              e.currentTarget.blur();
+            }
+          }}
+          className="sr-only"
+        />
+      )}
+
+      {/* Pop-up name pill on hover / focus / pin */}
+      {def.label && (
+        <AnimatePresence initial={false}>
+          {shown && (
+            <motion.span
+              key="tile-label"
+              data-testid="hero-tile-label"
+              aria-hidden="true"
+              className="pointer-events-none absolute whitespace-nowrap rounded-full border bg-white px-3.5 py-1.5 text-[13px] font-medium"
+              style={{
+                borderColor: 'rgba(10,10,10,0.08)',
+                color: 'rgba(10,10,10,0.92)',
+                boxShadow: '0 8px 24px -4px rgba(10,10,10,0.12), 0 2px 6px rgba(10,10,10,0.04)',
+                letterSpacing: '-0.01em',
+                left: '50%',
+                transformOrigin: def.label.placement === 'below' ? '50% 0%' : '50% 100%',
+                ...(def.label.placement === 'below' ? { top: belowTop } : { bottom: 'calc(100% + 12px)' }),
+              }}
+              initial={{ opacity: 0, x: labelX, y: labelFromY, scale: 0.94 }}
+              animate={{ opacity: 1, x: labelX, y: 0, scale: 1 }}
+              exit={{
+                opacity: 0,
+                x: labelX,
+                y: def.label.placement === 'below' ? 4 : -4,
+                scale: 0.96,
+                transition: { duration: still ? 0 : 0.2, ease: LABEL_EASE },
+              }}
+              transition={{ duration: still ? 0 : 0.26, ease: LABEL_EASE }}
+            >
+              {def.label.text}
+            </motion.span>
+          )}
+        </AnimatePresence>
+      )}
     </motion.div>
   );
 }
 
 /* ─── One parallax group per gutter ─────────────────────────────────────── */
 
-function ParallaxGroup({ children }: { children: ReactNode }) {
+function ParallaxGroup({ children, frozen = false }: { children: ReactNode; frozen?: boolean }) {
   const still = useReducedMotion();
 
   /* One gentle pointer parallax for the group: at most 8px, desktop
@@ -200,7 +258,7 @@ function ParallaxGroup({ children }: { children: ReactNode }) {
   const sy = useSpring(my, { stiffness: 60, damping: 20 });
 
   useEffect(() => {
-    if (still) return;
+    if (still || frozen) return;
     if (!window.matchMedia('(pointer: fine)').matches) return;
     const onMove = (e: PointerEvent) => {
       const nx = e.clientX / window.innerWidth - 0.5;
@@ -210,95 +268,135 @@ function ParallaxGroup({ children }: { children: ReactNode }) {
     };
     window.addEventListener('pointermove', onMove, { passive: true });
     return () => window.removeEventListener('pointermove', onMove);
-  }, [still, mx, my]);
+  }, [still, frozen, mx, my]);
 
   return (
     <motion.div
-      aria-hidden="true"
       className="pointer-events-none absolute inset-0"
-      style={still ? undefined : { x: sx, y: sy }}
+      style={{ x: sx, y: sy }}
     >
       {children}
     </motion.div>
   );
 }
 
-/* ─── The six objects, anchored inside their gutters ───────────────────────
-   Inner edges stay 52px clear of the text column (see --hero-tile-clear).
-   Vertical positions are px from the gutter top/bottom, tuned against the
-   stack — never percentages of the band. */
+/* ─── Dashed links between consecutive tiles (measured, never guessed) ──── */
 
-export function GutterTilesLeft() {
+function GutterLinks({ gutter }: { gutter: 'left' | 'right' }) {
+  const svgRef = useRef<SVGSVGElement>(null);
+  const [segs, setSegs] = useState<Array<{ x1: number; y1: number; x2: number; y2: number }>>([]);
+
+  useEffect(() => {
+    const svg = svgRef.current;
+    if (!svg) return;
+    const measure = () => {
+      const box = svg.getBoundingClientRect();
+      // Gutter hidden (below 1100px): no links.
+      if (box.width === 0 && box.height === 0) {
+        setSegs([]);
+        return;
+      }
+      const center = (stage: string) => {
+        const el = svg.parentElement?.querySelector(`[data-hero-stage="${stage}"]`);
+        if (!el) return null;
+        const r = el.getBoundingClientRect();
+        if (r.width === 0) return null;
+        // Tile face center (the wrapper includes the overhanging pills, so
+        // derive from the face box, not the wrapper box).
+        const face = el.querySelector('.tile-face');
+        const f = (face ?? el).getBoundingClientRect();
+        return { x: f.left + f.width / 2 - box.left, y: f.top + f.height / 2 - box.top };
+      };
+      const next: Array<{ x1: number; y1: number; x2: number; y2: number }> = [];
+      for (const [a, b] of HERO_LINKS) {
+        const tiles = HERO_TILES.filter((t) => t.gutter === gutter).map((t) => t.stage);
+        if (!tiles.includes(a) || !tiles.includes(b)) continue;
+        const p = center(a);
+        const q = center(b);
+        if (p && q) next.push({ x1: p.x, y1: p.y, x2: q.x, y2: q.y });
+      }
+      setSegs((prev) =>
+        prev.length === next.length &&
+        prev.every((s, i) => Math.abs(s.x1 - next[i].x1) < 0.5 && Math.abs(s.y1 - next[i].y1) < 0.5)
+          ? prev
+          : next,
+      );
+    };
+    measure();
+    window.addEventListener('resize', measure);
+    document.fonts?.ready.then(measure).catch(() => {});
+    const t = setTimeout(measure, 800);
+    return () => {
+      window.removeEventListener('resize', measure);
+      clearTimeout(t);
+    };
+  }, [gutter]);
+
   return (
-    <div className="hero-gutter" aria-hidden="true">
-      <ParallaxGroup>
-        {/* 1 · Envelope — upper left, beside the pill */}
-        <Tile
-          size={140}
-          rotate={-8}
-          tilt
-          icon={<EnvelopeIcon />}
-          floatDuration={7.2}
-          floatDelay={0}
-          className="right-[52px] top-[190px]"
-        />
-        {/* 2 · Dot matrix — left middle, beside the headline */}
-        <Tile
-          size={120}
-          rotate={6}
-          icon={<DotMatrixIcon />}
-          floatDuration={8.4}
-          floatDelay={1.1}
-          className="right-[56px] top-[470px]"
-        />
-        {/* 5 · Magnifier — clipped by the left viewport edge, low */}
-        <Tile
-          size={120}
-          rotate={-10}
-          blur
-          icon={<MagnifierIcon />}
-          floatDuration={9}
-          floatDelay={0.3}
-          className="bottom-[48px] left-[-36px]"
-        />
+    <svg
+      ref={svgRef}
+      aria-hidden="true"
+      data-hero-links={gutter}
+      className="pointer-events-none absolute inset-0 h-full w-full"
+    >
+      {segs.map((s, i) => {
+        const mx = (s.x1 + s.x2) / 2;
+        const my = (s.y1 + s.y2) / 2;
+        return (
+          <g key={i}>
+            <line
+              x1={s.x1}
+              y1={s.y1}
+              x2={s.x2}
+              y2={s.y2}
+              stroke="rgba(10,10,10,0.25)"
+              strokeWidth="1"
+              strokeDasharray="2 6"
+            />
+            <path
+              d={`M ${mx - 4} ${my - 2} L ${mx} ${my + 2} L ${mx + 4} ${my - 2}`}
+              stroke="rgba(10,10,10,0.25)"
+              strokeWidth="1.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              fill="none"
+            />
+          </g>
+        );
+      })}
+    </svg>
+  );
+}
+
+/* ─── The seven tiles, flex-distributed so they never overlap ────────────── */
+
+function GutterTiles({ gutter, frozen = false }: { gutter: 'left' | 'right'; frozen?: boolean }) {
+  const tiles = HERO_TILES.filter((t) => t.gutter === gutter);
+  return (
+    <div className="hero-gutter" data-gutter={gutter}>
+      <ParallaxGroup frozen={frozen}>
+        <div
+          className="relative flex h-full flex-col justify-between"
+          style={
+            gutter === 'left'
+              ? { padding: '150px 0 70px' }
+              : { padding: '140px 0 50px' }
+          }
+        >
+          <GutterLinks gutter={gutter} />
+          {tiles.map((t, i) => (
+            <Tile key={t.stage} def={t} index={gutter === 'left' ? i : i + 3} />
+          ))}
+        </div>
       </ParallaxGroup>
     </div>
   );
 }
 
-export function GutterTilesRight() {
-  return (
-    <div className="hero-gutter" aria-hidden="true">
-      <ParallaxGroup>
-        {/* 3 · Check — upper right, beside the pill */}
-        <Tile
-          size={130}
-          rotate={-6}
-          icon={<CheckIcon />}
-          floatDuration={7.8}
-          floatDelay={0.6}
-          className="left-[52px] top-[180px]"
-        />
-        {/* 4 · Paper plane — lower right, beside the subhead */}
-        <Tile
-          size={130}
-          rotate={10}
-          tilt
-          icon={<PaperPlaneIcon />}
-          floatDuration={8.8}
-          floatDelay={1.6}
-          className="left-[52px] top-[600px]"
-        />
-        {/* 6 · Stack — clipped by the right viewport edge, low */}
-        <Tile
-          size={110}
-          rotate={8}
-          icon={<StackIcon />}
-          floatDuration={7.5}
-          floatDelay={2}
-          className="bottom-[40px] right-[-32px]"
-        />
-      </ParallaxGroup>
-    </div>
-  );
+export function GutterTilesLeft({ frozen = false }: { frozen?: boolean }) {
+  return <GutterTiles gutter="left" frozen={frozen} />;
+}
+
+export function GutterTilesRight({ frozen = false }: { frozen?: boolean }) {
+  return <GutterTiles gutter="right" frozen={frozen} />;
 }

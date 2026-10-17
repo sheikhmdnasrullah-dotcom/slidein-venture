@@ -1,0 +1,10 @@
+import { chromium } from '@playwright/test';
+const b = await chromium.launch();
+const p = await b.newPage({ viewport: { width: 1440, height: 900 } });
+await p.goto('http://localhost:3000/', { waitUntil: 'domcontentloaded' });
+await p.evaluate(()=>document.fonts.ready);
+await p.waitForSelector('[data-hero-stage]');
+await p.waitForTimeout(1200);
+await p.screenshot({ path: 'design-reference/hero-field-current.png' });
+console.log('saved design-reference/hero-field-current.png');
+await b.close();

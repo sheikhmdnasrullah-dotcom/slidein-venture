@@ -23,29 +23,62 @@ export const NAV_SLOTS = {
   cta: { label: 'Connect', href: '/contact' },
 } as const;
 
+/**
+ * ARCHIVED HEADLINES — Preserved so the owner can recall/restore whenever needed.
+ * To recall the previous headline, copy its lines into HOME.headline below.
+ */
+export const ARCHIVED_HEADLINES = {
+  /* Original 3-line headline */
+  threeLineSystem: {
+    line1: 'We find your prospects,',
+    line2: 'write the emails,',
+    /* The last word(s) of line 2 — they carry the soft accent pill. */
+    highlight: 'and book the calls.',
+  },
+} as const;
+
 export const HOME = {
   announcement: {
     chip: '',
     label: '',
   },
   headline: {
-    line1: 'We find your prospects,',
-    line2: 'write the emails,',
-    /* The last word(s) of line 2 — they carry the soft accent pill. */
-    highlight: 'and book the calls.',
+    line1: 'Getting Clients',
+    line2: '',
+    /* The highlighted word — artistically highlighted in creative brand orange */
+    highlight: 'Simplified',
   },
   subhead: {
+    /* THE OWNER'S COPY. Verbatim, supplied directly. Do not paraphrase.
+       The closing clause was changed by the owner from "until your meeting
+       is booked" to "until they are convinced" — that wording is the
+       current one. */
     line1:
-      'An end-to-end system that finds and researches each prospect, matches them to your offers, and writes each one a personal email. It keeps working until your meeting is booked.',
+      'An end-to-end system that finds and researches each prospect, matches them to your offers, and writes each one a personal email. It keeps working until they are convinced.',
     line2: '',
+    /* Optional accent-tinted phrase, split out of line1 by the component.
+       EMPTY — nothing is tinted over the owner's copy. Fill it with a
+       substring of line1 to switch the tint on. */
+    emphasis: '',
   },
   cta: {
     primary: 'Connect',
+    /* The story-player's own label. Signed-off user copy. */
+    primaryVideo: 'See How It Works',
     /* Secondary is text-only with a chevron, wired to the existing route. */
     secondary: 'See how it works',
     primaryHref: '/contact', // the existing conversion URL
     secondaryHref: '/process',
   },
+  icpTagline: 'Everything gets started with preparing the Master Business Playbook',
+  persistentKnowledgeTagline:
+    'One persistent knowledge from the master playbook that evolves every time you interact with it.',
+  playbookCaptions: {
+    act1: 'From scattered business information to organized profile offers and ICP.',
+    act2: 'To organized master playbook.',
+    act3: 'One persistent knowledge from the master playbook that evolves every time you interact with it.',
+  },
+  multiAgentTitle: 'Multi-Agent Orchestration',
 } as const;
 
 /* ── Lower sections — DESIGN ONLY slot file ────────────────────────────────

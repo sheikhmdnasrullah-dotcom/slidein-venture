@@ -1,0 +1,125 @@
+/* ── Home story spine: nodes + handoff placeholders ────────────────────
+   Fixed overlays repositioned every frame from measured anchors (see
+   HomeSpine.tsx). pointer-events: none throughout — nodes are markers,
+   not controls. z-index sits above bands, below the nav. */
+
+.story-node {
+  position: fixed;
+  left: 0;
+  top: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  z-index: 2;
+  pointer-events: none;
+  transition: opacity 300ms;
+}
+
+.story-node-word {
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  color: rgba(10, 10, 10, 0.9);
+  white-space: nowrap;
+  background: rgb(255 255 255 / 100%);
+  border: 1px solid rgba(10, 10, 10, 0.08);
+  border-radius: 999px;
+  padding: 3px 10px;
+  box-shadow: var(--shadow-contact);
+}
+
+/* Upcoming nodes read as hairline: dimmed tile + soft word. */
+.story-node[data-node-state='todo'] {
+  opacity: 0.45;
+}
+
+.story-node[data-node-state='todo'] .story-node-word {
+  color: rgba(10, 10, 10, 0.4);
+}
+
+.story-handoff {
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 2;
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@media (max-width: 1023.98px) {
+  .story-node-word {
+    font-size: 12px;
+  }
+}
+
+/* ── Organize slider (configure) ─────────────────────────────────── */
+
+/* faint scattered-side dot field: 3px dots, 24px grid, ink 8% */
+.organize-dots {
+  background-image: radial-gradient(circle, rgba(10, 10, 10, 0.08) 1.5px, transparent 1.6px);
+  background-size: 24px 24px;
+}
+
+/* 44px glossy knob (kept from the compare shell) */
+.organize-knob {
+  display: block;
+  width: 44px;
+  height: 44px;
+  border-radius: 9999px;
+  background: linear-gradient(145deg, rgba(255, 255, 255, 1), rgba(244, 244, 245, 1));
+  border: 1px solid var(--scaffold-hairline);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 1),
+    0 2px 4px rgba(0, 0, 0, 0.05),
+    0 18px 36px -12px rgba(0, 0, 0, 0.18);
+}
+
+/* slider handle: no outline except keyboard focus (longhands: the build
+   pre-resolves color-mix and drops shorthand siblings) */
+.organize-handle {
+  border-radius: 9999px;
+  outline-width: 0;
+  outline-style: solid;
+  outline-color: transparent;
+}
+.organize-handle:focus {
+  outline-width: 0;
+}
+.organize-handle:focus-visible {
+  outline-width: 2px;
+  outline-style: solid;
+  outline-color: color-mix(in oklch, var(--color-brand) 60%, transparent);
+  outline-offset: 2px;
+}
+
+/* soft ring pulse while dragging (transform + opacity only) */
+.organize-pulse {
+  position: absolute;
+  inset: -6px;
+  border-radius: 9999px;
+  border: 1px solid color-mix(in oklch, var(--color-brand) 55%, transparent);
+  animation: organize-pulse 1.2s ease-out infinite;
+  pointer-events: none;
+}
+@keyframes organize-pulse {
+  0% {
+    transform: scale(0.94);
+    opacity: 0.9;
+  }
+  70% {
+    transform: scale(1.06);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1.06);
+    opacity: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .organize-pulse {
+    animation: none;
+    display: none;
+  }
+}

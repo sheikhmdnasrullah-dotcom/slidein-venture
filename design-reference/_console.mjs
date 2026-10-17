@@ -1,0 +1,10 @@
+import { chromium } from '@playwright/test';
+const b = await chromium.launch();
+const p = await b.newPage({ viewport: { width: +(process.argv[2] || 1440), height: +(process.argv[3] || 1000) } });
+const logs = [];
+p.on('console', (m) => { if (['error','warning'].includes(m.type())) logs.push(m.type()+': '+m.text().slice(0,300)); });
+p.on('pageerror', (e) => logs.push('PAGEERR: '+e.message.slice(0,300)));
+await p.goto('http://localhost:3000/', { waitUntil: 'load', timeout: 60000 });
+await p.waitForTimeout(4000);
+console.log(logs.join('\n') || 'no console errors');
+await b.close();

@@ -9,9 +9,14 @@
    that final state.
    ═══════════════════════════════════════════════════════════════════════════ */
 
-/* ── Loop section shell ─────────────────────────────────────────────────── */
+/* ── Frame ──────────────────────────────────────────────────────────────────
+   One container for the rail, the return band and the panel: they share the
+   same left and right edges because they share the same box.            */
 
 .wf-loop {
+  --wf-nav-h: 84px; /* the fixed nav's bottom edge */
+  --wf-top-gap: clamp(48px, 8vh, 72px);
+  --wf-hairline-solid: color-mix(in oklch, var(--color-ink) 6%, #fff);
   position: relative;
   background: var(--scaffold-bg);
   overflow-x: clip;
@@ -25,24 +30,237 @@
   position: sticky;
   top: 0;
   height: 100svh;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
+  box-sizing: border-box;
+  padding-top: calc(var(--wf-nav-h) + var(--wf-top-gap));
+  padding-bottom: 24px;
 }
 
-.wf-stage {
-  position: relative;
-  flex: 1;
-  width: 100%;
-  max-width: 1200px;
+.wf-static {
+  padding-top: var(--wf-top-gap);
+  padding-bottom: 96px;
+}
+
+.wf-frame {
+  width: min(100% - 64px, 1200px);
   margin-inline: auto;
-  padding: 84px clamp(20px, 4vw, 48px) clamp(12px, 2vh, 28px);
-  display: flex;
-  flex-direction: column;
-  min-height: 0;
+  container-type: inline-size;
 }
 
-/* The measured comet path + return path overlay */
+/* ── Rail: 13 grid tracks — 7 nodes, 6 link cells ─────────────────────────── */
+
+.wf-rail-block {
+  --n: clamp(56px, 8cqi, 96px); /* node size */
+  position: relative;
+  isolation: isolate;
+}
+
+.wf-rail {
+  display: grid;
+  grid-template-columns: var(--n) repeat(6, minmax(0, 1fr) var(--n));
+  height: var(--n);
+}
+
+/* the return band: reserved height; the path and its two tiles are placed
+   by the geometry layer */
+.wf-band {
+  height: 120px;
+}
+
+.wf-node {
+  position: relative;
+  z-index: 3;
+  width: 100%;
+  height: 100%;
+}
+
+.wf-tile {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  border-radius: 28%;
+  cursor: pointer;
+  transition: transform 0.4s var(--scaffold-ease), filter 0.4s var(--scaffold-ease);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.wf-tile.is-active {
+  transform: translateY(-4px);
+  filter: drop-shadow(0 6px 8px rgb(10 10 10 / 5%));
+}
+
+.wf-tile:focus-visible,
+.wf-ret-overview:focus-visible {
+  outline: 2px solid color-mix(in oklch, var(--color-brand) 60%, transparent);
+  outline-offset: 4px;
+}
+
+/* the one accent dot: 8px, inset in proportion to the tile (14px at 96px) */
+.wf-tile-dot {
+  position: absolute;
+  top: calc(var(--n) * 0.146);
+  right: calc(var(--n) * 0.146);
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--scaffold-accent);
+}
+
+/* the sliding active pill — one layoutId element that glides between tiles;
+   centered where the static dot above sits */
+.wf-active-pill {
+  position: absolute;
+  top: calc(var(--n) * 0.146 + 1px);
+  right: calc(var(--n) * 0.146 - 5px);
+  width: 18px;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--scaffold-accent);
+}
+
+/* ── Link cells: [run dot] ── [pod] ── [run dot] ─────────────────────────── */
+
+.wf-link {
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-width: 0;
+  height: 100%;
+}
+
+.wf-link-line {
+  position: absolute;
+  left: 10px;
+  right: 10px;
+  top: 50%;
+  height: 1px;
+  transform: translateY(-50%);
+  background: color-mix(in oklch, var(--color-ink) 12%, transparent);
+}
+
+.wf-run-dot {
+  position: absolute;
+  top: 50%;
+  z-index: 1;
+  box-sizing: border-box;
+  width: 4px;
+  height: 4px;
+  transform: translateY(-50%);
+  border-radius: 50%;
+  border: 1px solid color-mix(in oklch, var(--color-ink) 25%, transparent);
+  background: #fff;
+  transition: background 0.4s var(--scaffold-ease), border-color 0.4s var(--scaffold-ease);
+}
+
+.wf-run-dot-a {
+  left: 8px;
+}
+
+.wf-run-dot-b {
+  right: 8px;
+}
+
+.wf-link[data-state='done'] .wf-run-dot,
+.wf-link[data-state='crossing'] .wf-run-dot {
+  border-color: var(--scaffold-ink);
+  background: var(--scaffold-ink);
+}
+
+/* the done line is the progress fill (below); pending lines stay 12% ink */
+.wf-progress {
+  position: absolute;
+  z-index: 1;
+  border-radius: 999px;
+  background: var(--scaffold-ink);
+  transition: transform 0.6s var(--scaffold-ease);
+}
+
+/* ── Contract pods: [inputs] [ring] [outputs] in one row ──────────────────── */
+
+.wf-pod {
+  position: relative;
+  z-index: 2;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  width: 56px;
+  height: 28px;
+  border-radius: 999px;
+  background: #fff;
+  border: 1px solid var(--scaffold-hairline);
+  box-shadow: var(--scaffold-shadow-soft);
+}
+
+.wf-pod-sockets {
+  display: flex;
+  flex-direction: row;
+  gap: 2px;
+}
+
+.wf-socket {
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: color-mix(in oklch, var(--color-ink) 28%, transparent);
+  transition: background 0.4s var(--scaffold-ease);
+}
+
+.wf-pod-ring {
+  box-sizing: border-box;
+  width: 10px;
+  height: 10px;
+  flex: none;
+  border-radius: 50%;
+  border: 1.5px solid color-mix(in oklch, var(--color-ink) 22%, transparent);
+  background: transparent;
+  transition: background 0.4s var(--scaffold-ease), border-color 0.4s var(--scaffold-ease);
+}
+
+.wf-link[data-state='done'] .wf-pod-ring {
+  border-color: var(--scaffold-ink);
+  background: var(--scaffold-ink);
+}
+
+.wf-link[data-state='done'] .wf-socket {
+  background: color-mix(in oklch, var(--color-ink) 55%, transparent);
+}
+
+.wf-link[data-state='crossing'] .wf-pod-ring {
+  border-color: var(--scaffold-accent);
+  background: var(--scaffold-accent);
+}
+
+.wf-link .wf-pod-ring.is-neutral {
+  border-color: color-mix(in oklch, var(--color-ink) 22%, transparent);
+  background: transparent;
+}
+
+/* Ring-only pods: a 16px circle when a link cell is narrower than 72px
+   (container ≤ 990px: link = 0.0733 × container) and below 900px by spec. */
+@container (max-width: 990px) {
+  .wf-pod {
+    width: 16px;
+    height: 16px;
+    gap: 0;
+  }
+
+  .wf-pod-sockets {
+    display: none;
+  }
+
+  .wf-pod-ring {
+    width: 8px;
+    height: 8px;
+  }
+}
+
+/* ── Return path ─────────────────────────────────────────────────────────── */
+
 .wf-paths {
   position: absolute;
   inset: 0;
@@ -51,201 +269,83 @@
   overflow: visible;
   pointer-events: none;
   z-index: 1;
+  opacity: 0;
+  transition: opacity 0.3s var(--scaffold-ease);
 }
 
-.wf-path-main {
+.wf-paths.is-ready {
+  opacity: 1;
+}
+
+.wf-path-return,
+.wf-path-arrow {
   fill: none;
-  stroke: var(--scaffold-hairline);
-  stroke-width: 1;
+  stroke: color-mix(in oklch, var(--color-ink) 25%, transparent);
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 
-.wf-path-loop {
-  fill: none;
-  stroke: var(--scaffold-hairline);
-  stroke-width: 1;
-  stroke-dasharray: 2 5;
-  opacity: 0.6;
+.wf-path-return {
+  stroke-dasharray: 2 6;
 }
 
-/* ── Rail ───────────────────────────────────────────────────────────────── */
-
-.wf-rail {
-  position: relative;
-  z-index: 2;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 4px;
-  padding: 4px 2px 0;
+.wf-path-start {
+  fill: color-mix(in oklch, var(--color-ink) 25%, transparent);
 }
 
-.wf-tile-slot {
-  position: relative;
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  flex: none;
+.wf-chevron-bg {
+  fill: var(--scaffold-bg);
 }
 
-.wf-runner-dot {
-  width: 5px;
-  height: 5px;
-  border-radius: 50%;
-  flex: none;
-  background: color-mix(in oklch, var(--color-ink) 16%, transparent);
-  transition: background 0.45s var(--scaffold-ease);
-}
-
-.wf-runner-dot[data-filled='true'] {
-  background: var(--scaffold-ink);
-}
-
-.wf-tile {
-  position: relative;
-  width: 76px;
-  height: 76px;
+/* ledger + overview tiles sit ON the return run, snapped to rail columns */
+.wf-ret-tile {
+  --n: 56px;
+  position: absolute;
+  z-index: 3;
+  width: 56px;
+  height: 56px;
   padding: 0;
   border: 0;
-  background: transparent;
+  background: none;
+  border-radius: 28%;
+  transition: transform 0.4s var(--scaffold-ease);
+}
+
+.wf-ret-overview {
   cursor: pointer;
-  border-radius: var(--radius-md);
-  transition: transform 0.5s var(--scaffold-ease);
   -webkit-tap-highlight-color: transparent;
 }
 
-.wf-tile.is-active {
+.wf-ret-overview.is-active {
   transform: translateY(-4px);
 }
 
-.wf-tile:focus-visible {
-  outline: 2px solid color-mix(in oklch, var(--color-brand) 60%, transparent);
-  outline-offset: 4px;
-}
-
-.wf-tile-dot {
-  position: absolute;
-  left: 50%;
-  bottom: -14px;
-  width: 6px;
-  height: 6px;
-  margin-left: -3px;
-  border-radius: 50%;
-  background: var(--scaffold-accent);
-}
-
-/* ── Contract pods ─────────────────────────────────────────────────────── */
-
-.wf-pod {
-  position: relative;
-  z-index: 2;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 6px;
-  height: 46px;
-  padding: 0 10px;
-  border-radius: 999px;
-  background: var(--scaffold-surface);
-  border: 1px solid var(--scaffold-hairline);
-  box-shadow: var(--scaffold-shadow-soft);
-  flex: none;
-  transition: transform 0.5s var(--scaffold-ease), border-color 0.4s;
-}
-
-.wf-pod.is-active {
-  transform: translateY(-2px);
-  border-color: color-mix(in oklch, var(--color-brand) 30%, transparent);
-}
-
-.wf-pod-sockets {
+.wf-ledger-glyph {
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  gap: 3px;
-}
-
-.wf-socket {
-  width: 4px;
-  height: 4px;
-  border-radius: 50%;
-  background: color-mix(in oklch, var(--color-ink) 28%, transparent);
-  transition: background 0.4s;
-}
-
-.wf-pod.is-active .wf-socket {
-  background: color-mix(in oklch, var(--color-ink) 55%, transparent);
-}
-
-.wf-pod-ring {
-  width: 14px;
-  height: 14px;
-  border-radius: 50%;
-  flex: none;
-  border: 1.5px solid color-mix(in oklch, var(--color-ink) 22%, transparent);
-  background: transparent;
-  transition: all 0.45s var(--scaffold-ease);
-}
-
-.wf-pod.is-active .wf-pod-ring {
-  border-color: var(--scaffold-accent);
-  background: var(--scaffold-accent);
-}
-
-.wf-pod-ring.is-neutral {
-  border-color: color-mix(in oklch, var(--color-ink) 16%, transparent);
-  background: transparent;
-}
-
-/* ── Return row (ledger + overview tiles) ───────────────────────────────── */
-
-.wf-return-row {
-  position: relative;
-  z-index: 2;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 2px 44px 0;
-}
-
-.wf-mini-tile {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 10px 14px;
-  border-radius: var(--radius-md);
-  background: var(--scaffold-surface);
-  border: 1px solid var(--scaffold-hairline);
-  box-shadow: var(--scaffold-shadow-soft);
+  gap: 4px;
+  width: 52%;
   color: color-mix(in oklch, var(--color-ink) 55%, transparent);
 }
 
-.wf-overview-tile {
-  opacity: 0.8;
-}
-
-.wf-ledger-tile {
-  flex-direction: column;
-  align-items: stretch;
-  gap: 5px;
-  padding: 10px 12px;
-}
-
-.wf-ledger-row {
+.wf-glyph-row {
   display: flex;
   align-items: center;
-  gap: 5px;
+  gap: 3px;
 }
 
-.wf-ledger-row i {
-  width: 4px;
-  height: 4px;
+.wf-glyph-row i {
+  width: 3px;
+  height: 3px;
   border-radius: 50%;
-  background: color-mix(in oklch, var(--color-ink) 30%, transparent);
+  background: color-mix(in oklch, var(--color-ink) 35%, transparent);
   flex: none;
 }
 
-.wf-ledger-row span {
-  height: 4px;
+.wf-glyph-row span {
+  flex: 1;
+  height: 3px;
   border-radius: 999px;
   background: var(--scaffold-skeleton);
 }
@@ -284,41 +384,211 @@
   );
 }
 
-/* ── Progress hairline + controls ───────────────────────────────────────── */
+/* ── Inspector panel ─────────────────────────────────────────────────────── */
 
-.wf-progress {
+.wf-inspector {
   position: relative;
-  z-index: 2;
-  height: 2px;
-  margin: 14px 2px 0;
-  border-radius: 999px;
-  background: color-mix(in oklch, var(--color-ink) 8%, transparent);
-  overflow: hidden;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  margin-top: 32px;
+  padding: 40px;
+  min-height: clamp(480px, min(46vw, 100svh - 430px), 600px);
+  border-radius: var(--scaffold-r-xl);
+  background: var(--scaffold-surface);
+  border: 1px solid var(--scaffold-hairline);
+  box-shadow: var(--scaffold-shadow-soft);
 }
 
-.wf-progress-fill {
+.wf-notch {
+  position: absolute;
+  top: -9px;
+  /* -1px: the notch rides block (border-box) coordinates but positions from
+     the panel's padding box, inside its 1px border (see .wf-inspector). */
+  left: -1px;
+  z-index: 3;
+  pointer-events: none;
+  overflow: visible;
+}
+
+.wf-insp-grid {
+  flex: 1;
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  column-gap: 24px;
+  align-items: stretch;
+}
+
+.wf-insp-left {
+  grid-column: span 5;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.wf-insp-right {
+  grid-column: span 7;
+  min-width: 0;
+  display: flex;
+}
+
+.wf-insp-head {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.wf-insp-title {
+  font-family: var(--font-sans);
+  font-size: 22px;
+  line-height: 28px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--scaffold-ink);
+  min-height: 28px;
+}
+
+.wf-insp-sub {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-family: var(--font-sans);
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--scaffold-body-ink);
+}
+
+.wf-skel {
+  display: block;
+  border-radius: 999px;
+  background: var(--scaffold-skeleton);
+  max-width: 100%;
+}
+
+.wf-skel-title {
+  width: 60%;
+  height: 28px;
+}
+
+.wf-skel-line {
+  width: 100%;
+  height: 12px;
+}
+
+.wf-skel-line.is-short {
+  width: 62%;
+}
+
+.wf-skel-head {
+  width: 7em;
+  height: 12px;
+}
+
+/* the contract block: inputs → hairline + arrowhead → outputs */
+.wf-contract {
+  --pill-bar: 30px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+.wf-contract-gap {
+  height: 24px;
+}
+
+.wf-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.wf-pill {
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 72px;
+  height: 36px;
+  padding: 0 12px;
+  border-radius: 999px;
+  border: 1px solid var(--scaffold-hairline);
+  background: var(--scaffold-surface);
+  font-family: var(--font-sans);
+  font-size: 12px;
+  color: var(--scaffold-muted);
+}
+
+.wf-pill-dot {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: color-mix(in oklch, var(--color-ink) 35%, transparent);
+  flex: none;
+}
+
+.wf-contract-link {
   position: absolute;
   inset: 0;
-  border-radius: 999px;
-  background: color-mix(in oklch, var(--color-ink) 55%, transparent);
-  transform-origin: left;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+  fill: none;
+  stroke: color-mix(in oklch, var(--color-ink) 22%, transparent);
+  stroke-width: 1;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+@container (max-width: 900px) {
+  .wf-contract {
+    --pill-bar: 20px;
+  }
+
+  .wf-pill {
+    min-width: 56px;
+    padding: 0 8px;
+    gap: 4px;
+  }
+}
+
+.wf-insp-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--scaffold-hairline);
+}
+
+.wf-gate {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  color: color-mix(in oklch, var(--color-ink) 50%, transparent);
+}
+
+.wf-gate svg {
+  width: 16px;
+  height: 16px;
+  flex: none;
 }
 
 .wf-controls {
-  position: absolute;
-  top: clamp(12px, 2vh, 28px);
-  right: clamp(20px, 4vw, 48px);
-  z-index: 6;
   display: flex;
   gap: 8px;
+  flex: none;
 }
 
 .wf-ctl {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 40px;
-  height: 40px;
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
   border: 1px solid var(--scaffold-hairline);
   background: var(--scaffold-surface);
@@ -334,7 +604,8 @@
   color: var(--scaffold-ink);
 }
 
-.wf-ctl:focus-visible {
+.wf-ctl:focus-visible,
+.wf-failure-btn:focus-visible {
   outline: 2px solid color-mix(in oklch, var(--color-brand) 60%, transparent);
   outline-offset: 3px;
 }
@@ -344,131 +615,37 @@
   height: 16px;
 }
 
-/* ── Inspector ─────────────────────────────────────────────────────────── */
-
-.wf-inspector {
+/* scene surface: stretches to the full column; the art is centered by the
+   geometry layer (sceneFit), not by CSS */
+.wf-scene-surface {
   position: relative;
-  z-index: 2;
-  display: grid;
-  grid-template-columns: 35% 65%;
-  gap: 24px;
-  margin-block: auto;
-  padding: 24px;
-  border-radius: var(--scaffold-r-xl);
-  background: var(--scaffold-surface);
-  border: 1px solid var(--scaffold-hairline);
-  box-shadow: var(--scaffold-shadow-soft);
-  min-height: 0;
-}
-
-.wf-insp-left {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
+  box-sizing: border-box;
+  flex: 1;
   min-width: 0;
-}
-
-.wf-insp-title {
-  font-family: var(--font-sans);
-  font-size: 15px;
-  font-weight: 600;
-  letter-spacing: -0.01em;
-  color: var(--scaffold-ink);
-  min-height: 1em;
-}
-
-.wf-insp-sub {
-  font-family: var(--font-sans);
-  font-size: 13px;
-  line-height: 1.55;
-  color: var(--scaffold-body-ink);
-  min-height: 1em;
-}
-
-.wf-contract {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  flex-wrap: wrap;
-  margin-top: 2px;
-}
-
-.wf-pills {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  flex-wrap: wrap;
-}
-
-.wf-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  height: 22px;
-  padding: 0 8px;
-  border-radius: 999px;
+  border-radius: var(--scaffold-r-lg);
+  background: #fafafa;
   border: 1px solid var(--scaffold-hairline);
-  background: var(--scaffold-surface);
-  font-family: var(--font-sans);
-  font-size: 11px;
-  color: var(--scaffold-muted);
+  overflow: hidden;
 }
 
-.wf-pill-dot {
-  width: 4px;
-  height: 4px;
-  border-radius: 50%;
-  background: color-mix(in oklch, var(--color-ink) 35%, transparent);
-  flex: none;
-}
-
-.wf-pill .wf-pill-bar {
-  width: 38px;
-}
-
-.wf-contract-arrow {
-  color: color-mix(in oklch, var(--color-ink) 40%, transparent);
-  flex: none;
-}
-
-.wf-contract-arrow svg {
-  width: 16px;
-  height: 16px;
-}
-
-.wf-gate {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  color: color-mix(in oklch, var(--color-ink) 50%, transparent);
-  margin-top: auto;
-}
-
-.wf-gate svg {
-  width: 16px;
-  height: 16px;
-  flex: none;
-}
-
-.wf-insp-right {
-  position: relative;
-  height: 400px;
-  min-width: 0;
-}
-
-.wf-scene-wrap {
-  position: absolute;
-  inset: 0;
+/* The surface never grows taller than a 1.3 aspect: the art bands (60–85% ×
+   55–85%) are only jointly satisfiable for a viewport aspect H/W in
+   [0.659, 0.807] (discover binds the bottom, personalize the top), and 1.3
+   with the 32px viewport inset lands ≈0.72–0.75 at every width. Where the
+   column is shorter the surface keeps stretching as before. */
+.wf-insp-right > .wf-scene-surface {
+  aspect-ratio: 1.3;
+  max-height: 100%;
+  /* center, not stretch: stretch would fix the height and defeat the ratio */
+  align-self: center;
 }
 
 .wf-scene-viewport {
   position: absolute;
-  inset: 0;
-  overflow: hidden;
+  inset: 32px;
 }
 
-/* The Scene wrapper is a 0-height block by default (the canvas is
-   absolute). Filling it gives the canvas a real containing block. */
+.wf-scene-wrap,
 .wf-scene-fill {
   position: absolute;
   inset: 0;
@@ -476,26 +653,26 @@
 
 .wf-scene-canvas {
   position: absolute;
-  left: 50%;
-  top: 50%;
+  left: 0;
+  top: 0;
   width: 680px;
   height: 400px;
-  transform: translate(-50%, -50%) scale(var(--scene-scale, 1));
-  transform-origin: center;
+  transform: translate(var(--scene-tx, 0px), var(--scene-ty, 0px)) scale(var(--scene-scale, 1));
+  transform-origin: 0 0;
 }
 
-/* ── Inspector: failure toggle + recovery tile ─────────────────────────── */
+/* ── Failure toggle + recovery tile ──────────────────────────────────────── */
 
 .wf-failure-btn {
   position: absolute;
-  top: 0;
-  right: 0;
+  top: 16px;
+  right: 16px;
   z-index: 8;
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 34px;
-  height: 34px;
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
   border: 1px solid var(--scaffold-hairline);
   background: var(--scaffold-surface);
@@ -515,30 +692,27 @@
   border-color: color-mix(in oklch, var(--color-brand) 35%, transparent);
 }
 
-.wf-failure-btn:focus-visible {
-  outline: 2px solid color-mix(in oklch, var(--color-brand) 60%, transparent);
-  outline-offset: 3px;
-}
-
 .wf-failure-btn svg {
-  width: 15px;
-  height: 15px;
+  width: 16px;
+  height: 16px;
 }
 
 .wf-recovery {
   position: absolute;
-  left: 50%;
-  bottom: 0;
+  left: 0;
+  right: 0;
+  bottom: 16px;
   z-index: 7;
   display: flex;
   align-items: center;
   gap: 10px;
+  width: max-content;
+  margin-inline: auto;
   padding: 12px 18px;
   border-radius: var(--radius-md);
   background: var(--scaffold-surface);
   border: 1px solid var(--scaffold-hairline);
   box-shadow: var(--scaffold-shadow-soft);
-  transform: translateX(-50%);
 }
 
 .wf-recovery svg {
@@ -672,18 +846,15 @@
   height: 104px;
   border-radius: 50%;
   border: 1.5px dashed color-mix(in oklch, var(--color-ink) 22%, transparent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: color-mix(in oklch, var(--color-ink) 45%, transparent);
 }
 
-.wf-s-configure .wf-icp-ring::after {
-  content: '';
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  width: 11px;
-  height: 11px;
-  margin: -5.5px 0 0 -5.5px;
-  border-radius: 50%;
-  background: var(--scaffold-skeleton);
+.wf-s-configure .wf-icp-ring svg {
+  width: 22px;
+  height: 22px;
 }
 
 .wf-s-configure .wf-ver-layer {
@@ -693,19 +864,19 @@
   width: 360px;
   height: 250px;
   border-radius: var(--radius-md);
-  border: 1px solid var(--scaffold-hairline);
-  background: var(--scaffold-surface);
-  opacity: 0.5;
+  border: 1px solid rgba(10, 10, 10, 0.09);
+  background: var(--scaffold-well);
+  opacity: 0.55;
 }
 
 .wf-s-configure .wf-ver-layer-1 {
   transform: translate(12px, 12px);
-  opacity: 0.45;
+  opacity: 0.55;
 }
 
 .wf-s-configure .wf-ver-layer-2 {
   transform: translate(24px, 24px);
-  opacity: 0.3;
+  opacity: 0.35;
 }
 
 .wf-s-configure .wf-ver-sheet {
@@ -715,38 +886,66 @@
   width: 360px;
   height: 250px;
   border-radius: var(--radius-md);
-  background: color-mix(in oklch, var(--scaffold-surface) 88%, transparent);
+  background: var(--scaffold-surface);
   border: 1px solid color-mix(in oklch, var(--color-brand) 28%, transparent);
   box-shadow: var(--scaffold-shadow-soft);
   opacity: 0;
   z-index: 4;
-  padding: 30px;
+  padding: 26px;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 14px;
   animation: ver-slide 8s var(--scaffold-ease) infinite;
 }
 
-.wf-s-configure .wf-ver-sheet::before {
-  content: '';
-  width: 130px;
-  height: 12px;
-  border-radius: 999px;
-  background: var(--scaffold-skeleton);
+/* the landing layer is a real mini profile card, not a blank sheet */
+.wf-s-configure .wf-ver-mini {
+  display: flex;
+  align-items: center;
+  gap: 14px;
 }
 
-.wf-s-configure .wf-ver-sheet::after {
-  content: '';
-  width: 84px;
-  height: 12px;
-  border-radius: 999px;
+.wf-s-configure .wf-ver-mini-avatar {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
   background: var(--scaffold-skeleton);
+  flex: none;
+}
+
+.wf-s-configure .wf-ver-mini-bars {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.wf-s-configure .wf-ver-mini-bars .wf-bar:nth-child(1) {
+  width: 92px;
+}
+
+.wf-s-configure .wf-ver-mini-bars .wf-bar:nth-child(2) {
+  width: 60px;
+}
+
+.wf-s-configure .wf-ver-mini-tiles {
+  display: flex;
+  gap: 9px;
+}
+
+.wf-s-configure .wf-ver-mini-tiles span {
+  width: 46px;
+  height: 46px;
+  border-radius: var(--radius-sm);
+  background: linear-gradient(145deg, rgba(255, 255, 255, 1), var(--scaffold-well));
+  border: 1px solid rgba(10, 10, 10, 0.04);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 1),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.04), var(--scaffold-shadow-soft);
 }
 
 .wf-s-configure .wf-ver-check {
   position: absolute;
-  left: 340px;
-  top: 200px;
+  left: 482px;
+  top: 114px;
   width: 46px;
   height: 46px;
   margin: -23px 0 0 -23px;
@@ -768,27 +967,28 @@
   color: var(--scaffold-accent);
 }
 
+/* the sheet drops in over the stack, dwells as the focal moment, then
+   yields: the resting state (≈40–100%) is the full composed arrangement */
 @keyframes ver-slide {
   0% {
     transform: translateY(-180%);
     opacity: 0;
   }
-  10% {
+  8% {
+    opacity: 1;
+  }
+  14%, 30% {
     transform: translateY(0);
     opacity: 1;
   }
-  34% {
-    transform: translateY(0);
-    opacity: 1;
-  }
-  40%, 100% {
+  38%, 100% {
     transform: translateY(0);
     opacity: 0;
   }
 }
 
 @keyframes check-pop {
-  0%, 13% {
+  0%, 14% {
     transform: scale(0.4);
     opacity: 0;
   }
@@ -800,7 +1000,7 @@
     transform: scale(1);
     opacity: 1;
   }
-  36%, 100% {
+  34%, 100% {
     transform: scale(1);
     opacity: 0;
   }
@@ -916,81 +1116,120 @@
 }
 
 /* ── Scene 3 · research ─────────────────────────────────────────────────── */
+/* Geometry (card, bars, pills, anchors, scanner range) comes from Scenes.tsx
+   rects as inline style; this block only styles and animates. */
 
 .wf-s-research .wf-page {
-  left: 50px;
-  top: 80px;
-  width: 340px;
-  height: 250px;
-  padding: 22px;
   z-index: 2;
 }
 
 .wf-s-research .wf-page-head {
+  position: absolute;
   width: 120px;
   height: 20px;
   border-radius: var(--radius-sm);
   background: var(--scaffold-skeleton);
-  margin-bottom: 20px;
 }
 
 .wf-s-research .wf-page-bar {
-  width: 280px;
-  height: 11px;
-  margin-bottom: 18px;
+  position: absolute;
   border-radius: 999px;
   background: var(--scaffold-skeleton);
 }
 
-.wf-s-research .wf-page-bar:nth-of-type(3) {
-  width: 230px;
+.wf-s-research .wf-page-bar.is-src {
+  background: color-mix(in oklch, var(--color-ink) 14%, transparent);
 }
 
+/* the document's right sidebar: a divider, a head bar and small items */
 .wf-s-research .wf-page-side {
   position: absolute;
-  right: 18px;
-  top: 72px;
-  width: 70px;
-  height: 160px;
-  border-radius: var(--radius-sm);
-  background: color-mix(in oklch, var(--color-ink) 5%, transparent);
+  left: 289px; /* RS.sideX (340) − card left (50) − border (1) */
+  top: 34px;
+  bottom: 34px;
+  width: 96px;
 }
 
+.wf-s-research .wf-page-side::before {
+  content: '';
+  position: absolute;
+  left: -14px;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: var(--scaffold-hairline);
+}
+
+.wf-s-research .wf-side-head {
+  display: block;
+  width: 54px;
+  height: 10px;
+  border-radius: 999px;
+  background: var(--scaffold-skeleton);
+  margin-bottom: 22px;
+}
+
+.wf-s-research .wf-side-item {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.wf-s-research .wf-side-item i {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: color-mix(in oklch, var(--color-ink) 30%, transparent);
+  flex: none;
+}
+
+.wf-s-research .wf-side-item .wf-bar {
+  flex: 1;
+  height: 8px;
+}
+
+/* a 2px scanner line with a 24px fade above it, inside the card's inner width */
 .wf-s-research .wf-scan-line {
   position: absolute;
-  left: 50px;
-  width: 340px;
   height: 2px;
-  top: 92px;
+  top: var(--scan-b);
   background: color-mix(in oklch, var(--color-ink) 30%, transparent);
   opacity: 0;
   z-index: 3;
   animation: scan-sweep 8s var(--scaffold-ease) infinite;
 }
 
+.wf-s-research .wf-scan-line::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 100%;
+  height: 16px;
+  background: linear-gradient(to top, color-mix(in oklch, var(--color-ink) 5%, transparent), transparent);
+}
+
 @keyframes scan-sweep {
   0% {
-    top: 92px;
+    top: var(--scan-a);
     opacity: 0;
   }
   6% {
     opacity: 1;
   }
   42% {
-    top: 318px;
+    top: var(--scan-b);
     opacity: 1;
   }
   48%, 100% {
-    top: 318px;
+    top: var(--scan-b);
     opacity: 0;
   }
 }
 
 .wf-s-research .wf-claim {
   position: absolute;
-  left: 470px;
-  width: 122px;
-  height: 34px;
   border-radius: 999px;
   background: var(--scaffold-surface);
   border: 1px solid var(--scaffold-hairline);
@@ -1020,73 +1259,115 @@
   background: var(--scaffold-skeleton);
 }
 
-.wf-s-research .wf-claim-tether {
-  position: absolute;
-  right: 100%;
-  top: 50%;
-  width: 118px;
-  border-top: 1.5px dotted color-mix(in oklch, var(--color-ink) 32%, transparent);
-}
-
-.wf-s-research .wf-claim-1 {
-  top: 118px;
-  animation: claim-lift-1 8s var(--scaffold-ease) infinite;
-}
-
-.wf-s-research .wf-claim-2 {
-  top: 158px;
-  animation: claim-lift-2 8s var(--scaffold-ease) infinite;
-}
-
-.wf-s-research .wf-claim-3 {
-  top: 198px;
-  animation: claim-lift-3 8s var(--scaffold-ease) infinite;
+/* the broken claim carries a dash mark instead of the provenance dot */
+.wf-s-research .wf-claim-broken::before {
+  content: none;
 }
 
 .wf-s-research .wf-claim-broken {
-  left: 470px;
-  top: 20px;
+  gap: 6px;
+  color: color-mix(in oklch, var(--color-ink) 45%, transparent);
+}
+
+.wf-s-research .wf-claim-broken svg {
+  width: 11px;
+  height: 11px;
+  flex: none;
+}
+
+/* provenance tethers: card-edge anchor → pill-edge anchor, drawn behind both */
+.wf-tethers,
+.wf-s-converse .wf-links,
+.wf-s-overview .wf-flow {
+  position: absolute;
+  inset: 0;
+  width: 680px;
+  height: 400px;
+  overflow: visible;
+  z-index: 1;
+}
+
+.wf-s-research .wf-tether path {
+  fill: none;
+  stroke: color-mix(in oklch, var(--color-ink) 32%, transparent);
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-dasharray: 1.5 4;
+}
+
+.wf-anchor {
+  fill: color-mix(in oklch, var(--color-ink) 55%, transparent);
+}
+
+.wf-s-research .wf-tether-1 { animation: tether-in-1 8s var(--scaffold-ease) infinite; }
+.wf-s-research .wf-tether-2 { animation: tether-in-2 8s var(--scaffold-ease) infinite; }
+.wf-s-research .wf-tether-3 { animation: tether-in-3 8s var(--scaffold-ease) infinite; }
+
+.wf-s-research .wf-claim-1 { animation: claim-lift-1 8s var(--scaffold-ease) infinite; }
+.wf-s-research .wf-claim-2 { animation: claim-lift-2 8s var(--scaffold-ease) infinite; }
+.wf-s-research .wf-claim-3 { animation: claim-lift-3 8s var(--scaffold-ease) infinite; }
+
+/* the broken claim has no tether and fades out: no source, rejected */
+.wf-s-research .wf-claim-broken {
   animation: claim-broken 8s var(--scaffold-ease) infinite;
 }
 
+/* all three claims lift within the first fifth of the loop and dwell, so
+   the composed arrangement reads at any phase */
+@keyframes tether-in-1 {
+  0%, 4% { opacity: 0; }
+  10%, 100% { opacity: 1; }
+}
+
+@keyframes tether-in-2 {
+  0%, 8% { opacity: 0; }
+  14%, 100% { opacity: 1; }
+}
+
+@keyframes tether-in-3 {
+  0%, 12% { opacity: 0; }
+  18%, 100% { opacity: 1; }
+}
+
 @keyframes claim-lift-1 {
-  0%, 16% {
+  0%, 4% {
     transform: translateY(12px);
     opacity: 0;
   }
-  24%, 100% {
+  10%, 100% {
     transform: translateY(0);
     opacity: 1;
   }
 }
 
 @keyframes claim-lift-2 {
-  0%, 24% {
+  0%, 8% {
     transform: translateY(12px);
     opacity: 0;
   }
-  32%, 100% {
+  14%, 100% {
     transform: translateY(0);
     opacity: 1;
   }
 }
 
 @keyframes claim-lift-3 {
-  0%, 32% {
+  0%, 12% {
     transform: translateY(12px);
     opacity: 0;
   }
-  40%, 100% {
+  18%, 100% {
     transform: translateY(0);
     opacity: 1;
   }
 }
 
+/* the broken claim has no tether; it is present early, then clearly fades */
 @keyframes claim-broken {
-  0%, 40% {
+  0%, 55% {
     opacity: 1;
   }
-  52%, 100% {
+  70%, 100% {
     opacity: 0;
   }
 }
@@ -1107,16 +1388,47 @@
   height: 44px;
   border-radius: 50%;
   background: var(--scaffold-skeleton);
-  margin-bottom: 16px;
+  margin-bottom: 14px;
 }
 
-.wf-s-qualify .wf-prospect .wf-bar:nth-child(2) {
+.wf-s-qualify .wf-prospect > .wf-bar {
+  margin-bottom: 8px;
+}
+
+.wf-s-qualify .wf-prospect > .wf-bar:nth-child(2) {
   width: 120px;
-  margin-bottom: 9px;
 }
 
-.wf-s-qualify .wf-prospect .wf-bar:nth-child(3) {
+.wf-s-qualify .wf-prospect > .wf-bar:nth-child(3) {
   width: 88px;
+}
+
+.wf-s-qualify .wf-prospect > .wf-bar:nth-child(4) {
+  width: 104px;
+}
+
+.wf-s-qualify .wf-prospect-divider {
+  display: block;
+  height: 1px;
+  margin: 12px 0;
+  background: var(--scaffold-hairline);
+}
+
+.wf-s-qualify .wf-prospect-stats {
+  display: flex;
+  gap: 8px;
+}
+
+.wf-s-qualify .wf-prospect-stats .wf-bar {
+  height: 8px;
+}
+
+.wf-s-qualify .wf-prospect-stats .wf-bar:nth-child(1) {
+  width: 56px;
+}
+
+.wf-s-qualify .wf-prospect-stats .wf-bar:nth-child(2) {
+  width: 40px;
 }
 
 .wf-s-qualify .wf-q-offer {
@@ -1135,6 +1447,15 @@
   padding: 0 16px;
 }
 
+.wf-s-qualify .wf-q-offer::before {
+  content: '';
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: color-mix(in oklch, var(--color-ink) 30%, transparent);
+  flex: none;
+}
+
 .wf-s-qualify .wf-q-offer::after {
   content: '';
   width: 64px;
@@ -1143,17 +1464,9 @@
   background: var(--scaffold-skeleton);
 }
 
-.wf-s-qualify .wf-q-offer-1 {
-  top: 55px;
-}
-
 .wf-s-qualify .wf-q-offer-2 {
-  top: 165px;
+  transform-origin: left center; /* the connector's anchor stays on the left edge */
   animation: offer-lift 7s var(--scaffold-ease) infinite;
-}
-
-.wf-s-qualify .wf-q-offer-3 {
-  top: 275px;
 }
 
 .wf-s-qualify .wf-q-offer-2 .wf-offer-dot {
@@ -1169,20 +1482,20 @@
 }
 
 @keyframes offer-lift {
-  0%, 24% {
-    transform: translateY(0);
+  0%, 16% {
+    transform: scale(1);
   }
-  32%, 100% {
-    transform: translateY(-5px);
+  24%, 100% {
+    transform: scale(1.04);
   }
 }
 
 @keyframes offer-dot {
-  0%, 28% {
+  0%, 20% {
     opacity: 0;
     transform: scale(0.4);
   }
-  36% {
+  28% {
     opacity: 1;
     transform: scale(1);
   }
@@ -1210,10 +1523,10 @@
 }
 
 @keyframes connector-draw {
-  0%, 10% {
+  0%, 6% {
     stroke-dashoffset: 100;
   }
-  30%, 100% {
+  18%, 100% {
     stroke-dashoffset: 0;
   }
 }
@@ -1247,16 +1560,16 @@
 .wf-s-qualify .wf-q-meter {
   position: absolute;
   left: 440px;
-  top: 330px;
+  top: 358px;
   display: flex;
-  gap: 6px;
+  gap: 4px;
   z-index: 2;
 }
 
 .wf-s-qualify .wf-q-tick {
-  width: 18px;
-  height: 9px;
-  border-radius: 3px;
+  width: 15px;
+  height: 15px;
+  border-radius: 4px;
   background: color-mix(in oklch, var(--color-ink) 10%, transparent);
   transform-origin: left;
   transform: scaleX(1);
@@ -1267,31 +1580,29 @@
   animation: tick-fill 7s var(--scaffold-ease) infinite;
 }
 
-.wf-s-qualify .wf-q-tick.is-on:nth-child(2) { animation-delay: 0.04s; }
-.wf-s-qualify .wf-q-tick.is-on:nth-child(3) { animation-delay: 0.08s; }
-.wf-s-qualify .wf-q-tick.is-on:nth-child(4) { animation-delay: 0.12s; }
-.wf-s-qualify .wf-q-tick.is-on:nth-child(5) { animation-delay: 0.16s; }
-.wf-s-qualify .wf-q-tick.is-on:nth-child(6) { animation-delay: 0.2s; }
-.wf-s-qualify .wf-q-tick.is-on:nth-child(7) { animation-delay: 0.24s; }
+.wf-s-qualify .wf-q-tick.is-on:nth-child(2) { animation-delay: 0.05s; }
+.wf-s-qualify .wf-q-tick.is-on:nth-child(3) { animation-delay: 0.1s; }
+.wf-s-qualify .wf-q-tick.is-on:nth-child(4) { animation-delay: 0.15s; }
+.wf-s-qualify .wf-q-tick.is-on:nth-child(5) { animation-delay: 0.2s; }
+.wf-s-qualify .wf-q-tick.is-on:nth-child(6) { animation-delay: 0.25s; }
+.wf-s-qualify .wf-q-tick.is-on:nth-child(7) { animation-delay: 0.3s; }
 
 @keyframes tick-fill {
-  0%, 34% {
+  0%, 8% {
     transform: scaleX(0);
     background: color-mix(in oklch, var(--color-ink) 10%, transparent);
   }
-  44%, 100% {
+  18%, 100% {
     transform: scaleX(1);
     background: var(--scaffold-accent);
   }
 }
 
 /* ── Scene 5 · personalize ──────────────────────────────────────────────── */
+/* Chip, card, socket and thread positions come from Scenes.tsx rects. */
 
 .wf-s-personalize .wf-ev-chip {
   position: absolute;
-  left: 40px;
-  width: 132px;
-  height: 38px;
   border-radius: 999px;
   background: var(--scaffold-surface);
   border: 1px solid var(--scaffold-hairline);
@@ -1320,10 +1631,6 @@
   background: var(--scaffold-skeleton);
 }
 
-.wf-s-personalize .wf-ev-chip-1 { top: 70px; }
-.wf-s-personalize .wf-ev-chip-2 { top: 180px; }
-.wf-s-personalize .wf-ev-chip-3 { top: 290px; }
-
 .wf-s-personalize .wf-ev-chip .wf-ev-ring {
   position: absolute;
   inset: -1px;
@@ -1332,80 +1639,95 @@
   opacity: 0;
 }
 
+/* ONE evidence highlight dwells per loop: chip ring + its thread together */
 .wf-s-personalize .wf-ev-chip-1 .wf-ev-ring { animation: ev-hl-1 8s var(--scaffold-ease) infinite; }
-.wf-s-personalize .wf-ev-chip-2 .wf-ev-ring { animation: ev-hl-2 8s var(--scaffold-ease) infinite; }
-.wf-s-personalize .wf-ev-chip-3 .wf-ev-ring { animation: ev-hl-3 8s var(--scaffold-ease) infinite; }
 
 .wf-s-personalize .wf-email-card {
-  left: 240px;
-  top: 50px;
-  width: 400px;
-  height: 300px;
-  padding: 24px 28px;
   z-index: 3;
 }
 
 .wf-s-personalize .wf-draft-layer {
   position: absolute;
-  width: 400px;
+  width: 360px;
   height: 300px;
   border-radius: var(--radius-md);
-  background: var(--scaffold-surface);
-  border: 1px solid var(--scaffold-hairline);
+  background: var(--scaffold-well);
+  border: 1px solid rgba(10, 10, 10, 0.08);
   z-index: 1;
 }
 
+/* each draft is a faint but legible ghost of the email card */
+.wf-s-personalize .wf-draft-layer::before {
+  content: '';
+  position: absolute;
+  left: 28px;
+  top: 24px;
+  width: 130px;
+  height: 12px;
+  border-radius: 999px;
+  background: var(--scaffold-skeleton);
+}
+
+.wf-s-personalize .wf-draft-layer::after {
+  content: '';
+  position: absolute;
+  left: 28px;
+  top: 60px;
+  width: 240px;
+  height: 10px;
+  border-radius: 999px;
+  background: var(--scaffold-skeleton);
+}
+
 .wf-s-personalize .wf-draft-1 {
-  left: 254px;
-  top: 64px;
-  opacity: 0.4;
+  left: 258px;
+  top: 66px;
+  opacity: 0.6;
 }
 
 .wf-s-personalize .wf-draft-2 {
-  left: 268px;
-  top: 78px;
-  opacity: 0.25;
+  left: 276px;
+  top: 82px;
+  opacity: 0.4;
 }
 
 .wf-s-personalize .wf-subject {
+  position: absolute;
+  left: 28px;
+  top: 24px;
   width: 210px;
   height: 13px;
   border-radius: 999px;
   background: var(--scaffold-skeleton);
-  margin-bottom: 34px;
 }
 
-.wf-s-personalize .wf-email-line {
-  position: relative;
-  display: flex;
-  align-items: center;
-  gap: 13px;
-  margin-bottom: 30px;
-}
-
-.wf-s-personalize .wf-email-line .wf-line-socket {
+/* each line's socket sits on the card's left edge: the thread's end anchor */
+.wf-s-personalize .wf-line-socket {
+  position: absolute;
   width: 6px;
   height: 6px;
   border-radius: 50%;
   background: color-mix(in oklch, var(--color-ink) 30%, transparent);
-  flex: none;
 }
 
-.wf-s-personalize .wf-email-line .wf-bar {
-  width: 260px;
+.wf-s-personalize .wf-email-bar {
+  position: absolute;
+  width: 300px;
   transform-origin: left;
+  animation: line-draw 8s var(--scaffold-ease) infinite;
 }
 
-.wf-s-personalize .wf-email-line-1 .wf-bar { animation: line-draw-1 8s var(--scaffold-ease) infinite; }
-.wf-s-personalize .wf-email-line-2 .wf-bar { animation: line-draw-2 8s var(--scaffold-ease) infinite; }
-.wf-s-personalize .wf-email-line-3 .wf-bar { animation: line-draw-3 8s var(--scaffold-ease) infinite; }
+.wf-s-personalize .wf-email-bar-2 { animation-delay: 0.15s; }
+.wf-s-personalize .wf-email-bar-3 { animation-delay: 0.3s; }
 
 .wf-s-personalize .wf-signature {
+  position: absolute;
+  left: 28px;
+  top: 262px;
   width: 120px;
   height: 11px;
   border-radius: 999px;
   background: var(--scaffold-skeleton);
-  margin-top: 6px;
 }
 
 .wf-s-personalize .wf-threads {
@@ -1413,6 +1735,7 @@
   inset: 0;
   width: 680px;
   height: 400px;
+  overflow: visible;
   z-index: 2;
 }
 
@@ -1423,74 +1746,51 @@
   stroke-dasharray: 3 4;
 }
 
-.wf-s-personalize .wf-thread-hl {
+.wf-s-personalize .wf-threads path.wf-thread-hl {
   stroke: var(--scaffold-accent);
-  stroke-dasharray: none;
+  stroke-width: 1.6;
+  stroke-dasharray: 3 4;
   opacity: 0;
 }
 
 .wf-s-personalize .wf-thread-hl-1 { animation: thread-hl-1 8s var(--scaffold-ease) infinite; }
-.wf-s-personalize .wf-thread-hl-2 { animation: thread-hl-2 8s var(--scaffold-ease) infinite; }
-.wf-s-personalize .wf-thread-hl-3 { animation: thread-hl-3 8s var(--scaffold-ease) infinite; }
 
-@keyframes line-draw-1 {
-  0%, 4% { transform: scaleX(0); }
-  14%, 100% { transform: scaleX(1); }
+/* the lines draw in together at the top of the loop, then rest */
+@keyframes line-draw {
+  0%, 3% { transform: scaleX(0); }
+  10%, 100% { transform: scaleX(1); }
 }
 
-@keyframes line-draw-2 {
-  0%, 10% { transform: scaleX(0); }
-  20%, 100% { transform: scaleX(1); }
-}
-
-@keyframes line-draw-3 {
-  0%, 16% { transform: scaleX(0); }
-  26%, 100% { transform: scaleX(1); }
-}
-
+/* one highlight dwells ≈ a third of the loop; both shots of a 6–10s cycle
+   sit inside or outside it deliberately */
 @keyframes ev-hl-1 {
-  0%, 36% { opacity: 0; }
-  46%, 50% { opacity: 1; }
-  60%, 100% { opacity: 0; }
-}
-
-@keyframes ev-hl-2 {
-  0%, 50% { opacity: 0; }
-  60%, 64% { opacity: 1; }
-  74%, 100% { opacity: 0; }
-}
-
-@keyframes ev-hl-3 {
-  0%, 64% { opacity: 0; }
-  74%, 78% { opacity: 1; }
-  88%, 100% { opacity: 0; }
+  0%, 8% { opacity: 0; }
+  14%, 46% { opacity: 1; }
+  52%, 100% { opacity: 0; }
 }
 
 @keyframes thread-hl-1 {
-  0%, 36% { opacity: 0; }
-  46%, 50% { opacity: 1; }
-  60%, 100% { opacity: 0; }
-}
-
-@keyframes thread-hl-2 {
-  0%, 50% { opacity: 0; }
-  60%, 64% { opacity: 1; }
-  74%, 100% { opacity: 0; }
-}
-
-@keyframes thread-hl-3 {
-  0%, 64% { opacity: 0; }
-  74%, 78% { opacity: 1; }
-  88%, 100% { opacity: 0; }
+  0%, 8% { opacity: 0; }
+  14%, 46% { opacity: 1; }
+  52%, 100% { opacity: 0; }
 }
 
 /* ── Scene 6 · outreach ─────────────────────────────────────────────────── */
 
+/* stations hang on ticks above the lane; capsules ride the lane below */
+.wf-s-outreach .wf-station-tick {
+  position: absolute;
+  width: 1px;
+  transform: translateX(-0.5px);
+  background: color-mix(in oklch, var(--color-ink) 14%, transparent);
+  z-index: 1;
+}
+
 .wf-s-outreach .wf-gate {
   position: absolute;
-  top: 90px;
-  width: 64px;
-  height: 64px;
+  top: 108px;
+  width: 52px;
+  height: 52px;
   border-radius: var(--radius-md);
   background: var(--scaffold-surface);
   border: 1px solid var(--scaffold-hairline);
@@ -1503,69 +1803,54 @@
 }
 
 .wf-s-outreach .wf-gate svg {
-  width: 24px;
-  height: 24px;
+  width: 22px;
+  height: 22px;
 }
 
 .wf-s-outreach .wf-gate .wf-gate-dot {
   position: absolute;
-  bottom: 8px;
+  bottom: 6px;
   width: 5px;
   height: 5px;
   border-radius: 50%;
   background: color-mix(in oklch, var(--color-ink) 20%, transparent);
 }
 
-.wf-s-outreach .wf-gate-1 { left: 40px; }
-.wf-s-outreach .wf-gate-2 { left: 140px; }
-.wf-s-outreach .wf-gate-3 { left: 240px; }
-.wf-s-outreach .wf-gate-4 { left: 340px; }
-.wf-s-outreach .wf-gate-5 { left: 440px; }
+.wf-s-outreach .wf-gate-1 { left: 70px; }
+.wf-s-outreach .wf-gate-2 { left: 166px; }
+.wf-s-outreach .wf-gate-3 { left: 262px; }
+.wf-s-outreach .wf-gate-4 { left: 358px; }
+.wf-s-outreach .wf-gate-5 { left: 454px; }
 
 .wf-s-outreach .wf-server {
-  left: 540px;
-  top: 82px;
-  width: 78px;
-  height: 78px;
+  position: absolute;
   z-index: 2;
 }
 
 .wf-s-outreach .wf-server svg {
-  width: 27px;
-  height: 27px;
   color: color-mix(in oklch, var(--color-ink) 60%, transparent);
 }
 
 .wf-s-outreach .wf-recipient {
-  left: 552px;
-  top: 200px;
-  width: 58px;
-  height: 64px;
+  position: absolute;
   border-radius: var(--radius-md);
   z-index: 2;
 }
 
-.wf-s-outreach .wf-recipient svg {
-  width: 22px;
-  height: 22px;
-}
-
+/* the lane: one hairline under all seven stations, left to right */
 .wf-s-outreach .wf-lane {
   position: absolute;
-  left: 40px;
-  right: 530px;
-  top: 121px;
   height: 1px;
-  background: var(--scaffold-hairline);
+  background: color-mix(in oklch, var(--color-ink) 16%, transparent);
   z-index: 1;
 }
 
 .wf-s-outreach .wf-capsule {
   position: absolute;
-  top: 107px;
-  left: 40px;
-  width: 48px;
-  height: 27px;
+  top: 179px; /* centred on the lane: lane y 190 − 11 */
+  left: 16px;
+  width: 40px;
+  height: 22px;
   border-radius: 999px;
   background: var(--scaffold-surface);
   border: 1px solid var(--scaffold-hairline);
@@ -1579,8 +1864,8 @@
 }
 
 .wf-s-outreach .wf-capsule svg {
-  width: 15px;
-  height: 15px;
+  width: 13px;
+  height: 13px;
 }
 
 .wf-s-outreach .wf-capsule-a {
@@ -1588,47 +1873,46 @@
 }
 
 .wf-s-outreach .wf-capsule-b {
-  top: 201px;
   animation: capsule-b 9s linear infinite;
 }
 
 .wf-s-outreach .wf-stamp {
   position: absolute;
-  right: -15px;
-  top: -9px;
-  width: 17px;
-  height: 17px;
-  color: var(--scaffold-accent);
+  right: -13px;
+  top: -8px;
+  width: 15px;
+  height: 15px;
+  color: color-mix(in oklch, var(--color-ink) 55%, transparent);
   opacity: 0;
 }
 
 .wf-s-outreach .wf-stamp svg {
-  width: 17px;
-  height: 17px;
+  width: 15px;
+  height: 15px;
 }
 
 .wf-s-outreach .wf-hold {
   position: absolute;
   left: 50%;
   top: 50%;
-  margin: -10px 0 0 -10px;
-  width: 20px;
-  height: 20px;
-  color: color-mix(in oklch, var(--color-ink) 55%, transparent);
+  margin: -8.5px 0 0 -8.5px;
+  width: 17px;
+  height: 17px;
+  color: color-mix(in oklch, var(--color-ink) 60%, transparent);
   opacity: 0;
   z-index: 4;
 }
 
 .wf-s-outreach .wf-hold svg {
-  width: 20px;
-  height: 20px;
+  width: 17px;
+  height: 17px;
 }
 
 .wf-s-outreach .wf-switch {
   position: absolute;
   left: 50%;
   top: 50%;
-  margin: -8px 0 0 -13px;
+  margin: -7px 0 0 -13px;
   width: 26px;
   height: 14px;
   border-radius: 999px;
@@ -1650,61 +1934,52 @@
   animation: switch-knob 9s var(--scaffold-ease) infinite;
 }
 
+/* fail-closed: the breaker opens as capsule B arrives; the hold state is
+   neutral ink — the only colour in this scene is the pass-light */
 @keyframes switch-knob {
-  0%, 46% {
+  0%, 44% {
     transform: translateX(0);
     background: color-mix(in oklch, var(--color-ink) 45%, transparent);
   }
   54%, 100% {
     transform: translateX(10px);
-    background: var(--scaffold-accent);
+    background: color-mix(in oklch, var(--color-ink) 45%, transparent);
   }
 }
 
 .wf-s-outreach .wf-warm {
   position: absolute;
-  left: 40px;
-  top: 300px;
-  width: 92px;
-  height: 58px;
-  border-radius: var(--radius-md);
-  background: var(--scaffold-surface);
-  border: 1px solid var(--scaffold-hairline);
-  box-shadow: var(--scaffold-shadow-soft);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: color-mix(in oklch, var(--color-ink) 50%, transparent);
   z-index: 2;
 }
 
 .wf-s-outreach .wf-warm svg {
-  width: 21px;
-  height: 21px;
+  color: color-mix(in oklch, var(--color-ink) 50%, transparent);
 }
 
 .wf-s-outreach .wf-warm::after {
   content: '';
   position: absolute;
-  inset: -5px;
-  border-radius: var(--radius-md);
-  border: 1.5px solid color-mix(in oklch, var(--color-brand) 40%, transparent);
+  inset: -6px;
+  border-radius: calc(var(--radius-md) + 4px);
+  border: 1.5px solid color-mix(in oklch, var(--color-ink) 22%, transparent);
   opacity: 0;
   animation: warm-pulse 9s var(--scaffold-ease) infinite;
 }
 
+/* a slow neutral breath, late in the loop once both capsules have settled */
 @keyframes warm-pulse {
-  0%, 56% { opacity: 0; transform: scale(0.92); }
-  64% { opacity: 1; transform: scale(1); }
-  78%, 100% { opacity: 0; transform: scale(1.08); }
+  0%, 58% { opacity: 0; transform: scale(0.94); }
+  66% { opacity: 1; transform: scale(1); }
+  82%, 100% { opacity: 0; transform: scale(1.06); }
 }
 
+/* capsule A: enter left, ride the lane past every station, deliver at the
+   recipient, then rest invisible for the second half of the loop */
 @keyframes capsule-a {
-  0% { left: 40px; top: 107px; opacity: 0; }
-  4% { opacity: 1; }
-  36% { left: 540px; top: 107px; opacity: 1; }
-  44% { left: 552px; top: 201px; opacity: 1; }
-  50%, 100% { left: 552px; top: 201px; opacity: 0; }
+  0% { left: 16px; opacity: 0; }
+  3% { opacity: 1; }
+  40% { left: 608px; opacity: 1; }
+  46%, 100% { left: 608px; opacity: 0; }
 }
 
 .wf-s-outreach .wf-capsule-a .wf-stamp {
@@ -1712,8 +1987,8 @@
 }
 
 @keyframes stamp-seal {
-  0%, 34% { opacity: 0; transform: scale(0.5); }
-  40%, 100% { opacity: 1; transform: scale(1); }
+  0%, 31% { opacity: 0; transform: scale(0.5); }
+  36%, 100% { opacity: 1; transform: scale(1); }
 }
 
 .wf-s-outreach .wf-gate-1 .wf-gate-dot { animation: gate-light-1 9s linear infinite; }
@@ -1722,53 +1997,63 @@
 .wf-s-outreach .wf-gate-4 .wf-gate-dot { animation: gate-light-4 9s linear infinite; }
 .wf-s-outreach .wf-gate-5 .wf-gate-dot { animation: gate-light-5 9s linear infinite; }
 
+/* each station's dot settles to ink as capsule A passes; the accent only
+   ever appears as that brief pass-light */
 @keyframes gate-light-1 {
-  0%, 8% { background: color-mix(in oklch, var(--color-ink) 20%, transparent); }
-  16%, 100% { background: var(--scaffold-ink); }
+  0%, 4% { background: color-mix(in oklch, var(--color-ink) 20%, transparent); }
+  6%, 8% { background: var(--scaffold-accent); }
+  10%, 100% { background: color-mix(in oklch, var(--color-ink) 45%, transparent); }
 }
 
 @keyframes gate-light-2 {
-  0%, 18% { background: color-mix(in oklch, var(--color-ink) 20%, transparent); }
-  26%, 100% { background: var(--scaffold-ink); }
+  0%, 10% { background: color-mix(in oklch, var(--color-ink) 20%, transparent); }
+  12%, 14% { background: var(--scaffold-accent); }
+  16%, 100% { background: color-mix(in oklch, var(--color-ink) 45%, transparent); }
 }
 
 @keyframes gate-light-3 {
-  0%, 28% { background: color-mix(in oklch, var(--color-ink) 20%, transparent); }
-  36%, 100% { background: var(--scaffold-ink); }
+  0%, 16% { background: color-mix(in oklch, var(--color-ink) 20%, transparent); }
+  18%, 20% { background: var(--scaffold-accent); }
+  22%, 100% { background: color-mix(in oklch, var(--color-ink) 45%, transparent); }
 }
 
 @keyframes gate-light-4 {
-  0%, 38% { background: color-mix(in oklch, var(--color-ink) 20%, transparent); }
-  46%, 100% { background: var(--scaffold-ink); }
+  0%, 22% { background: color-mix(in oklch, var(--color-ink) 20%, transparent); }
+  24%, 26% { background: var(--scaffold-accent); }
+  28%, 100% { background: color-mix(in oklch, var(--color-ink) 45%, transparent); }
 }
 
 @keyframes gate-light-5 {
-  0%, 46% { background: color-mix(in oklch, var(--color-ink) 20%, transparent); }
-  54%, 100% { background: var(--scaffold-ink); }
+  0%, 28% { background: color-mix(in oklch, var(--color-ink) 20%, transparent); }
+  30%, 32% { background: var(--scaffold-accent); }
+  34%, 100% { background: color-mix(in oklch, var(--color-ink) 45%, transparent); }
 }
 
+/* capsule B: same lane, held 12px short of the circuit-breaker station
+   (gate-4's left edge 358 − 12 − capsule 40) */
 @keyframes capsule-b {
-  0%, 28% { left: 40px; opacity: 0; }
-  34% { left: 40px; opacity: 1; }
-  48% { left: 340px; opacity: 1; }
-  100% { left: 340px; opacity: 1; }
+  0%, 26% { left: 16px; opacity: 0; }
+  30% { left: 16px; opacity: 1; }
+  44% { left: 306px; opacity: 1; }
+  100% { left: 306px; opacity: 1; }
 }
 
 .wf-s-outreach .wf-capsule-b .wf-hold {
   animation: hold-show 9s var(--scaffold-ease) infinite;
 }
 
+/* the hold glyph rests with capsule B for over half the loop */
 @keyframes hold-show {
   0%, 52% { opacity: 0; transform: scale(0.5); }
-  60%, 100% { opacity: 1; transform: scale(1); }
+  58%, 100% { opacity: 1; transform: scale(1); }
 }
 
 /* ── Scene 7 · converse ─────────────────────────────────────────────────── */
+/* Bubble, classifier, lane and suppression positions come from Scenes.tsx
+   rects; links are drawn between edge anchors in the .wf-links overlay. */
 
 .wf-s-converse .wf-bubble {
   position: absolute;
-  width: 200px;
-  height: 60px;
   border-radius: 18px;
   background: var(--scaffold-surface);
   border: 1px solid var(--scaffold-hairline);
@@ -1784,22 +2069,15 @@
 .wf-s-converse .wf-bubble .wf-bar:nth-child(2) { width: 74px; }
 
 .wf-s-converse .wf-bubble-out {
-  left: 60px;
   border-bottom-left-radius: 6px;
 }
 
 .wf-s-converse .wf-bubble-in {
-  right: 60px;
   border-bottom-right-radius: 6px;
   align-items: flex-end;
 }
 
-.wf-s-converse .wf-bubble-1 { top: 20px; }
-.wf-s-converse .wf-bubble-2 { top: 95px; }
-.wf-s-converse .wf-bubble-3 { top: 170px; }
-
 .wf-s-converse .wf-bubble-new {
-  top: 245px;
   opacity: 1;
   animation: bubble-pop 8s var(--scaffold-ease) infinite;
 }
@@ -1810,29 +2088,35 @@
   26%, 100% { transform: scale(1) translateY(0); opacity: 1; }
 }
 
-.wf-s-converse .wf-join-line {
-  position: absolute;
-  left: 500px;
-  top: 222px;
-  width: 1.5px;
-  height: 24px;
-  background: color-mix(in oklch, var(--color-ink) 30%, transparent);
-  z-index: 1;
+.wf-s-converse .wf-links path {
+  fill: none;
+  stroke: color-mix(in oklch, var(--color-ink) 28%, transparent);
+  stroke-width: 1.5;
+  stroke-linecap: round;
+}
+
+.wf-s-converse .wf-fan-path {
+  stroke: color-mix(in oklch, var(--color-ink) 16%, transparent);
+  stroke-width: 1;
+}
+
+.wf-s-converse .wf-optout-path {
+  stroke-dasharray: 2 4;
+}
+
+.wf-s-converse .wf-join-path {
   animation: join-draw 8s var(--scaffold-ease) infinite;
 }
 
 @keyframes join-draw {
-  0%, 16% { transform: scaleY(0); opacity: 0; }
-  26%, 100% { transform: scaleY(1); opacity: 1; }
+  0%, 16% { opacity: 0; }
+  26%, 100% { opacity: 1; }
 }
 
 .wf-s-converse .wf-classifier {
   position: absolute;
-  left: 340px;
-  top: 292px;
   width: 15px;
   height: 15px;
-  margin-left: -7.5px;
   transform: rotate(45deg);
   border-radius: 3px;
   background: var(--scaffold-surface);
@@ -1840,34 +2124,35 @@
   z-index: 3;
 }
 
+/* the sorting dot rides the classifier → interested-lane branch */
 .wf-s-converse .wf-sort-dot {
   position: absolute;
-  left: 347px;
-  top: 299px;
+  left: 0;
+  top: 0;
   width: 8px;
   height: 8px;
   border-radius: 50%;
   background: var(--scaffold-accent);
   box-shadow: 0 0 0 3px color-mix(in oklch, var(--color-brand) 18%, transparent);
+  offset-path: var(--sort-path);
+  offset-distance: 0%;
   opacity: 0;
   z-index: 4;
   animation: sort-travel 8s var(--scaffold-ease) infinite;
 }
 
 @keyframes sort-travel {
-  0%, 30% { transform: translate(0, 0); opacity: 0; }
+  0%, 30% { offset-distance: 0%; opacity: 0; }
   36% { opacity: 1; }
-  52% { transform: translate(-158px, 62px); opacity: 1; }
-  60%, 100% { transform: translate(-158px, 62px); opacity: 0; }
+  52% { offset-distance: 100%; opacity: 1; }
+  60%, 100% { offset-distance: 100%; opacity: 0; }
 }
 
 .wf-s-converse .wf-lane {
   position: absolute;
-  top: 356px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 6px;
   color: color-mix(in oklch, var(--color-ink) 50%, transparent);
 }
 
@@ -1876,28 +2161,9 @@
   height: 19px;
 }
 
-.wf-s-converse .wf-lane-1 { left: 172px; }
-.wf-s-converse .wf-lane-2 { left: 296px; }
-.wf-s-converse .wf-lane-3 { left: 420px; }
-.wf-s-converse .wf-lane-4 { left: 544px; }
-
-.wf-s-converse .wf-optout-line {
-  position: absolute;
-  left: 553px;
-  top: 306px;
-  width: 1.5px;
-  height: 66px;
-  background: color-mix(in oklch, var(--color-ink) 22%, transparent);
-  z-index: 1;
-}
-
 .wf-s-converse .wf-suppress {
-  position: absolute;
-  left: 524px;
-  top: 238px;
-  width: 60px;
-  height: 46px;
   border-radius: var(--radius-sm);
+  position: absolute;
   z-index: 2;
 }
 
@@ -1908,10 +2174,6 @@
 
 .wf-s-converse .wf-ghost-cal {
   position: absolute;
-  left: 56px;
-  top: 286px;
-  width: 66px;
-  height: 58px;
   border-radius: var(--radius-md);
   border: 1.5px dashed color-mix(in oklch, var(--color-ink) 25%, transparent);
   display: flex;
@@ -1928,15 +2190,21 @@
 }
 
 /* ── Scene 8 · overview (return path) ───────────────────────────────────── */
+/* Ledger panel, overview card and the flow between them come from
+   Scenes.tsx rects. */
+
+.wf-s-overview .wf-ledger-panel {
+  z-index: 2;
+}
 
 .wf-s-overview .wf-ledger-stack {
   position: absolute;
-  left: 60px;
-  top: 70px;
+  left: 22px;
+  right: 22px;
+  top: 50px;
   display: flex;
   flex-direction: column;
-  gap: 16px;
-  z-index: 2;
+  gap: 24px;
 }
 
 .wf-s-overview .wf-ledger-row {
@@ -1955,7 +2223,7 @@
 }
 
 .wf-s-overview .wf-ledger-row span {
-  width: 140px;
+  flex: 1;
   height: 8px;
   border-radius: 999px;
   background: var(--scaffold-skeleton);
@@ -1964,6 +2232,7 @@
 .wf-s-overview .wf-ledger-row-1 { animation: ledger-write-1 7s var(--scaffold-ease) infinite; }
 .wf-s-overview .wf-ledger-row-2 { animation: ledger-write-2 7s var(--scaffold-ease) infinite; }
 .wf-s-overview .wf-ledger-row-3 { animation: ledger-write-3 7s var(--scaffold-ease) infinite; }
+.wf-s-overview .wf-ledger-row-4 { animation: ledger-write-3 7s var(--scaffold-ease) 0.5s infinite; }
 
 @keyframes ledger-write-1 {
   0% { transform: translateY(-18px); opacity: 0; }
@@ -1980,56 +2249,39 @@
   26%, 100% { transform: translateY(0); opacity: 1; }
 }
 
-.wf-s-overview .wf-flow-arrow {
-  position: absolute;
-  left: 290px;
-  top: 145px;
-  width: 76px;
-  height: 1.5px;
-  background: var(--scaffold-hairline);
-  z-index: 1;
-}
-
-.wf-s-overview .wf-flow-arrow::after {
-  content: '';
-  position: absolute;
-  right: -1px;
-  top: -3.5px;
-  border-left: 8px solid var(--scaffold-hairline);
-  border-top: 4.5px solid transparent;
-  border-bottom: 4.5px solid transparent;
+.wf-s-overview .wf-flow path {
+  fill: none;
+  stroke: color-mix(in oklch, var(--color-ink) 25%, transparent);
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 
 .wf-s-overview .wf-overview-card {
-  left: 410px;
-  top: 80px;
-  width: 210px;
-  height: 200px;
-  padding: 20px;
   z-index: 2;
 }
 
 .wf-s-overview .wf-chart-bars {
   position: absolute;
-  left: 20px;
-  bottom: 20px;
+  left: 30px;
+  bottom: 40px;
   display: flex;
   align-items: flex-end;
-  gap: 11px;
-  height: 78px;
+  gap: 16px;
+  height: 100px;
 }
 
 .wf-s-overview .wf-chart-bars i {
-  width: 19px;
-  border-radius: 4px 4px 2px 2px;
+  width: 28px;
+  border-radius: 5px 5px 2px 2px;
   background: color-mix(in oklch, var(--color-ink) 18%, transparent);
   transform-origin: bottom;
 }
 
-.wf-s-overview .wf-chart-bars i:nth-child(1) { height: 36px; animation: chart-bar-1 7s var(--scaffold-ease) infinite; }
-.wf-s-overview .wf-chart-bars i:nth-child(2) { height: 54px; animation: chart-bar-2 7s var(--scaffold-ease) infinite; }
-.wf-s-overview .wf-chart-bars i:nth-child(3) { height: 44px; animation: chart-bar-3 7s var(--scaffold-ease) infinite; }
-.wf-s-overview .wf-chart-bars i:nth-child(4) { height: 66px; animation: chart-bar-4 7s var(--scaffold-ease) infinite; }
+.wf-s-overview .wf-chart-bars i:nth-child(1) { height: 48px; animation: chart-bar-1 7s var(--scaffold-ease) infinite; }
+.wf-s-overview .wf-chart-bars i:nth-child(2) { height: 72px; animation: chart-bar-2 7s var(--scaffold-ease) infinite; }
+.wf-s-overview .wf-chart-bars i:nth-child(3) { height: 58px; animation: chart-bar-3 7s var(--scaffold-ease) infinite; }
+.wf-s-overview .wf-chart-bars i:nth-child(4) { height: 88px; animation: chart-bar-4 7s var(--scaffold-ease) infinite; }
 
 @keyframes chart-bar-1 {
   0%, 30% { transform: scaleY(0); }
@@ -2053,10 +2305,10 @@
 
 .wf-s-overview .wf-chart-line {
   position: absolute;
-  left: 20px;
-  top: 22px;
-  width: 170px;
-  height: 62px;
+  left: 30px;
+  top: 40px;
+  width: 180px;
+  height: 90px;
 }
 
 .wf-s-overview .wf-chart-line polyline {
@@ -2185,75 +2437,90 @@
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   MOBILE ACCORDION (≤ 1023px)
+   VERTICAL ORIENTATION (container < 640px) — the same grid, rotated.
+   Nodes centered on x = 28; links are vertical connectors with ring-only
+   pods; each stage opens as a card to the right of its node.
    ═══════════════════════════════════════════════════════════════════════════ */
 
-.wf-accordion {
-  background: var(--scaffold-bg);
-  padding: clamp(20px, 5vw, 40px) clamp(14px, 4vw, 24px);
-}
-
-.wf-acc-body {
-  display: grid;
-  grid-template-columns: 76px minmax(0, 1fr);
-  gap: 14px;
-  max-width: 640px;
-  margin-inline: auto;
-}
-
-.wf-acc-rail {
+.wf-vrail {
+  --n: 56px;
   position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 34px;
-  padding: 10px 0;
+  isolation: isolate;
+  display: grid;
+  grid-template-columns: var(--n) minmax(0, 1fr);
+  column-gap: 24px;
+  grid-template-rows: var(--n) repeat(6, minmax(32px, auto) var(--n)) minmax(32px, auto) auto;
 }
 
-.wf-acc-line {
-  position: absolute;
-  left: 30px;
-  top: 42px;
-  bottom: 42px;
+.wf-vcell {
+  position: relative;
+  min-height: 0;
+}
+
+.wf-vcell .wf-node {
+  width: var(--n);
+  height: var(--n);
+}
+
+/* rotated link: vertical line, run dots 10px from each end, ring-only pod */
+.wf-vrail .wf-link-line {
+  left: 50%;
+  right: auto;
+  top: 10px;
+  bottom: 10px;
   width: 1px;
-  background: var(--scaffold-hairline);
+  height: auto;
+  transform: translateX(-50%);
 }
 
-.wf-acc-comet {
-  position: absolute;
-  left: 30px;
-  width: 7px;
-  height: 7px;
-  margin-left: -3.5px;
-  border-radius: 50%;
-  background: var(--scaffold-accent);
-  box-shadow: 0 0 0 3px color-mix(in oklch, var(--color-brand) 18%, transparent);
-  top: 42px;
-  transition: top 0.7s var(--scaffold-ease);
-  z-index: 2;
+.wf-vrail .wf-run-dot {
+  left: 50%;
+  right: auto;
+  transform: translateX(-50%);
 }
 
-.wf-acc-cards {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
+.wf-vrail .wf-run-dot-a {
+  top: 8px;
+}
+
+.wf-vrail .wf-run-dot-b {
+  top: auto;
+  bottom: 8px;
+}
+
+.wf-vrail .wf-pod {
+  width: 16px;
+  height: 16px;
+  gap: 0;
+}
+
+.wf-vrail .wf-pod-sockets {
+  display: none;
+}
+
+.wf-vrail .wf-pod-ring {
+  width: 8px;
+  height: 8px;
+}
+
+.wf-vcard {
+  box-sizing: border-box;
+  align-self: start;
   min-width: 0;
-}
-
-.wf-acc-card {
+  overflow: hidden;
   background: var(--scaffold-surface);
   border: 1px solid var(--scaffold-hairline);
-  border-radius: var(--radius-md);
+  border-radius: var(--scaffold-r-md);
   box-shadow: var(--scaffold-shadow-soft);
-  overflow: hidden;
 }
 
-.wf-acc-head {
+.wf-vcard-head {
   display: flex;
   align-items: center;
   gap: 12px;
   width: 100%;
-  padding: 10px 12px;
+  height: calc(var(--n) - 2px);
+  padding: 0 16px;
   border: 0;
   background: none;
   cursor: pointer;
@@ -2261,103 +2528,117 @@
   -webkit-tap-highlight-color: transparent;
 }
 
-.wf-acc-head:focus-visible {
+.wf-vcard-head:focus-visible {
   outline: 2px solid color-mix(in oklch, var(--color-brand) 60%, transparent);
   outline-offset: -2px;
 }
 
-.wf-acc-head .wf-acc-title {
+.wf-vcard-title {
   flex: 1;
   min-width: 0;
+  font-family: var(--font-sans);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--scaffold-ink);
 }
 
-.wf-acc-head-icon {
+.wf-vcard-chev {
   width: 22px;
   height: 22px;
+  flex: none;
   color: color-mix(in oklch, var(--color-ink) 55%, transparent);
   transition: transform 0.4s var(--scaffold-ease);
-  flex: none;
 }
 
-.wf-acc-card.is-open .wf-acc-head-icon {
+.wf-vcard.is-open .wf-vcard-chev {
   transform: rotate(90deg);
-  color: var(--scaffold-accent);
 }
 
-.wf-acc-body-in {
+.wf-vcard-body {
   display: grid;
   grid-template-rows: 0fr;
   transition: grid-template-rows 0.5s var(--scaffold-ease);
 }
 
-.wf-acc-card.is-open .wf-acc-body-in {
+.wf-vcard.is-open .wf-vcard-body {
   grid-template-rows: 1fr;
 }
 
-.wf-acc-body-in > div {
-  overflow: hidden;
+.wf-vcard-body > div {
   min-height: 0;
-}
-
-.wf-acc-body-in .wf-scene-viewport {
-  position: relative;
-  height: 300px;
   overflow: hidden;
 }
 
-.wf-acc-contract {
+.wf-vscene {
+  flex: none;
+  margin: 0 12px;
+  aspect-ratio: 680 / 400;
+}
+
+.wf-vscene .wf-scene-viewport {
+  inset: 0;
+}
+
+.wf-vcard .wf-contract {
+  padding: 16px 12px 12px;
+}
+
+/* return card: ledger → overview, loop arrow back to the start */
+.wf-vreturn {
   display: flex;
   align-items: center;
   gap: 8px;
-  flex-wrap: wrap;
+  width: 100%;
+  min-height: calc(var(--n) + 24px);
   padding: 12px;
-  border-top: 1px solid var(--scaffold-hairline);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
 }
 
-.wf-acc-pod {
+.wf-vreturn:focus-visible {
+  outline: 2px solid color-mix(in oklch, var(--color-brand) 60%, transparent);
+  outline-offset: 2px;
+}
+
+.wf-vtile {
+  --n: 48px;
+  position: relative;
+  display: block;
+  flex: none;
+  width: 48px;
+  height: 48px;
+}
+
+.wf-vreturn-join {
   display: flex;
   align-items: center;
-  gap: 6px;
-  padding: 6px 10px;
-  border-radius: 999px;
-  background: var(--scaffold-surface);
-  border: 1px solid var(--scaffold-hairline);
-}
-
-.wf-acc-pod .wf-pod-sockets {
-  flex-direction: row;
-  gap: 3px;
-}
-
-.wf-acc-pod .wf-pod-ring {
-  width: 10px;
-  height: 10px;
-}
-
-.wf-acc-return {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  padding: 14px 12px;
-  border-top: 1px solid var(--scaffold-hairline);
-}
-
-.wf-acc-return-line {
   flex: 1;
-  height: 1px;
-  background: var(--scaffold-hairline);
-  border-top: 1px dashed color-mix(in oklch, var(--color-ink) 20%, transparent);
+  min-width: 16px;
+  color: color-mix(in oklch, var(--color-ink) 25%, transparent);
+}
+
+.wf-vreturn-join i {
+  flex: 1;
+  border-top: 1.5px dashed currentColor;
+}
+
+.wf-vreturn-join svg,
+.wf-vreturn-loop svg {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.wf-vreturn-loop {
+  flex: none;
+  color: color-mix(in oklch, var(--color-ink) 35%, transparent);
 }
 
 /* ── Responsive collapses ───────────────────────────────────────────────── */
 
 @media (max-width: 1023px) {
-  .wf-pin,
-  .wf-sticky {
-    display: none;
-  }
-
   .wf-planes-scene {
     height: auto;
     perspective: none;
@@ -2374,10 +2655,209 @@
     transform: none !important;
     opacity: 1 !important;
   }
+}
 
-  .wf-planes-signal {
-    display: none;
-  }
+/* ── Embedded Mode (inside Video Card Modal) ────────────────────────────── */
+.wf-loop.is-embed {
+  background: transparent;
+}
+
+.wf-loop.is-embed .wf-static {
+  padding-top: 8px;
+  padding-bottom: 6px;
+}
+
+.wf-loop.is-embed .wf-band {
+  height: 64px;
+}
+
+.wf-loop.is-embed .wf-inspector {
+  margin-top: 12px;
+  padding: 16px 20px;
+  min-height: 0;
+}
+
+.wf-loop.is-embed .wf-insp-grid {
+  align-items: stretch;
+}
+
+.wf-loop.is-embed .wf-scene-surface {
+  min-height: 240px;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   FOCUS PLAYER — the compact stage inside the How It Works video card.
+   One scene and one icon at a time; the caption clock owns all progress.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.wf-focus {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  gap: 4px;
+}
+
+/* slim seek rail: eight segments, one per cue */
+.wf-focus-rail {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  gap: 6px;
+}
+
+.wf-focus-seg {
+  flex: 1;
+  min-width: 0;
+  padding: 7px 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.wf-focus-seg:focus-visible {
+  outline: 2px solid color-mix(in oklch, var(--color-brand) 60%, transparent);
+  outline-offset: 2px;
+  border-radius: 999px;
+}
+
+.wf-focus-seg-track {
+  display: block;
+  height: 3px;
+  border-radius: 999px;
+  background: color-mix(in oklch, var(--color-ink) 8%, transparent);
+  overflow: hidden;
+}
+
+.wf-focus-seg-fill {
+  display: block;
+  height: 100%;
+  width: 100%;
+  border-radius: 999px;
+  background: color-mix(in oklch, var(--color-ink) 70%, transparent);
+  transform: scaleX(0);
+  transform-origin: left center;
+}
+
+.wf-focus-seg.is-active .wf-focus-seg-fill {
+  background: var(--scaffold-accent);
+}
+
+/* the stage surface: the scene art gets the whole frame */
+.wf-focus-surface {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  border-radius: var(--scaffold-r-lg);
+  background: #fafafa;
+  border: 1px solid var(--scaffold-hairline);
+  overflow: hidden;
+  transition: border-color 0.3s var(--scaffold-ease);
+}
+
+/* the accent window: while the emphasis words speak, the frame carries a
+   quiet accent edge and the focus tile glows once — the visual peak. */
+.wf-focus[data-phase='accent'] .wf-focus-surface {
+  border-color: color-mix(in oklch, var(--color-brand) 32%, transparent);
+}
+
+.wf-focus-viewport {
+  position: absolute;
+  inset: clamp(6px, 1.5vw, 18px);
+}
+
+.wf-focus-scene,
+.wf-focus-scene .wf-scene-fill {
+  position: absolute;
+  inset: 0;
+}
+
+/* ── Caption-locked scene timing ──────────────────────────────────────────
+   Every scene loop runs exactly one cue (4.8s) against the caption clock:
+   the stage remounts with its caption, so 0% of every timeline IS the
+   first word, and each scene's focal beat (≈20–30%) lands on the emphasis
+   words. Pause freezes every timeline with the transport. */
+
+.wf-focus-scene .wf-scene-canvas *,
+.wf-focus-scene .wf-scene-canvas *::before,
+.wf-focus-scene .wf-scene-canvas *::after {
+  animation-duration: 4.8s !important;
+}
+
+.wf-focus[data-playing='false'] .wf-scene-canvas *,
+.wf-focus[data-playing='false'] .wf-scene-canvas *::before,
+.wf-focus[data-playing='false'] .wf-scene-canvas *::after {
+  animation-play-state: paused !important;
+}
+
+/* ── Focus icon cluster: one icon sharp, neighbours blurred behind ────────
+   Sits beside the seek rail so the scene surface stays unobstructed. */
+
+.wf-focus-top {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex: none;
+}
+
+.wf-focus-cluster {
+  position: relative;
+  width: 108px;
+  height: 48px;
+  flex: none;
+}
+
+.wf-focus-tile {
+  position: absolute;
+  left: 50%;
+  top: 2px;
+  margin-left: -22px;
+  z-index: 2;
+  transition: filter 0.3s var(--scaffold-ease);
+}
+
+.wf-focus[data-phase='accent'] .wf-focus-tile {
+  filter: drop-shadow(0 4px 14px color-mix(in oklch, var(--color-brand) 32%, transparent));
+}
+
+.wf-focus-dot {
+  position: absolute;
+  top: 5px;
+  right: 3px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--scaffold-accent);
+}
+
+.wf-focus-ghost {
+  position: absolute;
+  top: 7px;
+  z-index: 1;
+  opacity: 0.35;
+  filter: blur(4px) saturate(0.85);
+}
+
+.wf-focus-ghost.is-prev {
+  left: 0;
+}
+
+.wf-focus-ghost.is-next {
+  right: 0;
+}
+
+/* caption progress hairline, drawn live under the scene */
+.wf-focus-hairline {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 2px;
+  background: var(--scaffold-accent);
+  transform: scaleX(0);
+  transform-origin: left center;
+  z-index: 6;
 }
 
 /* ── Reduced motion: every scene rests in its final (base) state ─────────── */
@@ -2385,13 +2865,20 @@
 @media (prefers-reduced-motion: reduce) {
   .wf-scene-canvas *,
   .wf-plate-hover,
-  .wf-acc-body-in {
+  .wf-vcard-body {
     animation: none !important;
     transition-duration: 1ms !important;
   }
 
-  .wf-comet,
-  .wf-acc-comet {
+  .wf-progress,
+  .wf-tile,
+  .wf-ret-tile,
+  .wf-run-dot,
+  .wf-pod-ring {
+    transition-duration: 1ms !important;
+  }
+
+  .wf-comet {
     display: none;
   }
 

@@ -17,10 +17,14 @@
  * its text. Everything decorative is aria-hidden; no numbers anywhere.
  */
 
-import { AnimatePresence, motion, useReducedMotion, useScroll, useTransform } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
 import { useCallback, useEffect, useRef, useState } from 'react';
+
+import { useSettledStill } from '@/lib/useSettledStill';
 import { cn } from '@/lib/utils';
 import { HOME_CONTENT } from '@/content/home';
+import { BAND_DISORDER } from '@/content/stages';
+import { HandoffArtifact } from '@/components/StorySpine/artifacts';
 import {
   Band,
   EASE,
@@ -28,7 +32,7 @@ import {
   Reveal,
   Scene,
   SectionHeader,
-  useScenePaused,
+  WordTag,
 } from '@/components/Sections/primitives';
 
 const POP = { type: 'spring' as const, stiffness: 260, damping: 22 };
@@ -116,21 +120,24 @@ function SideRow({
       </span>
       <Bar w={w} h={compact ? 5 : 7} className="relative" />
       {selected ? (
-        <span className="relative ml-auto block h-[5px] w-[5px] rounded-full bg-[var(--scaffold-accent-dot)]" />
+        <span
+          className="relative ml-auto block h-[5px] w-[5px] rounded-full bg-[var(--scaffold-accent-dot)]"
+          data-accent="platform-select"
+        />
       ) : null}
     </div>
   );
 }
 
 /* Step 0 — a record card sliding in from the right of the main area. */
-function RecordCard({ live, compact, still }: { live: boolean; compact?: boolean; still: boolean }) {
+function RecordCard({ compact, still }: { compact?: boolean; still: boolean }) {
   if (compact) {
     return (
       <div className="absolute right-2 top-10 flex w-[34%] flex-col gap-1.5 rounded-[10px] border border-[var(--scaffold-hairline)] bg-white p-2">
         <Bar w="72%" h={5} />
         <Bar w="92%" h={5} />
         <Bar w="54%" h={5} />
-        <span className="mt-0.5 block h-[4px] w-[4px] rounded-full bg-[var(--scaffold-accent-dot)]" />
+        <span className="mt-0.5 block h-[4px] w-[4px] rounded-full" style={{ background: 'rgba(10,10,10,0.35)' }} />
       </div>
     );
   }
@@ -139,7 +146,7 @@ function RecordCard({ live, compact, still }: { live: boolean; compact?: boolean
       <Bar w="70%" h={7} />
       <Bar w="92%" h={7} />
       <Bar w="58%" h={7} />
-      <span className="mt-1.5 block h-[5px] w-[5px] rounded-full bg-[var(--scaffold-accent-dot)]" />
+      <span className="mt-1.5 block h-[5px] w-[5px] rounded-full" style={{ background: 'rgba(10,10,10,0.35)' }} />
     </>
   );
   if (still) {
@@ -174,7 +181,7 @@ function CheckChip({ compact, still }: { compact?: boolean; still: boolean }) {
     <svg width={compact ? 8 : 11} height={compact ? 8 : 11} viewBox="0 0 9 9" aria-hidden="true">
       <path
         d="M1.5 4.8 L3.6 6.8 L7.6 2.4"
-        stroke="var(--scaffold-accent)"
+        stroke="rgba(10,10,10,0.55)"
         strokeWidth="1.6"
         strokeLinecap="round"
         strokeLinejoin="round"
@@ -207,61 +214,37 @@ function CheckChip({ compact, still }: { compact?: boolean; still: boolean }) {
   );
 }
 
-/* Step 3 — a send-queue pill riding a thin track at the card bottom. */
-function QueueTrack({ live, compact }: { live: boolean; compact?: boolean }) {
-  const ref = useRef<HTMLDivElement>(null);
-  const [w, setW] = useState(0);
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    const measure = () => setW(el.clientWidth);
-    measure();
-    const ro = new ResizeObserver(measure);
-    ro.observe(el);
-    return () => ro.disconnect();
-  }, []);
+/* Step 3 — a send-queue pill resting on a thin track at the card bottom. Static. */
+function QueueTrack({ compact }: { compact?: boolean }) {
   const pillW = compact ? 22 : 30;
-  const dist = Math.max(0, w - pillW);
   return (
     <div
-      ref={ref}
       className={cn('relative h-[6px] rounded-full bg-[var(--scaffold-hairline)]', compact ? 'mt-1.5' : 'mt-auto')}
     >
       <span className="absolute left-0 top-1/2 block" style={{ transform: 'translateY(-50%)' }}>
-        <motion.span
+        <span
           className="block rounded-full border border-[rgba(10,10,10,0.10)] bg-white"
           style={{ width: pillW, height: compact ? 10 : 13, boxShadow: 'var(--scaffold-shadow-soft)' }}
-          animate={live && w > 0 ? { x: [0, dist, 0] } : { x: 0 }}
-          transition={{ duration: 6, times: [0, 0.55, 1], ease: 'easeInOut', repeat: live ? Infinity : 0 }}
         />
       </span>
     </div>
   );
 }
 
-/* Step 4 — a reply notification dot + pulse line at the top right. */
-function ReplyDot({ live, compact, still }: { live: boolean; compact?: boolean; still: boolean }) {
+/* Step 4 — a reply notification dot + line at the top right. Static. */
+function ReplyDot({ compact, still }: { compact?: boolean; still: boolean }) {
   const dot = compact ? 6 : 7;
   const body = (
     <>
       <span className="relative flex" style={{ width: dot + 3, height: dot + 3 }}>
-        {live ? (
-          <motion.span
-            className="absolute inset-0 rounded-full bg-[var(--scaffold-accent)]"
-            animate={{ scale: [1, 2, 1], opacity: [0.5, 0, 0.5] }}
-            transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
-          />
-        ) : null}
         <span
-          className="relative self-center rounded-full bg-[var(--scaffold-accent-dot)]"
-          style={{ width: dot, height: dot }}
+          className="relative self-center rounded-full"
+          style={{ width: dot, height: dot, background: 'rgba(10,10,10,0.5)' }}
         />
       </span>
-      <motion.span
-        className="block h-[3px] rounded-full bg-[var(--scaffold-accent)]"
-        style={{ width: compact ? 14 : 22 }}
-        animate={live ? { opacity: [1, 0.35, 1] } : { opacity: 0.6 }}
-        transition={{ duration: 2.4, repeat: live ? Infinity : 0, ease: 'easeInOut' }}
+      <span
+        className="block h-[3px] rounded-full"
+        style={{ width: compact ? 14 : 22, background: 'rgba(10,10,10,0.35)', opacity: 0.6 }}
       />
     </>
   );
@@ -293,9 +276,6 @@ function Preview({
   compact?: boolean;
   still?: boolean;
 }) {
-  const paused = useScenePaused();
-  const live = !paused && !still && !compact;
-
   return (
     <div
       aria-hidden="true"
@@ -328,6 +308,12 @@ function Preview({
               layoutKey={compact ? 'pf-side-c' : 'pf-side'}
             />
           ))}
+          {!compact ? (
+            <div className="mt-auto flex flex-col gap-1 border-t border-[var(--scaffold-hairline)] px-2 pt-2">
+              <WordTag w="prospects" />
+              <WordTag w="provenance" />
+            </div>
+          ) : null}
         </aside>
 
         {/* Main area */}
@@ -367,7 +353,13 @@ function Preview({
               compact ? 'gap-1.5 p-2.5' : 'gap-2.5 p-4',
             )}
           >
-            <Bar w="42%" h={compact ? 6 : 10} />
+            <div className="flex items-center gap-2">
+              <Bar w="42%" h={compact ? 6 : 10} />
+              <span className="ml-auto flex items-center gap-3">
+                <WordTag w="evidence" />
+                {!compact ? <WordTag w="provenance" /> : null}
+              </span>
+            </div>
             <span className="block h-px w-full shrink-0 bg-[var(--scaffold-hairline)]" />
             <Bar w="92%" h={compact ? 5 : 8} />
             <Bar w="76%" h={compact ? 5 : 8} />
@@ -377,31 +369,30 @@ function Preview({
                 <Bar w="58%" />
               </>
             ) : null}
-            {/* Step 2 — blinking accent caret appended to the document */}
+            {/* Step 2 — caret set at the end of the document. Static. */}
             {step === 2 ? (
               <span
                 className={cn(
-                  'block shrink-0 rounded-[2px] bg-[var(--scaffold-accent)]',
+                  'block shrink-0 rounded-[2px]',
                   compact ? 'h-[10px] w-[5px]' : 'h-[14px] w-[7px]',
-                  live ? 'scene-anim' : '',
                 )}
-                style={live ? { animation: 'caret-blink 1.1s step-end infinite' } : undefined}
+                style={{ background: 'rgba(10,10,10,0.65)' }}
               />
             ) : null}
-            {/* Step 3 — queue pill riding the track */}
-            {step === 3 ? <QueueTrack live={live} compact={compact} /> : null}
+            {/* Step 3 — queue pill resting on the track */}
+            {step === 3 ? <QueueTrack compact={compact} /> : null}
           </div>
 
           {/* Swapping extras — record card (0) and reply dot (4) */}
           {still ? (
             <>
-              {step === 0 ? <RecordCard live={false} compact={compact} still /> : null}
-              {step === 4 ? <ReplyDot live={false} compact={compact} still /> : null}
+              {step === 0 ? <RecordCard compact={compact} still /> : null}
+              {step === 4 ? <ReplyDot compact={compact} still /> : null}
             </>
           ) : (
             <AnimatePresence>
-              {step === 0 ? <RecordCard key="rec" live={live} compact={compact} still={false} /> : null}
-              {step === 4 ? <ReplyDot key="rep" live={live} compact={compact} still={false} /> : null}
+              {step === 0 ? <RecordCard key="rec" compact={compact} still={false} /> : null}
+              {step === 4 ? <ReplyDot key="rep" compact={compact} still={false} /> : null}
             </AnimatePresence>
           )}
         </div>
@@ -430,7 +421,7 @@ function StepMarker({ active }: { active: boolean }) {
       <span className="flex h-full w-full items-center justify-center">
         <motion.span
           className="block h-[6px] w-[6px] rounded-full"
-          style={{ background: 'var(--scaffold-accent-dot)' }}
+          style={{ background: 'rgba(10,10,10,0.55)' }}
           initial={false}
           animate={active ? { scale: 1, opacity: 1 } : { scale: 0.5, opacity: 0.3 }}
           transition={POP}
@@ -473,11 +464,18 @@ function StepBlock({
       delay={index * 0.05}
       className="md:flex md:min-h-[300px] md:flex-col md:justify-center"
     >
-      <div ref={ref}>
+      <div ref={ref} data-story-node={index === 0 ? 'discover' : index === 1 ? 'research' : undefined}>
         {/* Mobile-only compact preview above the text */}
         <div className="mb-6 md:hidden">{compactPreview}</div>
         <div className="flex items-start gap-4">
-          <StepMarker active={active} />
+          <div className="flex w-[32px] shrink-0 flex-col items-center">
+            {index === 0 ? (
+              <span data-handoff-input="h-configure-discover" className="mb-2 block">
+                <HandoffArtifact kind="icp-ring" />
+              </span>
+            ) : null}
+            <StepMarker active={active} />
+          </div>
           <div className="min-w-0 flex-1">
             <ItemSlot item={item} titleBar="9em" bodyBar="30ch" />
           </div>
@@ -491,47 +489,19 @@ function StepBlock({
 
 export default function PlatformSection() {
   const section = HOME_CONTENT.sections[2];
-  const still = !!useReducedMotion();
+  /* Hydration-safe reduced-motion flag (false until settled after hydration). */
+  const calm = useSettledStill();
   const [active, setActive] = useState(0);
   const onActive = useCallback((i: number) => setActive(i), []);
 
-  /* Progress: a hairline at the far left with an accent dot travelling
-     down as the steps column scrolls through the viewport band. */
-  const stepsRef = useRef<HTMLDivElement>(null);
-  const [colH, setColH] = useState(0);
-  useEffect(() => {
-    const el = stepsRef.current;
-    if (!el) return;
-    const measure = () => setColH(el.scrollHeight);
-    measure();
-    const ro = new ResizeObserver(measure);
-    ro.observe(el);
-    return () => ro.disconnect();
-  }, []);
-  const { scrollYProgress } = useScroll({
-    target: stepsRef,
-    offset: ['start 0.6', 'end 0.6'],
-  });
-  const dotY = useTransform(scrollYProgress, [0, 1], [0, Math.max(0, colH - 6)]);
-
   return (
-    <Band tone="flat" id={section.id}>
+    <Band tone="flat" id={section.id} disorder={BAND_DISORDER.platform}>
       <SectionHeader section={section} align="center" />
 
       <div className="section-visual md:grid md:grid-cols-[minmax(0,2fr)_minmax(0,3fr)] md:gap-16">
-        {/* Steps column — left, with the progress hairline */}
-        <div ref={stepsRef} className="relative flex flex-col gap-16 md:gap-0 md:pl-12">
-          <span
-            aria-hidden="true"
-            className="absolute bottom-0 left-0 top-0 hidden w-px bg-[var(--scaffold-hairline)] md:block"
-          />
-          {!still ? (
-            <motion.span
-              aria-hidden="true"
-              className="absolute left-[-2.5px] top-0 hidden h-[6px] w-[6px] rounded-full bg-[var(--scaffold-accent)] md:block"
-              style={{ y: dotY }}
-            />
-          ) : null}
+        {/* Steps column — left. (Its old local progress hairline was removed:
+            the home spine now owns scroll progress; step highlights remain.) */}
+        <div className="relative flex flex-col gap-16 md:gap-0 md:pl-12">
           {section.items.map((item, i) => (
             <StepBlock
               key={i}
@@ -539,7 +509,7 @@ export default function PlatformSection() {
               item={item}
               active={active === i}
               onActive={onActive}
-              compactPreview={<Preview step={i} compact still={still} />}
+              compactPreview={<Preview step={i} compact still={calm} />}
             />
           ))}
         </div>
@@ -548,7 +518,7 @@ export default function PlatformSection() {
         <div className="mt-16 md:sticky md:top-[120px] md:mt-0 md:self-start">
           <Reveal y={16}>
             <Scene className="hidden md:block">
-              <Preview step={active} still={still} />
+              <Preview step={active} still={calm} />
             </Scene>
           </Reveal>
         </div>

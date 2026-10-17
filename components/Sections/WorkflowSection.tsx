@@ -17,7 +17,6 @@
 
 import { motion, useReducedMotion } from 'framer-motion';
 import { useEffect, useRef, useState } from 'react';
-import { cn } from '@/lib/utils';
 import { HOME_CONTENT } from '@/content/home';
 import {
   Band,
@@ -93,20 +92,13 @@ function Stage({
       >
         <GlossTile size={76} icon={<Icon />} rotate={index % 2 === 0 ? -4 : 4} />
       </motion.div>
-      {still ? (
-        <span
-          className="mt-3 block h-[6px] w-[6px] rounded-full"
-          style={{ background: 'var(--scaffold-accent-dot)' }}
-        />
-      ) : (
-        <motion.span
-          className="mt-3 block h-[6px] w-[6px] rounded-full"
-          style={{ background: 'var(--scaffold-accent-dot)' }}
-          initial={{ opacity: 0, scale: 0.4 }}
-          animate={active ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.4 }}
-          transition={{ delay, duration: 0.35, ease: EASE }}
-        />
-      )}
+      <motion.span
+        className="mt-3 block h-[6px] w-[6px] rounded-full"
+        style={{ background: 'var(--scaffold-accent-dot)' }}
+        initial={{ opacity: 0, scale: 0.4 }}
+        animate={still || active ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.4 }}
+        transition={still ? { duration: 0 } : { delay, duration: 0.35, ease: EASE }}
+      />
       <div className="mt-4">
         <ItemSlot item={item} align="center" titleBar="6em" bodyBar="20ch" />
       </div>

@@ -20,11 +20,13 @@ import {
   useEffect,
   useRef,
   useState,
+  type CSSProperties,
   type ReactNode,
 } from 'react';
 import { cn } from '@/lib/utils';
 import { Eyebrow, Heading, Text } from '@/components/Type/Type';
 import type { HomeSection } from '@/content/home';
+import { word, type EquationWord } from '@/content/stages';
 
 export const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
@@ -36,17 +38,22 @@ export function Band({
   tone = 'flat',
   id,
   className,
+  disorder,
   children,
 }: {
   tone?: BandTone;
   id?: string;
   className?: string;
+  /** Story mood value 0..1 (1 = messy hero, 0 = calm close). */
+  disorder?: number;
   children: ReactNode;
 }) {
   return (
     <section
       id={id}
       data-testid={`band-${id ?? tone}`}
+      data-disorder={disorder ?? ''}
+      style={disorder == null ? undefined : ({ '--disorder': disorder } as CSSProperties)}
       className={cn(
         'band',
         tone === 'flat' && 'band-flat',
@@ -231,6 +238,27 @@ export function Scene({
   );
 }
 
+/* ─── WordTag — an equation word attached to the object it names ──────── */
+/* 12px/500/ink-55 with a 5px ink dot leader. The ONLY story label shape;
+   every band imports this — no local copies. */
+
+export function WordTag({ w }: { w: EquationWord }) {
+  return (
+    <span className="inline-flex items-center gap-1.5" aria-hidden="true">
+      <span
+        className="block h-[5px] w-[5px] shrink-0 rounded-full"
+        style={{ background: 'rgba(10,10,10,0.35)' }}
+      />
+      <span
+        className="whitespace-nowrap text-[12px] font-medium leading-[18px]"
+        style={{ color: 'rgba(10,10,10,0.55)', letterSpacing: '-0.01em' }}
+      >
+        {word(w)}
+      </span>
+    </span>
+  );
+}
+
 /* ─── Reveal — the one entrance per block ──────────────────────────────── */
 
 export function Reveal({
@@ -248,10 +276,12 @@ export function Reveal({
   return (
     <motion.div
       className={className}
-      initial={still ? false : { opacity: 0, y }}
+      /* Hydration rule (see ScrollReveal): the preference changes the
+         transition, never the initial state. */
+      initial={{ opacity: 0, y }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, amount: 0.4 }}
-      transition={{ duration: 0.5, ease: EASE, delay: still ? 0 : delay }}
+      transition={still ? { duration: 0 } : { duration: 0.5, ease: EASE, delay }}
     >
       {children}
     </motion.div>

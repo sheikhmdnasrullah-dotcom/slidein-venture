@@ -132,7 +132,10 @@ export function useAttentionSlot(
   const still = useReducedMotion();
   const [, bump] = useState(0);
   const idRef = useRef(id);
-  idRef.current = id;
+
+  useEffect(() => {
+    idRef.current = id;
+  }, [id, idRef]);
 
   useEffect(() => {
     if (still) return;

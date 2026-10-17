@@ -258,8 +258,11 @@ p {
     'SOFT' var(--axis-soft),
     'WONK' var(--axis-wonk);
   font-size: 1em;
+  /* A wordmark is read as ONE shape, not as words, so it sets tighter
+     than any running text on the site. -0.03em is as tight as this cut
+     stays legible: the `d`/`e` pair starts to collide past it. */
   font-weight: var(--font-weight-display-sm);
-  letter-spacing: -0.022em;
+  letter-spacing: -0.03em;
   line-height: 1;
   color: var(--on-surface);
 }
@@ -268,22 +271,41 @@ p {
    small orange type-adjacent ink, and it appears in exactly the places that
    are NOT inside a tone band (the navbar floats over everything, so it reads
    :root). On the navbar's glass pill signal-deep composites under AA at this
-   size; signal-deeper is the same hue one step down the ramp and clears it. */
+   size; signal-deeper is the same hue one step down the ramp and clears it.
+
+   Drawn as a period, not as a bullet: 0.115em square, and its bottom edge
+   sits ON the baseline (align-items: baseline), so it reads as the full stop
+   after "SlideIn" rather than as a dot floating at x-height. */
 .wordmark-dot {
   width: 0.115em;
   height: 0.115em;
   border-radius: 50%;
   background: var(--color-signal-deeper);
   margin-left: 0.1em;
+  /* The stop is the only ink on the page allowed to bleed a little of its
+     own colour into the paper around it — a 6% accent bloom. It is what
+     makes the mark read as drawn rather than as typed, and it is why the
+     eye finds the logo before it reads the word. */
+  box-shadow: 0 0 0.5em color-mix(in oklch, var(--color-signal-deeper) 22%, transparent);
 }
 
 /* The only motion the mark has: the stop slides in from behind the `n` and
    comes to rest — the brand name, performed once, on hover. Nothing else
-   moves, nothing scales. */
+   moves, nothing scales.
+
+   The slide is given a travel of -0.22em and a 1px overshoot-free settle,
+   and the trail is the accent bloom fading in slightly behind it, so the
+   eye reads motion rather than a jump. `forwards` is implied: the stop
+   rests on its mark when the animation ends, and re-running it on every
+   hover is what makes a logo feel nervous. */
 @keyframes wordmark-dot-slide {
   from {
-    transform: translateX(-0.2em);
+    transform: translateX(-0.22em);
     opacity: 0;
+  }
+
+  60% {
+    opacity: 1;
   }
 
   to {

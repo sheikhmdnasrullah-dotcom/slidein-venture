@@ -6,7 +6,7 @@
  * Exits non-zero if any documented pair regresses below its target, so the
  * guardrail in app/styles/tokens.css cannot silently rot.
  */
-import { converter } from 'culori';
+import { converter, interpolate } from 'culori';
 
 const toRgb = converter('rgb');
 
@@ -54,8 +54,18 @@ const T = {
   apricot200: 'oklch(0.895 0.068 58)',
 };
 
+/* Hero accent-50, derived exactly as the token is: 8% brand on white in
+   OKLCH (see --hero-accent-50 in app/styles/assemble.css). */
+const heroAcc50 = interpolate(['#ffffff', 'oklch(0.691 0.207 42.28)'], 'oklch')(0.08);
+
 /* [label, fg, bg, minimum, note] */
 const CHECKS = [
+  /* ── HERO ACCENT RAMP — derived from --color-brand only ─────────────── */
+  ['hero accent-600 on #FDFDFD', 'oklch(0.5657 0.168 42.28)', '#FDFDFD', 4.5, 'the only coloured hero text'],
+  ['hero accent-600 on accent-50', 'oklch(0.5657 0.168 42.28)', heroAcc50, 4.5, 'active phrase text on its wash'],
+  ['hero ink on swash dark stop', '#0A0A0A', 'oklch(0.691 0.207 42.28)', 4.5, 'headline over accent-500'],
+  ['hero ink on swash light stop', '#0A0A0A', 'oklch(0.7426 0.1817 56.01)', 4.5, 'headline over accent-300'],
+
   ['ink on paper-50', T.ink, T.paper50, 4.5],
   ['ink on paper-100', T.ink, T.paper100, 4.5],
   ['slate-500 on paper-50', T.slate500, T.paper50, 4.5, 'mono labels / micro captions'],

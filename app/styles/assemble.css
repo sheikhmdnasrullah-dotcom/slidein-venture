@@ -24,7 +24,7 @@
   --scaffold-panel:     rgb(250 250 250 / 100%);   /* #FAFAFA inner panel */
   --scaffold-well:      rgb(244 244 245 / 100%);   /* #F4F4F5 tile gradient end */
   --scaffold-lip:       rgb(233 233 235 / 100%);   /* #E9E9EB tile under-layer */
-  --scaffold-button:    rgb(21 21 21 / 100%);      /* #151515 primary button */
+  --scaffold-button:    rgb(28 28 32 / 100%);      /* softened warm graphite charcoal, avoids harsh pitch black */
 
   /* ── Hairlines & skeletons ─────────────────────────────────────────── */
   --scaffold-hairline:  rgb(10 10 10 / 6%);
@@ -101,6 +101,26 @@
   --scaffold-eyebrow-tracking: 0.01em;
   --scaffold-eyebrow-ink:      rgb(10 10 10 / 60%);
 
+  /* ── Hero accent ramp — derived ONLY from --color-brand (#FF6200) ──
+     accent-50:  8% brand on white (renders #FFF4EE).
+     accent-100: 18% brand on white (renders #FFE5D9).
+     accent-300: the amber end of the swash. Hue +13.7° (inside the 10–14°
+       band) with chroma held as rich as sRGB allows (renders #FF8700):
+       the literal L+8%/C-held point clips out of gamut, and the max-chroma
+       fit at exact L/h washes out to #FF9649, so the clipped fit is the
+       honest value. Effective lightness +5.2pts, the brightest fittable.
+     accent-500: the brand itself.
+     accent-600: the brand darkened to 4.80:1 on #FDFDFD and 4.52:1 on
+       accent-50 (renders #C34A04) — the ONLY coloured text colour.
+     Measured with culori (WCAG 2 relative luminance), same method as
+     scripts/verify-contrast.mjs. Coloured text uses accent-600 only;
+     gradients only on the swash shape, never on glyph fills. */
+  --hero-accent-50: color-mix(in oklch, var(--color-brand) 8%, rgb(255 255 255 / 100%));
+  --hero-accent-100: color-mix(in oklch, var(--color-brand) 18%, rgb(255 255 255 / 100%));
+  --hero-accent-300: oklch(0.7426 0.1817 56.01);
+  --hero-accent-500: var(--color-brand);
+  --hero-accent-600: oklch(0.5657 0.168 42.28);
+
   /* ── Motion — one easing for the scaffold ──────────────────────────── */
   --scaffold-ease: cubic-bezier(0.22, 1, 0.36, 1);
 
@@ -146,7 +166,16 @@
   --hero-gutter-min: 192px;   /* biggest tile 140 + 52 inner clearance */
   --hero-tile-clear: 52px;    /* tile inner edge to column edge (test: 40) */
   --hero-tiles-below: 1100px; /* gutters hidden under this width */
-  --hero-nav-h: 96px;         /* fixed nav height the stack clears */
+  /* The REAL fixed-nav height (Navbar is h-[72px]; ProcessStory's
+     --story-nav defaults to the same 72px). This token was 96px, which
+     over-cleared a 72px bar by 24px and stacked a dead white band between
+     the nav and the first subject. Keep it locked to the nav. */
+  --hero-nav-h: 72px;
+  /* Air between the nav's bottom edge and the first subject. One scale
+     step below the nav, so the offset reads deliberate rather than
+     accidental, and the stack still lands high enough to keep the CTA and
+     the top of the product preview above a 900px fold. */
+  --hero-subject-air: clamp(32px, 6vh, 64px);
 
   /* ── Stack gaps (hairlines sit centered in each) ───────────────────── */
   --hero-gap-top: 24px;       /* above the pill */
@@ -157,23 +186,46 @@
 
   /* ── Type ──────────────────────────────────────────────────────────── */
   --hero-h1-size: clamp(2.25rem, 8cqi, 4.5rem);
-  --hero-h1-lh: 1.04;
+  /* 1.18, not 1.04: the marker swash extends 0.06em above "Simplified"
+     under the 'g' descenders of "Getting", and the old tight pitch left
+     only ~4px of ink clearance. With --hero-swash-line-gap the worst
+     desktop case (768px) measures 13.4px. */
+  --hero-h1-lh: 1.18;
   --hero-h1-tracking: -0.035em;
   --hero-h1-mobile-size: clamp(2.125rem, 9.5vw, 2.75rem);
-  --hero-h1-mobile-lh: 1.08;
+  /* 1.26: same swash-clearance cause as desktop, scaled to the small
+     sizes. With --hero-swash-line-gap the worst case (375px) measures
+     9.9px. */
+  --hero-h1-mobile-lh: 1.26;
+  /* Top gap on the swash line only (see .hero-word[data-word='2']). 0.1em
+     holds the 8px ink clearance at every width; verified, not chosen. */
+  --hero-swash-line-gap: 0.1em;
   --hero-h1-mobile-tracking: -0.03em;
-  --hero-sub-size: clamp(1rem, 1.35vw, 1.25rem);
-  --hero-sub-lh: 1.55;
-  --hero-sub-tracking: -0.005em;
+  /* Subhead: stepped up one notch at the owner's request — slightly
+     larger, one weight heavier, tighter tracked. 1.375rem cap is +2px on
+     the old 1.25rem; 500 is the next loaded instance above 400 (Inter Tight
+     is loaded 400/500/600 only, so 600 would collide with the headline's
+     own weight and flatten the hierarchy). Tracking goes NEGATIVE as the
+     size rises: at 22px a paragraph wants to be set as one shape rather
+     than as running text, the same reason the wordmark is tighter than the
+     body. Leading drops to 1.5 to keep the block compact despite the
+     heavier weight — 1.55 was leaving a hole under the headline. */
+  --hero-sub-size: clamp(1.0625rem, 1.5vw, 1.375rem);
+  --hero-sub-lh: 1.5;
+  --hero-sub-tracking: -0.014em;
 
   /* ── CTA ───────────────────────────────────────────────────────────── */
   --hero-cta-h: 56px;
   --hero-cta-gap: 20px;
 }
 
+/* ── The story play button's mark: static ring + triangle, no arc CSS.
+   (Owner: the animated treatment felt over-designed against the brand.) */
+
 /* ── The three zones ─────────────────────────────────────────────────── */
 .hero-grid {
   display: grid;
+  min-height: 100svh;
   grid-template-columns:
     1fr
     minmax(0, min(var(--hero-col-max), calc(100% - 2 * var(--hero-gutter-min))))
@@ -185,6 +237,7 @@
   min-height: 100%;
   z-index: 1;
   pointer-events: none;
+  overflow-x: clip;
 }
 
 .hero-column {
@@ -196,7 +249,14 @@
   flex-direction: column;
   align-items: center;
   isolation: isolate;
-  padding-top: calc(var(--hero-nav-h) + clamp(56px, 9vh, 96px));
+  /* Explicit placement, not flow order. The three zones used to depend on
+     the column being the SECOND of exactly three children; with the gutter
+     tiles gone the column became the only in-flow child and silently fell
+     into track 1 (the 1fr gutter), collapsing the text column from 920px to
+     260px. Pinning the track makes the layout independent of how many
+     siblings exist. */
+  grid-column: 2;
+  padding-top: calc(var(--hero-nav-h) + var(--hero-subject-air));
 }
 
 @media (max-width: 1099px) {
@@ -207,6 +267,9 @@
     display: none;
   }
   .hero-column {
+    /* Single-column below 1100px: un-pin the track so the column occupies
+       the one column the breakpoint defines. */
+    grid-column: 1;
     padding-inline: 24px;
   }
 }
@@ -231,12 +294,60 @@
   -webkit-mask-image: linear-gradient(to right, transparent, black 12%, black 88%, transparent);
 }
 
-/* ── Headline ────────────────────────────────────────────────────────── */
+/* The five hairlines draw in once from the center outward at the start of
+   the entrance (700ms, 60ms stagger), then stay static. Visible default:
+   without the boot attribute the lines simply render. */
+@keyframes hero-line-draw {
+  0% {
+    transform: translate(-50%, -50%) scaleX(0);
+    opacity: 0;
+  }
+
+  25% {
+    opacity: 1;
+  }
+
+  100% {
+    transform: translate(-50%, -50%) scaleX(1);
+    opacity: 1;
+  }
+}
+
+:root[data-hero-boot='play'] .hero-gap[data-line='true']::after {
+  animation: hero-line-draw 700ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: calc(var(--gap-i, 0) * 60ms);
+}
+
+/* ── Tile focus ring — on the rotated face, keyboard focus only ──────────
+   :focus-visible does not match ancestors, so no group-focus-visible
+   variant can reach the face from the focused button overlay; :has() can.
+   Outline (not a Tailwind ring): the face carries an inline box-shadow.
+   Longhands (not the shorthand): the build pre-resolves color-mix into a
+   duplicate rule that drops the shorthand's width/color siblings. */
+[data-testid="hero-tile"]:has(> button:focus-visible) .tile-face {
+  outline-width: 2px;
+  outline-style: solid;
+  outline-color: color-mix(in oklch, var(--color-brand) 60%, transparent);
+  outline-offset: 2px;
+}
+
+/* ── Headline ──────────────────────────────────────────────────────────
+   One h1, three word spans (Getting / Clients / Simplified), aria-hidden
+   under the h1's aria-label so assistive tech reads the sentence once.
+   Each word: .hero-word (scroll + parallax transform) > .hero-mask
+   (entrance clip) > .hero-rise (entrance travel) > text. Separate elements
+   per motion source so no two animations fight over one transform. */
 .hero-h1 {
   font-size: var(--hero-h1-size);
   line-height: var(--hero-h1-lh);
   letter-spacing: var(--hero-h1-tracking);
+  /* 600, not 700: the token contract caps weights at 600. */
   font-weight: 600;
+  /* Scroll choreography: scale to 0.95 over the hero height, opacity 1
+     until 0.6 then fading to 0.3. Transform and opacity only. */
+  transform: scale(calc(1 - var(--hero-hp, 0) * 0.05));
+  transform-origin: 50% 0;
+  opacity: calc(1 - max(0, var(--hero-hp, 0) - 0.6) / 0.4 * 0.7);
   text-wrap: balance;
   font-kerning: normal;
   hyphens: none;
@@ -246,21 +357,135 @@
   width: 100%;
 }
 
-.hero-h1-line {
+.hero-word {
+  display: inline-block;
+  position: relative;
+}
+
+/* Inter-line room for the swash, exactly where it is needed. The swash
+   extends 0.06em above "Simplified" under the 'g' descenders of "Getting";
+   widening line-height alone only buys half its growth (the baseline sinks
+   the other half), so the swash line carries its own top gap. Full effect,
+   scales with the font, no magic pixels. */
+/* Word parallax + scroll drift, one transform. Fine pointers shift the
+   words ≤3px at different depths (--hero-px/--hero-py, one rAF); scroll
+   (--hero-hp, 0→1 over the hero height) lifts them at different rates while
+   the headline scales and fades (see .hero-h1). Without the vars this is a
+   no-op transform. */
+.hero-word[data-word='0'] {
+  transform:
+    translate3d(
+      calc(var(--hero-px, 0) * 0.6),
+      calc(var(--hero-py, 0) * 0.6 + var(--hero-hp, 0) * -16px),
+      0
+    );
+}
+
+.hero-word[data-word='1'] {
+  transform:
+    translate3d(
+      var(--hero-px, 0),
+      calc(var(--hero-py, 0) + var(--hero-hp, 0) * -28px),
+      0
+    );
+}
+
+.hero-word[data-word='2'] {
+  margin-top: var(--hero-swash-line-gap);
+  transform:
+    translate3d(
+      calc(var(--hero-px, 0) * 1.4),
+      calc(var(--hero-py, 0) * 1.4 + var(--hero-hp, 0) * -44px),
+      0
+    );
+}
+
+/* The entrance clip. Negative insets widen the clip region past the box;
+   the 0.2em bottom padding (cancelled from layout by the negative margin)
+   keeps g and p descenders clear of the cut. */
+.hero-mask {
+  display: inline-block;
+  position: relative;
+  z-index: 1;
+  clip-path: inset(-0.1em -0.05em);
+  padding-bottom: 0.2em;
+  margin-bottom: -0.2em;
+}
+
+.hero-rise {
+  display: inline-block;
+}
+
+/* Per-letter spans exist ONLY on "Simplified". Inline-block so letters take
+   transforms; width and weight never change, so nothing reflows. */
+.hero-letter {
+  display: inline-block;
+}
+
+/* ── The marker swash ──────────────────────────────────────────────────
+   A filled inline-SVG hand-drawn marker bar behind "Simplified": rounded
+   but irregular, two bumps on the top edge, one tail flick at the left.
+   Gradient accent-300 → accent-500 at 100°, the ONLY gradient on glyphs'
+   ground (never on the glyph fills). Ink text stays ink above it.
+   Box: 0.06em vertical / 0.3em horizontal padding around the word, tilted
+   -1.2°. The 0.08em overhang counts as text rect in clearance tests. */
+.hero-swash {
+  position: absolute;
+  inset: -0.06em -0.3em;
+  transform: rotate(-1.2deg);
+  z-index: 0;
+  pointer-events: none;
+}
+
+.hero-swash-shape {
   display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
 }
 
-/* Accent highlight: last phrase only. Inline padding never grows the line. */
-.hero-hl {
-  background: var(--scaffold-accent-pill);
-  border-radius: 999px;
-  padding: 0.02em 0.22em;
-  margin: 0 -0.22em;
-  box-decoration-break: clone;
-  -webkit-box-decoration-break: clone;
+/* Three four-point sparkles at the swash corners. Static final state is
+   scale 0.85; the entrance twinkles them once (see the timeline below). */
+.hero-spark {
+  position: absolute;
+  display: block;
+  transform: scale(0.85);
+  pointer-events: none;
 }
 
-/* Mobile: one balanced paragraph, wrapping naturally. */
+.hero-spark > svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* Sparkle corners are measured to the visible path band inside the swash
+   box (path spans x 1.7–97.9%, y 15.4–80.8% of the 120×26 viewBox). The
+   top-right sparkle floats just outside its corner, clear of the "d". */
+.hero-spark[data-spark='0'] {
+  width: 16px;
+  height: 16px;
+  top: calc(15.4% - 16px);
+  right: calc(2.1% - 16px);
+}
+
+.hero-spark[data-spark='1'] {
+  width: 12px;
+  height: 12px;
+  bottom: -0.32em;
+  left: -0.12em;
+}
+
+.hero-spark[data-spark='2'] {
+  width: 10px;
+  height: 10px;
+  top: 38%;
+  right: -0.5em;
+}
+
+/* Mobile: the forced break after "Clients" stays; the first segment wraps
+   naturally, so the headline sets on 2 or 3 balanced lines with
+   "Simplified" always whole on its own line. */
 @media (max-width: 767px) {
   .hero-h1 {
     font-size: var(--hero-h1-mobile-size);
@@ -269,25 +494,383 @@
     max-width: 92%;
     margin-inline: auto;
   }
-  .hero-h1-line {
-    display: inline;
+}
+
+/* ── Entrance choreography (headline) ────────────────────────────────────
+   CSS-only from a visible default, armed by the boot script on <html>
+   during parse — before first paint, so the timeline runs from stylesheet
+   time rather than hydration time. With no boot attribute (pre-script,
+   no-JS, reduced motion) every rule below is inert and all text renders in
+   its final state. Any press, scroll or key — or the timeline end — flips
+   the attribute to "done" and the animations vanish, leaving the final
+   state. */
+/* The 105% travel plus the mask's own 0.2em bottom padding and 0.1em
+   clip inset: exactly what the word needs to clear its mask, no more. */
+@keyframes hero-rise {
+  0% {
+    transform: translateY(calc(105% + 0.3em));
   }
-  .hero-h1-line:not(:last-child)::after {
-    content: ' ';
+
+  100% {
+    transform: translateY(0);
   }
+}
+
+@keyframes hero-swash-draw {
+  0% {
+    clip-path: inset(-8% 101% -8% -1%);
+  }
+
+  70% {
+    clip-path: inset(-8% -2.5% -8% -1%);
+  }
+
+  100% {
+    clip-path: inset(-8% -1% -8% -1%);
+  }
+}
+
+@keyframes hero-spark-twinkle {
+  0% {
+    transform: scale(0);
+  }
+
+  60% {
+    transform: scale(1);
+  }
+
+  100% {
+    transform: scale(0.85);
+  }
+}
+
+:root[data-hero-boot='play'] .hero-rise {
+  animation: hero-rise 650ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+:root[data-hero-boot='play'] [data-word='0'] .hero-rise {
+  animation-delay: 300ms;
+}
+
+:root[data-hero-boot='play'] [data-word='1'] .hero-rise {
+  animation-delay: 370ms;
+}
+
+:root[data-hero-boot='play'] [data-word='2'] .hero-rise {
+  animation-delay: 440ms;
+}
+
+:root[data-hero-boot='play'] .hero-swash-shape {
+  animation: hero-swash-draw 500ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: 900ms;
+}
+
+:root[data-hero-boot='play'] .hero-spark {
+  animation: hero-spark-twinkle 450ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+:root[data-hero-boot='play'] .hero-spark[data-spark='0'] {
+  animation-delay: 1300ms;
+}
+
+:root[data-hero-boot='play'] .hero-spark[data-spark='1'] {
+  animation-delay: 1420ms;
+}
+
+:root[data-hero-boot='play'] .hero-spark[data-spark='2'] {
+  animation-delay: 1540ms;
+}
+
+/* Touch entrance wave: coarse pointers get one sweep across "Simplified"
+   at entrance, then static. Never under reduced motion (no boot attribute
+   there) and never on fine pointers (they get live letter reactivity). */
+@keyframes hero-letter-wave {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-0.12em);
+  }
+}
+
+@media (pointer: coarse) {
+  :root[data-hero-boot='play'] .hero-letter {
+    animation: hero-letter-wave 600ms cubic-bezier(0.22, 1, 0.36, 1) both;
+    animation-delay: calc(600ms + var(--li, 0) * 45ms);
+  }
+}
+
+/* ── Entrance timeline: pill, subline, CTA ────────────────────────────────
+   120ms the pill drops 12px; 1100ms the subline fades up 12px over 500ms;
+   1500ms the CTA pops. The spring(260, 22) landings are approximated with
+   a small overshoot keyframe — CSS has no springs, and the brief requires
+   the reveal to be CSS-only from a visible default. */
+@keyframes hero-pill-drop {
+  0% {
+    transform: translateY(-12px);
+    opacity: 0;
+  }
+
+  70% {
+    transform: translateY(1px);
+    opacity: 1;
+  }
+
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes hero-fade-up {
+  0% {
+    transform: translateY(12px);
+    opacity: 0;
+  }
+
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes hero-cta-pop {
+  0% {
+    transform: scale(0.92);
+    opacity: 0;
+  }
+
+  70% {
+    transform: scale(1.015);
+    opacity: 1;
+  }
+
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+:root[data-hero-boot='play'] [data-testid='hero-pill'] {
+  animation: hero-pill-drop 550ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: 120ms;
+}
+
+/* LCP is gated by the phrase-1 repaint at loop start (1850ms), not by
+   this delay: 1100 vs 700 measured identical (2052–2124ms prod). */
+:root[data-hero-boot='play'] [data-testid='hero-subhead'] {
+  animation: hero-fade-up 500ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: 1100ms;
+}
+
+:root[data-hero-boot='play'] [data-testid='hero-cta-row'] {
+  animation: hero-cta-pop 600ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: 1500ms;
 }
 
 /* ── Subhead: one paragraph, balanced, no orphans ────────────────────── */
 .hero-sub {
   font-size: var(--hero-sub-size);
+  /* 400 / ink 62% (5.64:1): the phrases' inactive state. The active phrase
+     lights to accent-600; the connective tissue stays at this quiet level. */
   font-weight: 400;
   line-height: var(--hero-sub-lh);
   letter-spacing: var(--hero-sub-tracking);
-  color: rgba(10, 10, 10, 0.6);
-  /* 40em per the longer end-to-end subline: it settles into 3 even lines
-     under the headline at desktop widths while staying balanced. */
+  color: rgb(10 10 10 / 62%);
   max-width: 40em;
+  /* width:100% is REQUIRED, not decoration. This <p> is a flex item of
+     .hero-column, which is `align-items: center` — so the paragraph
+     shrink-wraps to its max-content width. With no copy in the slot that
+     max-content is 0px, and the paragraph's own skeleton bars are sized in
+     PERCENT (76% / 52%), so they resolve against a zero-width parent and
+     collapse to nothing: an invisible, zero-width subject in the middle of
+     the hero. Claiming the full column width gives the percentages
+     something to resolve against, in both the filled and empty states. */
+  width: 100%;
   margin-inline: auto;
   text-align: center;
   text-wrap: balance;
+}
+
+/* ── Synced phrases ──────────────────────────────────────────────────────
+   Exactly one phrase is active at a time, driven by data-active-phrase on
+   the section (the master loop writes it; no React state). Active: accent-
+   600 text on an accent-50 marker wash with a 2px accent-300 underline bar,
+   drawn left to right in 320ms. Deactivation fades in 200ms — the outgoing
+   transition is read from this base rule, the incoming from the active one.
+   box-decoration-break keeps the wash correct across wrapped lines. */
+.hero-sub [data-phrase] {
+  border-radius: 6px;
+  padding: 0.04em 0.2em;
+  margin: 0 -0.2em;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+  background-image:
+    linear-gradient(var(--hero-accent-50), var(--hero-accent-50)),
+    linear-gradient(var(--hero-accent-300), var(--hero-accent-300));
+  background-repeat: no-repeat;
+  background-position: left center, left bottom;
+  background-size: 0% 100%, 0% 2px;
+  transition:
+    background-size 200ms cubic-bezier(0.22, 1, 0.36, 1),
+    color 200ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+[data-testid='hero'][data-active-phrase='1'] .hero-sub [data-phrase='1'],
+[data-testid='hero'][data-active-phrase='2'] .hero-sub [data-phrase='2'],
+[data-testid='hero'][data-active-phrase='3'] .hero-sub [data-phrase='3'],
+[data-testid='hero'][data-active-phrase='4'] .hero-sub [data-phrase='4'] {
+  color: var(--hero-accent-600);
+  background-size: 100% 100%, 100% 2px;
+  transition:
+    background-size 320ms cubic-bezier(0.22, 1, 0.36, 1),
+    color 320ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* Hover preview: a 1px ink-20% underline. Fine pointers only; touch taps
+   seek directly. Cursor signals the seek affordance. */
+@media (hover: hover) and (pointer: fine) {
+  .hero-sub [data-phrase] {
+    cursor: pointer;
+  }
+
+  .hero-sub [data-phrase]:hover {
+    text-decoration: underline solid rgb(10 10 10 / 20%) 1px;
+    text-underline-offset: 3px;
+  }
+}
+
+/* Reduced motion: phrase 1 stays lit until the visitor seeks, then the
+   sought phrase holds (transitions collapse to instant by the backstop). */
+@media (prefers-reduced-motion: reduce) {
+  [data-testid='hero']:not([data-active-phrase]) .hero-sub [data-phrase='1'] {
+    color: var(--hero-accent-600);
+    background-size: 100% 100%, 100% 2px;
+  }
+}
+
+/* The emphasis phrase. An inline span, so it reflows inside the balanced
+   line and physically cannot overlap a neighbour — the whole line is one
+   text run and the browser breaks it. The tint is the same soft accent the
+   headline's highlight pill uses, one step lighter so the paragraph still
+   sits below the h1 in the hierarchy. */
+.hero-sub-em {
+  color: var(--scaffold-ink);
+  background: var(--scaffold-accent-chip);
+  border-radius: 999px;
+  padding: 0.06em 0.3em 0.1em;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+}
+
+/* ── Announcement pill border beam ───────────────────────────────────────
+   A 1px accent arc (~90px of the ~780px perimeter ≈ 12%) travels the pill
+   border: a conic gradient masked to a 1px ring, one revolution per 6s.
+   Hover speeds it to 2.5s; offscreen pauses it; reduced motion removes it.
+   Decorative and aria-hidden. The hero's second looping animation. */
+@property --hero-beam-angle {
+  syntax: '<angle>';
+  initial-value: 0deg;
+  inherits: false;
+}
+
+@keyframes hero-beam-spin {
+  100% {
+    --hero-beam-angle: 360deg;
+  }
+}
+
+.hero-pill-beam {
+  position: absolute;
+  inset: -1px;
+  border-radius: 999px;
+  padding: 1px;
+  pointer-events: none;
+  background: conic-gradient(
+    from var(--hero-beam-angle),
+    var(--hero-accent-500),
+    transparent 12%
+  );
+  -webkit-mask: linear-gradient(rgb(255 255 255 / 100%) 0 0) content-box, linear-gradient(rgb(
+          255 255 255 / 100%
+        ) 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(rgb(255 255 255 / 100%) 0 0) content-box, linear-gradient(rgb(
+          255 255 255 / 100%
+        ) 0 0);
+  mask-composite: exclude;
+  animation: hero-beam-spin 6s linear infinite;
+}
+
+[data-testid='hero-pill']:hover .hero-pill-beam {
+  animation-duration: 2.5s;
+}
+
+[data-testid='hero'][data-onscreen='0'] .hero-pill-beam {
+  animation-play-state: paused;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-pill-beam {
+    display: none;
+  }
+}
+
+/* ── Spotlight dot grid ──────────────────────────────────────────────────
+   Layer 0: 2px dots on a 24px pitch in ink 6% across the whole hero. Two
+   masked layers above it follow the pointer (--hero-mx/--hero-my, smoothed
+   by the pointer loop): accent-500 dots at 35% inside 280px, ink dots at
+   14% in the neighbouring band. The spotlight rests at the headline center
+   without a pointer. Dots cover ~0.5% of the area, so text contrast never
+   moves. No blur, no glow, no page-background gradients. */
+.hero-bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.hero-dots {
+  position: absolute;
+  inset: 0;
+  background-size: 24px 24px;
+}
+
+.hero-dots-base {
+  background-image: radial-gradient(circle, rgb(10 10 10 / 6%) 1px, transparent 1.5px);
+}
+
+.hero-dots-near {
+  background-image: radial-gradient(circle, rgb(10 10 10 / 14%) 1px, transparent 1.5px);
+  -webkit-mask-image: radial-gradient(
+    circle 420px at var(--hero-mx, 50%) var(--hero-my, 30%),
+    black 30%,
+    transparent 72%
+  );
+  mask-image: radial-gradient(
+    circle 420px at var(--hero-mx, 50%) var(--hero-my, 30%),
+    black 30%,
+    transparent 72%
+  );
+}
+
+.hero-dots-hot {
+  background-image: radial-gradient(
+    circle,
+    color-mix(in oklch, var(--hero-accent-500) 35%, transparent) 1px,
+    transparent 1.5px
+  );
+  -webkit-mask-image: radial-gradient(
+    circle 280px at var(--hero-mx, 50%) var(--hero-my, 30%),
+    black 55%,
+    transparent 100%
+  );
+  mask-image: radial-gradient(
+    circle 280px at var(--hero-mx, 50%) var(--hero-my, 30%),
+    black 55%,
+    transparent 100%
+  );
 }

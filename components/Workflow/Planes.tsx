@@ -11,8 +11,10 @@
  * mobile. No text anywhere — structure only.
  */
 
-import { motion, useReducedMotion, useScroll, useTransform } from 'framer-motion';
+import { motion, useScroll, useTransform } from 'framer-motion';
 import { useRef, useState } from 'react';
+
+import { useSettledStill } from '@/lib/useSettledStill';
 import { cn } from '@/lib/utils';
 import {
   ChartIcon,
@@ -89,7 +91,8 @@ function Plate({
 
 export default function Planes() {
   const ref = useRef<HTMLElement>(null);
-  const still = !!useReducedMotion();
+  /* Hydration-safe reduced-motion flag (false until settled after hydration). */
+  const settled = useSettledStill();
   const [hover, setHover] = useState(-1);
   const { scrollYProgress } = useScroll({
     target: ref,
@@ -108,13 +111,13 @@ export default function Planes() {
               icon={p.icon}
               bars={p.bars}
               scrollYProgress={scrollYProgress}
-              still={still}
+              still={settled}
               hover={hover}
               setHover={setHover}
             />
           ))}
         </div>
-        {!still && (
+        {!settled && (
           <motion.span className="wf-planes-signal" style={{ scaleY: signalScale }} />
         )}
       </div>

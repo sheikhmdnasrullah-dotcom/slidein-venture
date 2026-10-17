@@ -3,8 +3,9 @@
  *
  * At 1440, 1280, 1024, 768, 390 and 375 widths:
  *  1. No tile rect within 40px of any text rect.
- *  2. Longest headline line ink <= 92% of the text column (desktop 3-line
- *     mode); h1 box <= 92% in mobile paragraph mode (< 768).
+ *  2. Longest headline line ink <= 92% of the text column (desktop 2-line
+ *     mode: "Getting Clients" / "Simplified"); h1 box <= 92% in mobile
+ *     paragraph mode (< 768).
  *  3. No hairline y inside any text block rect.
  *  4. No horizontal scroll (scrollWidth <= viewport width).
  *  5. At 1440x900: primary CTA bottom <= 900 AND >= 120px of preview visible.
@@ -52,15 +53,23 @@ async function measure(page: import('@playwright/test').Page, width: number) {
       const b = el.getBoundingClientRect();
       return { x: b.x, y: b.y, w: b.width, h: b.height };
     };
-    const inkWidth = (el: Element): number => {
-      const range = document.createRange();
-      range.selectNodeContents(el);
-      return range.getBoundingClientRect().width;
-    };
     const col = document.querySelector('[data-testid="hero-column"]');
     const h1 = document.querySelector('[data-testid="hero-headline"]');
-    const lineEls = [...document.querySelectorAll('[data-testid="hero-line"]')];
-    const hl = document.querySelector('[data-testid="hero-highlight"]');
+    // Words group into visual lines by vertical center (the h1 is three word
+    // spans with a forced break after "Clients", not line elements).
+    const wordEls = [...document.querySelectorAll('[data-testid="hero-word"]')];
+    const lh = h1 ? parseFloat(getComputedStyle(h1).lineHeight) : 0;
+    const lineEls: Element[][] = [];
+    for (const w of wordEls) {
+      const yc = w.getBoundingClientRect().y + w.getBoundingClientRect().height / 2;
+      const line = lineEls.find((g) => {
+        const r = (g[0] as Element).getBoundingClientRect();
+        return Math.abs(r.y + r.height / 2 - yc) < lh / 2;
+      });
+      if (line) line.push(w);
+      else lineEls.push([w]);
+    }
+    const hl = document.querySelector('[data-testid="hero-swash"]');
     const sub = document.querySelector('[data-testid="hero-subhead"]');
     const pill = document.querySelector('[data-testid="hero-pill"]');
     const cta = document.querySelector('[data-testid="hero-cta-primary"]');
@@ -76,13 +85,20 @@ async function measure(page: import('@playwright/test').Page, width: number) {
     const mobile = w < 768;
     const h1Box = rect(h1);
     const colBox = rect(col);
-    const lh = h1 ? parseFloat(getComputedStyle(h1).lineHeight) : 0;
-    // Desktop: ink width + wrap check per intentional line.
-    // Mobile: h1 is one balanced paragraph; its box is the bound.
-    const lineInks = mobile ? [] : lineEls.map(inkWidth);
+    // Desktop: ink width per visual line (a word must never wrap: its box
+    // stays one line tall). Mobile: h1 is a balanced paragraph; its box is
+    // the bound.
+    const lineInks = mobile
+      ? []
+      : lineEls.map((words) => {
+          const range = document.createRange();
+          range.setStartBefore(words[0]);
+          range.setEndAfter(words[words.length - 1]);
+          return range.getBoundingClientRect().width;
+        });
     const wrapped = mobile
       ? false
-      : lineEls.some((el) => el.getBoundingClientRect().height > lh * 1.35);
+      : wordEls.some((el) => el.getBoundingClientRect().height > lh * 1.35);
     const longest = mobile ? (h1Box?.w ?? 0) : Math.max(0, ...lineInks);
     const texts = [rect(pill), h1Box, rect(sub), rect(cta), rect(sec), rect(hl)].filter(
       (r): r is Rect => !!r && r.w > 0 && r.h > 0,
@@ -137,7 +153,8 @@ for (const width of [1440, 1280, 1024, 768, 390, 375]) {
         m.hairlineCount === 5 &&
         m.lineHits === 0 &&
         m.scrollW <= m.innerW &&
-        (width !== 1440 || (m.ctaBottom <= 900 && m.previewPx >= 120));
+        (width !== 1440 || m.ctaBottom <= 900) &&
+        m.previewPx === -1;
       rows.push({
         width,
         colW: Math.round(m.colW),
@@ -165,10 +182,13 @@ for (const width of [1440, 1280, 1024, 768, 390, 375]) {
       expect(m.lineHits, 'hairline(s) crossing text').toBe(0);
       // 4. no horizontal scroll
       expect(m.scrollW, `scrollWidth ${m.scrollW} > viewport ${m.innerW}`).toBeLessThanOrEqual(m.innerW);
-      // 5. fold at 1440x900
+      // 5. hero preview stays removed at every width (owner decision
+      // 2026-10-17: the dashboard below the CTA is out; the peer's console
+      // re-add was backed up to /tmp/peer-console-backup/ and adjudicated).
+      expect(m.previewPx, 'hero preview should stay removed').toBe(-1);
+      // 6. fold at 1440x900: primary CTA above it.
       if (width === 1440) {
         expect(m.ctaBottom, `CTA bottom ${m.ctaBottom} below fold`).toBeLessThanOrEqual(900);
-        expect(m.previewPx, `only ${m.previewPx}px of preview above fold`).toBeGreaterThanOrEqual(120);
       }
     });
   });

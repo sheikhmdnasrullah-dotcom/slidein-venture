@@ -23,6 +23,7 @@
 }
 
 .band-flat { background: var(--scaffold-bg); }
+
 .band-soft {
   background: var(--scaffold-panel);
   border-block: 1px solid var(--scaffold-hairline);
@@ -33,6 +34,7 @@
    the same --scaffold-* names, so no component needs to know. */
 .band-dark {
   background: rgb(15 15 15 / 100%);
+
   --scaffold-skeleton: rgb(255 255 255 / 12%);
   --scaffold-hairline: rgb(255 255 255 / 10%);
   --scaffold-rule: rgb(255 255 255 / 12%);
@@ -93,14 +95,14 @@
 
 /* Dot-grid backdrop with the edges masked away. --dot-grid-size tunes pitch. */
 .dot-grid {
-  background-image: radial-gradient(circle, rgba(10, 10, 10, 0.10) 1px, transparent 1.2px);
+  background-image: radial-gradient(circle, rgb(10 10 10 / 10%) 1px, transparent 1.2px);
   background-size: var(--dot-grid-size, 22px) var(--dot-grid-size, 22px);
   mask-image: radial-gradient(ellipse at center, black 30%, transparent 78%);
   -webkit-mask-image: radial-gradient(ellipse at center, black 30%, transparent 78%);
 }
 
 .band-dark .dot-grid {
-  background-image: radial-gradient(circle, rgba(255, 255, 255, 0.14) 1px, transparent 1.2px);
+  background-image: radial-gradient(circle, rgb(255 255 255 / 14%) 1px, transparent 1.2px);
 }
 
 /* Edge fade masks for marquees and tracks. */
@@ -116,7 +118,7 @@
   content: '';
   position: absolute;
   inset: 0;
-  background: linear-gradient(115deg, transparent 30%, rgba(255, 255, 255, 0.9) 50%, transparent 70%);
+  background: linear-gradient(115deg, transparent 30%, rgb(255 255 255 / 90%) 50%, transparent 70%);
   transform: translateX(-130%);
   transition: transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
   pointer-events: none;
@@ -191,6 +193,7 @@
 
 /* Orbit: slow revolutions; icons counter-rotate to stay upright. */
 @keyframes orbit-spin { to { transform: rotate(360deg); } }
+
 @keyframes orbit-spin-rev { to { transform: rotate(-360deg); } }
 
 /* Beams: accent dashes travelling along an SVG path. */
@@ -198,6 +201,7 @@
 
 /* Marquee rows drifting in opposite directions. */
 @keyframes marquee-l { to { transform: translateX(-50%); } }
+
 @keyframes marquee-r { from { transform: translateX(-50%); } to { transform: translateX(0); } }
 
 /* Entrance for the inbox fan. */
@@ -232,7 +236,7 @@
   position: absolute;
   inset: 0;
   pointer-events: none;
-  background-image: radial-gradient(circle, rgba(10, 10, 10, 0.22) 1.2px, transparent 1.5px);
+  background-image: radial-gradient(circle, rgb(10 10 10 / 22%) 1.2px, transparent 1.5px);
   background-size: 20px 20px;
   mask-image: radial-gradient(220px circle at var(--mx) var(--my), black 20%, transparent 100%);
   -webkit-mask-image: radial-gradient(220px circle at var(--mx) var(--my), black 20%, transparent 100%);

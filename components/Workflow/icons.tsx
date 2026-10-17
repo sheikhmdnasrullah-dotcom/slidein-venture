@@ -378,3 +378,14 @@ export function EyeIcon(p: P) {
     </Svg>
   );
 }
+
+/* lock — read-only */
+export function LockIcon(p: P) {
+  return (
+    <Svg {...p}>
+      <rect x="6" y="10.5" width="12" height="9.5" rx="2.5" />
+      <path d="M8.5 10.5 V8 A3.5 3.5 0 0 1 15.5 8 V10.5" />
+      <circle cx="12" cy="15" r="1" fill={INK} stroke="none" />
+    </Svg>
+  );
+}

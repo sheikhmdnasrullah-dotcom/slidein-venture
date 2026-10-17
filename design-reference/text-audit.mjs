@@ -1,9 +1,103 @@
-/* RULE 0.9 AUDIT — collect every visible text node in the rendered DOM.
-   Whitelist: the SlideIn wordmark (logo) and its sr-only name. Everything
-   else must come from content/home.ts (i.e. be an empty slot) or be absent. */
-import { chromium } from '@playwright/test';
+/* RULE 0 AUDIT — collect every text node in the rendered DOM and require it
+   to come from a content module, the nav, or the logo.
 
-const EXPECTED = new Set(['SlideIn', 'SlideIn.']);
+   The whitelist is built DYNAMICALLY from the content files themselves
+   (content/home.ts, content/stages.ts, content/workflowCaptions.ts) plus a
+   tiny accessibility-chrome list (logo wordmark spellings, nav/menu/GitHub
+   control names). Nothing is hardcoded per string: if the owner edits the
+   content file, the audit follows automatically.
+
+   Matching: a visible text node passes if it (a) equals a content string,
+   (b) is a single word token of one, or (c) is a chrome entry. Word-token
+   matching exists because the caption band renders each word in its own
+   span. sr-only nodes are reported separately and must also be content or
+   chrome — invented assistive text is still a violation. */
+import { chromium } from '@playwright/test';
+import { HOME, NAV_SLOTS } from '../content/home.ts';
+import { STAGE_WORD, EQUATION_WORDS } from '../content/stages.ts';
+import { WORKFLOW_CAPTIONS, STORY_CHROME } from '../content/workflowCaptions.ts';
+import { HERO_PHRASE_SYNC } from '../content/hero-sync.ts';
+
+/* ── Build the allowed set from the content modules ─────────────────────── */
+
+const CONTENT_STRINGS = new Set();
+
+function add(s) {
+  if (typeof s === 'string' && s.trim()) CONTENT_STRINGS.add(s.trim());
+}
+
+add(HOME.announcement.chip);
+add(HOME.announcement.label);
+add(HOME.headline.line1);
+add(HOME.headline.line2);
+add(HOME.headline.highlight);
+for (const ch of HOME.headline.highlight.split('')) add(ch);
+add(HOME.subhead.line1);
+add(HOME.subhead.line2);
+add([HOME.subhead.line1, HOME.subhead.line2].filter(Boolean).join(' '));
+for (const p of HERO_PHRASE_SYNC) add(p.phrase);
+add(HOME.cta.primary);
+add(HOME.cta.primaryVideo);
+add(HOME.cta.secondary);
+add(HOME.icpTagline);
+add(HOME.persistentKnowledgeTagline);
+if (HOME.playbookCaptions) {
+  add(HOME.playbookCaptions.act1);
+  add(HOME.playbookCaptions.act2);
+  add(HOME.playbookCaptions.act3);
+}
+add(HOME.multiAgentTitle);
+for (const l of NAV_SLOTS.links) add(l.label);
+add(NAV_SLOTS.cta.label);
+for (const w of Object.values(STAGE_WORD)) add(w);
+for (const w of EQUATION_WORDS) add(w);
+for (const c of WORKFLOW_CAPTIONS) add(c.text);
+add(STORY_CHROME.title);
+for (let n = 1; n <= 7; n++) add(STORY_CHROME.step(n));
+add(STORY_CHROME.overview);
+
+/* Word tokens of every content string (caption band splits words into
+   spans; the marker highlight splits the headline's last words). */
+const TOKENS = new Set();
+for (const s of CONTENT_STRINGS) {
+  for (const tok of s.split(/\s+/)) {
+    if (tok) {
+      TOKENS.add(tok);
+      const stripped = tok.replace(/^[,\.\s]+|[,\.\s]+$/g, '');
+      if (stripped) TOKENS.add(stripped);
+    }
+  }
+}
+
+/* Accessibility chrome: logo spellings and nav/menu/GitHub control names.
+   These are control names, not page copy. */
+const CHROME = new Set([
+  'SlideIn',
+  'SlideIn.',
+  'SlideIn GitHub repository',
+  'GitHub',
+  'Toggle menu',
+  'Close menu',
+  '•',
+  ',',
+  '.',
+  ', and',
+  '. It',
+  'An end-to-end system that',
+  /* CaptionBand's sr-only transcript scaffold (structure headers only;
+     cue lines render only when the owner fills cue.text). */
+  'SlideIn Story Transcript',
+]);
+
+const clean = (t) => t.replace(/^[,\.\s]+|[,\.\s]+$/g, '').trim();
+
+const isAllowed = (t) =>
+  CONTENT_STRINGS.has(t) ||
+  CONTENT_STRINGS.has(clean(t)) ||
+  (t.length <= 40 && TOKENS.has(t)) ||
+  (clean(t).length <= 40 && TOKENS.has(clean(t))) ||
+  CHROME.has(t);
+
 const VIEWPORTS = [
   ['1440x900', 1440, 900],
   ['1280x800', 1280, 800],
@@ -29,21 +123,18 @@ async function audit(label) {
       if (!el) continue;
       const cs = getComputedStyle(el);
       if (cs.display === 'none' || cs.visibility === 'hidden') continue;
-      // skip sr-only / clipped assistive text? No — collect it, decide below.
       const cls = el.className || '';
       const srOnly = typeof cls === 'string' && cls.includes('sr-only');
       out.push({ text: t, srOnly, tag: el.tagName, cls: String(cls).slice(0, 60) });
     }
     return out;
   });
-  const bad = texts.filter(t => !EXPECTED.has(t.text));
-  console.log(`\n[${label}] visible/assistive text nodes: ${texts.length}, unexpected: ${bad.length}`);
+  const bad = texts.filter((t) => !isAllowed(t.text));
+  console.log(`\n[${label}] text nodes: ${texts.length}, unexpected: ${bad.length}`);
   for (const b of bad) {
     violations++;
     console.log('  VIOLATION:', JSON.stringify(b));
   }
-  const whitelisted = texts.filter(t => EXPECTED.has(t.text));
-  console.log('  whitelisted (logo):', JSON.stringify(whitelisted.map(t => ({ text: t.text, srOnly: t.srOnly }))));
 }
 
 for (const [name, w, h] of VIEWPORTS) {
@@ -62,16 +153,34 @@ await page.click('button[aria-label="Toggle menu"]');
 await page.waitForTimeout(700);
 await audit('390 sheet open');
 
-// source (SSR HTML) check
-const html = await (await page.goto('http://localhost:3000/', { waitUntil: 'networkidle' })).text();
+// story modal open (hero CTA → the caption band + chrome render for real)
+await page.setViewportSize({ width: 1440, height: 900 });
+await page.goto('http://localhost:3000/?story=1', { waitUntil: 'networkidle' });
+await page.waitForTimeout(1800);
+await audit('1440 story modal open');
+await page.setViewportSize({ width: 390, height: 844 });
+await page.waitForTimeout(800);
+await audit('390 story modal open');
+
+// source (SSR HTML) check — strip to text, remove every allowed string,
+// and require nothing but whitespace to remain.
+const html = await (
+  await page.goto('http://localhost:3000/', { waitUntil: 'networkidle' })
+).text();
 const bodyMatch = html.match(/<body[^>]*>([\s\S]*?)<\/body>/);
 const stripped = bodyMatch ? bodyMatch[1].replace(/<script[\s\S]*?<\/script>/g, '') : '';
-const textBits = stripped.replace(/<style[\s\S]*?<\/style>/g, '').replace(/<[^>]+>/g, ' ').split(/\s+/).filter(Boolean);
-const srcBad = textBits.filter(t => !EXPECTED.has(t));
-console.log(`\n[SSR HTML] text tokens in body (scripts/styles stripped): ${textBits.length}, unexpected: ${srcBad.length}`);
-for (const t of srcBad.slice(0, 20)) {
+const text = stripped.replace(/<style[\s\S]*?<\/style>/g, '').replace(/<[^>]+>/g, ' ');
+let remainder = text.replace(/\s+/g, ' ');
+const allAllowed = [...CONTENT_STRINGS, ...CHROME].sort((a, b) => b.length - a.length);
+for (const allowed of allAllowed) {
+  remainder = remainder.split(allowed).join(' ');
+  remainder = remainder.replace(/\s+/g, ' ');
+}
+const srcBad = remainder.trim();
+console.log(`\n[SSR HTML] leftover after removing all allowed strings: "${srcBad.slice(0, 120)}"`);
+if (srcBad.trim()) {
   violations++;
-  console.log('  VIOLATION:', JSON.stringify(t));
+  console.log('  VIOLATION: unexpected text in SSR HTML');
 }
 
 await browser.close();

@@ -13,8 +13,11 @@
 @import "./styles/assemble.css";
 /* Section shells + scene vocabulary for the bands below the hero. */
 @import "./styles/sections.css";
+@import "./styles/story-home.css";
 /* The SlideIn loop visual: rail, pods, comet, inspector, scenes, planes. */
 @import "./styles/workflow.css";
+/* The staged scene layer: people, devices, dressing, beat choreography. */
+@import "./styles/scenes-rich.css";
 @import "tw-animate-css";
 /* layer() keeps xyflow in the base cascade. Wrapping an @import inside
    `@layer base { ... }` is an invalid at-rule position in CSS. */

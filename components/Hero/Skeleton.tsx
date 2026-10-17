@@ -28,7 +28,7 @@ export function Bar({
   return (
     <span
       aria-hidden="true"
-      className={cn('inline-block shrink-0 rounded-full', className)}
+      className={cn('inline-block max-w-full shrink-0 rounded-full', className)}
       style={{
         width,
         height: '0.7em',

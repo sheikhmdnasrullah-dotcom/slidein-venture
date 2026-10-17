@@ -44,10 +44,9 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      /* suppressHydrationWarning is vestigial: the hero that used to set
-          data-thread-departed after hydration is gone. It is kept because it
-          is the right thing to have on the root if any client-only attribute
-          is ever set here again, and removing it changes nothing today. */
+      /* suppressHydrationWarning covers the hero boot script's client-only
+          attributes (data-hero-boot / data-hero-boot-t), set during parse
+          before React hydrates. See components/Hero/HeroBootScript.tsx. */
       suppressHydrationWarning
       className={cn(
         "font-sans",
