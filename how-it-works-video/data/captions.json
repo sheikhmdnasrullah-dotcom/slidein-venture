@@ -1,0 +1,904 @@
+{
+  "scenes": [
+    {
+      "sceneId": "setup",
+      "words": [
+        {
+          "word": "Start",
+          "start": 0.6,
+          "end": 0.803125,
+          "emphasized": false
+        },
+        {
+          "word": "with",
+          "start": 0.803125,
+          "end": 1.00625,
+          "emphasized": false
+        },
+        {
+          "word": "your",
+          "start": 1.00625,
+          "end": 1.209375,
+          "emphasized": false
+        },
+        {
+          "word": "business",
+          "start": 1.209375,
+          "end": 1.81875,
+          "emphasized": false
+        },
+        {
+          "word": "offers",
+          "start": 1.81875,
+          "end": 2.225,
+          "emphasized": false
+        },
+        {
+          "word": "and",
+          "start": 2.225,
+          "end": 2.428125,
+          "emphasized": false
+        },
+        {
+          "word": "ideal",
+          "start": 2.428125,
+          "end": 2.834375,
+          "emphasized": false
+        },
+        {
+          "word": "customer",
+          "start": 2.834375,
+          "end": 3.44375,
+          "emphasized": false
+        },
+        {
+          "word": "profiles",
+          "start": 3.44375,
+          "end": 4.053125,
+          "emphasized": false
+        },
+        {
+          "word": "Every",
+          "start": 4.053125,
+          "end": 4.6625,
+          "emphasized": false
+        },
+        {
+          "word": "run",
+          "start": 4.6625,
+          "end": 4.865625,
+          "emphasized": false
+        },
+        {
+          "word": "uses",
+          "start": 4.865625,
+          "end": 5.271875,
+          "emphasized": false
+        },
+        {
+          "word": "a",
+          "start": 5.271875,
+          "end": 5.475,
+          "emphasized": false
+        },
+        {
+          "word": "saved",
+          "start": 5.475,
+          "end": 5.88125,
+          "emphasized": true
+        },
+        {
+          "word": "version",
+          "start": 5.88125,
+          "end": 6.2875,
+          "emphasized": false
+        },
+        {
+          "word": "of",
+          "start": 6.2875,
+          "end": 6.490625,
+          "emphasized": false
+        },
+        {
+          "word": "that",
+          "start": 6.490625,
+          "end": 6.69375,
+          "emphasized": false
+        },
+        {
+          "word": "setup",
+          "start": 6.69375,
+          "end": 7.1,
+          "emphasized": false
+        }
+      ],
+      "accentAt": 2.55
+    },
+    {
+      "sceneId": "sources",
+      "words": [
+        {
+          "word": "Prospects",
+          "start": 0.6,
+          "end": 1.0054054054054054,
+          "emphasized": false
+        },
+        {
+          "word": "come",
+          "start": 1.0054054054054054,
+          "end": 1.4108108108108108,
+          "emphasized": false
+        },
+        {
+          "word": "from",
+          "start": 1.4108108108108108,
+          "end": 1.6135135135135135,
+          "emphasized": false
+        },
+        {
+          "word": "different",
+          "start": 1.6135135135135135,
+          "end": 2.2216216216216216,
+          "emphasized": false
+        },
+        {
+          "word": "places",
+          "start": 2.2216216216216216,
+          "end": 2.627027027027027,
+          "emphasized": false
+        },
+        {
+          "word": "and",
+          "start": 2.627027027027027,
+          "end": 2.8297297297297295,
+          "emphasized": false
+        },
+        {
+          "word": "some",
+          "start": 2.8297297297297295,
+          "end": 3.2351351351351347,
+          "emphasized": false
+        },
+        {
+          "word": "show",
+          "start": 3.2351351351351347,
+          "end": 3.4378378378378374,
+          "emphasized": false
+        },
+        {
+          "word": "up",
+          "start": 3.4378378378378374,
+          "end": 3.64054054054054,
+          "emphasized": false
+        },
+        {
+          "word": "twice",
+          "start": 3.64054054054054,
+          "end": 4.045945945945945,
+          "emphasized": true
+        },
+        {
+          "word": "Duplicates",
+          "start": 4.045945945945945,
+          "end": 4.856756756756756,
+          "emphasized": false
+        },
+        {
+          "word": "merge",
+          "start": 4.856756756756756,
+          "end": 5.262162162162161,
+          "emphasized": false
+        },
+        {
+          "word": "and",
+          "start": 5.262162162162161,
+          "end": 5.464864864864864,
+          "emphasized": false
+        },
+        {
+          "word": "every",
+          "start": 5.464864864864864,
+          "end": 6.072972972972972,
+          "emphasized": false
+        },
+        {
+          "word": "record",
+          "start": 6.072972972972972,
+          "end": 6.478378378378377,
+          "emphasized": false
+        },
+        {
+          "word": "still",
+          "start": 6.478378378378377,
+          "end": 6.6810810810810795,
+          "emphasized": false
+        },
+        {
+          "word": "knows",
+          "start": 6.6810810810810795,
+          "end": 6.883783783783782,
+          "emphasized": false
+        },
+        {
+          "word": "where",
+          "start": 6.883783783783782,
+          "end": 7.289189189189187,
+          "emphasized": true
+        },
+        {
+          "word": "it",
+          "start": 7.289189189189187,
+          "end": 7.49189189189189,
+          "emphasized": false
+        },
+        {
+          "word": "came",
+          "start": 7.49189189189189,
+          "end": 7.897297297297295,
+          "emphasized": false
+        },
+        {
+          "word": "from",
+          "start": 7.897297297297295,
+          "end": 8.099999999999998,
+          "emphasized": false
+        }
+      ],
+      "accentAt": 2.85
+    },
+    {
+      "sceneId": "research",
+      "words": [
+        {
+          "word": "Next",
+          "start": 0.6,
+          "end": 0.8037037037037037,
+          "emphasized": false
+        },
+        {
+          "word": "it",
+          "start": 0.8037037037037037,
+          "end": 1.0074074074074073,
+          "emphasized": false
+        },
+        {
+          "word": "reads",
+          "start": 1.0074074074074073,
+          "end": 1.211111111111111,
+          "emphasized": false
+        },
+        {
+          "word": "each",
+          "start": 1.211111111111111,
+          "end": 1.4148148148148147,
+          "emphasized": false
+        },
+        {
+          "word": "prospect's",
+          "start": 1.4148148148148147,
+          "end": 1.8222222222222222,
+          "emphasized": false
+        },
+        {
+          "word": "public",
+          "start": 1.8222222222222222,
+          "end": 2.2296296296296294,
+          "emphasized": false
+        },
+        {
+          "word": "presence",
+          "start": 2.2296296296296294,
+          "end": 2.8407407407407406,
+          "emphasized": false
+        },
+        {
+          "word": "Every",
+          "start": 2.8407407407407406,
+          "end": 3.4518518518518517,
+          "emphasized": false
+        },
+        {
+          "word": "finding",
+          "start": 3.4518518518518517,
+          "end": 3.859259259259259,
+          "emphasized": false
+        },
+        {
+          "word": "gets",
+          "start": 3.859259259259259,
+          "end": 4.062962962962962,
+          "emphasized": false
+        },
+        {
+          "word": "tied",
+          "start": 4.062962962962962,
+          "end": 4.266666666666666,
+          "emphasized": false
+        },
+        {
+          "word": "back",
+          "start": 4.266666666666666,
+          "end": 4.470370370370369,
+          "emphasized": false
+        },
+        {
+          "word": "to",
+          "start": 4.470370370370369,
+          "end": 4.674074074074072,
+          "emphasized": false
+        },
+        {
+          "word": "the",
+          "start": 4.674074074074072,
+          "end": 4.8777777777777755,
+          "emphasized": false
+        },
+        {
+          "word": "original",
+          "start": 4.8777777777777755,
+          "end": 5.69259259259259,
+          "emphasized": true
+        },
+        {
+          "word": "source",
+          "start": 5.69259259259259,
+          "end": 6.099999999999998,
+          "emphasized": false
+        }
+      ],
+      "accentAt": 2.25
+    },
+    {
+      "sceneId": "matching",
+      "words": [
+        {
+          "word": "Each",
+          "start": 0.6,
+          "end": 0.8068965517241379,
+          "emphasized": false
+        },
+        {
+          "word": "prospect",
+          "start": 0.8068965517241379,
+          "end": 1.2206896551724138,
+          "emphasized": false
+        },
+        {
+          "word": "is",
+          "start": 1.2206896551724138,
+          "end": 1.4275862068965517,
+          "emphasized": false
+        },
+        {
+          "word": "weighed",
+          "start": 1.4275862068965517,
+          "end": 1.8413793103448275,
+          "emphasized": false
+        },
+        {
+          "word": "against",
+          "start": 1.8413793103448275,
+          "end": 2.2551724137931033,
+          "emphasized": false
+        },
+        {
+          "word": "your",
+          "start": 2.2551724137931033,
+          "end": 2.462068965517241,
+          "emphasized": false
+        },
+        {
+          "word": "criteria",
+          "start": 2.462068965517241,
+          "end": 3.082758620689655,
+          "emphasized": true
+        },
+        {
+          "word": "and",
+          "start": 3.082758620689655,
+          "end": 3.289655172413793,
+          "emphasized": false
+        },
+        {
+          "word": "matched",
+          "start": 3.289655172413793,
+          "end": 3.7034482758620686,
+          "emphasized": false
+        },
+        {
+          "word": "to",
+          "start": 3.7034482758620686,
+          "end": 3.9103448275862065,
+          "emphasized": false
+        },
+        {
+          "word": "a",
+          "start": 3.9103448275862065,
+          "end": 4.117241379310345,
+          "emphasized": false
+        },
+        {
+          "word": "relevant",
+          "start": 4.117241379310345,
+          "end": 4.7379310344827585,
+          "emphasized": false
+        },
+        {
+          "word": "offer",
+          "start": 4.7379310344827585,
+          "end": 5.151724137931034,
+          "emphasized": false
+        },
+        {
+          "word": "with",
+          "start": 5.151724137931034,
+          "end": 5.358620689655172,
+          "emphasized": false
+        },
+        {
+          "word": "the",
+          "start": 5.358620689655172,
+          "end": 5.56551724137931,
+          "emphasized": false
+        },
+        {
+          "word": "reasons",
+          "start": 5.56551724137931,
+          "end": 5.979310344827586,
+          "emphasized": true
+        },
+        {
+          "word": "recorded",
+          "start": 5.979310344827586,
+          "end": 6.6,
+          "emphasized": false
+        }
+      ],
+      "accentAt": 2.4
+    },
+    {
+      "sceneId": "drafting",
+      "words": [
+        {
+          "word": "Then",
+          "start": 0.6,
+          "end": 0.789655172413793,
+          "emphasized": false
+        },
+        {
+          "word": "it",
+          "start": 0.789655172413793,
+          "end": 0.9793103448275862,
+          "emphasized": false
+        },
+        {
+          "word": "drafts",
+          "start": 0.9793103448275862,
+          "end": 1.1689655172413793,
+          "emphasized": false
+        },
+        {
+          "word": "a",
+          "start": 1.1689655172413793,
+          "end": 1.3586206896551725,
+          "emphasized": false
+        },
+        {
+          "word": "one-to-one",
+          "start": 1.3586206896551725,
+          "end": 2.117241379310345,
+          "emphasized": true
+        },
+        {
+          "word": "email",
+          "start": 2.117241379310345,
+          "end": 2.496551724137931,
+          "emphasized": false
+        },
+        {
+          "word": "Every",
+          "start": 2.496551724137931,
+          "end": 3.0655172413793106,
+          "emphasized": false
+        },
+        {
+          "word": "personalized",
+          "start": 3.0655172413793106,
+          "end": 4.013793103448276,
+          "emphasized": false
+        },
+        {
+          "word": "line",
+          "start": 4.013793103448276,
+          "end": 4.393103448275863,
+          "emphasized": false
+        },
+        {
+          "word": "links",
+          "start": 4.393103448275863,
+          "end": 4.582758620689655,
+          "emphasized": false
+        },
+        {
+          "word": "back",
+          "start": 4.582758620689655,
+          "end": 4.772413793103448,
+          "emphasized": false
+        },
+        {
+          "word": "to",
+          "start": 4.772413793103448,
+          "end": 4.962068965517241,
+          "emphasized": false
+        },
+        {
+          "word": "the",
+          "start": 4.962068965517241,
+          "end": 5.1517241379310335,
+          "emphasized": false
+        },
+        {
+          "word": "research",
+          "start": 5.1517241379310335,
+          "end": 5.53103448275862,
+          "emphasized": true
+        },
+        {
+          "word": "behind",
+          "start": 5.53103448275862,
+          "end": 5.910344827586206,
+          "emphasized": false
+        },
+        {
+          "word": "it",
+          "start": 5.910344827586206,
+          "end": 6.099999999999999,
+          "emphasized": false
+        }
+      ],
+      "accentAt": 2.25
+    },
+    {
+      "sceneId": "safeguards",
+      "words": [
+        {
+          "word": "Every",
+          "start": 0.6,
+          "end": 1.229032258064516,
+          "emphasized": false
+        },
+        {
+          "word": "message",
+          "start": 1.229032258064516,
+          "end": 1.8580645161290321,
+          "emphasized": false
+        },
+        {
+          "word": "is",
+          "start": 1.8580645161290321,
+          "end": 2.0677419354838706,
+          "emphasized": false
+        },
+        {
+          "word": "checked",
+          "start": 2.0677419354838706,
+          "end": 2.487096774193548,
+          "emphasized": false
+        },
+        {
+          "word": "against",
+          "start": 2.487096774193548,
+          "end": 2.9064516129032256,
+          "emphasized": false
+        },
+        {
+          "word": "your",
+          "start": 2.9064516129032256,
+          "end": 3.116129032258064,
+          "emphasized": false
+        },
+        {
+          "word": "sending",
+          "start": 3.116129032258064,
+          "end": 3.5354838709677416,
+          "emphasized": false
+        },
+        {
+          "word": "safeguards",
+          "start": 3.5354838709677416,
+          "end": 4.164516129032258,
+          "emphasized": false
+        },
+        {
+          "word": "first",
+          "start": 4.164516129032258,
+          "end": 4.374193548387097,
+          "emphasized": false
+        },
+        {
+          "word": "If",
+          "start": 4.374193548387097,
+          "end": 4.583870967741936,
+          "emphasized": false
+        },
+        {
+          "word": "a",
+          "start": 4.583870967741936,
+          "end": 4.7935483870967746,
+          "emphasized": false
+        },
+        {
+          "word": "required",
+          "start": 4.7935483870967746,
+          "end": 5.422580645161291,
+          "emphasized": true
+        },
+        {
+          "word": "check",
+          "start": 5.422580645161291,
+          "end": 5.6322580645161295,
+          "emphasized": false
+        },
+        {
+          "word": "fails",
+          "start": 5.6322580645161295,
+          "end": 5.8419354838709685,
+          "emphasized": false
+        },
+        {
+          "word": "it's",
+          "start": 5.8419354838709685,
+          "end": 6.0516129032258075,
+          "emphasized": false
+        },
+        {
+          "word": "held",
+          "start": 6.0516129032258075,
+          "end": 6.261290322580646,
+          "emphasized": true
+        },
+        {
+          "word": "instead",
+          "start": 6.261290322580646,
+          "end": 6.6806451612903235,
+          "emphasized": false
+        },
+        {
+          "word": "of",
+          "start": 6.6806451612903235,
+          "end": 6.8903225806451625,
+          "emphasized": false
+        },
+        {
+          "word": "sent",
+          "start": 6.8903225806451625,
+          "end": 7.100000000000001,
+          "emphasized": false
+        }
+      ],
+      "accentAt": 2.55
+    },
+    {
+      "sceneId": "replies",
+      "words": [
+        {
+          "word": "When",
+          "start": 0.6,
+          "end": 0.8142857142857143,
+          "emphasized": false
+        },
+        {
+          "word": "replies",
+          "start": 0.8142857142857143,
+          "end": 1.2428571428571429,
+          "emphasized": false
+        },
+        {
+          "word": "come",
+          "start": 1.2428571428571429,
+          "end": 1.6714285714285715,
+          "emphasized": false
+        },
+        {
+          "word": "in",
+          "start": 1.6714285714285715,
+          "end": 1.8857142857142857,
+          "emphasized": false
+        },
+        {
+          "word": "they're",
+          "start": 1.8857142857142857,
+          "end": 2.314285714285714,
+          "emphasized": false
+        },
+        {
+          "word": "matched",
+          "start": 2.314285714285714,
+          "end": 2.7428571428571424,
+          "emphasized": false
+        },
+        {
+          "word": "to",
+          "start": 2.7428571428571424,
+          "end": 2.957142857142857,
+          "emphasized": false
+        },
+        {
+          "word": "the",
+          "start": 2.957142857142857,
+          "end": 3.1714285714285713,
+          "emphasized": false
+        },
+        {
+          "word": "conversation",
+          "start": 3.1714285714285713,
+          "end": 4.0285714285714285,
+          "emphasized": false
+        },
+        {
+          "word": "they",
+          "start": 4.0285714285714285,
+          "end": 4.242857142857143,
+          "emphasized": false
+        },
+        {
+          "word": "belong",
+          "start": 4.242857142857143,
+          "end": 4.671428571428572,
+          "emphasized": false
+        },
+        {
+          "word": "to",
+          "start": 4.671428571428572,
+          "end": 4.885714285714286,
+          "emphasized": false
+        },
+        {
+          "word": "and",
+          "start": 4.885714285714286,
+          "end": 5.1000000000000005,
+          "emphasized": false
+        },
+        {
+          "word": "sorted",
+          "start": 5.1000000000000005,
+          "end": 5.528571428571429,
+          "emphasized": true
+        },
+        {
+          "word": "by",
+          "start": 5.528571428571429,
+          "end": 5.742857142857144,
+          "emphasized": false
+        },
+        {
+          "word": "intent",
+          "start": 5.742857142857144,
+          "end": 6.171428571428573,
+          "emphasized": false
+        },
+        {
+          "word": "Opt-outs",
+          "start": 6.171428571428573,
+          "end": 6.600000000000001,
+          "emphasized": false
+        },
+        {
+          "word": "feed",
+          "start": 6.600000000000001,
+          "end": 6.814285714285716,
+          "emphasized": false
+        },
+        {
+          "word": "straight",
+          "start": 6.814285714285716,
+          "end": 7.02857142857143,
+          "emphasized": false
+        },
+        {
+          "word": "into",
+          "start": 7.02857142857143,
+          "end": 7.457142857142859,
+          "emphasized": false
+        },
+        {
+          "word": "suppression",
+          "start": 7.457142857142859,
+          "end": 8.100000000000001,
+          "emphasized": true
+        }
+      ],
+      "accentAt": 2.85
+    },
+    {
+      "sceneId": "ledger",
+      "words": [
+        {
+          "word": "Every",
+          "start": 0.6,
+          "end": 1.2,
+          "emphasized": false
+        },
+        {
+          "word": "action",
+          "start": 1.2,
+          "end": 1.6,
+          "emphasized": false
+        },
+        {
+          "word": "lands",
+          "start": 1.6,
+          "end": 1.8,
+          "emphasized": false
+        },
+        {
+          "word": "in",
+          "start": 1.8,
+          "end": 2,
+          "emphasized": false
+        },
+        {
+          "word": "a",
+          "start": 2,
+          "end": 2.2,
+          "emphasized": false
+        },
+        {
+          "word": "ledger",
+          "start": 2.2,
+          "end": 2.6,
+          "emphasized": true
+        },
+        {
+          "word": "A",
+          "start": 2.6,
+          "end": 2.8000000000000003,
+          "emphasized": false
+        },
+        {
+          "word": "read-only",
+          "start": 2.8000000000000003,
+          "end": 3.4000000000000004,
+          "emphasized": true
+        },
+        {
+          "word": "overview",
+          "start": 3.4000000000000004,
+          "end": 4,
+          "emphasized": false
+        },
+        {
+          "word": "of",
+          "start": 4,
+          "end": 4.2,
+          "emphasized": false
+        },
+        {
+          "word": "it",
+          "start": 4.2,
+          "end": 4.4,
+          "emphasized": false
+        },
+        {
+          "word": "informs",
+          "start": 4.4,
+          "end": 4.800000000000001,
+          "emphasized": false
+        },
+        {
+          "word": "future",
+          "start": 4.800000000000001,
+          "end": 5.4,
+          "emphasized": true
+        },
+        {
+          "word": "runs",
+          "start": 5.4,
+          "end": 5.6000000000000005,
+          "emphasized": false
+        }
+      ],
+      "accentAt": 2.1
+    }
+  ]
+}
