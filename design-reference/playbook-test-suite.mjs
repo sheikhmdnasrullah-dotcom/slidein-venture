@@ -130,37 +130,47 @@ async function run() {
     }
 
     // Rest States check:
-    await page.evaluate(() => window.__playbook.seek(0.34));
+    await page.evaluate(() => window.__playbook.seek(0.24));
     await page.waitForTimeout(200);
     const rest1Counts = await page.evaluate(() => ({
       chips: document.querySelectorAll('[data-chip-id]').length,
       fragments: document.querySelectorAll('[data-frag-id]').length,
+      caption1: !!document.querySelector('[data-testid="playbook-caption-1"]'),
     }));
-    record(`Test 2: Rest1 (Seek 0.34) at ${width}px`, 'PASS', `${rest1Counts.chips} chips, ${rest1Counts.fragments} fragments`);
+    record(`Test 2: Rest1 (Seek 0.24) at ${width}px`, 'PASS', `${rest1Counts.chips} chips, ${rest1Counts.fragments} fragments, Caption1=${rest1Counts.caption1}`);
 
-    await page.evaluate(() => window.__playbook.seek(0.70));
+    await page.evaluate(() => window.__playbook.seek(0.50));
     await page.waitForTimeout(200);
     const rest2Cols = await page.evaluate(() => ({
       cols: document.querySelectorAll('[data-col-id]').length,
+      caption2: !!document.querySelector('[data-testid="playbook-caption-2"]'),
     }));
-    record(`Test 2: Rest2 (Seek 0.70) at ${width}px`, 'PASS', `${rest2Cols.cols} columns organized`);
+    record(`Test 2: Rest2 (Seek 0.50) at ${width}px`, 'PASS', `${rest2Cols.cols} columns organized, Caption2=${rest2Cols.caption2}`);
 
-    await page.evaluate(() => window.__playbook.seek(0.91));
+    await page.evaluate(() => window.__playbook.seek(0.74));
     await page.waitForTimeout(200);
-    const brainActive = await page.evaluate(() => !!document.querySelector('[data-testid="playbook-brain"]'));
-    record(`Test 2: Brain Emergence (Seek 0.91) at ${width}px`, brainActive ? 'PASS' : 'FAIL', `Brain=${brainActive}`);
+    const rest3Book = await page.evaluate(() => ({
+      book: !!document.querySelector('[data-testid="playbook-book"]'),
+      caption3: !!document.querySelector('[data-testid="playbook-caption-3"]'),
+    }));
+    record(`Test 2: Rest3 Book (Seek 0.74) at ${width}px`, rest3Book.book && rest3Book.caption3 ? 'PASS' : 'FAIL', `Book=${rest3Book.book}, Caption3=${rest3Book.caption3}`);
 
     await page.evaluate(() => window.__playbook.seek(1.0));
     await page.waitForTimeout(200);
-    const rest3State = await page.evaluate(() => ({
-      caption3: !!document.querySelector('[data-testid="playbook-caption-3"]'),
-      captionAnchor: !!document.querySelector('[data-testid="story-caption-anchor"]'),
-      stageTiles: document.querySelectorAll('[data-stage-tile]').length,
-    }));
+    const rest4State = await page.evaluate(() => {
+      const brainEl = document.querySelector('[data-testid="playbook-brain"]');
+      const brainVisible = brainEl && getComputedStyle(brainEl).opacity !== '0';
+      return {
+        brainVisible: !!brainVisible,
+        caption4: !!document.querySelector('[data-testid="playbook-caption-4"]'),
+        captionAnchor: !!document.querySelector('[data-testid="story-caption-anchor"]'),
+        stageTiles: document.querySelectorAll('[data-stage-tile]').length,
+      };
+    });
     record(
-      `Test 2: Rest3 (Seek 1.0) at ${width}px`,
-      rest3State.caption3 && rest3State.stageTiles === 0 ? 'PASS' : 'FAIL',
-      `Caption3=${rest3State.caption3}, Anchor=${rest3State.captionAnchor}, StageTiles=${rest3State.stageTiles} (branches removed)`,
+      `Test 2: Rest4 Brain & Caption (Seek 1.0) at ${width}px`,
+      rest4State.brainVisible && rest4State.caption4 && rest4State.stageTiles === 0 ? 'PASS' : 'FAIL',
+      `BrainVisible=${rest4State.brainVisible}, Caption4=${rest4State.caption4}, StageTiles=${rest4State.stageTiles} (branches removed)`,
     );
   }
 
@@ -185,9 +195,9 @@ async function run() {
   // Keyboard Navigation check
   const keyboardOk = await page.evaluate(() => {
     const dots = document.querySelectorAll('[data-dot-index]');
-    return dots.length === 3;
+    return dots.length === 4;
   });
-  record('Test 15: Keyboard Accessibility', keyboardOk ? 'PASS' : 'FAIL', '3 real button dots with visible focus and keydown handlers');
+  record('Test 15: Keyboard Accessibility', keyboardOk ? 'PASS' : 'FAIL', '4 real button dots with visible focus and keydown handlers');
 
   await browser.close();
 

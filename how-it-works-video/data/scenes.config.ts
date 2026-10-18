@@ -87,3 +87,4 @@ export const SCENES: SceneConfig[] = [
 ] as const;
 
 export const TOTAL_DURATION: number = STARTS[7] + DURATIONS[7];
+export const scenes = SCENES;

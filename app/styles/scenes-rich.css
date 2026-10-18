@@ -89,6 +89,50 @@
   box-shadow: 0 0 0 3px color-mix(in oklch, var(--color-brand) 16%, transparent);
 }
 
+/* ── Scene labels: owner-directed micro copy placed inside the scenes ──────
+   Small uppercase wayfinding words (Business, Offers, Verify, Inbox…).
+   Deliberately quieter than the wf-tag pills: no border, no surface, just
+   tracked type at 42% ink so the shapes stay the protagonists. `.is-inset`
+   left-aligns a label inside a pill or tile instead of centering under it. */
+
+.wf-lbl {
+  position: absolute;
+  transform: translateX(-50%);
+  font-family: var(--font-sans);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: color-mix(in oklch, var(--color-ink) 42%, transparent);
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: 6;
+}
+
+.wf-lbl.is-inset {
+  transform: none;
+  color: color-mix(in oklch, var(--color-ink) 50%, transparent);
+}
+
+/* The "Duplicate" label lives only while the duplicate row does: same beat
+   window as discover-row3 (visible ~16–30% of the loop), gone at rest. */
+.wf-s-discover .wf-lbl-dup {
+  opacity: 0;
+  animation: dup-label 7s var(--scaffold-ease) infinite;
+}
+
+@keyframes dup-label {
+  0%, 10% {
+    opacity: 0;
+  }
+  16%, 30% {
+    opacity: 1;
+  }
+  36%, 100% {
+    opacity: 0;
+  }
+}
+
 /* ── Dressing: dot patches, plus marks ───────────────────────────────────── */
 
 .wf-dots {
@@ -702,7 +746,7 @@
 }
 
 .wf-s-outreach .wf-capsule-a .wf-capsule-tag {
-  animation: sent-pop 9s linear infinite;
+  animation: sent-pop 9s var(--scaffold-ease) infinite;
 }
 
 .wf-s-outreach .wf-capsule-b .wf-capsule-tag {

@@ -39,8 +39,13 @@ export const ARCHIVED_HEADLINES = {
 
 export const HOME = {
   announcement: {
-    chip: '',
-    label: '',
+    /* The primary CTA pill below the subhead (the hero's only button).
+       Grounded, claim-free copy: "Video" names the medium (the pill opens
+       the How-It-Works video modal); "See how it works" reuses the
+       existing secondary-CTA words verbatim. Empty slots render skeleton
+       bars like every other mandatory slot. */
+    chip: 'Video',
+    label: 'See how it works',
   },
   headline: {
     line1: 'Getting Clients',
@@ -63,7 +68,9 @@ export const HOME = {
   },
   cta: {
     primary: 'Connect',
-    /* The story-player's own label. Signed-off user copy. */
+    /* The story-player's own label. Signed-off user copy. Currently
+       unmounted — the pill CTA uses the announcement slots above — and
+       preserved verbatim for recall. */
     primaryVideo: 'See How It Works',
     /* Secondary is text-only with a chevron, wired to the existing route. */
     secondary: 'See how it works',
@@ -72,11 +79,18 @@ export const HOME = {
   },
   icpTagline: 'Everything gets started with preparing the Master Business Playbook',
   persistentKnowledgeTagline:
-    'One persistent knowledge from the master playbook that evolves every time you interact with it.',
+    'to a persistent knowledge from the master playbook that evolves every time you interact with it.',
+  playbookHeadlines: {
+    scene1: 'Scattered Information',
+    scene2: 'Structured Context',
+    scene3: 'Master Playbook',
+    scene4: 'Persistent Knowledge',
+  },
   playbookCaptions: {
-    act1: 'From scattered business information to organized profile offers and ICP.',
-    act2: 'To organized master playbook.',
-    act3: 'One persistent knowledge from the master playbook that evolves every time you interact with it.',
+    scene1: 'From scattered business information',
+    scene2: 'to preparing offers and Ideal Client Profile',
+    scene3: 'to organized master playbook, which has all the context about your business',
+    scene4: 'to a persistent knowledge from the master playbook that evolves every time you interact with it.',
   },
   multiAgentTitle: 'Multi-Agent Orchestration',
 } as const;

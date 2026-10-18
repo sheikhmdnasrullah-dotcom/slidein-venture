@@ -28,7 +28,7 @@
 
   /* ── Hairlines & skeletons ─────────────────────────────────────────── */
   --scaffold-hairline:  rgb(10 10 10 / 6%);
-  --scaffold-rule:      rgb(10 10 10 / 10%);   /* announcement pill border */
+  --scaffold-rule:      rgb(10 10 10 / 10%);   /* CTA pill border */
   --scaffold-line:      rgb(10 10 10 / 5%);   /* full-bleed hero lines */
   --scaffold-skeleton:  rgb(10 10 10 / 8%);   /* empty text slot bars */
   /* The primary button sits on #151515, where the standard skeleton bar
@@ -38,7 +38,7 @@
   /* ── Accent — the existing SlideIn orange, three places only ─────────
      1. the highlight pill behind the last headline word
      2. the small dot inside the primary CTA
-     3. the chip in the announcement pill                                        */
+     3. the chip in the CTA pill                                                */
   --scaffold-accent:       var(--color-brand);
   --scaffold-accent-pill:  color-mix(in oklch, var(--color-brand) 18%, transparent);
   --scaffold-accent-chip:  color-mix(in oklch, var(--color-brand) 16%, rgb(255 255 255 / 100%));
@@ -178,8 +178,7 @@
   --hero-subject-air: clamp(32px, 6vh, 64px);
 
   /* ── Stack gaps (hairlines sit centered in each) ───────────────────── */
-  --hero-gap-top: 24px;       /* above the pill */
-  --hero-gap-pill-head: 28px;
+  --hero-gap-top: 24px;       /* above the headline */
   --hero-gap-head-sub: 32px;  /* head-sub shared gap: subhead spec wins */
   --hero-gap-sub-cta: 36px;
   --hero-gap-bottom: 24px;    /* below the CTA row */
@@ -294,7 +293,7 @@
   -webkit-mask-image: linear-gradient(to right, transparent, black 12%, black 88%, transparent);
 }
 
-/* The five hairlines draw in once from the center outward at the start of
+/* The four hairlines draw in once from the center outward at the start of
    the entrance (700ms, 60ms stagger), then stay static. Visible default:
    without the boot attribute the lines simply render. */
 @keyframes hero-line-draw {
@@ -602,28 +601,11 @@
   }
 }
 
-/* ── Entrance timeline: pill, subline, CTA ────────────────────────────────
-   120ms the pill drops 12px; 1100ms the subline fades up 12px over 500ms;
-   1500ms the CTA pops. The spring(260, 22) landings are approximated with
-   a small overshoot keyframe — CSS has no springs, and the brief requires
-   the reveal to be CSS-only from a visible default. */
-@keyframes hero-pill-drop {
-  0% {
-    transform: translateY(-12px);
-    opacity: 0;
-  }
-
-  70% {
-    transform: translateY(1px);
-    opacity: 1;
-  }
-
-  100% {
-    transform: translateY(0);
-    opacity: 1;
-  }
-}
-
+/* ── Entrance timeline: subline, CTA ──────────────────────────────────────
+   1100ms the subline fades up 12px over 500ms; 1500ms the CTA pops. The
+   spring(260, 22) landings are approximated with a small overshoot
+   keyframe — CSS has no springs, and the brief requires the reveal to be
+   CSS-only from a visible default. */
 @keyframes hero-fade-up {
   0% {
     transform: translateY(12px);
@@ -651,11 +633,6 @@
     transform: scale(1);
     opacity: 1;
   }
-}
-
-:root[data-hero-boot='play'] [data-testid='hero-pill'] {
-  animation: hero-pill-drop 550ms cubic-bezier(0.22, 1, 0.36, 1) both;
-  animation-delay: 120ms;
 }
 
 /* LCP is gated by the phrase-1 repaint at loop start (1850ms), not by
@@ -765,7 +742,7 @@
   -webkit-box-decoration-break: clone;
 }
 
-/* ── Announcement pill border beam ───────────────────────────────────────
+/* ── CTA pill border beam ────────────────────────────────────────────────
    A 1px accent arc (~90px of the ~780px perimeter ≈ 12%) travels the pill
    border: a conic gradient masked to a 1px ring, one revolution per 6s.
    Hover speeds it to 2.5s; offscreen pauses it; reduced motion removes it.
@@ -804,7 +781,7 @@
   animation: hero-beam-spin 6s linear infinite;
 }
 
-[data-testid='hero-pill']:hover .hero-pill-beam {
+[data-testid='hero-cta-primary']:hover .hero-pill-beam {
   animation-duration: 2.5s;
 }
 

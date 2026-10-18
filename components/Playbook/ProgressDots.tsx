@@ -14,7 +14,7 @@ import React, { useRef } from 'react';
 import { cn } from '@/lib/utils';
 
 interface ProgressDotsProps {
-  currentRestIndex: number; // 0, 1, or 2
+  currentRestIndex: number; // 0, 1, 2, or 3
   onSelectRest: (index: number) => void;
   className?: string;
 }
@@ -28,17 +28,18 @@ export function ProgressDots({
     useRef<HTMLButtonElement>(null),
     useRef<HTMLButtonElement>(null),
     useRef<HTMLButtonElement>(null),
+    useRef<HTMLButtonElement>(null),
   ];
 
   const handleKeyDown = (e: React.KeyboardEvent, index: number) => {
     if (e.key === 'ArrowRight') {
       e.preventDefault();
-      const next = (index + 1) % 3;
+      const next = (index + 1) % 4;
       buttonRefs[next].current?.focus();
       onSelectRest(next);
     } else if (e.key === 'ArrowLeft') {
       e.preventDefault();
-      const prev = (index + 2) % 3;
+      const prev = (index + 3) % 4;
       buttonRefs[prev].current?.focus();
       onSelectRest(prev);
     }
@@ -50,7 +51,7 @@ export function ProgressDots({
       role="group"
       aria-label=""
       className={cn(
-        'relative flex items-center justify-center gap-4 z-40 select-none pointer-events-auto',
+        'relative flex items-center justify-center gap-3.5 z-40 select-none pointer-events-auto',
         className,
       )}
     >
@@ -60,7 +61,7 @@ export function ProgressDots({
         aria-hidden="true"
       />
 
-      {[0, 1, 2].map((idx) => {
+      {[0, 1, 2, 3].map((idx) => {
         const isCurrent = currentRestIndex === idx;
         const isCompleted = currentRestIndex > idx;
 
@@ -73,16 +74,16 @@ export function ProgressDots({
             aria-current={isCurrent ? 'step' : undefined}
             onClick={() => onSelectRest(idx)}
             onKeyDown={(e) => handleKeyDown(e, idx)}
-            className="flex items-center justify-center min-w-[44px] min-h-[44px] cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-[var(--scaffold-accent)]/60 focus-visible:ring-offset-2 rounded-full transition-all"
+            className="flex items-center justify-center min-w-[40px] min-h-[40px] cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-[var(--scaffold-accent)]/60 focus-visible:ring-offset-2 rounded-full transition-all"
           >
             <span
               className={cn(
                 'transition-all duration-300 ease-out',
                 isCurrent
-                  ? 'h-[8px] w-[24px] rounded-full bg-[rgba(10,10,10,0.85)] shadow-sm'
+                  ? 'h-[7px] w-[22px] rounded-full bg-[rgba(10,10,10,0.88)] shadow-sm'
                   : isCompleted
-                  ? 'h-[8px] w-[8px] rounded-full bg-[rgba(10,10,10,0.7)]'
-                  : 'h-[8px] w-[8px] rounded-full border border-[rgba(10,10,10,0.25)] bg-white',
+                  ? 'h-[7px] w-[7px] rounded-full bg-[rgba(10,10,10,0.68)]'
+                  : 'h-[7px] w-[7px] rounded-full border border-[rgba(10,10,10,0.22)] bg-white',
               )}
             />
           </button>

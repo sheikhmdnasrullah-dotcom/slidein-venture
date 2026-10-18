@@ -18,6 +18,7 @@
 @import "./styles/workflow.css";
 /* The staged scene layer: people, devices, dressing, beat choreography. */
 @import "./styles/scenes-rich.css";
+@import "../how-it-works-video/styles/video-player.css";
 @import "tw-animate-css";
 /* layer() keeps xyflow in the base cascade. Wrapping an @import inside
    `@layer base { ... }` is an invalid at-rule position in CSS. */

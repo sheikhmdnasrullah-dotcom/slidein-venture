@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
-import { generateCaptions, type WordTiming } from '../how-it-works-video/data/generate-captions';
-import { SCENES, TOTAL_DURATION } from '../how-it-works-video/data/scenes.config';
+import { generateCaptions } from '../generate-captions';
+import { SCENES, TOTAL_DURATION } from '../scenes.config';
 
 describe('captions generator', () => {
   const result = generateCaptions();
@@ -20,7 +20,7 @@ describe('captions generator', () => {
       const cfg = SCENES.find((s) => s.id === scene.sceneId)!;
       const winStart = 0.6;
       const winEnd = cfg.duration - 0.9;
-      scene.words.forEach((w: WordTiming) => {
+      scene.words.forEach((w) => {
         expect(w.start).toBeGreaterThanOrEqual(winStart - 0.001);
         expect(w.end).toBeLessThanOrEqual(winEnd + 0.001);
       });

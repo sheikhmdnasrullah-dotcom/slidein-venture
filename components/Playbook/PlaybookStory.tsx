@@ -31,7 +31,7 @@ import { Chip } from './Chip';
 import { PlaybookTriptych } from './PlaybookTriptych';
 import { PlaybookHeading } from './HeadingSwash';
 import { ProgressDots } from './ProgressDots';
-import { StoryCaptionBar } from './StoryCaptionBar';
+import { KineticTypography } from './KineticTypography';
 
 declare global {
   interface Window {
@@ -51,12 +51,7 @@ export function PlaybookStory() {
 
   const reducedMotion = useReducedMotion();
   const [isGsapReady, setIsGsapReady] = useState(false);
-  const [isPortrait, setIsPortrait] = useState(() => {
-    if (typeof window !== 'undefined') {
-      return window.innerWidth < 768;
-    }
-    return false;
-  });
+  const [isPortrait, setIsPortrait] = useState(false);
   const [currentProgress, setCurrentProgress] = useState(0);
   const [currentRestIndex, setCurrentRestIndex] = useState(0);
   const [swashDrawn, setSwashDrawn] = useState(false);
@@ -88,8 +83,9 @@ export function PlaybookStory() {
     setCanvasScale(scale);
   }, []);
 
-  // Update layout on mount
+  // Update layout on mount & detect portrait mode
   useEffect(() => {
+    setIsPortrait(window.innerWidth < 768);
     updateLayout();
   }, [updateLayout]);
 
@@ -162,7 +158,7 @@ export function PlaybookStory() {
       window.addEventListener('resize', updateLayout);
 
       ctx = gsap.context(() => {
-        const portrait = window.innerWidth < 768;
+        const portrait = isPortrait;
         const chips = portrait ? PORTRAIT_CHIPS : LANDSCAPE_CHIPS;
         const fragments = portrait ? PORTRAIT_FRAGMENTS : LANDSCAPE_FRAGMENTS;
 
@@ -174,23 +170,25 @@ export function PlaybookStory() {
 
         masterTimeline.current = tl;
 
-        // Labels
+        // Labels for 4 scenes
         tl.addLabel('start', 0);
-        tl.addLabel('rest1', 34);
-        tl.addLabel('rest2', 70);
-        tl.addLabel('rest3', 100);
+        tl.addLabel('rest1', 24);
+        tl.addLabel('rest2', 50);
+        tl.addLabel('rest3', 74);
+        tl.addLabel('rest4', 100);
 
         // ==========================================
-        // ACT 1: GATHER (0 to 34)
+        // INITIAL SETUP
         // ==========================================
-        // Initial setup
+        gsap.set('[data-act="gather"]', { opacity: 1 });
         gsap.set('[data-act="distill"]', { opacity: 0, pointerEvents: 'none' });
         gsap.set('[data-act="compile"]', { opacity: 0, pointerEvents: 'none' });
         gsap.set('[data-testid="scan-beam"]', { y: 0, opacity: 1 });
         gsap.set('.act1-cue', { opacity: 0.8 });
         gsap.set('.story-caption-1', { opacity: 1, y: 0 });
-        gsap.set('.story-caption-2', { opacity: 0, y: 14 });
-        gsap.set('.story-caption-3', { opacity: 0, y: 14 });
+        gsap.set('.story-caption-2', { opacity: 0, y: 24 });
+        gsap.set('.story-caption-3', { opacity: 0, y: 24 });
+        gsap.set('.story-caption-4', { opacity: 0, y: 24 });
         gsap.set('.act3-paper-crease', { opacity: 0 });
 
         // Dotted threads start hidden (strokeDashoffset)
@@ -199,23 +197,35 @@ export function PlaybookStory() {
         // Chips start at opacity 0 in their constellation poses
         gsap.set('.act-chip-wrap', { opacity: 0, scale: 0.6 });
 
-        // Beat 1: Beam enters top and sweeps to bottom (0 to 12)
+        // Act 3 Book & Brain initial states
+        gsap.set('.act3-book-container', { xPercent: -50, yPercent: -50, opacity: 0, scale: 0.92, y: 24, rotation: 0 });
+        gsap.set('[data-testid="book-cover"]', { rotateY: 0 });
+        gsap.set('.act3-brain-container', { xPercent: -50, yPercent: -50, opacity: 0, scale: 0.35, rotation: 0 });
+        gsap.set('.brain-circuit', { drawSVG: '0% 0%' });
+        gsap.set('.brain-node', { scale: 0 });
+        gsap.set('.brain-core', { scale: 0 });
+        gsap.set('.brain-pulse-ring', { scale: 0.8, opacity: 0 });
+
+        // ==========================================
+        // SCENE 01: SCATTERED BUSINESS INFORMATION (0 to 24)
+        // Caption 1: "From scattered business information"
+        // ==========================================
         tl.to(
           '[data-testid="scan-beam"]',
           {
             y: portrait ? CANVAS_PORTRAIT.h : CANVAS_LANDSCAPE.h,
-            duration: 12,
+            duration: 13,
             ease: 'none',
           },
           0,
         );
 
-        // Scroll cue fades on first scroll (0 to 5)
-        tl.to('.act1-cue', { opacity: 0, duration: 5 }, 0);
+        // Scroll cue fades on first scroll
+        tl.to('.act1-cue', { opacity: 0, duration: 4 }, 0);
 
-        // Beat 2: As beam hits fragments, fragments pop and chips emerge (12 to 30)
+        // Fragments pop and chips emerge
         fragments.forEach((frag) => {
-          const hitTime = frag.hitProgress * 100; // 13 to 26
+          const hitTime = frag.hitProgress * 55; // 7 to 15
 
           // Fragment hit bounce
           tl.to(
@@ -237,10 +247,10 @@ export function PlaybookStory() {
               {
                 opacity: 1,
                 scale: 1,
-                duration: 4,
+                duration: 3.5,
                 ease: 'back.out(2)',
               },
-              hitTime + 1,
+              hitTime + 0.8,
             );
 
             // Thread draws from fragment to chip
@@ -248,41 +258,35 @@ export function PlaybookStory() {
               `[data-thread-id="${chipId}"]`,
               {
                 drawSVG: '0% 100%',
-                duration: 4,
+                duration: 3.5,
                 ease: 'power2.out',
               },
-              hitTime + 1,
+              hitTime + 0.8,
             );
           });
         });
 
-        // Beat 3: Beam exits bottom, fragments dim to 0.35 (30 to 34, rest1)
-        tl.to(
-          '[data-testid="scan-beam"]',
-          { opacity: 0, duration: 2 },
-          32,
-        );
-        tl.to(
-          '.act1-frag-wrap',
-          { opacity: 0.35, duration: 4, ease: 'power2.out' },
-          30,
-        );
+        // Beam exits at bottom and fragments dim
+        tl.to('[data-testid="scan-beam"]', { opacity: 0, duration: 2 }, 18);
+        tl.to('.act1-frag-wrap', { opacity: 0.4, duration: 3, ease: 'power2.out' }, 18);
+
+        // Settle as Scene 01 (Rest 1 at 24): Only Caption 1 is visible
 
         // ==========================================
-        // TRANSITION 1 (34 to 40)
+        // TRANSITION 1: SCENE 01 -> SCENE 02 (24 to 34)
         // ==========================================
-        // Fragments fade out and lift 6px
+        // Fragments fade out and lift slightly
         tl.to(
           '.act1-frag-wrap',
           {
             opacity: 0,
-            y: '-=6',
+            y: '-=8',
             scale: 0.92,
-            stagger: 0.15,
-            duration: 5,
+            stagger: 0.1,
+            duration: 4.5,
             ease: 'power2.in',
           },
-          34,
+          24,
         );
 
         // Threads erase
@@ -290,47 +294,20 @@ export function PlaybookStory() {
           '.act1-thread',
           {
             drawSVG: '100% 100%',
-            duration: 4,
+            duration: 3.5,
             ease: 'power2.in',
           },
-          34,
-        );
-
-        // Chips lift 6px in anticipation
-        tl.to(
-          '.act-chip-wrap',
-          {
-            y: '-=6',
-            duration: 5,
-            ease: 'power2.out',
-          },
-          34,
+          24,
         );
 
         // Hide Act 1 background container
-        tl.to('[data-act="gather"]', { opacity: 0, duration: 2 }, 38);
+        tl.to('[data-act="gather"]', { opacity: 0, duration: 2 }, 28);
 
-        // Transition Caption 1 to Caption 2 in the same anchored spot
-        tl.to('.story-caption-1', { opacity: 0, y: -10, duration: 4, ease: 'power2.in' }, 34);
-        tl.to('.story-caption-2', { opacity: 1, y: 0, duration: 4, ease: 'power2.out' }, 37);
+        // Synchronized Caption 1 -> Caption 2 Transition
+        tl.to('.story-caption-1', { opacity: 0, y: -20, duration: 3.5, ease: 'power2.in' }, 24);
+        tl.to('.story-caption-2', { opacity: 1, y: 0, duration: 4, ease: 'power2.out' }, 27.5);
 
-        // ==========================================
-        // ACT 2: DISTILL (40 to 70)
-        // ==========================================
-        // Columns fade in and rise 18px (40 to 46)
-        tl.to(
-          '[data-act="distill"]',
-          { opacity: 1, duration: 1 },
-          40,
-        );
-        tl.fromTo(
-          '.act2-col-card',
-          { y: 18, opacity: 0 },
-          { y: 0, opacity: 1, stagger: 1, duration: 5, ease: 'power2.out' },
-          40,
-        );
-
-        // Chips fly along curved MotionPath arcs into docked slots (40 to 52)
+        // Chips fly along curved MotionPath arcs into table slots
         chips.forEach((chip, i) => {
           const dx = chip.docked.x - chip.constellation.x;
           const dy = chip.docked.y - chip.constellation.y;
@@ -340,79 +317,91 @@ export function PlaybookStory() {
             {
               motionPath: {
                 path: [
-                  { x: dx * 0.45, y: dy * 0.45 - 80 },
+                  { x: dx * 0.45, y: dy * 0.45 - 60 },
                   { x: dx, y: dy },
                 ],
-                curviness: 1.4,
+                curviness: 1.3,
               },
               rotation: 0,
-              duration: 9,
+              duration: 8,
               ease: 'power3.inOut',
             },
-            40 + (i % 8) * 0.7,
+            26 + (i % 8) * 0.5,
           );
         });
 
-        // Beat 2: ICP column spotlight (52 to 64)
+        // ==========================================
+        // SCENE 02: ORGANIZED BUSINESS CONTEXT (34 to 52)
+        // Caption 2: "To organized Profile, Offers and Ideal Client Profile."
+        // ==========================================
+        tl.to('[data-act="distill"]', { opacity: 1, duration: 1 }, 30);
+        tl.fromTo(
+          '.act2-col-card',
+          { y: 18, opacity: 0 },
+          { y: 0, opacity: 1, stagger: 0.8, duration: 4.5, ease: 'power2.out' },
+          30,
+        );
+
+        // ICP column spotlight and spokes
         tl.to(
           '[data-col-id="col-icps"]',
-          { scale: 1.06, duration: 5, ease: 'power2.out' },
-          52,
+          { scale: 1.05, duration: 4, ease: 'power2.out' },
+          40,
         );
         tl.to(
           ['[data-col-id="col-profile"]', '[data-col-id="col-offers"]'],
-          { scale: 0.94, opacity: 0.7, duration: 5, ease: 'power2.out' },
+          { scale: 0.95, opacity: 0.75, duration: 4, ease: 'power2.out' },
+          40,
+        );
+
+        if (!portrait) {
+          tl.to(
+            '.act2-icp-ring',
+            { scale: 1.3, duration: 3.5, ease: 'back.out(1.5)' },
+            40.5,
+          );
+          tl.to(
+            '.act2-icp-dot',
+            { scale: 1.25, duration: 3.5 },
+            40.5,
+          );
+          tl.fromTo(
+            '.act2-spoke',
+            { drawSVG: '0% 0%' },
+            { drawSVG: '0% 100%', stagger: 0.5, duration: 4.5, ease: 'power2.out' },
+            41,
+          );
+        }
+
+        // Settle at Rest 2 (columns return to equal scale 1.0)
+        tl.to(
+          ['[data-col-id="col-icps"]', '[data-col-id="col-profile"]', '[data-col-id="col-offers"]'],
+          { scale: 1.0, opacity: 1.0, duration: 3, ease: 'power2.out' },
+          48,
+        );
+
+        // ==========================================
+        // TRANSITION 2: SCENE 02 -> SCENE 03 (52 to 62)
+        // ==========================================
+        // Columns lift and fade out
+        tl.to(
+          '.act2-col-card',
+          { y: -14, opacity: 0, duration: 4.5, ease: 'power2.in' },
           52,
         );
 
-        // ICP Ring scales up and center dot pulses
-        tl.to(
-          '.act2-icp-ring',
-          { scale: 1.35, duration: 4, ease: 'back.out(1.5)' },
-          53,
-        );
-        tl.to(
-          '.act2-icp-dot',
-          { scale: 1.25, duration: 4 },
-          53,
-        );
+        if (!portrait) {
+          tl.to(
+            '.act2-spoke',
+            { drawSVG: '100% 100%', duration: 3.5, ease: 'power2.in' },
+            52,
+          );
+        }
 
-        // 6 Spokes draw to criteria chips + dash links to skip chips
-        tl.fromTo(
-          '.act2-spoke',
-          { drawSVG: '0% 0%' },
-          { drawSVG: '0% 100%', stagger: 0.7, duration: 6, ease: 'power2.out' },
-          55,
-        );
-
-        // Beat 3: Short settle, columns return to equal scale 1.0 (64 to 70, rest2)
-        tl.to(
-          ['[data-col-id="col-icps"]', '[data-col-id="col-profile"]', '[data-col-id="col-offers"]'],
-          { scale: 1.0, opacity: 1.0, duration: 5, ease: 'power2.out' },
-          64,
-        );
-
-        // ==========================================
-        // TRANSITION 2 (70 to 76)
-        // ==========================================
-        // Columns lift 12px and fade
-        tl.to(
-          '.act2-col-card',
-          { y: -12, opacity: 0, duration: 5, ease: 'power2.in' },
-          70,
-        );
-
-        // Spokes erase
-        tl.to(
-          '.act2-spoke',
-          { drawSVG: '100% 100%', duration: 4, ease: 'power2.in' },
-          70,
-        );
-
-        // Chips fly into the book center in vortex convergence (70 to 76)
+        // Chips fly into the book center in vortex convergence
         chips.forEach((chip, i) => {
           const bookTargetX = portrait ? 360 : 640;
-          const bookTargetY = portrait ? 280 : 255;
+          const bookTargetY = portrait ? 280 : 235;
           const endDx = bookTargetX - chip.constellation.x - 48;
           const endDy = bookTargetY - chip.constellation.y - 14;
 
@@ -421,76 +410,65 @@ export function PlaybookStory() {
             {
               x: endDx,
               y: endDy,
-              scale: 0.35,
+              scale: 0.3,
               opacity: 0,
               duration: 5,
               ease: 'power3.in',
             },
-            70 + (i % 6) * 0.35,
+            52 + (i % 6) * 0.3,
           );
         });
 
-        // Hide Act 2 container and ensure all chips are absorbed
-        tl.to('.act-chip-wrap', { opacity: 0, duration: 1 }, 75);
-        tl.to('[data-act="distill"]', { opacity: 0, duration: 1 }, 75);
+        // Hide Act 2 container
+        tl.to('.act-chip-wrap', { opacity: 0, duration: 1 }, 58);
+        tl.to('[data-act="distill"]', { opacity: 0, duration: 1 }, 58);
+
+        // Transition Caption 2 -> Caption 3
+        tl.to('.story-caption-2', { opacity: 0, y: -20, duration: 3.5, ease: 'power2.in' }, 52);
+        tl.to('.story-caption-3', { opacity: 1, y: 0, duration: 4, ease: 'power2.out' }, 56);
 
         // ==========================================
-        // ACT 3: COMPILE & PERSISTENT KNOWLEDGE (76 to 100)
+        // SCENE 03: THE MASTER PLAYBOOK (62 to 78)
+        // Caption 3: "2 Organized Master Playbook, which has all the context about your business."
         // ==========================================
-        // Initial setup for Act 3 elements
-        gsap.set('.act3-book-container', { xPercent: -50, yPercent: -50, opacity: 0, scale: 0.92, y: 24, rotation: 0 });
-        gsap.set('[data-testid="book-cover"]', { rotateY: 0 });
-        gsap.set('.act3-brain-container', { xPercent: -50, yPercent: -50, opacity: 0, scale: 0.4, rotation: 0 });
-        gsap.set('.brain-circuit', { drawSVG: '0% 0%' });
-        gsap.set('.brain-node', { scale: 0 });
-        gsap.set('.brain-core', { scale: 0 });
-        gsap.set('.brain-pulse-ring', { scale: 0.8, opacity: 0 });
-        gsap.set('.act3-tagline-container', { opacity: 0, y: 22 });
-        gsap.set('.act3-tagline-word', { opacity: 0, y: 10 });
+        tl.to('[data-act="compile"]', { opacity: 1, duration: 1 }, 59);
 
-        // Show Act 3 container
-        tl.to(
-          '[data-act="compile"]',
-          { opacity: 1, duration: 1 },
-          76,
-        );
-
-        // 1. Master Playbook Book rises and cover opens (76 to 82)
+        // Master Playbook Book rises
         tl.fromTo(
           '.act3-book-container',
           { xPercent: -50, yPercent: -50, y: 24, scale: 0.92, opacity: 0, rotation: 0 },
           { xPercent: -50, yPercent: -50, y: 0, scale: 1, opacity: 1, rotation: 0, duration: 5, ease: 'power2.out' },
-          76,
+          60,
         );
 
         // Cover opens (rotateY: 0 -> -160deg)
         tl.fromTo(
           '[data-testid="book-cover"]',
           { rotateY: 0 },
-          { rotateY: -160, duration: 5, ease: 'power2.inOut' },
-          77,
+          { rotateY: -160, duration: 5.5, ease: 'power2.inOut' },
+          61,
         );
 
         // Chapter tabs slide out on right edge
         tl.fromTo(
           '.act3-chapter-tab',
           { x: -16, opacity: 0 },
-          { x: 0, opacity: 1, stagger: 0.6, duration: 2.5, ease: 'back.out(1.8)' },
-          78.5,
+          { x: 0, opacity: 1, stagger: 0.5, duration: 2.5, ease: 'back.out(1.8)' },
+          63.5,
         );
 
         // Checkmark seals and rule bars pop in
         tl.fromTo(
           '.act3-check-seal',
           { scale: 0, opacity: 0 },
-          { scale: 1, opacity: 1, stagger: 0.5, duration: 2.5, ease: 'back.out(2)' },
-          79.5,
+          { scale: 1, opacity: 1, stagger: 0.4, duration: 2.2, ease: 'back.out(2)' },
+          64.5,
         );
         tl.fromTo(
           '.act3-rule-bar',
           { scaleX: 0 },
-          { scaleX: 1, stagger: 0.5, duration: 2.5, ease: 'power2.out' },
-          79.5,
+          { scaleX: 1, stagger: 0.4, duration: 2.2, ease: 'power2.out' },
+          64.5,
         );
 
         // Bookmark ribbon lowers
@@ -498,119 +476,89 @@ export function PlaybookStory() {
           '[data-bookmark="ribbon"]',
           { y: -10 },
           { y: 10, duration: 2.5, ease: 'power2.out' },
-          80.5,
+          65.5,
         );
 
-        // Settle as Open Master Business Playbook (82 to 86) with Caption 2
+        // Settle at Rest 3 (72 to 76) with Caption 3
 
-        // 2. FOLD / SCRAMBLE INTO REALISTIC BRAIN (86 to 88.5)
+        // ==========================================
+        // TRANSITION 3: SCENE 03 -> SCENE 04 (78 to 88)
+        // ==========================================
         // Cover folds shut
         tl.to(
           '[data-testid="book-cover"]',
-          { rotateY: 0, duration: 2.2, ease: 'power2.inOut' },
-          86,
+          { rotateY: 0, duration: 2.5, ease: 'power2.inOut' },
+          78,
         );
 
         // Chapter tabs slide in & bookmark ribbon retracts
-        tl.to(
-          '.act3-chapter-tab',
-          { x: -16, opacity: 0, duration: 2, ease: 'power2.in' },
-          86,
-        );
-        tl.to(
-          '[data-bookmark="ribbon"]',
-          { y: -10, duration: 2, ease: 'power2.in' },
-          86,
-        );
+        tl.to('.act3-chapter-tab', { x: -16, opacity: 0, duration: 2, ease: 'power2.in' }, 78);
+        tl.to('[data-bookmark="ribbon"]', { y: -10, duration: 2, ease: 'power2.in' }, 78);
 
         // Paper creases appear as physical book crumples
-        tl.fromTo(
-          '.act3-paper-crease',
-          { opacity: 0 },
-          { opacity: 0.9, duration: 1.5, ease: 'power1.in' },
-          86.2,
-        );
+        tl.fromTo('.act3-paper-crease', { opacity: 0 }, { opacity: 0.9, duration: 1.8, ease: 'power1.in' }, 78.5);
 
         // Book scrambles like paper, rotates, and folds down into center vortex
         tl.to(
           '.act3-book-container',
-          { xPercent: -50, yPercent: -50, scale: 0.18, rotation: -22, skewX: 16, opacity: 0, duration: 2.4, ease: 'power2.in' },
-          86.5,
+          { xPercent: -50, yPercent: -50, scale: 0.16, rotation: -22, skewX: 16, opacity: 0, duration: 3, ease: 'power2.in' },
+          79.5,
         );
 
-        // Brain design materializes and expands from the vortex center (88 to 94)
+        // Transition Caption 3 -> Caption 4
+        tl.to('.story-caption-3', { opacity: 0, y: -20, duration: 3, ease: 'power2.in' }, 78);
+        tl.to('.story-caption-4', { opacity: 1, y: 0, duration: 4, ease: 'power2.out' }, 82);
+
+        // Brain design materializes and emerges from center vortex
         tl.fromTo(
           '.act3-brain-container',
           { xPercent: -50, yPercent: -50, scale: 0.35, rotation: 8, opacity: 0, filter: 'blur(0px)' },
-          { xPercent: -50, yPercent: -50, scale: 1, rotation: 0, opacity: 1, filter: 'blur(0px)', duration: 3.2, ease: 'back.out(1.5)' },
-          88,
+          { xPercent: -50, yPercent: -50, scale: 1, rotation: 0, opacity: 1, filter: 'blur(0px)', duration: 4.5, ease: 'back.out(1.5)' },
+          82,
         );
 
         // Brain circuit lines draw in
         tl.fromTo(
           '.brain-circuit',
           { drawSVG: '0% 0%' },
-          { drawSVG: '0% 100%', stagger: 0.08, duration: 2.8, ease: 'power2.out' },
-          88.4,
+          { drawSVG: '0% 100%', stagger: 0.08, duration: 3.5, ease: 'power2.out' },
+          82.5,
         );
 
         // Synaptic nodes pop in
         tl.fromTo(
           '.brain-node',
           { scale: 0 },
-          { scale: 1, stagger: 0.06, duration: 2.2, ease: 'back.out(2)' },
-          88.8,
+          { scale: 1, stagger: 0.05, duration: 2.8, ease: 'back.out(2)' },
+          83,
         );
 
         // Protagonist orange core dot springs to life
         tl.fromTo(
           '.brain-core',
           { scale: 0 },
-          { scale: 1.35, duration: 1.8, ease: 'back.out(3)' },
-          89.2,
+          { scale: 1.35, duration: 2.2, ease: 'back.out(3)' },
+          84,
         );
-        tl.to(
-          '.brain-core',
-          { scale: 1.0, duration: 1.2, ease: 'power1.out' },
-          91,
-        );
+        tl.to('.brain-core', { scale: 1.0, duration: 1.5, ease: 'power1.out' }, 86.5);
 
         // Concentric knowledge aura rings ripple outward
         tl.fromTo(
           '.brain-pulse-ring',
           { scale: 0.7, opacity: 0 },
-          { scale: 1.25, opacity: 0.8, stagger: 0.4, duration: 3, ease: 'power1.out' },
-          88.5,
+          { scale: 1.15, opacity: 0.7, stagger: 0.4, duration: 3.5, ease: 'power1.out' },
+          83.5,
         );
 
-        // Transition Caption 2 to Caption 3 in the exact same anchored place
-        tl.to(
-          '.story-caption-2',
-          { opacity: 0, y: -8, duration: 2.2, ease: 'power2.in' },
-          87.5,
-        );
-        tl.to(
-          '.story-caption-3',
-          { opacity: 1, y: 0, duration: 2.8, ease: 'power2.out' },
-          89.5,
-        );
-
-        // 3. BRAIN DISSOLVES INTO RADIANT KNOWLEDGE (94.5 to 98.5)
-        // Upon scrolling, the brain dissolves into particles, leaving the persistent knowledge caption
-        tl.to(
-          '.act3-brain-container',
-          { xPercent: -50, yPercent: -50, scale: 1.18, opacity: 0, filter: 'blur(8px)', duration: 3.8, ease: 'power2.in' },
-          94.5,
-        );
+        // ==========================================
+        // SCENE 04: PERSISTENT KNOWLEDGE (88 to 100)
+        // Caption 4: "1 Persistent Knowledge from the Master Playbook that evolves every time you interact with it."
+        // THE BRAIN ICON REMAINS 100% VISIBLE THROUGHOUT SCENE 04! NO DISSOLVE!
+        // ==========================================
         tl.to(
           '.brain-pulse-ring',
-          { scale: 1.85, opacity: 0, stagger: 0.2, duration: 3.5, ease: 'power1.out' },
-          94.5,
-        );
-        tl.to(
-          '.brain-core',
-          { scale: 2.4, opacity: 0, duration: 3, ease: 'power2.out' },
-          94.5,
+          { scale: 1.25, opacity: 0.5, stagger: 0.3, duration: 10, ease: 'sine.inOut' },
+          88,
         );
 
         // Lock timeline total duration strictly to 100
@@ -635,7 +583,7 @@ export function PlaybookStory() {
           snap: {
             snapTo: (value: number) => {
               if (value < 0.03) return 0;
-              const rests = [0.34, 0.7, 1.0];
+              const rests = [0.24, 0.50, 0.74, 1.0];
               let closest = rests[0];
               let minDiff = Math.abs(value - rests[0]);
               for (const r of rests) {
@@ -655,16 +603,18 @@ export function PlaybookStory() {
             const p = self.progress;
             setCurrentProgress(p);
 
-            // Update Rest Index
-            if (p < 0.52) {
+            // Update Rest Index for 4 Scenes
+            if (p < 0.37) {
               setCurrentRestIndex(0);
-            } else if (p < 0.85) {
+            } else if (p < 0.63) {
               setCurrentRestIndex(1);
-            } else {
+            } else if (p < 0.86) {
               setCurrentRestIndex(2);
+            } else {
+              setCurrentRestIndex(3);
             }
 
-            // Heading swash draws at rest3 (p >= 0.95)
+            // Heading swash draws at rest4 (p >= 0.95)
             if (p >= 0.95) {
               setSwashDrawn(true);
             } else {
@@ -721,18 +671,24 @@ export function PlaybookStory() {
         // Expose test hook
         window.__playbook = {
           seek: (p: number) => {
+            if (scrollTriggerInstance.current) {
+              const st = scrollTriggerInstance.current;
+              const target = st.start + (st.end - st.start) * p;
+              st.scroll(target);
+            }
             tl.progress(p);
             setCurrentProgress(p);
-            if (p < 0.52) setCurrentRestIndex(0);
-            else if (p < 0.85) setCurrentRestIndex(1);
-            else setCurrentRestIndex(2);
+            if (p < 0.37) setCurrentRestIndex(0);
+            else if (p < 0.63) setCurrentRestIndex(1);
+            else if (p < 0.86) setCurrentRestIndex(2);
+            else setCurrentRestIndex(3);
             setSwashDrawn(p >= 0.95);
           },
           progress: () => tl.progress(),
           duration: () => tl.totalDuration(),
           state: () => ({
             progress: tl.progress(),
-            restIndex: tl.progress() < 0.52 ? 0 : tl.progress() < 0.85 ? 1 : 2,
+            restIndex: tl.progress() < 0.37 ? 0 : tl.progress() < 0.63 ? 1 : tl.progress() < 0.86 ? 2 : 3,
           }),
         };
       }, containerRef);
@@ -783,7 +739,7 @@ export function PlaybookStory() {
       const { gsap } = await import('gsap');
 
       const st = scrollTriggerInstance.current;
-      const targets = [0.34, 0.7, 1.0];
+      const targets = [0.24, 0.50, 0.74, 1.0];
       const targetP = targets[restIdx];
       const targetScroll = st.start + (st.end - st.start) * targetP;
 
@@ -872,13 +828,13 @@ export function PlaybookStory() {
           <CanvasAct2
             chips={chips}
             isPortrait={isPortrait}
-            spotlight={currentProgress >= 0.52 && currentProgress < 0.65}
+            spotlight={currentProgress >= 0.40 && currentProgress < 0.54}
           />
 
           {/* Act 3: COMPILE & PERSISTENT KNOWLEDGE */}
           <CanvasAct3
             isPortrait={isPortrait}
-            bookOpen={currentProgress >= 0.78 && currentProgress < 0.88}
+            bookOpen={currentProgress >= 0.64 && currentProgress < 0.80}
           />
 
           {/* Persistent 24 Chips Layer (Animated continuously across all 3 acts) */}
@@ -902,10 +858,10 @@ export function PlaybookStory() {
               </div>
             ))}
           </div>
-        </div>
 
-        {/* Pinned Consistent Story Caption Bar across all 3 acts */}
-        <StoryCaptionBar className="absolute bottom-11 sm:bottom-12 left-1/2 -translate-x-1/2 z-35" />
+          {/* Bold Kinetic Typography Synchronized with each scene */}
+          <KineticTypography isPortrait={isPortrait} />
+        </div>
 
         {/* Progress Navigation Dots at card bottom center */}
         <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-40">

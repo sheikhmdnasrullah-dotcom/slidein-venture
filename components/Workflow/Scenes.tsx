@@ -9,9 +9,11 @@
  * resolve to a legible resting frame (55–100%) — so the visual peaks with
  * the caption's emphasis words at any loop duration.
  *
- * Words on stage: three, owner-authorized, each lifted verbatim from its
- * caption — MATCH (qualify), SENT and HELD (outreach). Nothing else is
- * written, counted or claimed. All motion is CSS (workflow.css +
+ * Words on stage: the three original pill tags (MATCH, SENT, HELD) plus a
+ * layer of owner-directed micro labels (.wf-lbl) — short uppercase wayfinding
+ * words (Business, Offers, Verify, Inbox…) placed beside the shapes they
+ * name. Nothing is written, counted or claimed beyond that set; all copy is
+ * grounded in the verified workflow. All motion is CSS (workflow.css +
  * scenes-rich.css); the base styles are each element's final state, so
  * reduced motion rests cleanly. Everything here is decorative (aria-hidden
  * via the Scene wrapper) — meaning lives in the captions and transcript.
@@ -76,6 +78,10 @@ function Tag({ children, accent = false }: { children: string; accent?: boolean 
 function ConfigureScene() {
   return (
     <div className="wf-scene-canvas wf-s-configure" data-scene="configure">
+      <span className="wf-lbl" style={{ left: 340, top: 50 }}>Business</span>
+      <span className="wf-lbl" style={{ left: 276, top: 233 }}>Offers</span>
+      <span className="wf-lbl" style={{ left: 446, top: 311 }}>Target profile</span>
+      <span className="wf-lbl" style={{ left: 482, top: 142 }}>Saved</span>
       <span className="wf-dots" style={{ left: 62, top: 116, width: 92, height: 152 }} />
       <span className="wf-plus" style={{ left: 560, top: 138 }} />
       <span className="wf-plus" style={{ left: 592, top: 182 }} />
@@ -123,6 +129,9 @@ function ConfigureScene() {
 function DiscoverScene() {
   return (
     <div className="wf-scene-canvas wf-s-discover" data-scene="discover">
+      <span className="wf-lbl" style={{ left: 300, top: 31 }}>Prospect record</span>
+      <span className="wf-lbl wf-lbl-dup" style={{ left: 300, top: 267 }}>Duplicate</span>
+      <span className="wf-lbl" style={{ left: 478, top: 220 }}>Merged</span>
       <svg className="wf-d-arc" viewBox="0 0 680 400" aria-hidden="true">
         <path d="M 104 332 A 290 290 0 0 1 576 332" />
       </svg>
@@ -228,6 +237,8 @@ function ResearchScene() {
   const ticks = ['wf-claim-1', 'wf-claim-2', 'wf-claim-3'];
   return (
     <div className="wf-scene-canvas wf-s-research" data-scene="research">
+      <span className="wf-lbl" style={{ left: 280, top: 26 }}>Public page</span>
+      <span className="wf-lbl" style={{ left: 388, top: 86 }}>Source</span>
       <svg className="wf-tethers" viewBox="0 0 680 400" aria-hidden="true">
         {RS_CLAIMS.map((c, i) => (
           <g key={c.k} className={`wf-tether wf-tether-${i + 1}`}>
@@ -286,10 +297,12 @@ function ResearchScene() {
           <span className="wf-tick">
             <CheckIcon size={10} />
           </span>
+          <span className="wf-lbl is-inset" style={{ left: 32, top: 12 }}>Claim</span>
         </div>
       ))}
       <div className="wf-claim wf-claim-broken" style={box(RS_BROKEN)}>
         <SlashIcon size={12} />
+        <span className="wf-lbl is-inset" style={{ left: 32, top: 12 }}>No source</span>
       </div>
     </div>
   );
@@ -307,6 +320,10 @@ const Q_TO = anchor(Q.offers[1], 'left');
 function QualifyScene() {
   return (
     <div className="wf-scene-canvas wf-s-qualify" data-scene="qualify">
+      <span className="wf-lbl" style={{ left: 140, top: 66 }}>Prospect</span>
+      <span className="wf-lbl" style={{ left: 525, top: 32 }}>Offers</span>
+      <span className="wf-lbl" style={{ left: 113, top: 302 }}>Criteria</span>
+      <span className="wf-lbl" style={{ left: 330, top: 281 }}>Decision log</span>
       <span className="wf-dots" style={{ left: 268, top: 62, width: 140, height: 84 }} />
       <svg className="wf-q-connector" viewBox="0 0 680 400" aria-hidden="true">
         <path d={bez(Q_FROM, Q_TO)} pathLength={100} vectorEffect="non-scaling-stroke" />
@@ -384,6 +401,8 @@ const P_THREADS = P.chips.map((chip, i) => ({
 function PersonalizeScene() {
   return (
     <div className="wf-scene-canvas wf-s-personalize" data-scene="personalize">
+      <span className="wf-lbl" style={{ left: 106, top: 87 }}>Evidence</span>
+      <span className="wf-lbl" style={{ left: 420, top: 26 }}>Draft</span>
       <svg className="wf-threads" viewBox="0 0 680 400" aria-hidden="true">
         {P_THREADS.map((t, i) => (
           <path key={`b${i}`} className="wf-ants" d={bez(t.from, t.to)} pathLength={100} />
@@ -463,6 +482,14 @@ const O_B_REST = O.gateCx[3] - O.gate / 2 - 12 - O_CAPSULE.w; // 306
 function OutreachScene() {
   return (
     <div className="wf-scene-canvas wf-s-outreach" data-scene="outreach">
+      <span className="wf-lbl" style={{ left: 96, top: 212 }}>Verify</span>
+      <span className="wf-lbl" style={{ left: 192, top: 212 }}>Deliver</span>
+      <span className="wf-lbl" style={{ left: 288, top: 212 }}>Placement</span>
+      <span className="wf-lbl" style={{ left: 384, top: 212 }}>Circuit</span>
+      <span className="wf-lbl" style={{ left: 480, top: 212 }}>Suppress</span>
+      <span className="wf-lbl" style={{ left: 552, top: 212 }}>Relay</span>
+      <span className="wf-lbl" style={{ left: 628, top: 212 }}>Inbox</span>
+      <span className="wf-lbl" style={{ left: 74, top: 330 }}>Warmup</span>
       <span className="wf-dots" style={{ left: 310, top: 276, width: 170, height: 80 }} />
       <div
         className="wf-lane"
@@ -557,6 +584,11 @@ function ConverseScene() {
   const lanes = [CheckIcon, QuestionIcon, MoonIcon, StopIcon];
   return (
     <div className="wf-scene-canvas wf-s-converse" data-scene="converse">
+      <span className="wf-lbl" style={{ left: 340, top: 291 }}>Classify</span>
+      <span className="wf-lbl" style={{ left: 214, top: 375 }}>Interested</span>
+      <span className="wf-lbl" style={{ left: 298, top: 375 }}>Objection</span>
+      <span className="wf-lbl" style={{ left: 382, top: 375 }}>Away</span>
+      <span className="wf-lbl" style={{ left: 466, top: 375 }}>Opt-out</span>
       <svg className="wf-links" viewBox="0 0 680 400" aria-hidden="true">
         <path className="wf-join-path" d={elbow(CV_JOIN.from, CV_JOIN.to)} pathLength={100} />
         <path className="wf-feed-path" d={bez(CV_FEED.from, CV_FEED.to, 'v')} pathLength={100} />
@@ -622,8 +654,12 @@ function ConverseScene() {
       <div className="wf-icon-chip wf-suppress" style={box(CV_SUPPRESS)}>
         <span className="wf-vault-lid" />
         <SlashIcon size={19} />
+        <span className="wf-lbl is-inset" style={{ left: 30, top: 32, transform: 'translateX(-50%)' }}>Suppress</span>
       </div>
-      <div className="wf-ghost-cal" style={box(CV_GHOST)}><CalendarIcon size={23} /></div>
+      <div className="wf-ghost-cal" style={box(CV_GHOST)}>
+        <CalendarIcon size={23} />
+        <span className="wf-lbl is-inset" style={{ left: 10, top: 'auto', bottom: 7 }}>Planned</span>
+      </div>
     </div>
   );
 }
@@ -642,6 +678,9 @@ const OV_FLOW = { from: anchor(OV.ledger, 'right'), to: anchor(OV.card, 'left') 
 function OverviewScene() {
   return (
     <div className="wf-scene-canvas wf-s-overview" data-scene="overview">
+      <span className="wf-lbl" style={{ left: 180, top: 26 }}>Activity ledger</span>
+      <span className="wf-lbl" style={{ left: 500, top: 26 }}>Overview</span>
+      <span className="wf-lbl" style={{ left: 614, top: 70 }}>Read only</span>
       <svg className="wf-flow" viewBox="0 0 680 400" aria-hidden="true">
         <path className="wf-ants" d={`M ${OV_FLOW.from.x} ${OV_FLOW.from.y} L ${OV_FLOW.to.x - 5} ${OV_FLOW.to.y}`} />
         <path

@@ -4,21 +4,23 @@
  * HERO — the rebuilt opening band
  * ---------------------------------------------------------------------------
  * Flat #FDFDFD ground. Three zones: [gutter] [text column] [gutter].
- * Everything textual (pill, headline, subhead, CTA row) lives only in the
- * text column; tiles live only in the gutters, 52px clear of the column.
+ * Everything textual (headline, subhead, CTA row) lives only in the text
+ * column; tiles live only in the gutters, 52px clear of the column.
  * Hairlines sit centered inside the gaps between blocks, so they can never
  * cut through text. Every text slot reads from content/home.ts and renders
- * a skeleton bar while empty (Rule 0). Copy is never altered here.
+ * a skeleton bar while empty (Rule 0). Copy is never altered here. The
+ * hero holds exactly one button — the white pill CTA below the subhead.
  *
  * Entrance: a CSS-only ~2.2s timeline from a visible default (hairlines,
- * pill, words, swash, sparkles, subline, CTA), gated on data-live. Any
- * press, scroll or key completes it instantly. Reduced motion and no-JS
- * render the final state with no entrance.
+ * words, swash, sparkles, subline, CTA), gated on data-live. Any press,
+ * scroll or key completes it instantly. Reduced motion and no-JS render
+ * the final state with no entrance.
  */
 
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { StoryModal } from './StoryModal';
 import { TextSlot } from './Skeleton';
+import { VideoPlayerV2 } from '@/how-it-works-video/core/player';
 import { HOME } from '@/content/home';
 import { BAND_DISORDER } from '@/content/stages';
 import { HERO_PHRASE_SYNC } from '@/content/hero-sync';
@@ -57,31 +59,60 @@ function HeadlineLift() {
   );
 }
 
-/* Accent-tinted chip + label, both slots. */
-function AnnouncementPill() {
+/* THE PRIMARY CTA — the story button, and the hero's only button. A white
+ * pill: accent-tinted chip (static play triangle + slot) beside a muted
+ * label slot, with the traveling border beam. One control, one action
+ * (opens the story modal) — the separate announcement pill above the
+ * headline and the old black button are both gone by owner order, so this
+ * is the single "how it works" entry and there is no repetition. Copy
+ * reads from HOME.announcement (chip + label); empty slots render skeleton
+ * bars like every other mandatory slot. Hover stays quiet: the beam
+ * already answers hover by speeding up (see assemble.css), so the pill
+ * only warms its fill one token step. */
+function PrimaryCTAButton({
+  onOpenStory,
+  ctaRef,
+}: {
+  onOpenStory: () => void;
+  ctaRef?: React.RefObject<HTMLButtonElement | null>;
+}) {
+  const { chip, label } = HOME.announcement;
   return (
-    <div
-      data-testid="hero-pill"
-      className="relative flex h-[52px] max-w-[calc(100vw-48px)] items-center gap-3 rounded-full border border-[var(--scaffold-rule)] bg-[var(--scaffold-surface)] pr-6"
+    <button
+      ref={ctaRef as React.Ref<HTMLButtonElement>}
+      type="button"
+      onClick={onOpenStory}
+      data-testid="hero-cta-primary"
+      aria-label="See how it works video walkthrough"
+      className="relative flex h-[52px] max-w-[calc(100vw-48px)] cursor-pointer items-center gap-3 rounded-full border border-[var(--scaffold-rule)] bg-[var(--scaffold-surface)] pr-6 outline-none transition-[background-color,transform] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:bg-[var(--scaffold-accent-row)] focus-visible:ring-2 focus-visible:ring-[color-mix(in_oklch,var(--color-brand)_60%,transparent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--scaffold-bg)] active:scale-[0.98]"
       style={{ paddingLeft: 6, boxShadow: 'var(--scaffold-shadow-soft)' }}
     >
       <span data-testid="hero-pill-beam" className="hero-pill-beam" aria-hidden="true" />
       <span
-        className="flex h-[38px] items-center rounded-full bg-[var(--scaffold-accent-chip)] px-5"
+        className="flex h-[38px] items-center gap-1.5 rounded-full bg-[var(--scaffold-accent-chip)] px-5"
         style={{ marginTop: 1, marginBottom: 1 }}
       >
+        <svg viewBox="0 0 12 12" width="12" height="12" aria-hidden="true" focusable="false">
+          <path
+            d="M3.6 2.3 L10 6 L3.6 9.7 Z"
+            fill="var(--scaffold-ink)"
+            stroke="var(--scaffold-ink)"
+            strokeWidth="1.4"
+            strokeLinejoin="round"
+          />
+        </svg>
         <TextSlot
-          text={HOME.announcement.chip}
+          text={chip}
           textClassName="text-[15px] font-medium whitespace-nowrap"
           barWidth="2.4em"
         />
       </span>
       <TextSlot
-        text={HOME.announcement.label}
+        text={label}
         textClassName="text-[15px] text-[var(--scaffold-muted)] whitespace-nowrap"
         barWidth="min(16em, 46vw)"
       />
-    </div>
+    </button>
   );
 }
 
@@ -228,38 +259,6 @@ function Subhead() {
   );
 }
 
-/* THE PLAY MARK — the story button's icon.
- *
- * One 30px disc, two elements, no ornament: a static ACCENT ring and a solid
- * white play triangle. The brand colour sits in the control at rest, so the
- * orange reads as one decision. No hover choreography — the hero CTA keeps
- * the same quiet manners as the nav's Connect pill (owner: the animated
- * ring/arc/glow treatment felt over-designed against the brand). */
-function PlayMark() {
-  return (
-    <span
-      className="relative flex h-[30px] w-[30px] shrink-0 items-center justify-center"
-      aria-hidden="true"
-    >
-      {/* Accent ring. */}
-      <span
-        className="absolute inset-0 rounded-full border-[1.5px]"
-        style={{ borderColor: 'var(--scaffold-accent)' }}
-      />
-      {/* The triangle. */}
-      <svg viewBox="0 0 30 30" width="30" height="30" className="absolute inset-0">
-        <path
-          d="M12.4 9.6 L20.4 15 L12.4 20.4 Z"
-          fill="#FFFFFF"
-          stroke="#FFFFFF"
-          strokeWidth="2"
-          strokeLinejoin="round"
-        />
-      </svg>
-    </span>
-  );
-}
-
 function CTARow({
   onOpenStory,
   ctaRef,
@@ -273,28 +272,9 @@ function CTARow({
       className="flex w-full flex-col items-center justify-center md:w-auto"
       style={{ gap: 'var(--hero-cta-gap)' }}
     >
-      {/* Primary — opens the story. Dark brand pill, one static accent
-          ring on the play mark, quiet hover. Same manners as Connect. */}
-      <button
-        ref={ctaRef as React.Ref<HTMLButtonElement>}
-        type="button"
-        onClick={onOpenStory}
-        data-testid="hero-cta-primary"
-        aria-label="See how it works video walkthrough"
-        className="relative inline-flex h-[56px] w-full max-w-[340px] cursor-pointer items-center justify-center gap-3.5 overflow-hidden rounded-full bg-[var(--scaffold-button)] pl-7 pr-8 text-[17px] font-medium text-white shadow-[var(--scaffold-shadow-button)] outline-none transition-[background-color,transform] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:bg-[color-mix(in_oklch,var(--scaffold-button)_88%,white)] focus-visible:ring-2 focus-visible:ring-[color-mix(in_oklch,var(--color-brand)_60%,transparent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--scaffold-bg)] active:scale-[0.98] md:h-[var(--hero-cta-h)] md:w-auto"
-        style={{
-          letterSpacing: '-0.01em',
-        }}
-      >
-        <span className="relative z-10">
-          <PlayMark />
-        </span>
-        {/* The label is a SLOT: skeleton bar until the owner signs off on
-            the words. Nothing invented here. */}
-        <span className="relative z-10">
-          <TextSlot text={HOME.cta.primaryVideo} barWidth="4.6em" onDark />
-        </span>
-      </button>
+      {/* The single primary control — the white pill button. Opens the
+          story modal; focus returns here on close via ctaRef. */}
+      <PrimaryCTAButton onOpenStory={onOpenStory} ctaRef={ctaRef} />
       {/* Secondary locator anchor for test compatibility */}
       <span data-testid="hero-cta-secondary" className="sr-only" aria-hidden="true" />
     </div>
@@ -304,6 +284,7 @@ function CTARow({
 export default function Hero() {
   const still = useSettledStill();
   const [storyOpen, setStoryOpen] = useState(false);
+  const [videoV2Open, setVideoV2Open] = useState(false);
   const storyBtnRef = useRef<HTMLButtonElement>(null);
   const sectionRef = useRef<HTMLElement>(null);
   useHeroPointer(sectionRef, still);
@@ -372,6 +353,10 @@ export default function Hero() {
         // eslint-disable-next-line react-hooks/set-state-in-effect
         setStoryOpen(true);
       }
+      if (params.get('video') === 'v2') {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        setVideoV2Open(true);
+      }
     }
   }, []);
 
@@ -403,26 +388,54 @@ export default function Hero() {
           <HeadlineLift />
           <div data-testid="hero-column" className="hero-column">
             <Gap token="--hero-gap-top" line i={0} />
-            <AnnouncementPill />
-            <Gap token="--hero-gap-pill-head" line i={1} />
             <Headline />
-            <Gap token="--hero-gap-head-sub" line i={2} />
+            <Gap token="--hero-gap-head-sub" line i={1} />
             <Subhead />
-            <Gap token="--hero-gap-sub-cta" line i={3} />
+            <Gap token="--hero-gap-sub-cta" line i={2} />
             <CTARow
               onOpenStory={() => setStoryOpen(true)}
               ctaRef={storyBtnRef}
             />
-            <Gap token="--hero-gap-bottom" line i={4} />
+            <Gap token="--hero-gap-bottom" line i={3} />
           </div>
         </div>
 
-        {/* Story Video Card Modal */}
+        {/* Story Video Card Modal (current player) */}
         <StoryModal
           open={storyOpen}
           onClose={() => setStoryOpen(false)}
           triggerRef={storyBtnRef}
         />
+
+        {/* Video Player V2 Modal (new player, ?video=v2 flag) */}
+        {videoV2Open && (
+          <div
+            className="vp-modal-backdrop"
+            onClick={() => setVideoV2Open(false)}
+            aria-modal="true"
+            role="dialog"
+          >
+            <div
+              onClick={(e) => e.stopPropagation()}
+              style={{
+                position: 'fixed',
+                top: '50%',
+                left: '50%',
+                transform: 'translate(-50%, -50%)',
+                maxWidth: '1180px',
+                width: 'min(1180px, 100% - 48px)',
+                maxHeight: 'calc(100vh - 40px)',
+                overflow: 'auto',
+              }}
+            >
+              <VideoPlayerV2
+                inline={false}
+                autoPlay={true}
+                onClose={() => setVideoV2Open(false)}
+              />
+            </div>
+          </div>
+        )}
       </section>
     </>
   );

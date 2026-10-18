@@ -51,8 +51,8 @@ export function CanvasAct2({
           {PORTRAIT_BANDS.map((band) => (
             <div
               key={band.id}
-              data-col-id={band.id}
-              className="absolute rounded-[24px] bg-white border border-[rgba(10,10,10,0.07)] p-4 flex flex-col justify-between"
+              data-col-id={band.id.replace('band-', 'col-')}
+              className="absolute act2-col-card rounded-[24px] bg-white border border-[rgba(10,10,10,0.07)] p-4 flex flex-col justify-between"
               style={{
                 left: band.x,
                 top: band.y,
@@ -175,7 +175,7 @@ export function CanvasAct2({
       >
         {icpsChips.map((chip, idx) => {
           const ringX = 1156;
-          const ringY = 258;
+          const ringY = 228;
           const chipX = chip.docked.x + 48;
           const chipY = chip.docked.y + 14;
 

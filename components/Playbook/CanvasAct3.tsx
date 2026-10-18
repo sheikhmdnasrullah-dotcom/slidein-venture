@@ -49,7 +49,7 @@ export function CanvasAct3({
           staticState === 'brain' && 'hidden',
         )}
         style={{
-          left: '50%',
+          left: isPortrait ? '50%' : book.cx,
           top: book.cy,
           perspective: 1200,
         }}
@@ -225,7 +225,7 @@ export function CanvasAct3({
           staticState === 'book' && 'hidden',
         )}
         style={{
-          left: '50%',
+          left: isPortrait ? '50%' : book.cx,
           top: isPortrait ? book.cy - 10 : book.cy - 15,
         }}
       >

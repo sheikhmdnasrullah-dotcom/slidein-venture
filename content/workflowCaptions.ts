@@ -3,8 +3,10 @@
  * ---------------------------------------------------------------------------
  * Official human-written captions for the playable "How It Works" video card.
  * Synchronized with the 7-step rail and return path overview.
- * Outside Layer A (visual animation carries only the three owner-authorized
- * caption words: MATCH, SENT, HELD — each lifted verbatim from its caption).
+ * Outside Layer A: the visual animation carries the three pill tags
+ * (MATCH, SENT, HELD) plus a set of owner-directed micro labels (.wf-lbl —
+ * Business, Offers, Verify, Inbox and so on), all grounded in the same
+ * workflow facts as these captions.
  */
 
 export interface StoryCaptionCue {

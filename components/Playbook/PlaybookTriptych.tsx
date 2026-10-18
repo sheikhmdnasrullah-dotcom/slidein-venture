@@ -23,7 +23,7 @@ import {
 import { CanvasAct1 } from './CanvasAct1';
 import { CanvasAct2 } from './CanvasAct2';
 import { CanvasAct3 } from './CanvasAct3';
-import { StoryCaptionBar } from './StoryCaptionBar';
+import { KineticTypography } from './KineticTypography';
 import { ScrollCueIcon } from './icons';
 
 interface PlaybookTriptychProps {
@@ -68,7 +68,7 @@ export function PlaybookTriptych({ isPortrait = false }: PlaybookTriptychProps) 
             isPortrait={isPortrait}
             showCue={false}
           />
-          <StoryCaptionBar staticAct={1} className="absolute bottom-6 left-1/2 -translate-x-1/2 z-35" />
+          <KineticTypography staticAct={1} isPortrait={isPortrait} />
         </div>
 
         {/* Down Chevron between rest states */}
@@ -100,7 +100,7 @@ export function PlaybookTriptych({ isPortrait = false }: PlaybookTriptychProps) 
             spotlight={true}
             renderChips={true}
           />
-          <StoryCaptionBar staticAct={2} className="absolute bottom-6 left-1/2 -translate-x-1/2 z-35" />
+          <KineticTypography staticAct={2} isPortrait={isPortrait} />
         </div>
 
         <div className="mt-6 flex justify-center text-[rgba(10,10,10,0.3)]">
@@ -108,7 +108,7 @@ export function PlaybookTriptych({ isPortrait = false }: PlaybookTriptychProps) 
         </div>
       </div>
 
-      {/* Rest 3: COMPILE */}
+      {/* Rest 3: THE MASTER PLAYBOOK (BOOK) */}
       <div className="w-full max-w-[1280px] flex flex-col items-center">
         <div
           data-testid="triptych-rest3"
@@ -127,9 +127,38 @@ export function PlaybookTriptych({ isPortrait = false }: PlaybookTriptychProps) 
           />
           <CanvasAct3
             isPortrait={isPortrait}
+            staticState="book"
+          />
+          <KineticTypography staticAct={3} isPortrait={isPortrait} />
+        </div>
+
+        <div className="mt-6 flex justify-center text-[rgba(10,10,10,0.3)]">
+          <ScrollCueIcon size={28} />
+        </div>
+      </div>
+
+      {/* Rest 4: PERSISTENT KNOWLEDGE (BRAIN) */}
+      <div className="w-full max-w-[1280px] flex flex-col items-center">
+        <div
+          data-testid="triptych-rest4"
+          className="relative w-full rounded-[40px] border border-[rgba(10,10,10,0.06)] bg-white overflow-hidden"
+          style={{
+            aspectRatio: `${canvasW} / ${canvasH}`,
+            boxShadow: 'var(--scaffold-shadow-object)',
+          }}
+        >
+          <div
+            className="absolute inset-0 opacity-[0.035] pointer-events-none"
+            style={{
+              backgroundImage: 'radial-gradient(circle, #0A0A0A 1px, transparent 1px)',
+              backgroundSize: '20px 20px',
+            }}
+          />
+          <CanvasAct3
+            isPortrait={isPortrait}
             staticState="brain"
           />
-          <StoryCaptionBar staticAct={3} className="absolute bottom-6 left-1/2 -translate-x-1/2 z-35" />
+          <KineticTypography staticAct={4} isPortrait={isPortrait} />
         </div>
       </div>
     </div>

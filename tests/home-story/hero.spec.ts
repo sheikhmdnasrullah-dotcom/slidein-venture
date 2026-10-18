@@ -8,7 +8,7 @@
  * Group 8 (hero story): 7 tiles in stage reading order; 48px text and 24px
  * nav clearance; no overlaps; stage pills carry equation words; links join
  * consecutive tiles with chevrons; the 14s loop dwells on tile centers,
- * travels the links, crosses above the pill, and pauses on hover.
+ * travels the links, crosses above the top hairline, and pauses on hover.
  * H3 (preview sync) is skipped by standing owner order: the preview stays
  * removed, asserted absent.
  */

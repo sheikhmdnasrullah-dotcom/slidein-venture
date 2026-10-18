@@ -41,7 +41,7 @@ import {
   type RefObject,
 } from 'react';
 import { WORKFLOW, WORKFLOW_CHROME, type WorkflowStageId } from '@/content/workflow';
-import { ALL_STAGES, SOCKETS, STAGE_COUNT, STAGE_ORDER } from './contracts';
+import { ALL_STAGES, SCENE_MS, SOCKETS, STAGE_COUNT, STAGE_ORDER } from './contracts';
 import { Bar } from '@/components/Hero/Skeleton';
 import { GlossTile, Scene } from '@/components/Sections/primitives';
 import { RiveScene } from './RiveScene';
@@ -487,7 +487,11 @@ function Loop({
       animRef.current = c;
       c.then(() => {
         if (token.cancelled) return;
-        later(step, 3400);
+        /* Rest exactly one full scene loop (minus the travel time the
+           signal already consumed) so the stage's story completes before
+           the signal moves on. */
+        const dwell = Math.max(SCENE_MS[ALL_STAGES[next]] - 700, 1200);
+        later(step, dwell);
       });
     };
     step();

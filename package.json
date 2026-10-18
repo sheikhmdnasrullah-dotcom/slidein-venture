@@ -8,7 +8,9 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "lint:story": "node design-reference/stages-lint.mjs"
+    "lint:story": "node design-reference/stages-lint.mjs",
+    "video:shots": "node scripts/video-shots.mjs",
+    "video:check": "node scripts/video-check.mjs"
   },
   "dependencies": {
     "@base-ui/react": "^1.6.0",
@@ -47,6 +49,7 @@
     "sharp": "^0.35.5",
     "stylelint": "^17.14.1",
     "stylelint-config-standard": "^40.0.0",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vitest": "^3.0.0"
   }
 }

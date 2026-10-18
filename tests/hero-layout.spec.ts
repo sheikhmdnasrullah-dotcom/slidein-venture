@@ -150,7 +150,7 @@ for (const width of [1440, 1280, 1024, 768, 390, 375]) {
         (m.tileCount === 0 || m.minTileGap >= 40) &&
         pct <= 92 &&
         !m.wrapped &&
-        m.hairlineCount === 5 &&
+        m.hairlineCount === 4 &&
         m.lineHits === 0 &&
         m.scrollW <= m.innerW &&
         (width !== 1440 || m.ctaBottom <= 900) &&
@@ -178,7 +178,10 @@ for (const width of [1440, 1280, 1024, 768, 390, 375]) {
       expect(pct, `longest line ${m.longest}px = ${pct.toFixed(1)}% of ${m.colW}px column`).toBeLessThanOrEqual(92);
       expect(m.wrapped, 'a headline line wrapped unexpectedly').toBe(false);
       // 3. hairlines never inside text
-      expect(m.hairlineCount, 'expected 5 gap hairlines').toBe(5);
+      // Four, not five: the announcement pill and its gap were removed by
+      // owner order (the pill button moved into the CTA row), so one
+      // hairline left with them.
+      expect(m.hairlineCount, 'expected 4 gap hairlines').toBe(4);
       expect(m.lineHits, 'hairline(s) crossing text').toBe(0);
       // 4. no horizontal scroll
       expect(m.scrollW, `scrollWidth ${m.scrollW} > viewport ${m.innerW}`).toBeLessThanOrEqual(m.innerW);

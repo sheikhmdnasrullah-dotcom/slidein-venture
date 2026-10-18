@@ -50,7 +50,8 @@ export const email = {
   ],
 };
 
-export const checks = ["Verify", "Deliver", "Placement", "Circuit", "Suppress", "Relay", "Inbox", "Warmup"];
+export const checks = ["Verify", "Deliver", "Placement", "Circuit", "Suppress", "Relay", "Inbox"];
+export const warmup = { label: "Warmup", y: 330 };
 export const held = { who: "Marcus Webb", reason: "Address failed verification" };
 
 export const replies = [

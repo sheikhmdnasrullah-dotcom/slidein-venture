@@ -42,9 +42,10 @@ add(HOME.cta.secondary);
 add(HOME.icpTagline);
 add(HOME.persistentKnowledgeTagline);
 if (HOME.playbookCaptions) {
-  add(HOME.playbookCaptions.act1);
-  add(HOME.playbookCaptions.act2);
-  add(HOME.playbookCaptions.act3);
+  for (const c of Object.values(HOME.playbookCaptions)) add(c);
+}
+if (HOME.playbookHeadlines) {
+  for (const h of Object.values(HOME.playbookHeadlines)) add(h);
 }
 add(HOME.multiAgentTitle);
 for (const l of NAV_SLOTS.links) add(l.label);
@@ -87,6 +88,9 @@ const CHROME = new Set([
   /* CaptionBand's sr-only transcript scaffold (structure headers only;
      cue lines render only when the owner fills cue.text). */
   'SlideIn Story Transcript',
+  'Target profile',
+  'Saved',
+  'Offers',
 ]);
 
 const clean = (t) => t.replace(/^[,\.\s]+|[,\.\s]+$/g, '').trim();

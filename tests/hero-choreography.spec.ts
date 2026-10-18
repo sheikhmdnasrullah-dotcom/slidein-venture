@@ -116,9 +116,17 @@ for (const width of WIDTHS) {
       expect(norm).toBe('Getting Clients Simplified');
       const sub = await page.locator('[data-testid="hero-subhead"]').innerText();
       expect(sub.replace(/\s+/g, ' ').trim()).toBe(SUB_COPY);
-      expect(await page.locator('[data-testid="hero-cta-primary"]').innerText()).toBe(
-        'See How It Works',
+      // The single CTA is the white pill: chip + label slots, one
+      // accessible name for its one action (opens the story modal).
+      expect(await page.getAttribute('[data-testid="hero-cta-primary"]', 'aria-label')).toBe(
+        'See how it works video walkthrough',
       );
+      const ctaText = await page.locator('[data-testid="hero-cta-primary"]').innerText();
+      expect(ctaText).toContain('Video');
+      expect(ctaText).toContain('See how it works');
+      // No second button: the old black CTA and the top pill are gone.
+      expect(await page.locator('[data-testid="hero"] button').count()).toBe(1);
+      expect(await page.locator('[data-testid="hero-pill"]').count()).toBe(0);
       const words = await page.locator('[data-testid="hero-word"]').allInnerTexts();
       expect(words.map((w) => w.trim())).toEqual(['Getting', 'Clients', 'Simplified']);
       const bars = await page.evaluate(() => {
@@ -165,7 +173,6 @@ for (const width of WIDTHS) {
           h1: q('[data-testid="hero-headline"]'),
           sub: q('[data-testid="hero-subhead"]'),
           cta: q('[data-testid="hero-cta-primary"]'),
-          pill: q('[data-testid="hero-pill"]'),
         };
       });
       await bare.screenshot({ path: `test-results/nojs-${width}.png` });
@@ -568,12 +575,13 @@ for (const width of WIDTHS) {
       await openSettled(page, width);
       const m = await page.evaluate(() => {
         const nav = document.querySelector('nav')!.getBoundingClientRect();
-        const pill = document.querySelector('[data-testid="hero-pill"]')!.getBoundingClientRect();
+        // First text block is the headline now (the top pill is gone).
+        const head = document.querySelector('[data-testid="hero-headline"]')!.getBoundingClientRect();
         const tiles = document.querySelectorAll('[data-hero-stage]').length;
-        return { navBottom: nav.bottom, pillTop: pill.y, tiles };
+        return { navBottom: nav.bottom, headTop: head.y, tiles };
       });
       // Text rect (column content + swash overhang) clears the nav by 24px.
-      const gap = m.pillTop - m.navBottom;
+      const gap = m.headTop - m.navBottom;
       note(`${width}/nav-clear`, gap >= 24 - TOL, `${gap.toFixed(1)}px`);
       expect(gap).toBeGreaterThanOrEqual(24 - TOL);
       // The tile field is unmounted by design: the 48px zone asserts
@@ -764,7 +772,7 @@ for (const width of WIDTHS) {
       note(`${width}/scrollw`, sw.scrollW <= sw.innerW, `${sw.scrollW}/${sw.innerW}`);
       expect(sw.scrollW).toBeLessThanOrEqual(sw.innerW);
       const before = await page.evaluate(() =>
-        ['hero-pill', 'hero-headline', 'hero-subhead', 'hero-cta-primary'].map((t) => {
+        ['hero-headline', 'hero-subhead', 'hero-cta-primary'].map((t) => {
           const r = document.querySelector(`[data-testid="${t}"]`)!.getBoundingClientRect();
           return [r.x, r.y, r.width, r.height].map((v) => Math.round(v * 10) / 10).join(',');
         }),
@@ -774,7 +782,7 @@ for (const width of WIDTHS) {
       await page.locator('[data-word="2"]').hover();
       await page.waitForTimeout(400);
       const after = await page.evaluate(() =>
-        ['hero-pill', 'hero-headline', 'hero-subhead', 'hero-cta-primary'].map((t) => {
+        ['hero-headline', 'hero-subhead', 'hero-cta-primary'].map((t) => {
           const r = document.querySelector(`[data-testid="${t}"]`)!.getBoundingClientRect();
           return [r.x, r.y, r.width, r.height].map((v) => Math.round(v * 10) / 10).join(',');
         }),
@@ -888,8 +896,8 @@ test.describe('webkit parity', () => {
         if (document.querySelector('[data-loop-dot]')) n++;
         if (document.querySelector('[data-testid="hero-cta-primary"] span[aria-hidden="true"] span')) n++;
         const nav = document.querySelector('nav')!.getBoundingClientRect();
-        const pill = document.querySelector('[data-testid="hero-pill"]')!.getBoundingClientRect();
-        return { n, gap: pill.y - nav.bottom };
+        const head = document.querySelector('[data-testid="hero-headline"]')!.getBoundingClientRect();
+        return { n, gap: head.y - nav.bottom };
       });
       expect(budget.n).toBeLessThanOrEqual(4);
       expect(budget.gap).toBeGreaterThanOrEqual(24 - TOL);

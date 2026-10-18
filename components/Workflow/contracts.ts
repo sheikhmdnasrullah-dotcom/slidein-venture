@@ -47,3 +47,21 @@ export const SOCKETS: Record<WorkflowStageId, StageSockets> = {
 
 /** Signal positions: 0..6 are the loop stages, 7 is the overview stage. */
 export const STAGE_COUNT = ALL_STAGES.length;
+
+/**
+ * One full scene-loop per stage, in ms — matches the keyframe durations
+ * both scene stylesheets use per scene (7s discover/qualify/overview,
+ * 8s configure/research/personalize/converse, 9s outreach). Autoplay
+ * dwells one whole loop per stage so every scene completes a full beat
+ * before the signal moves on.
+ */
+export const SCENE_MS: Record<WorkflowStageId, number> = {
+  configure: 8000,
+  discover: 7000,
+  research: 8000,
+  qualify: 7000,
+  personalize: 8000,
+  outreach: 9000,
+  converse: 8000,
+  overview: 7000,
+};
