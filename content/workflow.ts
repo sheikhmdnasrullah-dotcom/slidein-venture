@@ -40,28 +40,84 @@ export interface WorkflowStageContent {
 }
 
 export const WORKFLOW: Record<WorkflowStageId, WorkflowStageContent> = {
-  configure: { title: '', summary: '', contractIn: [], contractOut: [], gateNote: '', ariaLabel: '' },
-  discover: { title: '', summary: '', contractIn: [], contractOut: [], gateNote: '', ariaLabel: '' },
-  research: { title: '', summary: '', contractIn: [], contractOut: [], gateNote: '', ariaLabel: '' },
-  qualify: { title: '', summary: '', contractIn: [], contractOut: [], gateNote: '', ariaLabel: '' },
-  personalize: { title: '', summary: '', contractIn: [], contractOut: [], gateNote: '', ariaLabel: '' },
-  outreach: { title: '', summary: '', contractIn: [], contractOut: [], gateNote: '', ariaLabel: '' },
-  converse: { title: '', summary: '', contractIn: [], contractOut: [], gateNote: '', ariaLabel: '' },
-  overview: { title: '', summary: '', contractIn: [], contractOut: [], gateNote: '', ariaLabel: '' },
+  configure: {
+    title: '',
+    summary: '',
+    contractIn: [],
+    contractOut: [],
+    gateNote: '',
+    ariaLabel: 'Configure: business profile, offers, and ideal customer profiles',
+  },
+  discover: {
+    title: '',
+    summary: '',
+    contractIn: [],
+    contractOut: [],
+    gateNote: '',
+    ariaLabel: 'Discover: source prospects and merge duplicates',
+  },
+  research: {
+    title: '',
+    summary: '',
+    contractIn: [],
+    contractOut: [],
+    gateNote: '',
+    ariaLabel: 'Research: public presence and source-backed claims',
+  },
+  qualify: {
+    title: '',
+    summary: '',
+    contractIn: [],
+    contractOut: [],
+    gateNote: '',
+    ariaLabel: 'Qualify: evaluate fit and match to an offer',
+  },
+  personalize: {
+    title: '',
+    summary: '',
+    contractIn: [],
+    contractOut: [],
+    gateNote: '',
+    ariaLabel: 'Personalize: evidence-linked email draft',
+  },
+  outreach: {
+    title: '',
+    summary: '',
+    contractIn: [],
+    contractOut: [],
+    gateNote: '',
+    ariaLabel: 'Outreach: sending safeguards and deliverability',
+  },
+  converse: {
+    title: '',
+    summary: '',
+    contractIn: [],
+    contractOut: [],
+    gateNote: '',
+    ariaLabel: 'Converse: classify replies and update suppression',
+  },
+  overview: {
+    title: '',
+    summary: '',
+    contractIn: [],
+    contractOut: [],
+    gateNote: '',
+    ariaLabel: 'Overview: activity ledger and read-only summary',
+  },
 };
 
 /* Chrome slots — the icon-only controls and the live region. Accessible
    names come from the content file too; every one of these ships empty and
    must be filled before launch (see the final report). */
 export const WORKFLOW_CHROME = {
-  stageList: '',
-  play: '',
-  pause: '',
-  prev: '',
-  next: '',
-  failure: '',
-  recovery: '',
-  liveRegion: '',
+  stageList: 'Workflow stages',
+  play: 'Play workflow',
+  pause: 'Pause workflow',
+  prev: 'Previous stage',
+  next: 'Next stage',
+  failure: 'Simulate failure and recovery',
+  recovery: 'Retry failed step',
+  liveRegion: 'Workflow stage changed',
 } as const;
 
 export type WorkflowChromeKey = keyof typeof WORKFLOW_CHROME;

@@ -2887,3 +2887,9 @@
     stroke-dashoffset: 0;
   }
 }
+
+/* ── Rive canvas sizing inside the scene viewport ───────────────────────── */
+.wf-rive-scene canvas {
+  width: 100% !important;
+  height: 100% !important;
+}

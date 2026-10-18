@@ -27,7 +27,7 @@ import { AnimatePresence, motion, useMotionValueEvent, useReducedMotion, type Mo
 import { STORY_CHROME, type StoryCaptionCue } from '@/content/workflowCaptions';
 import { UTILITY_STRINGS } from '@/content/story';
 import { ALL_STAGES } from './contracts';
-import { STAGE_SCENES } from './Scenes';
+import { RiveScene } from './RiveScene';
 import { sceneFit } from './sceneArt';
 import { GlossTile, Scene } from '@/components/Sections/primitives';
 import {
@@ -199,7 +199,7 @@ export function EmbedStoryPlayer({ cue, stageIndex, runId, progress, playing, on
                   ['--scene-ty' as string]: `${fit.ty}px`,
                 }}
               >
-                {STAGE_SCENES[stage]}
+                <RiveScene stage={stage} active={playing} reducedMotion={still} />
               </Scene>
             </motion.div>
           </AnimatePresence>

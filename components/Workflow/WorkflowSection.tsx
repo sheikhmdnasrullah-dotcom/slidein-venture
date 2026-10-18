@@ -44,7 +44,7 @@ import { WORKFLOW, WORKFLOW_CHROME, type WorkflowStageId } from '@/content/workf
 import { ALL_STAGES, SOCKETS, STAGE_COUNT, STAGE_ORDER } from './contracts';
 import { Bar } from '@/components/Hero/Skeleton';
 import { GlossTile, Scene } from '@/components/Sections/primitives';
-import { STAGE_SCENES } from './Scenes';
+import { RiveScene } from './RiveScene';
 import { buildPaths, anchor, rectIn, signalLength, useRailGeometry, type RailGeometry } from './geometry';
 import { SCENE_ART, sceneFit } from './sceneArt';
 import { GeometryDebug } from './GeometryDebug';
@@ -863,7 +863,7 @@ function Loop({
                             transition={fade}
                           >
                             <Scene className="wf-scene-fill" style={fitStyle(stage, view.w, view.h)}>
-                              {STAGE_SCENES[stage]}
+                              <RiveScene stage={stage} active reducedMotion={still} />
                             </Scene>
                           </motion.div>
                         </AnimatePresence>
@@ -963,7 +963,7 @@ function Loop({
                     </button>
                     <div className="wf-vcard-body">
                       <div>
-                        <VerticalScene stage={id} />
+                        <VerticalScene stage={id} active={open} />
                         <ContractBlock stage={id} compact />
                       </div>
                     </div>
@@ -1015,13 +1015,14 @@ function Loop({
 }
 
 /* a card-body scene: fixed 680:400 box, art fitted and centered */
-function VerticalScene({ stage }: { stage: WorkflowStageId }) {
+function VerticalScene({ stage, active }: { stage: WorkflowStageId; active: boolean }) {
   const [ref, box] = useBoxSize<HTMLDivElement>();
+  const still = !!useReducedMotion();
   return (
     <div className="wf-scene-surface wf-vscene" ref={ref}>
       <div className="wf-scene-viewport">
         <Scene className="wf-scene-fill" style={fitStyle(stage, box.w, box.h, 0.88)}>
-          {STAGE_SCENES[stage]}
+          <RiveScene stage={stage} active={active} reducedMotion={still} />
         </Scene>
       </div>
     </div>
