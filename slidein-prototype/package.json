@@ -1,0 +1,7 @@
+{
+  "name": "slidein-prospect-journey",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Drop-in HTML and Next.js six-stage animated prospect journey",
+  "peerDependencies": { "react": ">=18", "next": ">=13", "gsap": "^3.13.0" }
+}

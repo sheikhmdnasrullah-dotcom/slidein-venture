@@ -100,6 +100,7 @@ export function SectionHeader({
           <Text
             variant="lead"
             text={section.lead}
+            animate={true}
             barWidth="min(34ch, 72vw)"
             align={align}
             className={cn(align === 'center' && 'mx-auto')}

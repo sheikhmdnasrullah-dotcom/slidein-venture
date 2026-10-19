@@ -21,6 +21,7 @@ const sceneBuilders = [
 export function createPlayer(stageRoot: HTMLElement, options?: VideoPlayerOptions): PlayerAPI & { _ctx: SceneContext } {
   const ctx = createContext(stageRoot);
   ctx.config = { scenes };
+  ctx.reducedMotion = !!options?.reducedMotion;
 
   const master = gsap.timeline({
     paused: true,
@@ -44,10 +45,24 @@ export function createPlayer(stageRoot: HTMLElement, options?: VideoPlayerOption
     sceneTimelines.push(sceneTl);
   });
 
-  // Scene visibility: set at start-0.3, hide at end+0.3
+  // Scene visibility: set at start-0.3, hide at end+0.3.
+  // Reduced motion: 0.2s crossfades on the same timer instead of hard sets.
   scenes.forEach((scene, i) => {
     const container = ctx.layers.scenes.querySelector<HTMLElement>(`[data-vp-scene="${i + 1}"]`);
-    if (container) {
+    if (!container) return;
+    if (options?.reducedMotion) {
+      master.fromTo(
+        container,
+        { autoAlpha: 0 },
+        { autoAlpha: 1, duration: 0.2, ease: 'none', overwrite: 'auto' },
+        Math.max(scene.start - 0.2, 0),
+      );
+      master.to(
+        container,
+        { autoAlpha: 0, duration: 0.2, ease: 'none', overwrite: 'auto' },
+        scene.start + scene.duration,
+      );
+    } else {
       master.set(
         container,
         { opacity: 1, visibility: 'visible' },

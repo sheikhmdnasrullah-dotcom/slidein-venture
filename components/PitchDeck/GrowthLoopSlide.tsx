@@ -105,7 +105,7 @@ export default function GrowthLoopSlide() {
         transition={{ duration: 0.6, ease: EASE }}
         className="text-center mb-1"
       >
-        <p className="text-[11px] md:text-xs font-bold tracking-[0.14em] uppercase text-[var(--accent)]">Why It&apos;s One System</p>
+        <p className="text-[13px] md:text-[14px] font-[550] tracking-[-0.01em] text-[var(--accent)]">Why It&apos;s One System</p>
         <h2 className="mt-1.5 display-headline text-[clamp(1.3rem,2.6vw,1.9rem)] text-[var(--on-surface)]">
           Not two services. <span className="text-[var(--accent)]">One growth engine.</span>
         </h2>

@@ -24,9 +24,10 @@ export function PlaybookHeading({ drawn = false, className }: HeadingSwashProps)
   return (
     <h2
       className={cn(
-        'text-[28px] md:text-[38px] font-bold tracking-[-0.03em] text-[var(--scaffold-text)] leading-[1.18] text-center',
+        'text-[clamp(1.75rem,3.2vw,3rem)] font-[650] tracking-[-0.035em] text-[var(--scaffold-ink)] leading-[1.14] text-center text-balance',
         className,
       )}
+      style={{ fontFamily: 'var(--font-display), Georgia, serif' }}
     >
       {introWords.map((word, i) => (
         <React.Fragment key={word}>

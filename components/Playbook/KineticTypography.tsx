@@ -3,15 +3,13 @@
 /**
  * KINETIC TYPOGRAPHY — SCROLL-SYNCHRONIZED EDITORIAL SYSTEM
  * ---------------------------------------------------------------------------
- * Replaces the passive bottom subtitle container with an oversized, bold,
- * scene-specific kinetic typography presentation:
- * - Scene 01 (Gather):  Center-integrated aperture amidst floating scattered notes
- * - Scene 02 (Distill): Architectural top banner presiding over 3 structured tables
- * - Scene 03 (Compile): Left-aligned dramatic spread balanced against open Book
- * - Scene 04 (Evolve):  Left-aligned dramatic spread balanced against radiant Brain
- *
- * All headlines and copy derived strictly from HOME.playbookHeadlines & HOME.playbookCaptions.
- * Zero AI synthetic assumptions.
+ * Displays the verified line for each scene in large, bold editorial typography.
+ * Implements strict typographic consistency:
+ * - 100% unified font design across all words (Fraunces display serif).
+ * - Zero dual-font conflict: eliminates disjointed sans-serif eyebrows.
+ * - Single harmonious typographic DNA across all 4 slides.
+ * - Generous text spacing with unclipped ascenders and descenders (P, y, g).
+ * - Hand-drawn hairline AccentRule underline placed safely below letter descenders.
  */
 
 import React from 'react';
@@ -24,18 +22,40 @@ interface KineticTypographyProps {
   staticAct?: 1 | 2 | 3 | 4;
 }
 
+/* ─── Hand-drawn hairline under the accent word ────────────────────────────── */
+function AccentRule() {
+  return (
+    <svg
+      className="accent-underline text-[var(--scaffold-accent)]"
+      viewBox="0 0 100 6"
+      preserveAspectRatio="none"
+      aria-hidden="true"
+      style={{ bottom: '-0.25em' }}
+    >
+      <path
+        d="M0,3.1 Q25,1.9 50,3 T100,3.1"
+        pathLength="100"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.2"
+        strokeLinecap="round"
+        className="underline-draw"
+      />
+    </svg>
+  );
+}
+
 export function KineticTypography({
   className,
   isPortrait = false,
   staticAct,
 }: KineticTypographyProps) {
   const captions = HOME.playbookCaptions;
-  const headlines = HOME.playbookHeadlines;
 
-  const wordsScene1 = captions.scene1.split(' ');
-  const wordsScene2 = captions.scene2.split(' ');
-  const wordsScene3 = captions.scene3.split(' ');
-  const wordsScene4 = captions.scene4.split(' ');
+  const wordsScene1 = captions.scene1.split(' '); // ['From', 'scattered', 'business', 'information']
+  const wordsScene2 = captions.scene2.split(' '); // ['to', 'preparing', 'offers', 'and', 'Ideal', 'Client', 'Profile']
+  const wordsScene3 = captions.scene3.split(' '); // ['to', 'organized', 'Master', 'Playbook,', 'which', 'has', 'all', 'the', 'context', 'about', 'your', 'business']
+  const wordsScene4 = captions.scene4.split(' '); // ['to', 'a', 'persistent', 'knowledge', 'from', 'the', 'master', 'playbook', 'that', 'evolves', 'every', 'time', 'you', 'interact', 'with', 'it.']
 
   return (
     <div
@@ -43,105 +63,110 @@ export function KineticTypography({
       className={cn('kinetic-typography-system absolute inset-0 pointer-events-none select-none z-30', className)}
     >
       {/* ====================================================================
-          SCENE 01: SCATTERED INFORMATION (Center Aperture in Landscape)
+          SCENE 01: "From scattered business information"
+          Unified Font Design: Fraunces display serif throughout
           ==================================================================== */}
       <div
         data-testid="playbook-caption-1"
         className={cn(
-          'kinetic-scene kinetic-scene-1 story-caption-1',
+          'kinetic-scene kinetic-scene-1 story-caption-1 will-change-transform',
           isPortrait
-            ? 'absolute left-8 top-9 flex flex-col items-start text-left max-w-[620px]'
-            : 'absolute left-1/2 top-[47%] -translate-x-1/2 -translate-y-1/2 flex flex-col items-center text-center max-w-[640px]',
+            ? 'absolute left-8 top-10 flex flex-col items-start text-left max-w-[620px]'
+            : 'absolute left-8 md:left-[80px] top-[140px] flex flex-col items-start text-left max-w-[440px]',
           staticAct !== undefined && staticAct !== 1 && 'hidden',
         )}
       >
-        <div className="overflow-hidden">
+        <div className="overflow-visible pt-2 pb-5 pr-6 pl-0">
           <h2
             className={cn(
-              'font-black tracking-[-0.04em] text-[#0A0A0A] leading-[0.92] select-none uppercase',
-              isPortrait ? 'text-[44px] sm:text-[54px]' : 'text-[52px] md:text-[68px] lg:text-[76px]',
+              'font-[650] tracking-[-0.03em] leading-[1.15] select-none text-left text-[#0A0A0A]',
+              isPortrait ? 'text-[44px]' : 'text-[36px] sm:text-[42px] md:text-[46px] lg:text-[50px]',
             )}
+            style={{ fontFamily: 'var(--font-display), Georgia, serif' }}
           >
-            <span className="block">Scattered</span>
-            <span className="block text-[var(--scaffold-accent)]">Information</span>
+            <span className="block">From scattered</span>
+            <span className="block">business</span>
+            <span className="relative inline-block text-[var(--scaffold-accent)] pb-2 pr-2">
+              <span>information</span>
+              <AccentRule />
+            </span>
           </h2>
         </div>
-
-        <p className="mt-4 sm:mt-5 text-[14px] sm:text-[16px] lg:text-[17px] text-[rgba(10,10,10,0.55)] font-medium tracking-tight max-w-[420px] leading-relaxed">
-          {wordsScene1.map((w, i) => (
-            <span key={i} className="inline-block mr-[0.25em]">
-              {w}
-            </span>
-          ))}
-        </p>
       </div>
 
       {/* ====================================================================
-          SCENE 02: STRUCTURED CONTEXT (Top Architectural Header in Landscape)
+          SCENE 02: "To preparing offers and Ideal Client Profile"
+          Spacious Architectural Header: spans gracefully above the 3 full-width columns
+          Unified Font Design: Fraunces display serif throughout (zero split)
           ==================================================================== */}
       <div
         data-testid="playbook-caption-2"
         className={cn(
-          'kinetic-scene kinetic-scene-2 story-caption-2',
+          'kinetic-scene kinetic-scene-2 story-caption-2 will-change-transform',
           isPortrait
-            ? 'absolute left-8 top-9 flex flex-col items-start text-left max-w-[620px]'
-            : 'absolute left-[68px] top-7 right-[68px] flex items-baseline justify-between max-w-[1144px]',
+            ? 'absolute left-8 top-8 flex flex-col items-start text-left max-w-[620px]'
+            : 'absolute left-[95px] top-6 right-[95px] flex items-center justify-between max-w-[1090px]',
           staticAct !== undefined && staticAct !== 2 && 'hidden',
         )}
       >
-        <div className="overflow-hidden">
+        <div className="overflow-visible pt-1 pb-3 pr-4 pl-0">
           <h2
             className={cn(
-              'font-black tracking-[-0.035em] text-[#0A0A0A] leading-none select-none uppercase',
-              isPortrait ? 'text-[40px] sm:text-[48px]' : 'text-[44px] md:text-[52px] lg:text-[58px]',
+              'font-[650] tracking-[-0.03em] leading-tight select-none text-left text-[#0A0A0A]',
+              isPortrait ? 'text-[34px]' : 'text-[28px] sm:text-[32px] md:text-[36px] lg:text-[38px]',
             )}
+            style={{ fontFamily: 'var(--font-display), Georgia, serif' }}
           >
-            <span>Structured </span>
-            <span className="text-[var(--scaffold-accent)]">Context</span>
+            <span>To preparing offers and </span>
+            <span className="relative inline-block text-[var(--scaffold-accent)] pb-1 pr-2">
+              <span>Ideal Client Profile</span>
+              <AccentRule />
+            </span>
           </h2>
         </div>
-
-        <p
-          className={cn(
-            'text-[14px] sm:text-[15px] lg:text-[16px] text-[rgba(10,10,10,0.55)] font-medium tracking-tight leading-relaxed',
-            isPortrait ? 'mt-2 max-w-[440px]' : 'max-w-[480px] text-right',
-          )}
-        >
-          {wordsScene2.map((w, i) => (
-            <span key={i} className="inline-block mr-[0.25em]">
-              {w}
-            </span>
-          ))}
-        </p>
       </div>
 
       {/* ====================================================================
-          SCENE 03: MASTER PLAYBOOK (Left Editorial Spread Balanced vs Book)
+          SCENE 03: "To organized Master Playbook, which has all the context about your business"
+          Unified Font Design: Fraunces display serif throughout (zero split)
           ==================================================================== */}
       <div
         data-testid="playbook-caption-3"
         className={cn(
-          'kinetic-scene kinetic-scene-3 story-caption-3',
+          'kinetic-scene kinetic-scene-3 story-caption-3 will-change-transform',
           isPortrait
-            ? 'absolute left-8 top-9 flex flex-col items-start text-left max-w-[620px]'
-            : 'absolute left-[80px] top-[48%] -translate-y-1/2 flex flex-col items-start text-left max-w-[480px]',
+            ? 'absolute left-8 top-10 flex flex-col items-start text-left max-w-[620px]'
+            : 'absolute left-8 md:left-[80px] top-[165px] flex flex-col items-start text-left max-w-[420px]',
           staticAct !== undefined && staticAct !== 3 && 'hidden',
         )}
       >
-        <div className="overflow-hidden">
+        <div className="overflow-visible pt-2 pb-4 pr-6 pl-0">
           <h2
             className={cn(
-              'font-black tracking-[-0.04em] text-[#0A0A0A] leading-[0.92] select-none uppercase',
-              isPortrait ? 'text-[44px] sm:text-[54px]' : 'text-[52px] md:text-[66px] lg:text-[76px]',
+              'font-[650] tracking-[-0.03em] leading-[1.15] select-none text-left text-[#0A0A0A]',
+              isPortrait ? 'text-[44px]' : 'text-[36px] sm:text-[42px] md:text-[46px] lg:text-[48px]',
             )}
+            style={{ fontFamily: 'var(--font-display), Georgia, serif' }}
           >
-            <span className="block">Master</span>
-            <span className="block text-[var(--scaffold-accent)]">Playbook</span>
+            <span className="block">To organized</span>
+            <span className="relative inline-block text-[var(--scaffold-accent)] pb-2 pr-2">
+              <span>Master Playbook</span>
+              <AccentRule />
+            </span>
           </h2>
         </div>
 
-        <p className="mt-4 sm:mt-5 text-[14px] sm:text-[16px] lg:text-[17px] text-[rgba(10,10,10,0.55)] font-medium tracking-tight max-w-[400px] leading-relaxed">
-          {wordsScene3.map((w, i) => (
+        {/* Supporting context in harmonious display tone */}
+        <p
+          className={cn(
+            'text-[rgba(10,10,10,0.65)] font-[450] tracking-[-0.015em] leading-[1.5] text-pretty text-left',
+            isPortrait
+              ? 'mt-3 text-[18px] max-w-[560px]'
+              : 'mt-2 text-[16px] md:text-[17px] max-w-[360px]',
+          )}
+          style={{ fontFamily: 'var(--font-display), Georgia, serif' }}
+        >
+          {wordsScene3.slice(4).map((w, i) => (
             <span key={i} className="inline-block mr-[0.25em]">
               {w}
             </span>
@@ -150,32 +175,46 @@ export function KineticTypography({
       </div>
 
       {/* ====================================================================
-          SCENE 04: PERSISTENT KNOWLEDGE (Left Editorial Spread Balanced vs Brain)
+          SCENE 04: "To a persistent knowledge from the master playbook that evolves every time you interact with it."
+          Unified Font Design: Fraunces display serif throughout (zero split)
           ==================================================================== */}
       <div
         data-testid="playbook-caption-4"
         className={cn(
-          'kinetic-scene kinetic-scene-4 story-caption-4',
+          'kinetic-scene kinetic-scene-4 story-caption-4 will-change-transform',
           isPortrait
-            ? 'absolute left-8 top-9 flex flex-col items-start text-left max-w-[620px]'
-            : 'absolute left-[80px] top-[48%] -translate-y-1/2 flex flex-col items-start text-left max-w-[480px]',
+            ? 'absolute left-8 top-10 flex flex-col items-start text-left max-w-[620px]'
+            : 'absolute left-8 md:left-[80px] top-[165px] flex flex-col items-start text-left max-w-[420px]',
           staticAct !== undefined && staticAct !== 4 && 'hidden',
         )}
       >
-        <div className="overflow-hidden">
+        <div className="overflow-visible pt-2 pb-4 pr-6 pl-0">
           <h2
             className={cn(
-              'font-black tracking-[-0.04em] text-[#0A0A0A] leading-[0.92] select-none uppercase',
-              isPortrait ? 'text-[44px] sm:text-[54px]' : 'text-[52px] md:text-[66px] lg:text-[76px]',
+              'font-[650] tracking-[-0.03em] leading-[1.15] select-none text-left text-[#0A0A0A]',
+              isPortrait ? 'text-[44px]' : 'text-[36px] sm:text-[42px] md:text-[46px] lg:text-[48px]',
             )}
+            style={{ fontFamily: 'var(--font-display), Georgia, serif' }}
           >
-            <span className="block">Persistent</span>
-            <span className="block text-[var(--scaffold-accent)]">Knowledge</span>
+            <span className="block">To a persistent</span>
+            <span className="relative inline-block text-[var(--scaffold-accent)] pb-2 pr-2">
+              <span>knowledge</span>
+              <AccentRule />
+            </span>
           </h2>
         </div>
 
-        <p className="mt-4 sm:mt-5 text-[14px] sm:text-[16px] lg:text-[17px] text-[rgba(10,10,10,0.55)] font-medium tracking-tight max-w-[420px] leading-relaxed">
-          {wordsScene4.map((w, i) => (
+        {/* Supporting context in harmonious display tone */}
+        <p
+          className={cn(
+            'text-[rgba(10,10,10,0.65)] font-[450] tracking-[-0.015em] leading-[1.5] text-pretty text-left',
+            isPortrait
+              ? 'mt-3 text-[18px] max-w-[560px]'
+              : 'mt-2 text-[16px] md:text-[17px] max-w-[360px]',
+          )}
+          style={{ fontFamily: 'var(--font-display), Georgia, serif' }}
+        >
+          {wordsScene4.slice(4).map((w, i) => (
             <span key={i} className="inline-block mr-[0.25em]">
               {w}
             </span>

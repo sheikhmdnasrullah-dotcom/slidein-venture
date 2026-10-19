@@ -337,11 +337,12 @@
    (entrance clip) > .hero-rise (entrance travel) > text. Separate elements
    per motion source so no two animations fight over one transform. */
 .hero-h1 {
+  font-family: var(--font-display), Georgia, serif;
   font-size: var(--hero-h1-size);
   line-height: var(--hero-h1-lh);
   letter-spacing: var(--hero-h1-tracking);
-  /* 600, not 700: the token contract caps weights at 600. */
-  font-weight: 600;
+  /* 650 weight for rich Fraunces display cut */
+  font-weight: 650;
   /* Scroll choreography: scale to 0.95 over the hero height, opacity 1
      until 0.6 then fading to 0.3. Transform and opacity only. */
   transform: scale(calc(1 - var(--hero-hp, 0) * 0.05));
@@ -850,4 +851,22 @@
     black 55%,
     transparent 100%
   );
+}
+
+/* ── Reading pages on the real page ground ─────────────────────────────────
+   The tone layer paints its bands with --color-paper-50 (#F6F4F0), a warm
+   newsprint that is a shade off the flat scaffold page the rest of the site
+   is built on (#FDFDFD). On a page whose whole job is reading, that reads as
+   a colour cast rather than as a band: the insights directory and the
+   article beneath it sat on #F6F4F0 against a #FDFDFD body, so the page
+   looked like it had been tinted.
+
+   Reading pages therefore take the page ground, not the paper ramp. The
+   tone's TEXT contract is untouched — ink, slate and the accent are still
+   handed down by .tone-*; only the fill changes. Two classes of specificity
+   beats the single-class tone rules, so this needs no !important. */
+section.insights-paper,
+section.insights-paper[style],
+article section.insights-paper {
+  background-color: var(--scaffold-bg);
 }

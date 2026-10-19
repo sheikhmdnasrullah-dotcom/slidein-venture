@@ -71,6 +71,7 @@ export interface ThreadConnectOpts {
 export interface CursorOpts {
   dur?: number;
   curve?: boolean;
+  from?: { x: number; y: number };
 }
 
 export interface CameraAPI {
@@ -109,6 +110,7 @@ export interface SceneContext {
     inout: string;
     settle: string;
   };
+  reducedMotion: boolean;
   stage: { w: number; h: number };
   config: {
     scenes: Array<{

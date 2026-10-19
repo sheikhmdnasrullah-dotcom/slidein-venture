@@ -158,11 +158,11 @@ export default function BookingCalendar() {
         <div className="text-center mb-14">
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full mb-5" style={{ background: RED_LIGHT }}>
             <span className="w-2 h-2 rounded-full animate-pulse" style={{ background: RED }} />
-            <span className="text-[11.5px] font-[700] tracking-[0.08em] uppercase" style={{ color: RED }}>
+            <span className="text-[12.5px] font-[550] tracking-[-0.01em]" style={{ color: RED }}>
               Let&apos;s talk
             </span>
           </div>
-          <h2 className="text-[clamp(2rem,4vw,3.25rem)] font-[800] leading-[1.05] tracking-[-0.03em] text-[#191919] mb-4">
+          <h2 className="text-[clamp(2rem,4vw,3.25rem)] font-[620] leading-[1.08] tracking-[-0.035em] text-[#191919] mb-4">
             Book a call now
           </h2>
           <p className="text-[17px] text-[#787774] max-w-[480px] mx-auto leading-[1.65]">
@@ -300,7 +300,7 @@ export default function BookingCalendar() {
               >
                 {selectedDate ? (
                   <>
-                    <p className="text-[12px] font-[700] tracking-[0.06em] uppercase mb-1" style={{ color: RED }}>
+                    <p className="text-[13px] font-[550] tracking-[-0.01em] mb-1" style={{ color: RED }}>
                       Available times
                     </p>
                     <p className="text-[14px] font-[600] text-[#191919] mb-5 tracking-[-0.01em]">

@@ -186,7 +186,7 @@ export function WorkflowVideoStage({
       {/* 3. Subtle Return Loop Indicator (at bottom of canvas) */}
       <div className="flex items-center gap-2 text-[12px] font-medium tracking-wide text-[rgba(10,10,10,0.4)]">
         <span className="h-1.5 w-1.5 rounded-full bg-[var(--scaffold-accent)]" />
-        <span className="uppercase tracking-wider">Continuous Feedback Loop</span>
+        <span className="tracking-[-0.01em]">Continuous Feedback Loop</span>
         <svg width="14" height="10" viewBox="0 0 16 12" fill="none" aria-hidden="true">
           <path d="M2 6h11M9 2.5L12.5 6 9 9.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
         </svg>

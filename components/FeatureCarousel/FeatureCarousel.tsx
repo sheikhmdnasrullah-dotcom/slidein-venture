@@ -36,12 +36,12 @@ export default function FeatureCarousel({ tabs, eyebrow, title, subtitle, dark }
         {(eyebrow || title || subtitle) && (
           <div className="text-center mb-14">
             {eyebrow && (
-              <p className="text-[11.5px] font-[700] tracking-[0.08em] uppercase text-[#0F8A8A] mb-3">
+              <p className="text-[13px] font-[550] tracking-[-0.01em] text-[#0F8A8A] mb-3">
                 {eyebrow}
               </p>
             )}
             {title && (
-              <h2 className={`text-[clamp(1.875rem,3.5vw,3rem)] font-[700] leading-[1.1] tracking-[-0.025em] mb-4 ${dark ? 'text-white' : 'text-[#191919]'}`}>
+              <h2 className={`text-[clamp(1.875rem,3.5vw,3rem)] font-[620] leading-[1.12] tracking-[-0.03em] mb-4 ${dark ? 'text-white' : 'text-[#191919]'}`}>
                 {title}
               </h2>
             )}
@@ -118,7 +118,7 @@ export default function FeatureCarousel({ tabs, eyebrow, title, subtitle, dark }
               >
                 {current.badge && (
                   <div
-                    className="absolute top-4 left-4 text-[10.5px] font-[700] tracking-[0.05em] uppercase px-2.5 py-1 rounded-full"
+                    className="absolute top-4 left-4 text-[11px] font-[550] tracking-[-0.01em] px-2.5 py-1 rounded-full"
                     style={{ color: current.badgeColor, background: `${current.badgeColor}18` }}
                   >
                     {current.badge}

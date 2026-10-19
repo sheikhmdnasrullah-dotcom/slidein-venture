@@ -22,6 +22,8 @@ import {
   LANDSCAPE_CHIPS,
   PORTRAIT_FRAGMENTS,
   PORTRAIT_CHIPS,
+  BOOK_PORTRAIT,
+  BOOK_LANDSCAPE,
   PLAYBOOK_CONFIG,
 } from './poses';
 import { CanvasAct1 } from './CanvasAct1';
@@ -185,10 +187,10 @@ export function PlaybookStory() {
         gsap.set('[data-act="compile"]', { opacity: 0, pointerEvents: 'none' });
         gsap.set('[data-testid="scan-beam"]', { y: 0, opacity: 1 });
         gsap.set('.act1-cue', { opacity: 0.8 });
-        gsap.set('.story-caption-1', { opacity: 1, y: 0 });
-        gsap.set('.story-caption-2', { opacity: 0, y: 24 });
-        gsap.set('.story-caption-3', { opacity: 0, y: 24 });
-        gsap.set('.story-caption-4', { opacity: 0, y: 24 });
+        gsap.set('.story-caption-1', { autoAlpha: 1, y: 0 });
+        gsap.set('.story-caption-2', { autoAlpha: 0, y: 16 });
+        gsap.set('.story-caption-3', { autoAlpha: 0, y: 16 });
+        gsap.set('.story-caption-4', { autoAlpha: 0, y: 16 });
         gsap.set('.act3-paper-crease', { opacity: 0 });
 
         // Dotted threads start hidden (strokeDashoffset)
@@ -214,7 +216,7 @@ export function PlaybookStory() {
           '[data-testid="scan-beam"]',
           {
             y: portrait ? CANVAS_PORTRAIT.h : CANVAS_LANDSCAPE.h,
-            duration: 13,
+            duration: 23,
             ease: 'none',
           },
           0,
@@ -223,9 +225,9 @@ export function PlaybookStory() {
         // Scroll cue fades on first scroll
         tl.to('.act1-cue', { opacity: 0, duration: 4 }, 0);
 
-        // Fragments pop and chips emerge
+        // Fragments pop and chips emerge as the beam passes
         fragments.forEach((frag) => {
-          const hitTime = frag.hitProgress * 55; // 7 to 15
+          const hitTime = frag.hitProgress * 78; // hits each fragment as beam sweeps down (9 to 21)
 
           // Fragment hit bounce
           tl.to(
@@ -247,10 +249,10 @@ export function PlaybookStory() {
               {
                 opacity: 1,
                 scale: 1,
-                duration: 3.5,
+                duration: 3,
                 ease: 'back.out(2)',
               },
-              hitTime + 0.8,
+              hitTime + 0.6,
             );
 
             // Thread draws from fragment to chip
@@ -258,56 +260,80 @@ export function PlaybookStory() {
               `[data-thread-id="${chipId}"]`,
               {
                 drawSVG: '0% 100%',
-                duration: 3.5,
+                duration: 3,
                 ease: 'power2.out',
               },
-              hitTime + 0.8,
+              hitTime + 0.6,
             );
           });
         });
 
-        // Beam exits at bottom and fragments dim
-        tl.to('[data-testid="scan-beam"]', { opacity: 0, duration: 2 }, 18);
-        tl.to('.act1-frag-wrap', { opacity: 0.4, duration: 3, ease: 'power2.out' }, 18);
-
-        // Settle as Scene 01 (Rest 1 at 24): Only Caption 1 is visible
+        // Beam sweeps continuously across the full height of the slide (0 to 20)
+        tl.to(
+          '[data-testid="scan-beam"]',
+          {
+            y: portrait ? CANVAS_PORTRAIT.h : CANVAS_LANDSCAPE.h,
+            duration: 20,
+            ease: 'none',
+          },
+          0,
+        );
 
         // ==========================================
-        // TRANSITION 1: SCENE 01 -> SCENE 02 (24 to 34)
+        // TRANSITION 1: SCENE 01 -> SCENE 02 (19 to 26)
+        // As soon as the black line goes down, the next slide smoothly arrives
         // ==========================================
-        // Fragments fade out and lift slightly
+        // Beam reaches bottom and smoothly dissolves (19.5 to 21)
+        tl.to('[data-testid="scan-beam"]', { opacity: 0, duration: 1.2, ease: 'power2.out' }, 19.8);
+
+        // Act 1 fragments and threads fade out and lift away
         tl.to(
           '.act1-frag-wrap',
           {
             opacity: 0,
-            y: '-=8',
-            scale: 0.92,
-            stagger: 0.1,
-            duration: 4.5,
+            y: '-=12',
+            scale: 0.94,
+            duration: 2.0,
             ease: 'power2.in',
           },
-          24,
+          19.5,
         );
-
-        // Threads erase
         tl.to(
           '.act1-thread',
           {
             drawSVG: '100% 100%',
-            duration: 3.5,
+            duration: 1.8,
             ease: 'power2.in',
           },
-          24,
+          19.5,
         );
 
         // Hide Act 1 background container
-        tl.to('[data-act="gather"]', { opacity: 0, duration: 2 }, 28);
+        tl.to('[data-act="gather"]', { opacity: 0, duration: 1 }, 21.0);
 
-        // Synchronized Caption 1 -> Caption 2 Transition
-        tl.to('.story-caption-1', { opacity: 0, y: -20, duration: 3.5, ease: 'power2.in' }, 24);
-        tl.to('.story-caption-2', { opacity: 1, y: 0, duration: 4, ease: 'power2.out' }, 27.5);
+        // Caption 1 dissolves as the black bar hits the bottom
+        tl.to('.story-caption-1', { autoAlpha: 0, y: -16, duration: 1.5, ease: 'power2.in' }, 19.5);
 
-        // Chips fly along curved MotionPath arcs into table slots
+        // AS SOON AS THE BAR GOES DOWN: Next slide (Scene 2) smoothly comes in (20.5 onwards)
+        tl.to('[data-act="distill"]', { opacity: 1, duration: 1.2 }, 20.5);
+
+        // Caption 2 smoothly glides in at the top
+        tl.fromTo(
+          '.story-caption-2',
+          { autoAlpha: 0, y: 16 },
+          { autoAlpha: 1, y: 0, duration: 2.2, ease: 'power2.out' },
+          20.5,
+        );
+
+        // The 3 spacious 360px columns smoothly glide up into place
+        tl.fromTo(
+          '.act2-col-card',
+          { y: 32, opacity: 0 },
+          { y: 0, opacity: 1, stagger: 0.25, duration: 3.0, ease: 'power2.out' },
+          20.8,
+        );
+
+        // Chips fly along curved MotionPath arcs directly into their column slots
         chips.forEach((chip, i) => {
           const dx = chip.docked.x - chip.constellation.x;
           const dy = chip.docked.y - chip.constellation.y;
@@ -317,16 +343,16 @@ export function PlaybookStory() {
             {
               motionPath: {
                 path: [
-                  { x: dx * 0.45, y: dy * 0.45 - 60 },
+                  { x: dx * 0.45, y: dy * 0.45 - 35 },
                   { x: dx, y: dy },
                 ],
-                curviness: 1.3,
+                curviness: 1.2,
               },
               rotation: 0,
-              duration: 8,
+              duration: 4.5,
               ease: 'power3.inOut',
             },
-            26 + (i % 8) * 0.5,
+            21.2 + (i % 8) * 0.25,
           );
         });
 
@@ -335,12 +361,6 @@ export function PlaybookStory() {
         // Caption 2: "To organized Profile, Offers and Ideal Client Profile."
         // ==========================================
         tl.to('[data-act="distill"]', { opacity: 1, duration: 1 }, 30);
-        tl.fromTo(
-          '.act2-col-card',
-          { y: 18, opacity: 0 },
-          { y: 0, opacity: 1, stagger: 0.8, duration: 4.5, ease: 'power2.out' },
-          30,
-        );
 
         // ICP column spotlight and spokes
         tl.to(
@@ -400,8 +420,8 @@ export function PlaybookStory() {
 
         // Chips fly into the book center in vortex convergence
         chips.forEach((chip, i) => {
-          const bookTargetX = portrait ? 360 : 640;
-          const bookTargetY = portrait ? 280 : 235;
+          const bookTargetX = portrait ? BOOK_PORTRAIT.cx : BOOK_LANDSCAPE.cx;
+          const bookTargetY = portrait ? BOOK_PORTRAIT.cy : BOOK_LANDSCAPE.cy;
           const endDx = bookTargetX - chip.constellation.x - 48;
           const endDy = bookTargetY - chip.constellation.y - 14;
 
@@ -423,9 +443,14 @@ export function PlaybookStory() {
         tl.to('.act-chip-wrap', { opacity: 0, duration: 1 }, 58);
         tl.to('[data-act="distill"]', { opacity: 0, duration: 1 }, 58);
 
-        // Transition Caption 2 -> Caption 3
-        tl.to('.story-caption-2', { opacity: 0, y: -20, duration: 3.5, ease: 'power2.in' }, 52);
-        tl.to('.story-caption-3', { opacity: 1, y: 0, duration: 4, ease: 'power2.out' }, 56);
+        // Transition Caption 2 -> Caption 3 (crisp, sequential crossfade)
+        tl.to('.story-caption-2', { autoAlpha: 0, y: -18, duration: 1.2, ease: 'power2.in' }, 52.0);
+        tl.fromTo(
+          '.story-caption-3',
+          { autoAlpha: 0, y: 18 },
+          { autoAlpha: 1, y: 0, duration: 1.4, ease: 'power2.out' },
+          53.2,
+        );
 
         // ==========================================
         // SCENE 03: THE MASTER PLAYBOOK (62 to 78)
@@ -433,50 +458,50 @@ export function PlaybookStory() {
         // ==========================================
         tl.to('[data-act="compile"]', { opacity: 1, duration: 1 }, 59);
 
-        // Master Playbook Book rises
+        // Master Playbook Book rises smoothly
         tl.fromTo(
           '.act3-book-container',
-          { xPercent: -50, yPercent: -50, y: 24, scale: 0.92, opacity: 0, rotation: 0 },
-          { xPercent: -50, yPercent: -50, y: 0, scale: 1, opacity: 1, rotation: 0, duration: 5, ease: 'power2.out' },
-          60,
+          { xPercent: -50, yPercent: -50, y: 20, scale: 0.94, opacity: 0, rotation: 0 },
+          { xPercent: -50, yPercent: -50, y: 0, scale: 1, opacity: 1, rotation: 0, duration: 4.2, ease: 'power3.out' },
+          59.5,
         );
 
-        // Cover opens (rotateY: 0 -> -160deg)
+        // Cover turns open smoothly and gracefully settles
         tl.fromTo(
           '[data-testid="book-cover"]',
-          { rotateY: 0 },
-          { rotateY: -160, duration: 5.5, ease: 'power2.inOut' },
-          61,
+          { rotateY: 0, opacity: 1 },
+          { rotateY: -160, opacity: 0, duration: 4.5, ease: 'power2.inOut' },
+          60.2,
         );
 
-        // Chapter tabs slide out on right edge
+        // Chapter tabs slide out with soft ease
         tl.fromTo(
           '.act3-chapter-tab',
-          { x: -16, opacity: 0 },
-          { x: 0, opacity: 1, stagger: 0.5, duration: 2.5, ease: 'back.out(1.8)' },
-          63.5,
+          { x: -14, opacity: 0 },
+          { x: 0, opacity: 1, stagger: 0.35, duration: 2.2, ease: 'power2.out' },
+          62.5,
         );
 
-        // Checkmark seals and rule bars pop in
+        // Checkmark seals and rule bars glide in cleanly
         tl.fromTo(
           '.act3-check-seal',
-          { scale: 0, opacity: 0 },
-          { scale: 1, opacity: 1, stagger: 0.4, duration: 2.2, ease: 'back.out(2)' },
-          64.5,
+          { scale: 0.3, opacity: 0 },
+          { scale: 1, opacity: 1, stagger: 0.3, duration: 2.0, ease: 'power2.out' },
+          63.2,
         );
         tl.fromTo(
           '.act3-rule-bar',
           { scaleX: 0 },
-          { scaleX: 1, stagger: 0.4, duration: 2.2, ease: 'power2.out' },
-          64.5,
+          { scaleX: 1, stagger: 0.3, duration: 2.0, ease: 'power2.out' },
+          63.2,
         );
 
-        // Bookmark ribbon lowers
+        // Bookmark ribbon lowers naturally
         tl.fromTo(
           '[data-bookmark="ribbon"]',
-          { y: -10 },
-          { y: 10, duration: 2.5, ease: 'power2.out' },
-          65.5,
+          { y: -14 },
+          { y: 8, duration: 2.0, ease: 'power2.out' },
+          64.0,
         );
 
         // Settle at Rest 3 (72 to 76) with Caption 3
@@ -505,9 +530,14 @@ export function PlaybookStory() {
           79.5,
         );
 
-        // Transition Caption 3 -> Caption 4
-        tl.to('.story-caption-3', { opacity: 0, y: -20, duration: 3, ease: 'power2.in' }, 78);
-        tl.to('.story-caption-4', { opacity: 1, y: 0, duration: 4, ease: 'power2.out' }, 82);
+        // Transition Caption 3 -> Caption 4 (crisp, sequential crossfade)
+        tl.to('.story-caption-3', { autoAlpha: 0, y: -18, duration: 1.2, ease: 'power2.in' }, 78.0);
+        tl.fromTo(
+          '.story-caption-4',
+          { autoAlpha: 0, y: 18 },
+          { autoAlpha: 1, y: 0, duration: 1.4, ease: 'power2.out' },
+          79.2,
+        );
 
         // Brain design materializes and emerges from center vortex
         tl.fromTo(

@@ -135,19 +135,19 @@ export function initCaptions(
   // Emphasis highlighter
   words.forEach((rw) => {
     if (rw.data.emphasized) {
-      const absEnd = scenes[rw.sceneIndex].start + rw.data.end;
+      const absStart = scenes[rw.sceneIndex].start + rw.data.start;
       const highlightEl = createEmphasisHighlight();
       rw.el.appendChild(highlightEl);
       rw.emphasisEl = highlightEl;
 
-      master.set(highlightEl, { opacity: 0, scaleX: 0 }, absEnd - (rw.data.end - rw.data.start));
+      master.set(highlightEl, { opacity: 0, scaleX: 0 }, absStart);
       master.to(highlightEl, {
         opacity: 1,
         scaleX: 1,
         duration: 0.35,
         ease: ctx.eases.out,
         transformOrigin: 'left center',
-      }, absEnd);
+      }, absStart);
     }
   });
 

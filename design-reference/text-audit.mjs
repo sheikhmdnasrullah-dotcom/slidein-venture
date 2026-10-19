@@ -13,7 +13,7 @@
    span. sr-only nodes are reported separately and must also be content or
    chrome — invented assistive text is still a violation. */
 import { chromium } from '@playwright/test';
-import { HOME, NAV_SLOTS } from '../content/home.ts';
+import { HOME, NAV_SLOTS, HOME_CONTENT } from '../content/home.ts';
 import { STAGE_WORD, EQUATION_WORDS } from '../content/stages.ts';
 import { WORKFLOW_CAPTIONS, STORY_CHROME } from '../content/workflowCaptions.ts';
 import { HERO_PHRASE_SYNC } from '../content/hero-sync.ts';
@@ -44,10 +44,10 @@ add(HOME.persistentKnowledgeTagline);
 if (HOME.playbookCaptions) {
   for (const c of Object.values(HOME.playbookCaptions)) add(c);
 }
-if (HOME.playbookHeadlines) {
-  for (const h of Object.values(HOME.playbookHeadlines)) add(h);
-}
 add(HOME.multiAgentTitle);
+add(HOME.journeyNote);
+add(HOME.dashboardTagline.full);
+add(HOME.dashboardTagline.highlight);
 for (const l of NAV_SLOTS.links) add(l.label);
 add(NAV_SLOTS.cta.label);
 for (const w of Object.values(STAGE_WORD)) add(w);
@@ -56,6 +56,27 @@ for (const c of WORKFLOW_CAPTIONS) add(c.text);
 add(STORY_CHROME.title);
 for (let n = 1; n <= 7; n++) add(STORY_CHROME.step(n));
 add(STORY_CHROME.overview);
+
+if (HOME_CONTENT && HOME_CONTENT.sections) {
+  for (const s of HOME_CONTENT.sections) {
+    add(s.eyebrow);
+    add(s.title);
+    add(s.lead);
+    if (s.items) {
+      for (const it of s.items) {
+        add(it.title);
+        add(it.body);
+      }
+    }
+    if (s.cta) add(s.cta.label);
+  }
+}
+if (HOME_CONTENT && HOME_CONTENT.footer) {
+  for (const col of HOME_CONTENT.footer.columns) {
+    add(col.heading);
+    for (const l of col.links) add(l.label);
+  }
+}
 
 /* Word tokens of every content string (caption band splits words into
    spans; the marker highlight splits the headline's last words). */
@@ -173,8 +194,17 @@ const html = await (
 ).text();
 const bodyMatch = html.match(/<body[^>]*>([\s\S]*?)<\/body>/);
 const stripped = bodyMatch ? bodyMatch[1].replace(/<script[\s\S]*?<\/script>/g, '') : '';
+const unescapeHtml = (str) =>
+  str
+    .replace(/&#x27;/g, "'")
+    .replace(/&amp;/g, '&')
+    .replace(/&quot;/g, '"')
+    .replace(/&#x2F;/g, '/')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>');
+
 const text = stripped.replace(/<style[\s\S]*?<\/style>/g, '').replace(/<[^>]+>/g, ' ');
-let remainder = text.replace(/\s+/g, ' ');
+let remainder = unescapeHtml(text).replace(/\s+/g, ' ');
 const allAllowed = [...CONTENT_STRINGS, ...CHROME].sort((a, b) => b.length - a.length);
 for (const allowed of allAllowed) {
   remainder = remainder.split(allowed).join(' ');

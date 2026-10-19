@@ -74,17 +74,18 @@ export function Heading({
 }) {
   const Tag = as ?? headingTag[variant];
   const v = headingVar[variant];
+  const isDisplay = variant === 'display' || variant === 'h2';
   return (
     <Slot text={text} barWidth={barWidth} className={cn(alignClass[align], className)}>
       {(t) => (
         <Tag
           className={cn('text-balance', alignClass[align], className)}
           style={{
-            fontFamily: 'var(--font-sans)',
+            fontFamily: isDisplay ? 'var(--font-display), Georgia, serif' : 'var(--font-sans), sans-serif',
             fontSize: `var(--scaffold-${v}-size)`,
-            fontWeight: `var(--scaffold-${v}-weight)`,
-            lineHeight: `var(--scaffold-${v}-leading)`,
-            letterSpacing: `var(--scaffold-${v}-tracking)`,
+            fontWeight: isDisplay ? 650 : `var(--scaffold-${v}-weight)`,
+            lineHeight: isDisplay ? 1.08 : `var(--scaffold-${v}-leading)`,
+            letterSpacing: isDisplay ? '-0.03em' : `var(--scaffold-${v}-tracking)`,
             color: 'var(--scaffold-ink)',
           }}
         >
@@ -94,6 +95,8 @@ export function Heading({
     </Slot>
   );
 }
+
+import ScrollReveal from '@/components/ui/ScrollReveal';
 
 /* ─── Text ────────────────────────────────────────────────────────────── */
 
@@ -105,6 +108,7 @@ export function Text({
   text,
   barWidth,
   align = 'left',
+  animate = false,
   className,
 }: {
   variant: TextVariant;
@@ -114,28 +118,49 @@ export function Text({
   text: string;
   barWidth?: string;
   align?: Align;
+  animate?: boolean;
   className?: string;
 }) {
   return (
     <Slot text={text} barWidth={barWidth} className={cn(alignClass[align], className)}>
-      {(t) => (
-        <Tag
-          className={cn('text-pretty', alignClass[align], className)}
-          style={{
-            fontFamily: 'var(--font-sans)',
-            fontSize: `var(--scaffold-${variant}-size)`,
-            fontWeight: `var(--scaffold-${variant}-weight)`,
-            lineHeight: `var(--scaffold-${variant}-leading)`,
-            letterSpacing:
-              variant === 'small' ? undefined : `var(--scaffold-${variant}-tracking)`,
-            color: `var(--scaffold-${variant}-ink)`,
-            maxWidth:
-              variant === 'small' ? undefined : `var(--scaffold-${variant}-measure)`,
-          }}
-        >
-          {t}
-        </Tag>
-      )}
+      {(t) =>
+        animate && Tag === 'p' ? (
+          <ScrollReveal
+            as="p"
+            className={cn('text-pretty', alignClass[align], className)}
+            style={{
+              fontFamily: 'var(--font-sans)',
+              fontSize: `var(--scaffold-${variant}-size)`,
+              fontWeight: `var(--scaffold-${variant}-weight)`,
+              lineHeight: `var(--scaffold-${variant}-leading)`,
+              letterSpacing:
+                variant === 'small' ? undefined : `var(--scaffold-${variant}-tracking)`,
+              color: `var(--scaffold-${variant}-ink)`,
+              maxWidth:
+                variant === 'small' ? undefined : `var(--scaffold-${variant}-measure)`,
+            }}
+          >
+            {t}
+          </ScrollReveal>
+        ) : (
+          <Tag
+            className={cn('text-pretty', alignClass[align], className)}
+            style={{
+              fontFamily: 'var(--font-sans)',
+              fontSize: `var(--scaffold-${variant}-size)`,
+              fontWeight: `var(--scaffold-${variant}-weight)`,
+              lineHeight: `var(--scaffold-${variant}-leading)`,
+              letterSpacing:
+                variant === 'small' ? undefined : `var(--scaffold-${variant}-tracking)`,
+              color: `var(--scaffold-${variant}-ink)`,
+              maxWidth:
+                variant === 'small' ? undefined : `var(--scaffold-${variant}-measure)`,
+            }}
+          >
+            {t}
+          </Tag>
+        )
+      }
     </Slot>
   );
 }
@@ -163,11 +188,12 @@ export function Eyebrow({
         <Tag
           className={cn(alignClass[align], className)}
           style={{
-            fontFamily: 'var(--font-sans)',
-            fontSize: 'var(--scaffold-eyebrow-size)',
-            fontWeight: 'var(--scaffold-eyebrow-weight)',
-            letterSpacing: 'var(--scaffold-eyebrow-tracking)',
-            color: 'var(--scaffold-eyebrow-ink)',
+            fontFamily: 'var(--font-mono), monospace',
+            fontSize: '12px',
+            fontWeight: 500,
+            letterSpacing: '0.12em',
+            textTransform: 'uppercase',
+            color: 'var(--scaffold-accent, var(--accent, #E05A1B))',
           }}
         >
           {t}

@@ -197,7 +197,7 @@ export function StoryModal({ open, onClose, triggerRef }: Props) {
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[var(--scaffold-accent)] opacity-75" />
                   <span className="relative inline-flex rounded-full h-2 w-2 bg-[var(--scaffold-accent)]" />
                 </span>
-                <span className="hidden min-[480px]:inline text-[11px] font-semibold tracking-wider uppercase text-[rgba(10,10,10,0.7)] whitespace-nowrap">
+                <span className="hidden min-[480px]:inline text-[12px] font-[550] tracking-[-0.01em] text-[rgba(10,10,10,0.7)] whitespace-nowrap">
                   {STORY_CHROME.title}
                 </span>
                 <span className="hidden min-[480px]:inline text-[rgba(10,10,10,0.25)] text-xs font-mono">•</span>

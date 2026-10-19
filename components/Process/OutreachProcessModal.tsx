@@ -236,7 +236,7 @@ export default function OutreachProcessModal({ open, phaseId, onClose }: Outreac
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: -12 }}
                       transition={still ? { duration: 0 } : { duration: 0.55, ease: EASE }}
-                      className="font-display-xl mx-auto max-w-[22ch] text-center text-[clamp(1.45rem,3.2vw,2.7rem)] uppercase leading-[1.05] text-[var(--on-surface)]"
+                      className="font-display-xl mx-auto max-w-[22ch] text-center text-[clamp(1.45rem,3.2vw,2.7rem)] leading-[1.05] text-[var(--on-surface)]"
                     >
                       {phase.subtitle}
                     </motion.h2>

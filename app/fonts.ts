@@ -1,46 +1,62 @@
 /**
  * FONT LAYER — SlideIn Venture
  * ---------------------------------------------------------------------------
- * ONE face for everything: Inter Tight, a modern neo-grotesque, loaded at
- * weights 400 / 500 / 600 only. The previous three-face system (Fraunces
- * display serif + Switzer body + JetBrains Mono labels) was retired with the
- * hero rebuild: the reference the owner approved is set entirely in one
- * grotesque family.
+ * Three faces, three jobs. Directly restored from tanim.tech source:
  *
- * The three exported faces keep their original names and CSS variables so
- * layout.tsx, the token layer and every untouched call site keep working
- * without a migration: --font-face-display, --font-face-body and
- * --font-face-mono all resolve to Inter Tight. Weights outside 400–600 snap
- * to the nearest loaded instance (variable-font clamping), so legacy
- * declarations like the 560/700 display weights render at 600.
+ *   display  Fraunces (variable: opsz · SOFT · WONK · wght)
+ *            Real ink traps and optical sizing. WONK is used on accent words.
+ *   body     Switzer (variable 100–900, self-hosted, latin subset)
+ *            Neo-grotesque with warmer terminals than Inter.
+ *   mono     JetBrains Mono — labels, coordinates, timestamps. Never body.
+ *
+ * These CSS variables carry the FACE only. Semantic roles (--font-display,
+ * --font-sans, --font-mono) map onto them in app/globals.css.
  */
 
-import { Inter_Tight } from 'next/font/google';
+import { Fraunces, JetBrains_Mono } from 'next/font/google';
+import localFont from 'next/font/local';
 
-/* Display — headlines and the wordmark. 600 only. */
-export const displayFace = Inter_Tight({
+/* ── Display ──────────────────────────────────────────────────────────────
+   axes are opt-in: without this array next/font ships wght only and
+   font-variation-settings for opsz/SOFT/WONK silently do nothing. */
+export const displayFace = Fraunces({
   subsets: ['latin'],
   display: 'swap',
   variable: '--font-face-display',
-  weight: '600',
-  fallback: ['system-ui', 'arial'],
+  axes: ['SOFT', 'WONK', 'opsz'],
+  weight: 'variable',
+  fallback: ['Georgia', 'Times New Roman', 'serif'],
 });
 
-/* Body — everything else. 400 / 500 / 600. */
-export const bodyFace = Inter_Tight({
-  subsets: ['latin'],
+/* ── Body ─────────────────────────────────────────────────────────────────
+   Fontshare variable TTFs subset to latin + punctuation + currency + arrows
+   and compressed to woff2. Located in app/fonts/Switzer-Variable-subset.woff2. */
+export const bodyFace = localFont({
+  src: [
+    {
+      path: './fonts/Switzer-Variable-subset.woff2',
+      style: 'normal',
+      weight: '100 900',
+    },
+    {
+      path: './fonts/Switzer-VariableItalic-subset.woff2',
+      style: 'italic',
+      weight: '100 900',
+    },
+  ],
   display: 'swap',
   variable: '--font-face-body',
-  weight: ['400', '500', '600'],
   fallback: ['system-ui', 'arial'],
+  adjustFontFallback: 'Arial',
 });
 
-/* Mono role — the label tier. Same face; the mono axis is gone from the
-   design, but the variable name is still referenced by the token layer. */
-export const monoFace = Inter_Tight({
+/* ── Mono ─────────────────────────────────────────────────────────────────
+   400/500 only. Anything heavier stops reading as system metadata. */
+export const monoFace = JetBrains_Mono({
   subsets: ['latin'],
   display: 'swap',
   variable: '--font-face-mono',
   weight: ['400', '500'],
-  fallback: ['system-ui', 'arial'],
+  fallback: ['ui-monospace', 'SFMono-Regular', 'monospace'],
 });
+

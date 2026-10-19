@@ -30,7 +30,13 @@ export default function SiteFooter() {
           <div className="grid grid-cols-2 gap-x-8 gap-y-12 py-20 md:grid-cols-3">
             {columns.map((col, i) => (
               <div key={i} className="flex flex-col gap-5">
-                <Bar width="5em" className="text-[13px]" />
+                {col.heading ? (
+                  <span className="font-mono text-[12px] font-semibold uppercase tracking-[0.12em] text-[var(--scaffold-accent)]">
+                    {col.heading}
+                  </span>
+                ) : (
+                  <Bar width="5em" className="text-[13px]" />
+                )}
                 <ul className="flex flex-col items-start gap-3.5">
                   {col.links.map((link, j) => (
                     <li key={j}>

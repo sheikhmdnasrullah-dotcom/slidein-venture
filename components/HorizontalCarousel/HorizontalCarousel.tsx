@@ -32,12 +32,12 @@ export default function HorizontalCarousel({ slides, eyebrow, title }: Horizonta
     <section className="py-24">
       <div className="max-w-[1200px] mx-auto px-6 md:px-10">
         {eyebrow && (
-          <p className="text-center text-[11.5px] font-[700] tracking-[0.08em] uppercase text-[#0F8A8A] mb-3">
+          <p className="text-center text-[13px] font-[550] tracking-[-0.01em] text-[#0F8A8A] mb-3">
             {eyebrow}
           </p>
         )}
         {title && (
-          <h2 className="text-center text-[clamp(1.875rem,3.5vw,3rem)] font-[700] leading-[1.1] tracking-[-0.025em] text-[#191919] mb-10">
+          <h2 className="text-center text-[clamp(1.875rem,3.5vw,3rem)] font-[620] leading-[1.12] tracking-[-0.03em] text-[#191919] mb-10">
             {title}
           </h2>
         )}
@@ -82,11 +82,11 @@ export default function HorizontalCarousel({ slides, eyebrow, title }: Horizonta
                 transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
               >
                 {slide.eyebrow && (
-                  <span className="block text-[11px] font-[700] tracking-[0.08em] uppercase text-white/60 mb-2">
+                  <span className="block text-[12px] font-[550] tracking-[-0.01em] text-white/70 mb-2">
                     {slide.eyebrow}
                   </span>
                 )}
-                <h3 className="text-[clamp(1.125rem,2.5vw,1.875rem)] font-[700] leading-[1.2] tracking-[-0.02em] text-white mb-2">
+                <h3 className="text-[clamp(1.125rem,2.5vw,1.875rem)] font-[620] leading-[1.2] tracking-[-0.025em] text-white mb-2">
                   {slide.headline}
                 </h3>
                 <p className="text-[14.5px] text-white/75 leading-[1.55] max-w-[480px]">

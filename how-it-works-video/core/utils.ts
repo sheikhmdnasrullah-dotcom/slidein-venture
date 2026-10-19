@@ -1,6 +1,6 @@
 import { gsap } from 'gsap';
-import { CustomEase, DrawSVGPlugin, MorphSVGPlugin, MotionPathPlugin } from 'gsap/all';
-gsap.registerPlugin(CustomEase, DrawSVGPlugin, MorphSVGPlugin, MotionPathPlugin);
+import { CustomEase, DrawSVGPlugin, Flip, MorphSVGPlugin, MotionPathPlugin, SplitText, TextPlugin } from 'gsap/all';
+gsap.registerPlugin(CustomEase, DrawSVGPlugin, Flip, MorphSVGPlugin, MotionPathPlugin, SplitText, TextPlugin);
 
 import type {
   SceneContext,
@@ -49,15 +49,7 @@ export function createThreadLayer(): SVGSVGElement {
   svg.setAttribute('width', '1280');
   svg.setAttribute('height', '720');
   svg.setAttribute('class', 'vp-thread-svg');
-  svg.style.cssText = 'position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible;';
-
-  // Background grid for the SVG
-  const bg = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-  bg.setAttribute('width', '1280');
-  bg.setAttribute('height', '720');
-  bg.setAttribute('fill', 'var(--vp-stage)');
-  svg.appendChild(bg);
-
+  svg.style.cssText = 'position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none;';
   return svg;
 }
 
@@ -77,7 +69,31 @@ export function createCameraGroup(): HTMLDivElement {
 export function createContext(root: HTMLElement): SceneContext {
   const eases = createEases();
 
-  // Find or create layers
+  // Root must be a positioned 1280x720 artboard (the real .vp-stage already is)
+  if (getComputedStyle(root).position === 'static') root.style.position = 'relative';
+  if (!root.classList.contains('vp-stage')) {
+    root.style.width = '1280px';
+    root.style.height = '720px';
+    root.style.overflow = 'hidden';
+  }
+
+  // Background layer (bottom): dot grid + film grain
+  let bgLayer = root.querySelector<HTMLElement>('[data-vp-bg]');
+  if (!bgLayer) {
+    bgLayer = document.createElement('div');
+    bgLayer.setAttribute('data-vp-bg', 'true');
+    bgLayer.className = 'vp-layer-bg';
+    bgLayer.innerHTML = `
+      <div class="vp-grid-overlay" data-vp-grid></div>
+      <svg class="vp-grain-overlay" width="1280" height="720" aria-hidden="true">
+        <filter id="vp-grain-filter"><feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="2" stitchTiles="stitch"/></filter>
+        <rect width="1280" height="720" filter="url(#vp-grain-filter)"/>
+      </svg>`;
+    root.appendChild(bgLayer);
+  }
+
+  // Scenes layer holds the camera group; persist + threads live inside the
+  // camera group so camera pushes scale scenes, kept objects and threads together.
   let scenesLayer = root.querySelector<HTMLElement>('[data-vp-scenes]');
   if (!scenesLayer) {
     scenesLayer = document.createElement('div');
@@ -86,12 +102,10 @@ export function createContext(root: HTMLElement): SceneContext {
     root.appendChild(scenesLayer);
   }
 
-  let bgLayer = root.querySelector<HTMLElement>('[data-vp-bg]');
-  if (!bgLayer) {
-    bgLayer = document.createElement('div');
-    bgLayer.setAttribute('data-vp-bg', 'true');
-    bgLayer.className = 'vp-layer-bg';
-    root.appendChild(bgLayer);
+  let cameraGroup = scenesLayer.querySelector<HTMLElement>('#camera');
+  if (!cameraGroup) {
+    cameraGroup = createCameraGroup();
+    scenesLayer.appendChild(cameraGroup);
   }
 
   let persistLayer = root.querySelector<HTMLElement>('[data-vp-persist]');
@@ -99,14 +113,14 @@ export function createContext(root: HTMLElement): SceneContext {
     persistLayer = document.createElement('div');
     persistLayer.setAttribute('data-vp-persist', 'true');
     persistLayer.className = 'vp-layer-persist';
-    root.appendChild(persistLayer);
+    cameraGroup.appendChild(persistLayer);
   }
 
   let threadLayer = root.querySelector<SVGSVGElement>('[data-vp-threads]');
   if (!threadLayer) {
     threadLayer = createThreadLayer();
     threadLayer.setAttribute('data-vp-threads', 'true');
-    root.appendChild(threadLayer);
+    cameraGroup.appendChild(threadLayer);
   }
 
   let hudLayer = root.querySelector<HTMLElement>('[data-vp-hud]');
@@ -125,16 +139,8 @@ export function createContext(root: HTMLElement): SceneContext {
     root.appendChild(cursorLayer);
   }
 
-  // Create camera group inside scenes layer
-  let cameraGroup = scenesLayer.querySelector<HTMLElement>('#camera');
-  if (!cameraGroup) {
-    cameraGroup = createCameraGroup();
-    scenesLayer.appendChild(cameraGroup);
-  }
-
-  // Scene containers go inside the camera group
+  // Scene containers go inside the camera group (below persist + threads)
   const scenesContainer = cameraGroup;
-  // Create 8 scene containers
   for (let i = 0; i < 8; i++) {
     const existing = scenesContainer.querySelector<HTMLElement>(`[data-vp-scene="${i + 1}"]`);
     if (!existing) {
@@ -142,7 +148,8 @@ export function createContext(root: HTMLElement): SceneContext {
       sc.setAttribute('data-vp-scene', String(i + 1));
       sc.className = 'vp-scene-container';
       sc.style.cssText = 'position: absolute; inset: 0; opacity: 0; visibility: hidden;';
-      scenesContainer.appendChild(sc);
+      // insert before persist layer so scenes stay at the bottom
+      scenesContainer.insertBefore(sc, persistLayer);
     }
   }
 
@@ -161,6 +168,7 @@ export function createContext(root: HTMLElement): SceneContext {
       cursor: cursorLayer,
     },
     tl: {} as unknown,
+    reducedMotion: false,
     cameraGroup,
     camera: {} as CameraAPI,
     hud: {} as HudAPI,
@@ -192,8 +200,15 @@ interface ThreadOpts {
   toSide?: 'left' | 'right' | 'top' | 'bottom';
 }
 
-function getRect(el: HTMLElement): DOMRect {
-  return el.getBoundingClientRect();
+// Element rect expressed in artboard coordinates (1280x720), relative to the
+// stage root, correcting for any ResizeObserver scale on the root.
+function artboardRect(ctx: SceneContext, el: HTMLElement) {
+  const rootRect = ctx.root.getBoundingClientRect();
+  const scale = rootRect.width / 1280 || 1;
+  const r = el.getBoundingClientRect();
+  const x = (r.left - rootRect.left) / scale;
+  const y = (r.top - rootRect.top) / scale;
+  return { x, y, w: r.width / scale, h: r.height / scale, cx: x + r.width / scale / 2, cy: y + r.height / scale / 2 };
 }
 
 function elbowPath(x1: number, y1: number, x2: number, y2: number, radius: number): string {
@@ -232,14 +247,24 @@ function createThreadUtil(ctx: SceneContext): SceneContext['thread'] {
     connect: (fromEl, toEl, opts: ThreadOpts = {}) => {
       const r = opts.radius || 12;
 
-      const fromRect = getRect(fromEl);
-      const toRect = getRect(toEl);
+      const from = artboardRect(ctx, fromEl);
+      const to = artboardRect(ctx, toEl);
 
-      const scale = 1280 / ctx.stage.w;
-      const fromX = (fromRect.left + fromRect.width / 2) / scale;
-      const fromY = (fromRect.top + fromRect.height / 2) / scale;
-      const toX = (toRect.left + toRect.width / 2) / scale;
-      const toY = (toRect.top + toRect.height / 2) / scale;
+      const sidePoint = (rect: typeof from, side?: ThreadOpts['fromSide']) => {
+        switch (side) {
+          case 'left': return { x: rect.x, y: rect.cy };
+          case 'right': return { x: rect.x + rect.w, y: rect.cy };
+          case 'top': return { x: rect.cx, y: rect.y };
+          case 'bottom': return { x: rect.cx, y: rect.y + rect.h };
+          default: return { x: rect.cx, y: rect.cy };
+        }
+      };
+      const fp = sidePoint(from, opts.fromSide);
+      const tp = sidePoint(to, opts.toSide);
+      const fromX = fp.x;
+      const fromY = fp.y;
+      const toX = tp.x;
+      const toY = tp.y;
 
       let path: string;
       if (opts.route === 'curve') {
@@ -283,6 +308,13 @@ function createThreadUtil(ctx: SceneContext): SceneContext['thread'] {
         bead.setAttribute('fill', 'var(--vp-thread)');
         bead.setAttribute('stroke', 'white');
         bead.setAttribute('stroke-width', '2');
+        // Park at the path start, hidden until travel runs
+        const start = path.match(/M(-?[\d.]+)[ ,](-?[\d.]+)/);
+        if (start) {
+          bead.setAttribute('cx', start[1]);
+          bead.setAttribute('cy', start[2]);
+        }
+        bead.setAttribute('opacity', '0');
         svg.appendChild(bead);
       }
 
@@ -290,7 +322,9 @@ function createThreadUtil(ctx: SceneContext): SceneContext['thread'] {
         el: pathEl,
         path,
         draw: (dur = 1, ease = ctx.eases.expo): GsapTween => {
-          return gsap.to(pathEl, {
+          return gsap.fromTo(pathEl, {
+            drawSVG: '0% 0%',
+          }, {
             drawSVG: '100% 0%',
             duration: dur,
             ease,
@@ -301,6 +335,7 @@ function createThreadUtil(ctx: SceneContext): SceneContext['thread'] {
           if (!bead) return gsap.timeline() as unknown as GsapTween;
           return gsap.to(bead, {
             motionPath: { path },
+            autoAlpha: 1,
             duration: dur,
             ease,
             paused: true,
@@ -308,11 +343,10 @@ function createThreadUtil(ctx: SceneContext): SceneContext['thread'] {
         },
         erase: (dur = 0.4): GsapTween => {
           return gsap.to(pathEl, {
-            drawSVG: '0% 100%',
+            drawSVG: '0% 0%',
             duration: dur,
             ease: ctx.eases.settle,
             paused: true,
-            onComplete: () => pathEl.remove(),
           }) as unknown as GsapTween;
         },
       };
@@ -336,11 +370,12 @@ function createCursorUtil(ctx: SceneContext): SceneContext['cursor'] {
     cursorEl = document.createElement('div');
     cursorEl.className = 'vp-cursor';
     cursorEl.setAttribute('aria-hidden', 'true');
+    cursorEl.style.opacity = '0';
     cursorEl.innerHTML = `
       <svg viewBox="0 0 24 24" width="18" height="18" fill="none">
         <path d="M5 17L12 5L14 9L17 4L19 8L15 12L19 16H5Z" fill="var(--vp-ink-950)" stroke="white" stroke-width="1.5" stroke-linejoin="round"/>
       </svg>
-      <div class="vp-cursor-ripple" style="position:absolute;width:0;height:0;border-radius:50%;background:color-mix(in srgb, var(--vp-thread-tint) 40%, transparent);pointer-events:none;"></div>
+      <div class="vp-cursor-ripple" style="position:absolute;width:0;height:0;border-radius:50%;background:color-mix(in srgb, var(--vp-thread-tint) 70%, transparent);pointer-events:none;"></div>
     `;
     ctx.layers.cursor.appendChild(cursorEl);
     return cursorEl;
@@ -349,24 +384,25 @@ function createCursorUtil(ctx: SceneContext): SceneContext['cursor'] {
   return {
     moveTo: (target: HTMLElement, opts: CursorOpts = {}): GsapTimeline => {
       const cursor = ensureCursor();
-      const rect = target.getBoundingClientRect();
-      const scale = 1280 / ctx.stage.w;
-      const x = rect.left / scale + rect.width / (2 * scale);
-      const y = rect.top / scale + rect.height / (2 * scale);
+      const rect = artboardRect(ctx, target);
+      const x = rect.cx;
+      const y = rect.cy;
 
       const dur = opts.dur || 0.6;
       const ease = opts.curve ? ctx.eases.out : ctx.eases.inout;
 
-      return gsap.timeline({ paused: true }).to(cursor, {
+      const tl = gsap.timeline({ paused: true });
+      if (opts.from) {
+        tl.set(cursor, { x: opts.from.x, y: opts.from.y, opacity: 0 });
+      }
+      tl.to(cursor, {
         x,
         y,
+        autoAlpha: 1,
         duration: dur,
         ease,
-        onUpdate: function () {
-          const v = this.targets()[0] as { _gsap: { x: number; y: number } };
-          cursor.style.transform = `translate3d(${v._gsap.x}px, ${v._gsap.y}px, 0)`;
-        },
       }) as unknown as GsapTimeline;
+      return tl as unknown as GsapTimeline;
     },
     click: (): GsapTimeline => {
       const cursor = ensureCursor();
@@ -381,7 +417,7 @@ function createCursorUtil(ctx: SceneContext): SceneContext['cursor'] {
     },
     hide: (): GsapTween => {
       const cursor = ensureCursor();
-      return gsap.to(cursor, { opacity: 0, duration: 0.2, ease: ctx.eases.out, onComplete: () => cursor.remove() }) as unknown as GsapTween;
+      return gsap.to(cursor, { autoAlpha: 0, duration: 0.2, ease: ctx.eases.out }) as unknown as GsapTween;
     },
   };
 }
@@ -466,19 +502,14 @@ function createHudUtil(ctx: SceneContext): SceneContext['hud'] {
 function createPersistUtil(ctx: SceneContext): PersistAPI {
   const fn: PersistAPI = (el: HTMLElement) => {
     // Reparent element into persist layer while keeping artboard position
-    const rect = el.getBoundingClientRect();
-    const scale = 1280 / ctx.stage.w;
-    const x = rect.left / scale;
-    const y = rect.top / scale;
-    const w = rect.width / scale;
-    const h = rect.height / scale;
-
+    const r = artboardRect(ctx, el);
     ctx.layers.persist.appendChild(el);
     el.style.position = 'absolute';
-    el.style.left = `${x}px`;
-    el.style.top = `${y}px`;
-    el.style.width = `${w}px`;
-    el.style.height = `${h}px`;
+    el.style.left = `${r.x}px`;
+    el.style.top = `${r.y}px`;
+    el.style.width = `${r.w}px`;
+    el.style.height = `${r.h}px`;
+    el.style.margin = '0';
 
     return el;
   };

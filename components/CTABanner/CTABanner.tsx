@@ -39,12 +39,12 @@ export default function CTABanner({
           transition={{ duration: 0.65, ease: [0.16, 1, 0.3, 1] }}
         >
           {eyebrow && (
-            <p className="text-[11.5px] font-[700] tracking-[0.08em] uppercase text-black/40 mb-4">
+            <p className="text-[13px] font-[550] tracking-[-0.01em] text-black/50 mb-3">
               {eyebrow}
             </p>
           )}
 
-          <h2 className="text-[clamp(2.25rem,5vw,4rem)] font-[700] leading-[1.06] tracking-[-0.03em] text-black mb-5">
+          <h2 className="text-[clamp(2.25rem,5vw,4rem)] font-[620] leading-[1.08] tracking-[-0.035em] text-black mb-5">
             {headline}
           </h2>
 

@@ -89,10 +89,18 @@ export const HOME = {
   playbookCaptions: {
     scene1: 'From scattered business information',
     scene2: 'to preparing offers and Ideal Client Profile',
-    scene3: 'to organized master playbook, which has all the context about your business',
+    scene3: 'to organized Master Playbook, which has all the context about your business',
     scene4: 'to a persistent knowledge from the master playbook that evolves every time you interact with it.',
   },
   multiAgentTitle: 'Multi-Agent Orchestration',
+  /* The agentic dashboard's tagline, rendered as the dashboard section
+     header. Owner-ordered copy, verbatim. `highlight` must stay an exact
+     substring of `full` — the component wraps it in the brand marker
+     swash (orange) while the rest sets in ink black. */
+  dashboardTagline: {
+    full: 'Your all-in-one agentic workforce directly in the dashboard.',
+    highlight: 'agentic workforce',
+  },
 } as const;
 
 /* ── Lower sections — DESIGN ONLY slot file ────────────────────────────────

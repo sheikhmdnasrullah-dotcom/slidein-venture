@@ -1,0 +1,1023 @@
+/* ═══════════════════════════════════════════════════════════════════════
+   SLIDEIN JOURNEY (sj) — the scroll-driven prospect pipeline
+   ---------------------------------------------------------------------------
+   Token discipline: every color references the design-system tokens
+   (app/styles/assemble.css + tokens.css) — no raw hex, no white/black
+   literals. --sj-pass / --sj-fail / --sj-passive are component-layer
+   aliases: green/red carry pass/fail meaning the brand orange must never
+   carry, and the passive gray is the one non-semantic stage wire.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+.sj {
+  --sj-accent: var(--scaffold-accent);
+  --sj-ease: cubic-bezier(0.16, 1, 0.3, 1);
+  --sj-radius: 12px;
+  --sj-pass: rgb(43 138 62);
+  --sj-fail: rgb(179 38 38);
+  --sj-passive: rgb(170 165 155);
+  --sj-ondark: rgb(255 255 255 / 88%);
+  --sj-ondark-dim: rgb(255 255 255 / 55%);
+  --sj-ondark-line: rgb(255 255 255 / 14%);
+
+  font-family: var(--font-sans), Arial, Helvetica, sans-serif;
+  color: var(--scaffold-ink);
+  /* Ground, not panel: the frame melts into the page (#FDFDFD) while the
+     white inner cards float above it — the same ground/panel relationship
+     as every other section on the site. */
+  background: var(--scaffold-bg);
+  border: 1px solid var(--scaffold-hairline);
+  border-radius: var(--scaffold-r-md);
+  max-width: 1280px;
+  margin-inline: auto;
+  overflow: hidden;
+  font-size: 15px;
+  line-height: 1.5;
+  box-sizing: border-box;
+}
+
+.sj * {
+  box-sizing: border-box;
+}
+
+/* ── Progress header: the active stage word + a hairline track ────────── */
+
+.sj-progress {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 24px 40px 0;
+}
+
+.sj-word {
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--hero-accent-600);
+  white-space: nowrap;
+  min-width: 7.5em;
+}
+
+.sj-track {
+  position: relative;
+  flex: 1;
+  height: 2px;
+  border-radius: 999px;
+  background: var(--scaffold-hairline);
+  overflow: hidden;
+}
+
+.sj-fill {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: var(--scaffold-accent);
+  transform: scaleX(0);
+  transform-origin: left center;
+}
+
+/* ── Viewport: six scenes share one grid cell (height = tallest) ──────── */
+
+.sj-viewport {
+  position: relative;
+  display: grid;
+  padding: 28px 40px 24px;
+  min-height: 520px;
+}
+
+.sj-stacked .sj-viewport {
+  display: block;
+}
+
+/* ── Scenes + wires ───────────────────────────────────────────────────── */
+
+.sj .scene {
+  position: relative;
+  grid-area: 1 / 1;
+  /* No floor: the scene must fit the dashboard's content box, so it sizes
+     to its own content instead of forcing itself taller than the frame. */
+  min-height: 0;
+  display: grid;
+  align-items: center;
+  gap: 100px;
+  grid-template-columns: 1fr 1.15fr;
+}
+
+.sj .scene > *:not(svg) {
+  min-width: 0;
+}
+
+.sj .wires {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  /* Paths are clipped to the scene so no wire ever escapes the dashboard. */
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 3;
+}
+
+.sj .wire {
+  stroke: var(--sj-accent);
+  stroke-width: 1.7;
+  fill: none;
+}
+
+.sj .wire-dot {
+  fill: var(--sj-accent);
+  stroke: var(--scaffold-bg);
+  stroke-width: 3;
+}
+
+/* ── Cards ────────────────────────────────────────────────────────────── */
+
+.sj .ui-card {
+  position: relative;
+  background: var(--scaffold-surface);
+  border: 1px solid var(--scaffold-hairline);
+  border-radius: var(--scaffold-r-sm);
+  box-shadow: var(--scaffold-shadow-soft);
+  padding: 24px;
+}
+
+/* ── Person avatars (face images) ──────────────────────────────────────── */
+
+.sj .person {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.sj .person-lines {
+  flex: 1;
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+}
+
+.sj .person-lines.center {
+  justify-items: center;
+}
+
+/* ── Person identity: name over role ───────────────────────────────────────
+   Brand ink only. Type is never set in the vivid accent or the faint
+   token — the role line carries the muted step, per the type rules. */
+
+.sj .person-name {
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+  color: var(--scaffold-ink);
+}
+
+.sj .person-role {
+  font-size: 12px;
+  line-height: 1.3;
+  color: var(--scaffold-lead-ink);
+}
+
+.sj .research-card .person-lines {
+  justify-items: center;
+}
+
+/* The dark inbox inverts with the theme rather than hardcoding light ink. */
+.sj .reply-card .person-name {
+  color: var(--sj-ondark);
+}
+
+.sj .reply-card .person-role {
+  color: var(--sj-ondark-dim);
+}
+
+.sj .avatar {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  object-fit: cover;
+  /* Hairline ring in the brand hairline token — separates the portrait from
+     the panel fill without introducing a raw hex or a hard shadow. */
+  box-shadow: 0 0 0 1px var(--scaffold-hairline);
+  flex-shrink: 0;
+}
+
+.sj .avatar.small {
+  width: 42px;
+  height: 42px;
+}
+
+.sj .avatar.large {
+  width: 76px;
+  height: 76px;
+}
+
+.sj .avatar.tiny {
+  width: 26px;
+  height: 26px;
+}
+
+/* ── Skeleton bars: illustrative geometry, never measurements ─────────── */
+
+.sj .sk {
+  display: block;
+  height: 8px;
+  border-radius: 999px;
+  background: var(--scaffold-skeleton);
+}
+
+.sj .sk.tall {
+  height: 12px;
+}
+
+.sj .sk.dim {
+  opacity: 0.55;
+}
+
+.sj .sk.ondark {
+  background: var(--scaffold-skeleton-on-dark);
+}
+
+/* ── Geometric company ticks (tones vary; nothing reads as a letter) ─── */
+
+.sj .ctick {
+  width: 30px;
+  height: 30px;
+  border-radius: 7px;
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+.sj .ctick.t1 {
+  background: var(--scaffold-well);
+}
+
+.sj .ctick.t2 {
+  background: var(--scaffold-accent-chip);
+}
+
+.sj .ctick.t3 {
+  background: var(--scaffold-panel);
+  border: 1px solid var(--scaffold-hairline);
+}
+
+.sj .ctick.t4 {
+  background: var(--scaffold-accent-row);
+}
+
+/* ── Discover ─────────────────────────────────────────────────────────── */
+
+.sj .source-list {
+  display: grid;
+  gap: 12px;
+}
+
+.sj .source-card {
+  padding: 14px 18px;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.sj .chips {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 16px;
+}
+
+.sj .sk-pill {
+  height: 24px;
+  border-radius: 6px;
+  background: var(--scaffold-panel);
+  border: 1px solid var(--scaffold-hairline);
+}
+
+.sj .sk-pill:nth-child(1) {
+  width: 64px;
+}
+
+.sj .sk-pill:nth-child(2) {
+  width: 52px;
+}
+
+.sj .sk-pill.tint {
+  width: 78px;
+  background: var(--scaffold-accent-chip);
+  border-color: transparent;
+}
+
+.sj .target-card {
+  padding: 30px;
+  background: var(--scaffold-accent-row);
+}
+
+/* ── Research ─────────────────────────────────────────────────────────── */
+
+.sj .research-scene {
+  grid-template-columns: 0.9fr 1.2fr 0.65fr;
+  gap: 56px;
+}
+
+.sj .research-card .person {
+  flex-direction: column;
+  text-align: center;
+}
+
+.sj .detail-line {
+  display: block;
+  font-size: 12.5px;
+  line-height: 1.7;
+  color: var(--scaffold-body-ink);
+}
+
+.sj .details {
+  border-top: 1px solid var(--scaffold-hairline);
+  margin-top: 22px;
+  padding-top: 15px;
+  display: grid;
+  gap: 9px;
+}
+
+.sj .insight-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 13px 12px;
+  margin-inline: -12px;
+  border-radius: 10px;
+  transition: background-color 0.3s var(--sj-ease);
+}
+
+.sj .insight-row:hover {
+  background: rgb(10 10 10 / 3%);
+}
+
+.sj .insight-glyph {
+  display: inline-flex;
+  flex: 0 0 auto;
+  width: 30px;
+  height: 30px;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--scaffold-hairline);
+  border-radius: 9px;
+  background: var(--scaffold-panel);
+  color: var(--scaffold-accent);
+}
+
+.sj .insight-glyph svg {
+  width: 16px;
+  height: 16px;
+}
+
+.sj .insight-text {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+
+.sj .insight-title {
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--scaffold-ink);
+}
+
+.sj .insight-detail {
+  font-size: 12px;
+  line-height: 1.35;
+  color: var(--scaffold-lead-ink);
+}
+
+.sj .insight-row:last-child {
+  border: 0;
+}
+
+.sj .insight-dot {
+  position: relative;
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: var(--scaffold-accent-chip);
+}
+
+.sj .insight-dot::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--sj-accent);
+}
+
+.sj .sources-sidebar {
+  padding: 17px;
+  box-shadow: none;
+  background: var(--scaffold-panel);
+  display: grid;
+  gap: 12px;
+}
+
+.sj .source-ref {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border-top: 1px solid var(--scaffold-hairline);
+  padding: 12px 0;
+}
+
+.sj .source-ref:first-child {
+  border-top: 0;
+  padding-top: 0;
+}
+
+.sj .source-ref:last-child {
+  padding-bottom: 0;
+}
+
+.sj .source-tick {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--scaffold-accent);
+  flex-shrink: 0;
+}
+
+/* ── Qualify ──────────────────────────────────────────────────────────── */
+
+.sj .qualify-scene {
+  grid-template-columns: 1.7fr 1fr;
+  gap: 90px;
+}
+
+.sj .qualified-card {
+  padding: 22px 24px;
+}
+
+.sj .qualified-card .person {
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--scaffold-hairline);
+}
+
+.sj .state-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.sj .state-dot.pass {
+  background: var(--sj-pass);
+}
+
+.sj .state-dot.idle {
+  background: rgb(10 10 10 / 22%);
+}
+
+.sj .state-dot.live {
+  background: var(--sj-accent);
+}
+
+.sj .qualified-card .state-dot {
+  margin-left: auto;
+}
+
+.sj .check-list {
+  margin-top: 12px;
+}
+
+.sj .check-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 0;
+}
+
+.sj .check {
+  width: 23px;
+  height: 23px;
+  border: 1px solid var(--scaffold-rule);
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  color: transparent;
+}
+
+.sj .tickpath {
+  width: 14px;
+  height: 14px;
+  display: block;
+}
+
+.sj .tickpath path {
+  fill: none;
+  stroke: currentcolor;
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.sj .score {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin-top: 14px;
+  padding-top: 13px;
+  border-top: 1px solid var(--scaffold-hairline);
+}
+
+.sj .score-ring {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: conic-gradient(var(--sj-pass) 92%, var(--scaffold-well) 0);
+  position: relative;
+  flex-shrink: 0;
+}
+
+.sj .score-ring::after {
+  content: "";
+  position: absolute;
+  inset: 4px;
+  border-radius: 50%;
+  background: var(--scaffold-surface);
+}
+
+.sj .rejected-card {
+  align-self: end;
+  margin-bottom: 20px;
+  opacity: 0.8;
+  padding: 20px;
+  border-style: dashed;
+}
+
+.sj .rejected-card .person {
+  gap: 10px;
+}
+
+.sj .hold-bars {
+  display: flex;
+  gap: 5px;
+  margin-top: 14px;
+}
+
+.sj .hold-bars span {
+  width: 4px;
+  height: 14px;
+  border-radius: 2px;
+  background: var(--scaffold-rule);
+}
+
+/* ── Personalize ──────────────────────────────────────────────────────── */
+
+.sj .personalize-scene {
+  grid-template-columns: 0.85fr 1.3fr;
+  gap: 80px;
+}
+
+.sj .context-card {
+  padding: 22px;
+}
+
+.sj .context-events {
+  margin-top: 24px;
+}
+
+.sj .source-label {
+  font-size: 12px;
+  line-height: 1.4;
+  color: var(--scaffold-body-ink);
+}
+
+.sj .check-label {
+  font-size: 12.5px;
+  line-height: 1.4;
+  color: var(--scaffold-body-ink);
+}
+
+.sj .context-event {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 15px 0 15px 18px;
+  border-top: 1px solid var(--scaffold-hairline);
+}
+
+/* One ink weight across every mark, so the set reads as a single family. */
+.sj .source-mark {
+  display: inline-flex;
+  flex: 0 0 auto;
+  width: 17px;
+  height: 17px;
+  color: var(--scaffold-lead-ink);
+}
+
+.sj .source-mark svg {
+  width: 100%;
+  height: 100%;
+}
+
+/* Current brand colours, taken from each company's own guidelines. */
+.sj .source-mark-linkedin { color: #0a66c2; }
+.sj .source-mark-facebook { color: #1877f2; }
+.sj .source-mark-instagram { color: #d62976; }
+
+.sj .source-note {
+  font-size: 12.5px;
+  line-height: 1.4;
+  color: var(--scaffold-body-ink);
+}
+
+.sj .context-event::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  left: 0;
+  top: 22px;
+  background: var(--sj-accent);
+}
+
+.sj .composer {
+  padding: 0;
+  overflow: hidden;
+}
+
+.sj .composer-head {
+  padding: 13px 22px;
+  border-bottom: 1px solid var(--scaffold-hairline);
+  display: grid;
+  gap: 8px;
+}
+
+.sj .email-body {
+  padding: 20px 24px;
+  display: grid;
+  gap: 14px;
+}
+
+/* Written copy: the email reads as a person wrote it. Body ink for the
+   sentences, never the vivid accent. */
+.sj .mail-text {
+  margin: 0;
+  font-size: 13.5px;
+  line-height: 1.65;
+  color: var(--scaffold-body-ink);
+}
+
+.sj .mail-recipient {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--scaffold-ink);
+}
+
+
+
+/* A socket is a phrase woven in from a signal: an inline highlight the
+   connector geometry is drawn against, not an empty placeholder. */
+.sj .socket {
+  display: inline-block;
+  padding: 0 5px;
+  border-radius: 5px;
+  background: var(--scaffold-skeleton);
+  font-size: 12.5px;
+  font-weight: 500;
+  line-height: 1.5;
+  color: var(--scaffold-ink);
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+}
+
+.sj .envelope {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 44px;
+  border: 1px solid var(--scaffold-hairline);
+  border-radius: 9px;
+  background: var(--scaffold-panel);
+  overflow: hidden;
+}
+
+.sj .env-flap {
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 25px;
+  border-bottom: 1px solid var(--scaffold-hairline);
+  background: linear-gradient(
+    135deg,
+    transparent 49.4%,
+    var(--scaffold-hairline) 49.4%,
+    var(--scaffold-hairline) 50.6%,
+    transparent 50.6%
+  ),
+    linear-gradient(225deg, transparent 49.4%, var(--scaffold-hairline) 49.4%, var(--scaffold-hairline) 50.6%, transparent 50.6%);
+}
+
+.sj .env-line {
+  position: absolute;
+  left: 14px;
+  height: 5px;
+  border-radius: 999px;
+  background: var(--scaffold-skeleton);
+}
+
+.sj .env-line:nth-of-type(2) {
+  top: 32px;
+  width: 62%;
+}
+
+.sj .env-line.hl {
+  top: 32px;
+  width: 22%;
+  background: var(--scaffold-accent-row);
+  box-shadow: 0 0 0 1px var(--scaffold-accent-chip);
+}
+
+.sj .env-line.short {
+  top: 40px;
+  width: 38%;
+}
+
+.sj .queue-track {
+  flex: 1;
+  min-width: 34px;
+  height: 4px;
+  border-radius: 999px;
+  background: var(--scaffold-hairline);
+  overflow: hidden;
+}
+
+.sj .queue-track i {
+  display: block;
+  height: 100%;
+  width: 34%;
+  border-radius: 999px;
+  background: var(--scaffold-accent);
+}
+
+/* Delivered: a ticked ring. A bullseye would read as "target audience",
+   which is not what this stage does. */
+.sj .delivery {
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-height: 190px;
+}
+
+.sj .delivery-check {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 76px;
+  height: 76px;
+  border-radius: 50%;
+  color: var(--sj-pass);
+  background: var(--scaffold-surface);
+  border: 1px solid var(--scaffold-hairline);
+}
+
+.sj .delivery-check .check-ring {
+  position: absolute;
+  inset: -7px;
+  border-radius: 50%;
+  border: 1px solid rgb(43 138 62 / 34%);
+}
+
+.sj .delivery-check svg {
+  width: 30px;
+  height: 30px;
+}
+
+.sj .delivery-beacon {
+  position: absolute;
+  z-index: 1;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--scaffold-accent);
+}
+
+.sj .composer-foot {
+  border-top: 1px solid var(--scaffold-hairline);
+  padding: 10px 22px;
+}
+
+/* ── Outreach ───────────────────────────────────────────────────────────
+   Purely visual: a sealed envelope, a queue track, and a struck target.
+   No words here on purpose. */
+
+.sj .outreach-scene {
+  gap: 120px;
+  grid-template-columns: 1.3fr 0.8fr;
+}
+
+.sj .outbound-list {
+  display: grid;
+  gap: 12px;
+}
+
+.sj .draft-card {
+  background: var(--scaffold-accent-row);
+}
+
+.sj .draft-preview {
+  margin-top: 13px;
+  border-top: 1px solid var(--scaffold-hairline);
+  padding-top: 12px;
+  display: grid;
+  gap: 8px;
+}
+
+.sj .dot-row {
+  display: flex;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.sj .queue-item {
+  box-shadow: none;
+  padding: 10px 18px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--scaffold-panel);
+}
+
+.sj .queue-item .state-dot {
+  margin-left: auto;
+}
+
+.sj .delivery {
+  min-height: 190px;
+  display: grid;
+  place-items: center;
+}
+
+
+/* ── Converse ───────────────────────────────────────────────────────────
+   The same light ground and the same outline icon family as every other
+   scene. Confirmation is carried by marks, never by a word in a pill: a
+   ticked ring on the sender, a ticked calendar, and a filled day. */
+
+.sj .converse-scene {
+  display: block;
+}
+
+.sj .inbox {
+  background: var(--scaffold-panel);
+  border: 1px solid var(--scaffold-hairline);
+  border-radius: var(--sj-radius);
+  max-width: 850px;
+  margin-inline: auto;
+  overflow: hidden;
+}
+
+.sj .inbox-head {
+  padding: 13px 24px;
+  border-bottom: 1px solid var(--scaffold-hairline);
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  background: var(--scaffold-surface);
+}
+
+.sj .inbox-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--scaffold-ink);
+}
+
+.sj .reply-when {
+  font-size: 11.5px;
+  color: var(--scaffold-lead-ink);
+}
+
+.sj .inbox-content {
+  padding: 20px 24px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  align-items: stretch;
+}
+
+.sj .reply-card,
+.sj .meeting-card {
+  background: var(--scaffold-surface);
+  border: 1px solid var(--scaffold-hairline);
+  border-radius: var(--sj-radius);
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+}
+
+.sj .reply-card .person {
+  gap: 10px;
+}
+
+.sj .reply-lines {
+  margin-top: 14px;
+  flex: 1;
+  display: flex;
+  align-items: center;
+}
+
+.sj .reply-text {
+  display: block;
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--scaffold-body-ink);
+}
+
+/* Status marks. Same 1.5px stroke as the rest of the outline family. */
+.sj .reply-card .person > svg,
+.sj .meeting-top > svg {
+  width: 22px;
+  height: 22px;
+  margin-left: auto;
+  flex: 0 0 auto;
+  color: var(--sj-pass);
+}
+
+.sj .tickring {
+  opacity: 0.34;
+}
+
+/* Calendar: outline glyph with the tick drawn inside the page. */
+.sj .meeting-top {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.sj .meeting-top > svg {
+  margin-left: 0;
+  width: 34px;
+  height: 34px;
+  padding: 6px;
+  border-radius: 10px;
+  color: var(--scaffold-accent);
+  background: var(--scaffold-accent-row);
+  border: 1px solid var(--scaffold-accent-chip);
+}
+
+.sj .meeting-meta {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+
+.sj .meeting-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--scaffold-ink);
+}
+
+.sj .meeting-time {
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--scaffold-lead-ink);
+}
+
+/* One week strip; the booked day is the only filled one. */
+.sj .meeting-slot {
+  display: flex;
+  gap: 5px;
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px solid var(--scaffold-hairline);
+}
+
+.sj .meeting-slot i {
+  flex: 1;
+  height: 26px;
+  border-radius: 7px;
+  background: rgb(10 10 10 / 4%);
+}
+
+.sj .meeting-slot i.on {
+  background: var(--scaffold-accent);
+}
+
+.sj .meeting-foot {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 14px;
+}
+
+.sj .meeting-seen {
+  margin-left: auto;
+  font-size: 11.5px;
+  color: var(--scaffold-lead-ink);
+}
+

@@ -21,6 +21,7 @@ import {
   LANDSCAPE_COLUMNS,
   PORTRAIT_BANDS,
   PLAYBOOK_CONFIG,
+  ICP_RING_CENTER_LANDSCAPE,
 } from './poses';
 import { Chip } from './Chip';
 
@@ -174,8 +175,8 @@ export function CanvasAct2({
         aria-hidden="true"
       >
         {icpsChips.map((chip, idx) => {
-          const ringX = 1156;
-          const ringY = 228;
+          const ringX = ICP_RING_CENTER_LANDSCAPE.x;
+          const ringY = ICP_RING_CENTER_LANDSCAPE.y;
           const chipX = chip.docked.x + 48;
           const chipY = chip.docked.y + 14;
 
