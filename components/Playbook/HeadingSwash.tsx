@@ -29,7 +29,7 @@ export function PlaybookHeading({ drawn = false, className }: HeadingSwashProps)
       )}
       style={{ fontFamily: 'var(--font-display), Georgia, serif' }}
     >
-      {introWords.map((word, i) => (
+      {introWords.map((word) => (
         <React.Fragment key={word}>
           <span>{word}</span>
           {' '}

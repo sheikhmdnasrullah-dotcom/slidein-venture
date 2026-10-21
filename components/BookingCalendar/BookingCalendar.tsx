@@ -5,8 +5,8 @@ import { motion } from 'framer-motion';
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 const NOTION_CALENDAR_URL = 'https://calendar.notion.so/meet/nasrullah_tanim/schedule';
-const RED = '#FF6200';
-const RED_LIGHT = '#FFF0F0';
+const BRAND = '#3B82F6';
+const BRAND_LIGHT = '#EFF6FF';
 
 const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
 const DAYS = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
@@ -145,20 +145,20 @@ export default function BookingCalendar() {
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
         <div
           className="absolute -top-32 -right-32 w-[500px] h-[500px] rounded-full opacity-[0.04]"
-          style={{ background: `radial-gradient(circle, ${RED} 0%, transparent 70%)` }}
+          style={{ background: `radial-gradient(circle, ${BRAND} 0%, transparent 70%)` }}
         />
         <div
           className="absolute -bottom-40 -left-40 w-[600px] h-[600px] rounded-full opacity-[0.03]"
-          style={{ background: `radial-gradient(circle, ${RED} 0%, transparent 70%)` }}
+          style={{ background: `radial-gradient(circle, ${BRAND} 0%, transparent 70%)` }}
         />
       </div>
 
       <div className="relative max-w-[1100px] mx-auto px-6 md:px-10">
         {/* ── Header ───────────────────────────────────────────────────── */}
         <div className="text-center mb-14">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full mb-5" style={{ background: RED_LIGHT }}>
-            <span className="w-2 h-2 rounded-full animate-pulse" style={{ background: RED }} />
-            <span className="text-[12.5px] font-[550] tracking-[-0.01em]" style={{ color: RED }}>
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full mb-5" style={{ background: BRAND_LIGHT }}>
+            <span className="w-2 h-2 rounded-full animate-pulse" style={{ background: BRAND }} />
+            <span className="text-[12.5px] font-[550] tracking-[-0.01em]" style={{ color: BRAND }}>
               Let&apos;s talk
             </span>
           </div>
@@ -193,7 +193,7 @@ export default function BookingCalendar() {
             }}
           >
             {/* Top accent stripe */}
-            <div className="h-[3px]" style={{ background: `linear-gradient(90deg, ${RED}, transparent 60%)` }} />
+            <div className="h-[3px]" style={{ background: `linear-gradient(90deg, ${BRAND}, transparent 60%)` }} />
 
             <div className="flex flex-col lg:flex-row">
               {/* ── Left: Calendar Grid ──────────────────────────────── */}
@@ -258,13 +258,13 @@ export default function BookingCalendar() {
                           ${day.inMonth && past ? 'text-[#D3D1CB] cursor-not-allowed' : ''}
                           ${selected ? 'text-white font-[650]' : ''}
                         `}
-                        style={selected ? { background: RED } : undefined}
+                        style={selected ? { background: BRAND } : undefined}
                       >
                         {day.day}
                         {todayDate && day.inMonth && (
                           <span
                             className="absolute bottom-[6px] left-1/2 -translate-x-1/2 w-1 h-1 rounded-full"
-                            style={{ background: selected ? 'white' : RED }}
+                            style={{ background: selected ? 'white' : BRAND }}
                           />
                         )}
                       </button>
@@ -275,11 +275,11 @@ export default function BookingCalendar() {
                 {/* Legend */}
                 <div className="flex items-center gap-4 mt-4 pt-4 border-t border-[#F1F1EF]">
                   <div className="flex items-center gap-1.5">
-                    <span className="w-2 h-2 rounded-full" style={{ background: RED }} />
+                    <span className="w-2 h-2 rounded-full" style={{ background: BRAND }} />
                     <span className="text-[11px] text-[#9B9A97] font-[500]">Today</span>
                   </div>
                   <div className="flex items-center gap-1.5">
-                    <span className="w-5 h-5 rounded-md text-[10px] flex items-center justify-center text-white font-[600]" style={{ background: RED }}>
+                    <span className="w-5 h-5 rounded-md text-[10px] flex items-center justify-center text-white font-[600]" style={{ background: BRAND }}>
                       15
                     </span>
                     <span className="text-[11px] text-[#9B9A97] font-[500]">Selected</span>
@@ -300,7 +300,7 @@ export default function BookingCalendar() {
               >
                 {selectedDate ? (
                   <>
-                    <p className="text-[13px] font-[550] tracking-[-0.01em] mb-1" style={{ color: RED }}>
+                    <p className="text-[13px] font-[550] tracking-[-0.01em] mb-1" style={{ color: BRAND }}>
                       Available times
                     </p>
                     <p className="text-[14px] font-[600] text-[#191919] mb-5 tracking-[-0.01em]">
@@ -317,9 +317,9 @@ export default function BookingCalendar() {
                             onMouseLeave={() => setHoveredSlot(null)}
                             className="relative w-full text-left px-4 py-3 rounded-xl text-[14px] font-[520] transition-all duration-150 overflow-hidden"
                             style={{
-                              background: hoveredSlot === slot ? RED : 'white',
+                              background: hoveredSlot === slot ? BRAND : 'white',
                               color: hoveredSlot === slot ? 'white' : '#191919',
-                              border: `1.5px solid ${hoveredSlot === slot ? RED : '#E3E2E0'}`,
+                              border: `1.5px solid ${hoveredSlot === slot ? BRAND : '#E3E2E0'}`,
                               boxShadow: hoveredSlot === slot
                                 ? '0 4px 16px rgba(122,10,14,0.2)'
                                 : '0 1px 3px rgba(0,0,0,0.04)',
@@ -358,9 +358,9 @@ export default function BookingCalendar() {
                     {/* Calendar icon */}
                     <div
                       className="w-14 h-14 rounded-2xl flex items-center justify-center mb-5"
-                      style={{ background: RED_LIGHT }}
+                      style={{ background: BRAND_LIGHT }}
                     >
-                      <svg className="w-6 h-6" style={{ color: RED }} viewBox="0 0 24 24" fill="none">
+                      <svg className="w-6 h-6" style={{ color: BRAND }} viewBox="0 0 24 24" fill="none">
                         <rect x="3" y="4" width="18" height="18" rx="3" stroke="currentColor" strokeWidth="1.8"/>
                         <path d="M3 9h18" stroke="currentColor" strokeWidth="1.8"/>
                         <path d="M8 2v4M16 2v4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/>
@@ -387,7 +387,7 @@ export default function BookingCalendar() {
                 {/* Avatar placeholder */}
                 <div
                   className="w-9 h-9 rounded-full flex items-center justify-center text-[13px] font-[700] text-white"
-                  style={{ background: RED }}
+                  style={{ background: BRAND }}
                 >
                   NT
                 </div>
@@ -402,7 +402,7 @@ export default function BookingCalendar() {
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-[13.5px] font-[650] text-white transition-all duration-200 hover:-translate-y-px"
                 style={{
-                  background: RED,
+                  background: BRAND,
                   boxShadow: '0 2px 8px rgba(122,10,14,0.25)',
                 }}
               >

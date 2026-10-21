@@ -59,11 +59,12 @@ export const HOME = {
        is booked" to "until they are convinced" — that wording is the
        current one. */
     line1:
-      /* OWNER COPY. Replaced the long end-to-end description with the tagline.
+      /* THE OWNER'S COPY. Verbatim, supplied directly. Do not paraphrase.
          The four phrases that light with the master loop live in
          HERO_PHRASE_SYNC (content/hero-sync.ts) and must stay exact
-         substrings of this line. */
-      'The internet\u2019s most powerful client acquisition secrets, unified into one framework.',
+         substrings of this line — a phrase that no longer matches renders
+         as plain text. */
+      'An end-to-end system that finds and researches each prospect, matches them to your offers, and writes each one a personal email. It keeps working until they are convinced.',
     line2: '',
     /* Optional accent-tinted phrase, split out of line1 by the component.
        EMPTY — nothing is tinted over the owner's copy. Fill it with a
@@ -322,4 +323,5 @@ export const DASHBOARD_STRINGS = [
   'View booked discovery calls',
   'No matching results',
   'Esc',
+  '⌘K',
 ] as const;

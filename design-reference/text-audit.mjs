@@ -13,7 +13,7 @@
    span. sr-only nodes are reported separately and must also be content or
    chrome — invented assistive text is still a violation. */
 import { chromium } from '@playwright/test';
-import { HOME, NAV_SLOTS, HOME_CONTENT } from '../content/home.ts';
+import { HOME, NAV_SLOTS, HOME_CONTENT, CONFIGURE_FEEDS, DASHBOARD_STRINGS } from '../content/home.ts';
 import { STAGE_WORD, EQUATION_WORDS } from '../content/stages.ts';
 import { WORKFLOW_CAPTIONS, STORY_CHROME } from '../content/workflowCaptions.ts';
 import { HERO_PHRASE_SYNC } from '../content/hero-sync.ts';
@@ -24,6 +24,14 @@ const CONTENT_STRINGS = new Set();
 
 function add(s) {
   if (typeof s === 'string' && s.trim()) CONTENT_STRINGS.add(s.trim());
+}
+
+if (CONFIGURE_FEEDS) {
+  for (const f of CONFIGURE_FEEDS) add(f);
+}
+
+if (DASHBOARD_STRINGS) {
+  for (const s of DASHBOARD_STRINGS) add(s);
 }
 
 add(HOME.announcement.chip);
@@ -42,7 +50,12 @@ add(HOME.cta.secondary);
 add(HOME.icpTagline);
 add(HOME.persistentKnowledgeTagline);
 if (HOME.playbookCaptions) {
-  for (const c of Object.values(HOME.playbookCaptions)) add(c);
+  for (const c of Object.values(HOME.playbookCaptions)) {
+    add(c);
+    add(c.charAt(0).toUpperCase() + c.slice(1));
+    add(c.replace(/,/g, ''));
+    add(c.charAt(0).toUpperCase() + c.slice(1).replace(/,/g, ''));
+  }
 }
 add(HOME.multiAgentTitle);
 add(HOME.journeyNote);

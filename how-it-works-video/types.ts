@@ -81,6 +81,7 @@ export interface CameraAPI {
 
 export interface HudAPI {
   setProfile: (label: string) => GsapTween;
+  ensure: () => GsapTween;
   pulse: () => GsapTimeline;
   addTag: (text: string) => GsapTween;
 }

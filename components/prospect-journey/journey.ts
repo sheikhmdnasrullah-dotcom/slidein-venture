@@ -47,7 +47,7 @@ type JourneyAPI = {
    in /public/journey-faces. `SUBJECT` is the prospect carried through the
    pipeline; `SOURCES` are the others discovered around them. */
 
-const PEOPLE = {
+export const PEOPLE = {
   daniel: { name: 'Dalian Carter', role: 'Founder' },
   olivia: { name: 'Olivia Vance', role: 'Growth Lead' },
   marcus: { name: 'Marcus Chen', role: 'Head of Sales' },
@@ -144,7 +144,7 @@ export function sceneMarkup(i: number): string {
   if (i === 0)
     return `<div class="scene discover-scene">${svg}<div class="source-list">${['t1', 't2', 't3', 't4'].map((t, n) => sourceCard(String(n), t, SOURCES[n]!)).join('')}</div><div class="ui-card target-card" id="discover-target">${personRow(SUBJECT, 'large')}<div class="chips"><span class="chip sk-pill"></span><span class="chip sk-pill"></span><span class="chip sk-pill tint"></span></div></div></div>`;
   if (i === 1)
-    return `<div class="scene research-scene">${svg}<div class="ui-card research-card" id="research-profile">${personRow(SUBJECT, 'large')}<div class="details">${['Cartwright, remote first', 'Europe and North America', 'Software, 40 people'].map((d) => `<span class="detail-line">${d}</span>`).join('')}</div></div><div class="insights">${insightNode(0, 'trend', 'Recently raised a funding round', 'Closed three weeks ago')}${insightNode(1, 'reach', 'Expanding into new markets', 'Europe and enterprise segments')}${insightNode(2, 'team', 'Hiring a growth team', 'Open growth and performance roles')}${insightNode(3, 'stack', 'Tooling already in place', 'Active technology signal')}</div><aside class="ui-card sources-sidebar">${['Company website', 'LinkedIn Jobs', 'Funding announcement'].map((src) => `<div class="source-ref"><span class="source-tick" aria-hidden="true"></span><span class="source-label">${src}</span></div>`).join('')}</aside></div>`;
+    return `<div class="scene research-scene">${svg}<div class="ui-card research-card" id="research-profile">${personRow(SUBJECT, 'large')}<div class="details">${['Cartwright, remote first', 'Europe and North America', 'Software, 40 people'].map((d) => `<span class="detail-line">${d}</span>`).join('')}</div></div><div class="insights">${insightNode(0, 'trend', 'Recently raised a funding round', 'Closed three weeks ago')}${insightNode(1, 'reach', 'Expanding into new markets', 'Europe and enterprise segments')}${insightNode(2, 'team', 'Hiring a growth team', 'Open growth and performance roles')}${insightNode(3, 'stack', 'Tooling already in place', 'Active technology signal')}</div></div>`;
   if (i === 2)
     return `<div class="scene qualify-scene">${svg}<div class="ui-card qualified-card" id="qualified-target"><div class="person">${avatar(SUBJECT)}${identity(SUBJECT)}<span class="state-dot pass" aria-hidden="true"></span></div><div class="check-list">${['Company size', 'Target industry', 'Relevant role', 'Hiring plan'].map((crit) => `<div class="check-row"><span class="check" aria-hidden="true">${TICKPATH}</span><span class="check-label">${crit}</span></div>`).join('')}</div><div class="score"><span class="score-ring" aria-hidden="true"></span><div class="person-lines">${sk('40%')}${sk('58%', 'dim')}</div></div></div><div class="ui-card rejected-card" id="rejected-target"><div class="person">${avatar('olivia', 'small')}${identity('olivia')}</div><div class="hold-bars" aria-hidden="true"><span></span><span></span></div><div class="details">${sk('72%')}${sk('56%', 'dim')}${sk('63%', 'dim')}</div></div></div>`;
   if (i === 3)
@@ -228,10 +228,13 @@ export function mountJourney(
       } else {
         sx = x.right - r.left;
         sy = x.top - r.top + x.height / 2;
+        if (i === 1) {
+          sy = x.top - r.top + x.height * 0.44 + (n - 1.5) * 16;
+        }
         ex = y.left - r.left;
         ey = y.top - r.top + y.height / 2;
         if (i === 0) ey += (n - 1.5) * 10;
-        const bend = Math.max(24, (ex - sx) * 0.5);
+        const bend = Math.max(32, (ex - sx) * 0.48);
         d = `M${sx},${sy} C${sx + bend},${sy} ${ex - bend},${ey} ${ex},${ey}`;
       }
 
@@ -353,8 +356,7 @@ export function mountJourney(
     if (i === 1) {
       draw(0.45, 0.5);
       tl.from(qa('.insight-row'), { x: 20, autoAlpha: 0, stagger: 0.15, duration: 0.5, ease: 'power2.out' }, 0.7)
-        .from(qa('.insight-dot'), { scale: 0.6, stagger: 0.15, duration: 0.35, ease: 'back.out(2)' }, 0.8)
-        .from(q('.sources-sidebar'), { autoAlpha: 0, duration: 0.7 }, 1.15);
+        .from(qa('.insight-dot'), { scale: 0.6, stagger: 0.15, duration: 0.35, ease: 'back.out(2)' }, 0.8);
     }
     if (i === 2) {
       qa('.check').forEach((el, n) => {
@@ -372,7 +374,7 @@ export function mountJourney(
           t,
         );
       });
-      tl.to(q('.qualified-card'), { borderColor: '#2B8A3E', boxShadow: '0 0 0 2px #2b8a3e', duration: 0.3 }, 2.05)
+      tl.to(q('.qualified-card'), { borderColor: '#2B8A3E', duration: 0.3 }, 2.05)
         .from(q('.state-dot.pass'), { scale: 0.5, autoAlpha: 0, duration: 0.4, ease: 'back.out(1.6)' }, 2.05)
         .from(q('.score'), { y: 8, autoAlpha: 0, duration: 0.4 }, 2.25);
       draw(2.5);
@@ -592,7 +594,6 @@ export function mountJourney(
       const qualified = scene.querySelector<HTMLElement>('.qualified-card');
       if (qualified) {
         qualified.style.borderColor = '#2b8a3e';
-        qualified.style.boxShadow = '0 0 0 2px #2b8a3e';
       }
     });
     current = 0;

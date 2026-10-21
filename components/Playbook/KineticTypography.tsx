@@ -72,19 +72,21 @@ export function KineticTypography({
           'kinetic-scene kinetic-scene-1 story-caption-1 will-change-transform',
           isPortrait
             ? 'absolute left-8 top-10 flex flex-col items-start text-left max-w-[620px]'
-            : 'absolute left-8 md:left-[80px] top-[140px] flex flex-col items-start text-left max-w-[440px]',
+            : 'absolute left-8 md:left-[80px] top-[150px] flex flex-col items-start text-left max-w-[440px]',
           staticAct !== undefined && staticAct !== 1 && 'hidden',
         )}
       >
         <div className="overflow-visible pt-2 pb-5 pr-6 pl-0">
           <h2
             className={cn(
-              'font-[650] tracking-[-0.03em] leading-[1.15] select-none text-left text-[#0A0A0A]',
-              isPortrait ? 'text-[44px]' : 'text-[36px] sm:text-[42px] md:text-[46px] lg:text-[50px]',
+              'font-[650] tracking-[-0.03em] leading-[1.12] select-none text-left text-[#0A0A0A]',
+              isPortrait ? 'text-[40px]' : 'text-[38px] sm:text-[44px] md:text-[48px] lg:text-[50px]',
             )}
             style={{ fontFamily: 'var(--font-display), Georgia, serif' }}
           >
-            <span className="block">From scattered</span>
+            <span className="block">
+              <span>{wordsScene1[0]}</span> <span>{wordsScene1[1]}</span>
+            </span>
             <span className="block">business</span>
             <span className="relative inline-block text-[var(--scaffold-accent)] pb-2 pr-2">
               <span>information</span>
@@ -105,21 +107,24 @@ export function KineticTypography({
           'kinetic-scene kinetic-scene-2 story-caption-2 will-change-transform',
           isPortrait
             ? 'absolute left-8 top-8 flex flex-col items-start text-left max-w-[620px]'
-            : 'absolute left-[95px] top-6 right-[95px] flex items-center justify-between max-w-[1090px]',
+            : 'absolute left-8 md:left-[80px] top-10 md:top-12 right-[80px] flex items-center justify-between max-w-[1120px]',
           staticAct !== undefined && staticAct !== 2 && 'hidden',
         )}
       >
         <div className="overflow-visible pt-1 pb-3 pr-4 pl-0">
           <h2
             className={cn(
-              'font-[650] tracking-[-0.03em] leading-tight select-none text-left text-[#0A0A0A]',
-              isPortrait ? 'text-[34px]' : 'text-[28px] sm:text-[32px] md:text-[36px] lg:text-[38px]',
+              'font-[650] tracking-[-0.03em] leading-[1.12] select-none text-left text-[#0A0A0A]',
+              isPortrait ? 'text-[32px]' : 'text-[38px] sm:text-[44px] md:text-[48px] lg:text-[50px]',
             )}
             style={{ fontFamily: 'var(--font-display), Georgia, serif' }}
           >
-            <span>To preparing offers and </span>
+            <span>
+              {wordsScene2[0].charAt(0).toUpperCase() + wordsScene2[0].slice(1)}{' '}
+              {wordsScene2.slice(1, 4).join(' ')}{' '}
+            </span>
             <span className="relative inline-block text-[var(--scaffold-accent)] pb-1 pr-2">
-              <span>Ideal Client Profile</span>
+              <span>{wordsScene2.slice(4).join(' ')}</span>
               <AccentRule />
             </span>
           </h2>
@@ -136,15 +141,15 @@ export function KineticTypography({
           'kinetic-scene kinetic-scene-3 story-caption-3 will-change-transform',
           isPortrait
             ? 'absolute left-8 top-10 flex flex-col items-start text-left max-w-[620px]'
-            : 'absolute left-8 md:left-[80px] top-[165px] flex flex-col items-start text-left max-w-[420px]',
+            : 'absolute left-8 md:left-[80px] top-[150px] flex flex-col items-start text-left max-w-[420px]',
           staticAct !== undefined && staticAct !== 3 && 'hidden',
         )}
       >
         <div className="overflow-visible pt-2 pb-4 pr-6 pl-0">
           <h2
             className={cn(
-              'font-[650] tracking-[-0.03em] leading-[1.15] select-none text-left text-[#0A0A0A]',
-              isPortrait ? 'text-[44px]' : 'text-[36px] sm:text-[42px] md:text-[46px] lg:text-[48px]',
+              'font-[650] tracking-[-0.03em] leading-[1.12] select-none text-left text-[#0A0A0A]',
+              isPortrait ? 'text-[40px]' : 'text-[38px] sm:text-[44px] md:text-[48px] lg:text-[50px]',
             )}
             style={{ fontFamily: 'var(--font-display), Georgia, serif' }}
           >
@@ -162,7 +167,7 @@ export function KineticTypography({
             'text-[rgba(10,10,10,0.65)] font-[450] tracking-[-0.015em] leading-[1.5] text-pretty text-left',
             isPortrait
               ? 'mt-3 text-[18px] max-w-[560px]'
-              : 'mt-2 text-[16px] md:text-[17px] max-w-[360px]',
+              : 'mt-3 text-[16px] md:text-[17px] max-w-[380px]',
           )}
           style={{ fontFamily: 'var(--font-display), Georgia, serif' }}
         >
@@ -184,15 +189,15 @@ export function KineticTypography({
           'kinetic-scene kinetic-scene-4 story-caption-4 will-change-transform',
           isPortrait
             ? 'absolute left-8 top-10 flex flex-col items-start text-left max-w-[620px]'
-            : 'absolute left-8 md:left-[80px] top-[165px] flex flex-col items-start text-left max-w-[420px]',
+            : 'absolute left-8 md:left-[80px] top-[150px] flex flex-col items-start text-left max-w-[420px]',
           staticAct !== undefined && staticAct !== 4 && 'hidden',
         )}
       >
         <div className="overflow-visible pt-2 pb-4 pr-6 pl-0">
           <h2
             className={cn(
-              'font-[650] tracking-[-0.03em] leading-[1.15] select-none text-left text-[#0A0A0A]',
-              isPortrait ? 'text-[44px]' : 'text-[36px] sm:text-[42px] md:text-[46px] lg:text-[48px]',
+              'font-[650] tracking-[-0.03em] leading-[1.12] select-none text-left text-[#0A0A0A]',
+              isPortrait ? 'text-[40px]' : 'text-[38px] sm:text-[44px] md:text-[48px] lg:text-[50px]',
             )}
             style={{ fontFamily: 'var(--font-display), Georgia, serif' }}
           >
@@ -210,7 +215,7 @@ export function KineticTypography({
             'text-[rgba(10,10,10,0.65)] font-[450] tracking-[-0.015em] leading-[1.5] text-pretty text-left',
             isPortrait
               ? 'mt-3 text-[18px] max-w-[560px]'
-              : 'mt-2 text-[16px] md:text-[17px] max-w-[360px]',
+              : 'mt-3 text-[16px] md:text-[17px] max-w-[380px]',
           )}
           style={{ fontFamily: 'var(--font-display), Georgia, serif' }}
         >

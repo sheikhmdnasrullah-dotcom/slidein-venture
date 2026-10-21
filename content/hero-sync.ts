@@ -23,19 +23,19 @@ export interface HeroPhraseSync {
 
 export const HERO_PHRASE_SYNC: HeroPhraseSync[] = [
   {
-    phrase: 'The internet\u2019s most powerful',
+    phrase: 'finds and researches each prospect',
     stages: ['configure', 'discover', 'research'],
   },
   {
-    phrase: 'client acquisition secrets',
+    phrase: 'matches them to your offers',
     stages: ['qualify'],
   },
   {
-    phrase: 'unified into',
+    phrase: 'writes each one a personal email',
     stages: ['personalize', 'outreach'],
   },
   {
-    phrase: 'one framework',
+    phrase: 'keeps working until they are convinced',
     stages: ['converse', 'overview'],
   },
 ];

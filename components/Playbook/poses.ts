@@ -29,7 +29,6 @@ export const CANVAS_PORTRAIT = {
 export const PLAYBOOK_CONFIG = {
   showBeam: true,
   showVersions: true,
-  autoAdvance: true,
 } as const;
 
 export type ChipType = 'profile' | 'offers' | 'icps';
@@ -490,9 +489,9 @@ export const LANDSCAPE_CHIPS: ChipDef[] = [
 
 /* Act 2 Columns: profile, offers, icps (generous 348px columns with 95px safe margins) */
 export const LANDSCAPE_COLUMNS = [
-  { id: 'col-profile', title: 'profile' as const, x: 95, y: 135, w: 348, h: 340 },
-  { id: 'col-offers', title: 'offers' as const, x: 466, y: 135, w: 348, h: 340 },
-  { id: 'col-icps', title: 'icps' as const, x: 837, y: 135, w: 348, h: 340 },
+  { id: 'col-profile', title: 'profile' as const, x: 95, y: 150, w: 348, h: 380 },
+  { id: 'col-offers', title: 'offers' as const, x: 466, y: 150, w: 348, h: 380 },
+  { id: 'col-icps', title: 'icps' as const, x: 837, y: 150, w: 348, h: 380 },
 ];
 
 /* ICP Spokes: from ICP ring center (col 2 + persona card center) to criteria chips */
@@ -503,12 +502,12 @@ export const ICP_RING_CENTER_LANDSCAPE = {
 
 /* Act 3 Book & Stage Tiles */
 export const BOOK_LANDSCAPE = {
-  cx: 820,
-  cy: 300,
-  w: 220, // closed width
-  openW: 440,
-  h: 240,
-  bookmark: { x: 820 - 20, y: 180, w: 14, h: 48 },
+  cx: 840,
+  cy: 325,
+  w: 280, // closed width
+  openW: 560,
+  h: 300,
+  bookmark: { x: 840 - 20, y: 175, w: 14, h: 48 },
   tabs: [
     { title: 'profile' as const, lead: 'circle' as const, y: 205 },
     { title: 'offers' as const, lead: 'square' as const, y: 245 },
@@ -788,18 +787,24 @@ export const PORTRAIT_BANDS = [
 
 export const BOOK_PORTRAIT = {
   cx: 360,
-  cy: 480,
-  w: 180,
-  openW: 360,
-  h: 210,
+  cy: 490,
+  w: 200,
+  openW: 400,
+  h: 235,
   scale: 0.8,
-  bookmark: { x: 360 - 15, y: 480 - 105, w: 12, h: 42 },
+  bookmark: { x: 360 - 15, y: 490 - 105, w: 12, h: 42 },
   tabs: [
-    { title: 'profile' as const, lead: 'circle' as const, y: 480 - 65 },
-    { title: 'offers' as const, lead: 'square' as const, y: 480 - 30 },
-    { title: 'icps' as const, lead: 'diamond' as const, y: 480 + 5 },
+    { title: 'profile' as const, lead: 'circle' as const, y: 490 - 65 },
+    { title: 'offers' as const, lead: 'square' as const, y: 490 - 30 },
+    { title: 'icps' as const, lead: 'diamond' as const, y: 490 + 5 },
   ],
 };
+
+/* Stage Spine: the connected configure → overview workflow rail shown in
+   the persistent-knowledge scene. Landscape sits under the brain; portrait
+   sits below it. */
+export const STAGE_SPINE_LANDSCAPE = { x0: 110, x1: 1210, y: 545 };
+export const STAGE_SPINE_PORTRAIT = { x0: 60, x1: 660, y: 705 };
 
 
 

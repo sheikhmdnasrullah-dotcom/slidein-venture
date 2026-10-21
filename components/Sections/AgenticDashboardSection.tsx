@@ -241,9 +241,9 @@ export default function AgenticDashboardSection() {
 
   return (
     <Band tone="flat" id="dashboard" className="relative">
-      <div className="mx-auto max-w-[1280px] px-2 sm:px-4">
+      <div className="mx-auto max-w-[1600px] px-2 sm:px-4">
         <Reveal y={16}>
-          <div className="mx-auto mb-10 md:mb-14 max-w-[900px] px-4">
+          <div className="mx-auto mb-8 md:mb-10 max-w-[900px] px-4">
             <DashboardTagline />
           </div>
         </Reveal>

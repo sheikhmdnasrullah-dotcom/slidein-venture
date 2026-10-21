@@ -315,8 +315,9 @@
 /* ── Research ─────────────────────────────────────────────────────────── */
 
 .sj .research-scene {
-  grid-template-columns: 0.9fr 1.2fr 0.65fr;
-  gap: 56px;
+  grid-template-columns: minmax(230px, 260px) 1fr;
+  gap: 72px;
+  align-items: center;
 }
 
 .sj .research-card .person {
@@ -414,48 +415,16 @@
   background: var(--sj-accent);
 }
 
-.sj .sources-sidebar {
-  padding: 17px;
-  box-shadow: none;
-  background: var(--scaffold-panel);
-  display: grid;
-  gap: 12px;
-}
-
-.sj .source-ref {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  border-top: 1px solid var(--scaffold-hairline);
-  padding: 12px 0;
-}
-
-.sj .source-ref:first-child {
-  border-top: 0;
-  padding-top: 0;
-}
-
-.sj .source-ref:last-child {
-  padding-bottom: 0;
-}
-
-.sj .source-tick {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: var(--scaffold-accent);
-  flex-shrink: 0;
-}
-
 /* ── Qualify ──────────────────────────────────────────────────────────── */
 
 .sj .qualify-scene {
-  grid-template-columns: 1.7fr 1fr;
-  gap: 90px;
+  grid-template-columns: 1.5fr 1fr;
+  gap: 40px;
+  align-items: start;
 }
 
 .sj .qualified-card {
-  padding: 22px 24px;
+  padding: 20px 22px;
 }
 
 .sj .qualified-card .person {
@@ -532,12 +501,13 @@
 }
 
 .sj .score-ring {
-  width: 34px;
-  height: 34px;
+  width: 30px;
+  height: 30px;
   border-radius: 50%;
-  background: conic-gradient(var(--sj-pass) 92%, var(--scaffold-well) 0);
+  background: conic-gradient(var(--sj-pass) 72%, var(--scaffold-well) 0);
   position: relative;
   flex-shrink: 0;
+  opacity: 0.85;
 }
 
 .sj .score-ring::after {
@@ -739,7 +709,6 @@
   top: 32px;
   width: 22%;
   background: var(--scaffold-accent-row);
-  box-shadow: 0 0 0 1px var(--scaffold-accent-chip);
 }
 
 .sj .env-line.short {
@@ -1019,5 +988,155 @@
   margin-left: auto;
   font-size: 11.5px;
   color: var(--scaffold-lead-ink);
+}
+
+/* ─── Dashboard Scene Embed Overrides ───────────────────────────────────────
+   When embedded in AgenticDashboard (.sj-scene-wrapper), scenes must fit
+   the dashboard's workspace bounds without clipping or overflow. */
+
+.sj.sj-scene-wrapper .scene {
+  gap: 32px;
+  grid-template-columns: 1fr 1.15fr;
+  min-height: 290px;
+}
+
+.sj.sj-scene-wrapper .discover-scene {
+  grid-template-columns: 1fr 1.15fr;
+  gap: 36px;
+}
+
+.sj.sj-scene-wrapper .research-scene {
+  grid-template-columns: minmax(230px, 260px) 1fr;
+  gap: 72px;
+  align-items: center;
+}
+
+.sj.sj-scene-wrapper .research-scene .insights {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  max-width: 440px;
+}
+
+.sj.sj-scene-wrapper .research-scene .insight-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  margin-inline: 0;
+  border: 1px solid var(--scaffold-hairline);
+  border-radius: 11px;
+  background: #ffffff;
+  box-shadow: 0 1px 3px rgba(10, 10, 10, 0.02);
+  transition: border-color 0.2s var(--sj-ease), box-shadow 0.2s var(--sj-ease);
+}
+
+.sj.sj-scene-wrapper .research-scene .insight-row:hover {
+  border-color: rgba(255, 98, 0, 0.25);
+  box-shadow: 0 2px 6px rgba(10, 10, 10, 0.04);
+}
+
+.sj.sj-scene-wrapper .qualify-scene {
+  grid-template-columns: 1.25fr 1fr;
+  gap: 36px;
+  align-items: center;
+}
+
+.sj.sj-scene-wrapper .qualified-card {
+  border-color: var(--scaffold-hairline) !important;
+}
+
+.sj.sj-scene-wrapper .rejected-card {
+  align-self: center;
+  margin-bottom: 0;
+}
+
+.sj.sj-scene-wrapper .personalize-scene {
+  grid-template-columns: 1fr 1.35fr;
+  gap: 28px;
+}
+
+.sj.sj-scene-wrapper .outreach-scene {
+  grid-template-columns: 1.25fr 0.8fr;
+  gap: 48px;
+  align-items: center;
+}
+
+.sj.sj-scene-wrapper .ui-card {
+  padding: 14px 16px;
+  border-radius: 12px;
+}
+
+.sj.sj-scene-wrapper .context-card {
+  padding: 14px 16px;
+}
+
+.sj.sj-scene-wrapper .context-events {
+  margin-top: 12px;
+}
+
+.sj.sj-scene-wrapper .context-event {
+  padding: 8px 0 8px 14px;
+  gap: 8px;
+}
+
+.sj.sj-scene-wrapper .context-event::before {
+  top: 14px;
+}
+
+.sj.sj-scene-wrapper .composer-head {
+  padding: 10px 16px;
+}
+
+.sj.sj-scene-wrapper .email-body {
+  padding: 14px 16px;
+  gap: 10px;
+}
+
+.sj.sj-scene-wrapper .mail-text {
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.sj.sj-scene-wrapper .socket {
+  font-size: 11.5px;
+  padding: 0 4px;
+}
+
+.sj.sj-scene-wrapper .converse-scene {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 290px;
+  width: 100%;
+}
+
+.sj.sj-scene-wrapper .inbox {
+  width: 100%;
+  max-width: 880px;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+}
+
+.sj.sj-scene-wrapper .inbox-head {
+  display: none;
+}
+
+.sj.sj-scene-wrapper .inbox-content {
+  display: grid;
+  grid-template-columns: 1.15fr 1fr;
+  gap: 24px;
+  padding: 0;
+  align-items: stretch;
+}
+
+.sj.sj-scene-wrapper .reply-card,
+.sj.sj-scene-wrapper .meeting-card {
+  padding: 20px 22px;
+  border-radius: 14px;
+  background: #ffffff;
+  border: 1px solid var(--scaffold-hairline);
+  box-shadow: 0 1px 4px rgba(10, 10, 10, 0.03);
 }
 

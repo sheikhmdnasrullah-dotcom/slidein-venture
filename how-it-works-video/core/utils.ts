@@ -475,6 +475,16 @@ function createHudUtil(ctx: SceneContext): SceneContext['hud'] {
       }
       return gsap.timeline() as unknown as GsapTween;
     },
+    ensure: (): GsapTween => {
+      const hud = ensureChip();
+      if (hud && !hud.querySelector('.vp-tag')) {
+        hud.innerHTML = `
+          <span class="vp-hud-bead"></span>
+          <span class="vp-tag">Profile v3</span>
+        `;
+      }
+      return gsap.to(hud, { opacity: 1, y: 0, duration: 0.01, paused: true }) as unknown as GsapTween;
+    },
     pulse: (): GsapTimeline => {
       const hud = ensureChip();
       if (hud) {

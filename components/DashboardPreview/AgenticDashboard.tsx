@@ -147,6 +147,11 @@ function JourneyScene({ stage, live }: { stage: number; live: boolean }) {
         } else {
           sx = xr.right - r2.left;
           sy = xr.top - r2.top + xr.height / 2;
+          if (stage === 1) {
+            /* Distribute string origins gracefully along the profile card's boundary
+               so each connector has its own docking port and ample room to breathe */
+            sy = xr.top - r2.top + xr.height * 0.44 + (n - 1.5) * 16;
+          }
           ex = yr.left - r2.left;
           ey = yr.top - r2.top + yr.height / 2 + (stage === 0 ? (n - 1.5) * 10 : 0);
           /* Personalization wires stop at the composer's edge, level with
@@ -160,7 +165,7 @@ function JourneyScene({ stage, live }: { stage: number; live: boolean }) {
               ex = stopX;
             }
           }
-          const bend = Math.max(24, (ex - sx) * 0.5);
+          const bend = Math.max(32, (ex - sx) * 0.48);
           d = `M${sx},${sy} C${sx + bend},${sy} ${ex - bend},${ey} ${ex},${ey}`;
         }
 
@@ -267,7 +272,7 @@ function JourneyScene({ stage, live }: { stage: number; live: boolean }) {
     const tl = ctx.add(() => {
       const t = gsap.timeline();
       t.from(scene.querySelectorAll('.source-card, .queue-item, .insight-row, .context-event, .check-row, .reply-card, .meeting-card, .draft-card, .target-card, .research-card, .qualified-card, .context-card, .composer'), {
-        y: 16, autoAlpha: 0, stagger: 0.08, duration: 0.4, ease: 'power2.out',
+        y: 12, autoAlpha: 0, stagger: 0.04, duration: 0.3, ease: 'power2.out',
       }, 0);
 
       paths.forEach((p, n) => {
@@ -308,7 +313,6 @@ function JourneyScene({ stage, live }: { stage: number; live: boolean }) {
           }
           t.to(el, { backgroundColor: 'rgb(43 138 62)', borderColor: 'rgb(43 138 62)', color: 'rgb(255 255 255)', duration: 0.15 }, at);
         });
-        t.to(scene.querySelector('.qualified-card'), { borderColor: 'rgb(43 138 62)', borderWidth: '1px', duration: 0.3 }, 1.75);
       }
 
       if (stage === 4) {
@@ -547,31 +551,244 @@ export const SCROLL_STAGES: StageId[] = [...SIDEBAR_STAGES, 'overview'];
 
 /* ─── Top Command Bar Component ──────────────────────────────────────────── */
 
-function CommandBar({ live, activeStage }: { live: boolean; activeStage: StageId }) {
+type SearchItem = {
+  id: string;
+  category: 'Stages' | 'Accounts' | 'Quick actions';
+  title: string;
+  badge?: string;
+  stage: StageId;
+};
+
+const SEARCH_ITEMS: SearchItem[] = [
+  { id: 's-configure', category: 'Stages', title: 'configure', badge: 'Active', stage: 'configure' },
+  { id: 's-discover', category: 'Stages', title: 'discover', badge: 'Active', stage: 'discover' },
+  { id: 's-research', category: 'Stages', title: 'research', badge: 'Active', stage: 'research' },
+  { id: 's-qualify', category: 'Stages', title: 'qualify', badge: 'Active', stage: 'qualify' },
+  { id: 's-personalize', category: 'Stages', title: 'personalize', badge: 'Active', stage: 'personalize' },
+  { id: 's-outreach', category: 'Stages', title: 'outreach', badge: 'Active', stage: 'outreach' },
+  { id: 's-converse', category: 'Stages', title: 'converse', badge: 'Active', stage: 'converse' },
+  { id: 's-overview', category: 'Stages', title: 'overview', badge: 'Active', stage: 'overview' },
+
+  { id: 'a-cartwright', category: 'Accounts', title: 'Cartwright', badge: 'Dalian Carter', stage: 'research' },
+  { id: 'a-horizon', category: 'Accounts', title: 'Horizon Dynamics', badge: 'Marcus Chen', stage: 'discover' },
+  { id: 'a-meridian', category: 'Accounts', title: 'Meridian Analytics', badge: 'Sophia Martinez', stage: 'personalize' },
+  { id: 'a-apex', category: 'Accounts', title: 'Apex Velocity', badge: 'Olivia Vance', stage: 'converse' },
+
+  { id: 'q-research', category: 'Quick actions', title: 'Run research dossier', badge: 'Cartwright', stage: 'research' },
+  { id: 'q-qualify', category: 'Quick actions', title: 'Inspect qualification matrix', badge: '94% ICP Match', stage: 'qualify' },
+  { id: 'q-outreach', category: 'Quick actions', title: 'Inspect outbound delivery', badge: 'Dispatched', stage: 'outreach' },
+  { id: 'q-converse', category: 'Quick actions', title: 'View booked discovery calls', badge: 'Booked call', stage: 'converse' },
+];
+
+function SearchPalette({
+  onClose,
+  onSelectStage,
+}: {
+  onClose: () => void;
+  onSelectStage: (stage: StageId) => void;
+}) {
+  const [query, setQuery] = useState('');
+  const [selectedIndex, setSelectedIndex] = useState(0);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    inputRef.current?.focus();
+  }, []);
+
+  const filtered = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    if (!q) return SEARCH_ITEMS;
+    return SEARCH_ITEMS.filter(
+      (item) =>
+        item.title.toLowerCase().includes(q) ||
+        (item.badge && item.badge.toLowerCase().includes(q)) ||
+        item.category.toLowerCase().includes(q) ||
+        item.stage.toLowerCase().includes(q),
+    );
+  }, [query]);
+
+  useEffect(() => {
+    setSelectedIndex(0);
+  }, [query]);
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Escape') {
+      e.preventDefault();
+      onClose();
+    } else if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      setSelectedIndex((prev) => (filtered.length ? (prev + 1) % filtered.length : 0));
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      setSelectedIndex((prev) => (filtered.length ? (prev - 1 + filtered.length) % filtered.length : 0));
+    } else if (e.key === 'Enter') {
+      e.preventDefault();
+      if (filtered[selectedIndex]) {
+        onSelectStage(filtered[selectedIndex].stage);
+        onClose();
+      }
+    }
+  };
+
   return (
-    <div className="flex h-[30px] max-w-[260px] flex-1 items-center gap-2 rounded-full border border-[rgba(10,10,10,0.08)] bg-white px-3 shadow-[inset_0_1px_2px_rgba(0,0,0,0.03)]">
-      {/* Sparkle AI Glyph */}
-      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" className="shrink-0" aria-hidden="true">
-        <path
-          d="M12 2L14.4 9.6L22 12L14.4 14.4L12 22L9.6 14.4L2 12L9.6 9.6L12 2Z"
-          fill="var(--scaffold-accent)"
-        />
-      </svg>
-      {/* Typing simulated bar */}
-      <span className="flex min-w-0 flex-1 items-center gap-1.5 overflow-hidden">
-        <span className="text-[11px] font-medium tracking-tight text-[rgba(10,10,10,0.55)]">
-          {activeStage}
-        </span>
-        <Bar w={live ? '36%' : '28%'} h={5} />
-      </span>
-      {/* Blinking accent caret */}
-      <span
-        className={cn(
-          'block h-[11px] w-[2px] shrink-0 rounded-full bg-[var(--scaffold-accent)]',
-          live ? 'animate-pulse' : '',
-        )}
-      />
+    <div
+      role="dialog"
+      aria-modal="true"
+      aria-label="Search dashboard"
+      className="absolute inset-0 z-50 flex items-start justify-center bg-black/25 p-4 backdrop-blur-xs animate-in fade-in duration-150"
+      onClick={onClose}
+    >
+      <div
+        className="mt-6 flex max-h-[420px] w-full max-w-[460px] flex-col overflow-hidden rounded-[16px] border border-[var(--scaffold-hairline)] bg-white shadow-2xl animate-in zoom-in-95 duration-150"
+        onClick={(e) => e.stopPropagation()}
+        onKeyDown={handleKeyDown}
+      >
+        {/* Search Input Bar */}
+        <div className="flex h-[46px] items-center gap-2.5 border-b border-[var(--scaffold-hairline)] px-3.5">
+          <svg
+            width="14"
+            height="14"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2.2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            className="text-[rgba(10,10,10,0.4)] shrink-0"
+          >
+            <circle cx="11" cy="11" r="8" />
+            <line x1="21" y1="21" x2="16.65" y2="16.65" />
+          </svg>
+          <input
+            ref={inputRef}
+            type="text"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Search stages..."
+            className="flex-1 bg-transparent text-[13px] font-medium text-[rgba(10,10,10,0.9)] placeholder:text-[rgba(10,10,10,0.4)] focus:outline-none"
+          />
+          {query ? (
+            <button
+              type="button"
+              onClick={() => setQuery('')}
+              className="text-[11px] font-semibold text-[rgba(10,10,10,0.4)] hover:text-black cursor-pointer px-1"
+            >
+              ×
+            </button>
+          ) : null}
+          <kbd className="rounded border border-[rgba(10,10,10,0.12)] bg-[var(--scaffold-panel)] px-1.5 py-0.5 text-[9px] font-semibold text-[rgba(10,10,10,0.45)]">
+            Esc
+          </kbd>
+        </div>
+
+        {/* Results List */}
+        <div className="flex-1 overflow-y-auto p-2">
+          {filtered.length === 0 ? (
+            <div className="p-6 text-center text-[12px] text-[rgba(10,10,10,0.4)]">
+              No matching results
+            </div>
+          ) : (
+            <div className="flex flex-col gap-1">
+              {filtered.map((item, idx) => {
+                const isSelected = idx === selectedIndex;
+                return (
+                  <button
+                    key={item.id}
+                    type="button"
+                    onMouseEnter={() => setSelectedIndex(idx)}
+                    onClick={() => {
+                      onSelectStage(item.stage);
+                      onClose();
+                    }}
+                    className={cn(
+                      'group flex items-center justify-between rounded-[9px] px-2.5 py-2 text-left transition-colors cursor-pointer',
+                      isSelected
+                        ? 'bg-[var(--scaffold-accent-row)] text-[var(--scaffold-accent)]'
+                        : 'hover:bg-[rgba(10,10,10,0.03)] text-[rgba(10,10,10,0.85)]',
+                    )}
+                  >
+                    <div className="flex items-center gap-2.5 min-w-0">
+                      <span
+                        className={cn(
+                          'flex h-[26px] w-[26px] items-center justify-center rounded-[7px] border transition-colors shrink-0',
+                          isSelected
+                            ? 'border-[var(--scaffold-accent)] bg-white text-[var(--scaffold-accent)] shadow-2xs'
+                            : 'border-[var(--scaffold-hairline)] bg-[var(--scaffold-panel)] text-[rgba(10,10,10,0.6)]',
+                        )}
+                      >
+                        <StageGlyphIcon stage={item.stage} size={12} />
+                      </span>
+                      <div className="flex flex-col min-w-0">
+                        <span className="truncate text-[12px] font-medium tracking-tight">
+                          {item.title}
+                        </span>
+                        <span className="truncate text-[9.5px] text-[rgba(10,10,10,0.45)]">
+                          {item.category}
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-2 shrink-0">
+                      {item.badge ? (
+                        <span className="rounded-md border border-[rgba(10,10,10,0.08)] bg-white px-1.5 py-0.5 text-[9px] font-medium text-[rgba(10,10,10,0.6)] shadow-2xs">
+                          {item.badge}
+                        </span>
+                      ) : null}
+                      <span className="text-[10px] font-medium text-[rgba(10,10,10,0.4)]">
+                        {item.stage}
+                      </span>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      </div>
     </div>
+  );
+}
+
+function CommandBar({
+  live,
+  activeStage,
+  onOpenSearch,
+}: {
+  live: boolean;
+  activeStage: StageId;
+  onOpenSearch: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onOpenSearch}
+      aria-label="Search stages, accounts, insights"
+      className="group flex h-[30px] max-w-[280px] flex-1 cursor-pointer items-center justify-between gap-2 rounded-full border border-[rgba(10,10,10,0.08)] bg-white px-3 shadow-[inset_0_1px_2px_rgba(0,0,0,0.03)] transition-all hover:border-[var(--scaffold-accent)]/50 hover:shadow-xs"
+    >
+      <div className="flex min-w-0 items-center gap-2">
+        <svg
+          width="11"
+          height="11"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2.5"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          className="shrink-0 text-[rgba(10,10,10,0.4)] group-hover:text-[var(--scaffold-accent)] transition-colors"
+          aria-hidden="true"
+        >
+          <circle cx="11" cy="11" r="8" />
+          <line x1="21" y1="21" x2="16.65" y2="16.65" />
+        </svg>
+        <span className="truncate text-[11px] font-medium tracking-tight text-[rgba(10,10,10,0.55)] group-hover:text-[rgba(10,10,10,0.85)]">
+          Search stages, accounts, insights...
+        </span>
+      </div>
+      <kbd className="hidden sm:inline-flex items-center rounded border border-[rgba(10,10,10,0.12)] bg-[var(--scaffold-panel)] px-1.5 py-0.5 text-[9px] font-semibold text-[rgba(10,10,10,0.5)] shadow-2xs">
+        ⌘K
+      </kbd>
+    </button>
   );
 }
 
@@ -668,7 +885,7 @@ function QualifyStageView({ live }: { live: boolean }) {
   );
 }
 
-/* 4. PERSONALIZE VIEW — dynamic video asset preview + versioned draft socket */
+/* 4. PERSONALIZE VIEW — dynamic video asset preview + personalized draft socket */
 function PersonalizeStageView({ live }: { live: boolean }) {
   return (
     <div className="relative">
@@ -685,291 +902,21 @@ function PersonalizeStageView({ live }: { live: boolean }) {
   );
 }
 
-/* 5. OUTREACH VIEW — outbound queue, policy safeguards matrix, and delivery pipeline */
-/* ── Outreach column bodies ─────────────────────────────────────────────
-   Authored once and reused by the desktop grid and the stacked mobile tabs,
-   so the two layouts can never drift apart. */
 
-function OutreachQueueColumn({ live }: { live: boolean }) {
-  return (
-    <div className="flex h-full flex-col justify-between gap-2 rounded-[14px] border border-[var(--scaffold-hairline)] bg-white p-2.5 shadow-xs">
-      <div>
-        <div className="flex items-center justify-between border-b border-[var(--scaffold-hairline)] pb-1.5">
-          <div className="flex items-center gap-1.5">
-            <span className="text-[11px] font-semibold text-[rgba(10,10,10,0.85)]">message</span>
-            <span className="text-[10px] text-[rgba(10,10,10,0.4)]">·</span>
-            <span className="text-[10px] font-medium text-[rgba(10,10,10,0.5)]">personalized</span>
-          </div>
-          <div className="flex items-center gap-1">
-            {[0, 1, 2].map((idx) => (
-              <span
-                key={idx}
-                className="flex h-[15px] items-center gap-1 rounded-[4px] border border-[rgba(10,10,10,0.06)] bg-[var(--scaffold-panel)] px-1"
-              >
-                <span
-                  className={cn(
-                    'h-1.5 w-1.5 rounded-full',
-                    idx === 0 ? 'bg-[var(--scaffold-accent)]' : 'bg-[rgba(10,10,10,0.25)]',
-                  )}
-                />
-                <Bar w={10} h={3} />
-              </span>
-            ))}
-          </div>
-        </div>
-        <div className="mt-2 rounded-[10px] border border-[var(--scaffold-accent-chip)] bg-[var(--scaffold-accent-row)]/30 p-2">
-          <div className="flex items-center gap-2">
-            <img
-              src="/journey-faces/daniel.png"
-              alt=""
-              aria-hidden="true"
-              className="h-7 w-7 rounded-full object-cover shadow-2xs border border-white"
-            />
-            <div className="flex min-w-0 flex-1 flex-col gap-1">
-              <Bar w="65%" h={5} />
-              <Bar w="40%" h={4} />
-            </div>
-            <span className="flex h-4 items-center rounded-full bg-[rgba(43,138,62,0.12)] px-1.5">
-              <span className="h-1 w-1 rounded-full bg-[rgb(43,138,62)]" />
-            </span>
-          </div>
-          <div className="mt-2 flex flex-col gap-1 rounded-[6px] border border-[rgba(10,10,10,0.06)] bg-white p-1.5">
-            <div className="flex items-center gap-1.5">
-              <EnvelopeGlyph id="out-env-icon" size="9px" />
-              <Bar w="45%" h={4} />
-            </div>
-            <Bar w="88%" h={4} />
-            <div className="flex items-center gap-1">
-              <Bar w="35%" h={4} tint />
-              <Bar w="40%" h={4} />
-            </div>
-          </div>
-          <div className="mt-2 flex items-center justify-between gap-2">
-            <div className="relative h-[3px] flex-1 rounded-full bg-[rgba(10,10,10,0.08)] overflow-hidden">
-              <motion.div
-                className="absolute inset-y-0 bg-[var(--scaffold-accent)] rounded-full"
-                animate={live ? { left: ['0%', '100%'], width: ['20%', '40%'] } : { left: '30%', width: '35%' }}
-                transition={{ duration: 1.8, repeat: Infinity, ease: 'easeInOut' }}
-              />
-            </div>
-            <Bar w={24} h={3} />
-          </div>
-        </div>
-        <div className="mt-1.5 flex items-center gap-2 rounded-[8px] border border-[rgba(10,10,10,0.06)] bg-[var(--scaffold-panel)] p-1.5">
-          <img
-            src="/journey-faces/marcus.png"
-            alt=""
-            aria-hidden="true"
-            className="h-5 w-5 rounded-full object-cover opacity-80"
-          />
-          <div className="flex min-w-0 flex-1 flex-col gap-1">
-            <Bar w="50%" h={4} />
-            <Bar w="30%" h={3} />
-          </div>
-          <span className="h-1.5 w-1.5 rounded-full bg-[rgba(10,10,10,0.25)]" />
-        </div>
-      </div>
-      <div className="flex items-center justify-between border-t border-[var(--scaffold-hairline)] pt-1.5">
-        <Bar w={28} h={4} />
-      </div>
-    </div>
-  );
-}
 
-function OutreachChecksColumn({ live }: { live: boolean }) {
-  return (
-    <div className="flex h-full flex-col justify-between gap-2 rounded-[14px] border border-[var(--scaffold-hairline)] bg-white p-2.5 shadow-xs">
-      <div>
-        <div className="flex items-center justify-between border-b border-[var(--scaffold-hairline)] pb-1.5">
-          <span className="text-[11px] font-semibold text-[rgba(10,10,10,0.85)]">checks</span>
-          <span className="flex h-[15px] items-center gap-1 rounded-full border border-[var(--scaffold-hairline)] bg-white px-1.5">
-            <Bar w={16} h={3} />
-          </span>
-        </div>
-        <div className="my-2 flex flex-col gap-1.5">
-          {[72, 58, 64, 52].map((w) => (
-            <div
-              key={w}
-              className="flex items-center justify-between rounded-[6px] border border-[rgba(10,10,10,0.05)] bg-[var(--scaffold-panel)] px-2 py-1"
-            >
-              <div className="flex items-center gap-1.5">
-                <span className="flex h-3.5 w-3.5 items-center justify-center rounded-full bg-[rgba(43,138,62,0.12)] text-[rgb(43,138,62)]">
-                  <svg width="7" height="7" viewBox="0 0 9 9" fill="none">
-                    <path d="M1.8 4.8 L3.6 6.8 L7.4 2.4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-                  </svg>
-                </span>
-                <Bar w={w} h={4} />
-              </div>
-              <span className="h-1.5 w-1.5 rounded-full bg-[rgba(10,10,10,0.25)]" />
-            </div>
-          ))}
-        </div>
-      </div>
-      <div className="flex items-center justify-between border-t border-[var(--scaffold-hairline)] pt-1.5">
-        <div className="flex items-center gap-1">
-          <span className="h-1.5 w-1.5 rounded-full bg-[rgb(43,138,62)]" />
-          <Bar w={32} h={4} />
-        </div>
-        <Bar w={20} h={3} />
-      </div>
-    </div>
-  );
-}
-
-function OutreachDeliveryColumn({ live }: { live: boolean }) {
-  return (
-    <div className="flex h-full flex-col justify-between gap-2 rounded-[14px] border border-[var(--scaffold-hairline)] bg-white p-2.5 shadow-xs">
-      <div>
-        <div className="flex items-center justify-between border-b border-[var(--scaffold-hairline)] pb-1.5">
-          <span className="text-[11px] font-semibold text-[rgba(10,10,10,0.85)]">delivered</span>
-          <span className="flex h-[14px] w-[14px] items-center justify-center rounded-full bg-[rgba(43,138,62,0.12)]">
-            <span className="h-1 w-1 rounded-full bg-[rgb(43,138,62)]" />
-          </span>
-        </div>
-        <div className="mt-2 flex flex-col items-center justify-center rounded-[10px] border border-[var(--scaffold-hairline)] bg-white p-3 text-center">
-          <span className="flex h-8 w-8 items-center justify-center rounded-full border border-[rgba(43,138,62,0.25)] text-[rgb(43,138,62)]">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M5 12.5l4.5 4.5L19 7.5" />
-            </svg>
-          </span>
-          <div className="mt-2 flex w-full flex-col items-center gap-1">
-            <Bar w="55%" h={5} />
-            <Bar w="35%" h={4} />
-          </div>
-        </div>
-        <div className="mt-2 flex flex-col gap-1.5 rounded-[8px] border border-[rgba(10,10,10,0.06)] bg-[var(--scaffold-panel)] p-2">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-1.5">
-              <span className="h-1.5 w-1.5 rounded-full bg-[rgba(10,10,10,0.25)]" />
-              <Bar w={40} h={4} />
-            </div>
-            <Bar w={24} h={4} />
-          </div>
-          <div className="flex flex-col gap-1 pt-1">
-            <div className="flex items-center justify-between">
-              <Bar w={48} h={3} />
-              <Bar w={16} h={3} />
-            </div>
-            <div className="relative h-1.5 w-full rounded-full bg-[rgba(10,10,10,0.08)] overflow-hidden">
-              <span
-                className="absolute inset-y-0 left-0 rounded-full bg-[rgba(10,10,10,0.3)]"
-                style={{ width: '84%' }}
-              />
-            </div>
-          </div>
-        </div>
-      </div>
-      <div className="flex items-center justify-between border-t border-[var(--scaffold-hairline)] pt-1.5">
-        <div className="flex items-center gap-1">
-          <span className="h-1 w-1 rounded-full bg-[rgba(10,10,10,0.25)]" />
-          <Bar w={24} h={4} />
-        </div>
-      </div>
-    </div>
-  );
-}
-
-/* 5. OUTREACH VIEW — outbound queue, policy safeguards matrix, and delivery pipeline */
+/* 5. OUTREACH VIEW — outbound queue and delivery pipeline */
 function OutreachStageView({ live }: { live: boolean }) {
-  const [mobileTab, setMobileTab] = useState<'queue' | 'checks' | 'delivery'>('queue');
-
-  // In live mode, auto-cycle mobile tabs every 3.5s so the phone view keeps moving
-  useEffect(() => {
-    if (!live) return;
-    const interval = setInterval(() => {
-      setMobileTab((prev) => {
-        if (prev === 'queue') return 'checks';
-        if (prev === 'checks') return 'delivery';
-        return 'queue';
-      });
-    }, 3500);
-    return () => clearInterval(interval);
-  }, [live]);
-
   return (
-    <div className="flex h-full flex-col gap-2.5">
-      {/* Header with Stage Name & Responsive Telemetry Controls */}
-      <div className="flex items-center justify-between">
+    <div className="relative">
+      <div className="mb-4 flex items-center justify-between">
         <div className="flex items-center gap-2">
           <span className="flex h-[24px] w-[24px] items-center justify-center rounded-[7px] border border-[rgba(10,10,10,0.08)] bg-white shadow-xs">
             <PlaneGlyph id="out-view-icon" size="13px" />
           </span>
-          <span className="hidden sm:inline text-[12px] font-medium text-[rgba(10,10,10,0.8)]">outreach</span>
-        </div>
-
-        {/* Desktop Telemetry Pills */}
-        <div className="hidden md:flex items-center gap-2">
-          <span className="flex h-[22px] items-center gap-1.5 rounded-full border border-[rgba(43,138,62,0.22)] bg-[rgba(43,138,62,0.08)] px-2.5 shadow-2xs">
-            <span className="h-1.5 w-1.5 rounded-full bg-[rgb(43,138,62)]" />
-            <span className="text-[10.5px] font-medium text-[rgb(43,138,62)]">checks</span>
-          </span>
-
-          <span className="flex h-[22px] items-center gap-1.5 rounded-full border border-[var(--scaffold-hairline)] bg-white px-2.5 shadow-2xs">
-            <span className={cn('h-1.5 w-1.5 rounded-full bg-[var(--scaffold-accent)]', live && 'animate-pulse')} />
-            <span className="text-[10.5px] font-medium text-[rgba(10,10,10,0.75)]">delivered</span>
-          </span>
-        </div>
-
-        {/* Mobile Segmented Switcher */}
-        <div className="flex md:hidden items-center gap-0.5 rounded-full border border-[var(--scaffold-hairline)] bg-white p-0.5 shadow-2xs">
-          <button
-            type="button"
-            onClick={() => setMobileTab('queue')}
-            className={cn(
-              'flex h-[19px] w-[19px] items-center justify-center rounded-full transition-colors cursor-pointer',
-              mobileTab === 'queue' ? 'bg-[var(--scaffold-accent-row)] text-[var(--scaffold-accent)]' : 'text-[rgba(10,10,10,0.4)]',
-            )}
-          >
-            <EnvelopeGlyph id="tab-env" size="8px" />
-          </button>
-          <button
-            type="button"
-            onClick={() => setMobileTab('checks')}
-            className={cn(
-              'flex h-[19px] w-[19px] items-center justify-center rounded-full transition-colors cursor-pointer',
-              mobileTab === 'checks' ? 'bg-[var(--scaffold-accent-row)] text-[var(--scaffold-accent)]' : 'text-[rgba(10,10,10,0.4)]',
-            )}
-          >
-            <CheckGlyph id="tab-chk" size="8px" />
-          </button>
-          <button
-            type="button"
-            onClick={() => setMobileTab('delivery')}
-            className={cn(
-              'flex h-[19px] w-[19px] items-center justify-center rounded-full transition-colors cursor-pointer',
-              mobileTab === 'delivery' ? 'bg-[var(--scaffold-accent-row)] text-[var(--scaffold-accent)]' : 'text-[rgba(10,10,10,0.4)]',
-            )}
-          >
-            <PlaneGlyph id="tab-pln" size="8px" />
-          </button>
+          <span className="text-[12px] font-medium text-[rgba(10,10,10,0.8)]">outreach</span>
         </div>
       </div>
-      {/* Main Content Area */}
-      <div className="relative min-h-0 flex-1 overflow-hidden">
-        {/* DESKTOP: 3 COLUMNS SIDE-BY-SIDE */}
-        <div className="hidden md:grid h-full grid-cols-3 gap-2.5">
-          <OutreachQueueColumn live={live} />
-          <OutreachChecksColumn live={live} />
-          <OutreachDeliveryColumn live={live} />
-        </div>
-
-        {/* MOBILE: ONE COLUMN AT A TIME */}
-        <div className="block md:hidden h-full">
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={mobileTab}
-              initial={{ opacity: 0, y: 6 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -6 }}
-              className="h-full"
-            >
-              {mobileTab === 'queue' && <OutreachQueueColumn live={live} />}
-              {mobileTab === 'checks' && <OutreachChecksColumn live={live} />}
-              {mobileTab === 'delivery' && <OutreachDeliveryColumn live={live} />}
-            </motion.div>
-          </AnimatePresence>
-        </div>
-      </div>
+      <JourneyScene stage={4} live={live} />
     </div>
   );
 }
@@ -991,411 +938,11 @@ function ConverseStageView({ live }: { live: boolean }) {
   );
 }
 
-/* 7. CONFIGURE VIEW — deep, advanced 3-pillar architecture (profile · offers · icps) */
-
-function ProfilePillarCard({ live }: { live: boolean }) {
-  return (
-    <div className="flex flex-col justify-between rounded-[14px] border border-[var(--scaffold-hairline)] bg-white p-2.5 shadow-xs">
-      <div>
-        {/* Column Header */}
-        <div className="flex items-center justify-between border-b border-[var(--scaffold-hairline)] pb-1.5">
-          <div className="flex items-center gap-1.5">
-            <span className="h-1.5 w-1.5 rounded-full bg-[var(--scaffold-accent)]" />
-            <span className="text-[11px] font-semibold text-[rgba(10,10,10,0.85)]">profile</span>
-          </div>
-          <span className="flex items-center gap-1 rounded-full bg-[rgba(43,138,62,0.1)] px-1.5 py-0.5 text-[9px] font-medium text-[rgb(43,138,62)]">
-            <span className="h-1 w-1 rounded-full bg-[rgb(43,138,62)]" />
-            <span>versioned</span>
-          </span>
-        </div>
-
-        {/* Business Identity & Verified Domain Block */}
-        <div className="mt-2 flex items-center justify-between rounded-[8px] border border-[rgba(10,10,10,0.06)] bg-[var(--scaffold-panel)] p-2">
-          <div className="flex items-center gap-2">
-            <div className="flex h-6 w-6 items-center justify-center rounded-[6px] bg-[rgba(10,10,10,0.85)] text-white shadow-2xs">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
-                <polyline points="22,6 12,13 2,6" />
-              </svg>
-            </div>
-            <div className="flex flex-col gap-1">
-              <Bar w={58} h={4.5} />
-              <Bar w={36} h={3.5} />
-            </div>
-          </div>
-          <span className="flex h-3.5 w-3.5 items-center justify-center rounded-full bg-[rgba(43,138,62,0.15)] text-[rgb(43,138,62)]">
-            <svg width="7" height="7" viewBox="0 0 9 9" fill="none">
-              <path d="M1.8 4.8 L3.6 6.8 L7.4 2.4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-            </svg>
-          </span>
-        </div>
-
-        {/* DNS Fortress Authentication Matrix (SPF / DKIM / DMARC / MX) */}
-        <div className="mt-2 flex flex-col gap-1 rounded-[8px] border border-[rgba(10,10,10,0.06)] bg-[var(--scaffold-panel)] p-2">
-          <div className="flex items-center justify-between pb-1 border-b border-[rgba(10,10,10,0.04)]">
-            <div className="flex items-center gap-1 text-[9.5px] font-medium text-[rgba(10,10,10,0.5)]">
-              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-              </svg>
-              <span>policy</span>
-            </div>
-            <span className="h-1.5 w-1.5 rounded-full bg-[rgb(43,138,62)]" />
-          </div>
-
-          <div className="grid grid-cols-2 gap-1 pt-0.5">
-            {[0, 1, 2, 3].map((i) => (
-              <div key={i} className="flex items-center justify-between rounded-[4px] bg-white px-1.5 py-1 border border-[rgba(10,10,10,0.04)]">
-                <div className="flex items-center gap-1">
-                  <span className="h-1 w-1 rounded-full bg-[rgb(43,138,62)]" />
-                  <Bar w={i % 2 === 0 ? 32 : 28} h={3} />
-                </div>
-                <svg width="6" height="6" viewBox="0 0 9 9" fill="none" className="text-[rgb(43,138,62)]">
-                  <path d="M1.8 4.8 L3.6 6.8 L7.4 2.4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
-                </svg>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Mailbox Pool Rotation Stream */}
-        <div className="mt-2 flex flex-col gap-1 rounded-[8px] border border-[rgba(10,10,10,0.06)] bg-[var(--scaffold-panel)] p-2">
-          <div className="flex items-center justify-between">
-            <Bar w={46} h={3.5} />
-            <div className="flex items-center gap-1">
-              <span className="h-1.5 w-1.5 rounded-full bg-[rgb(43,138,62)]" />
-              <span className="h-1.5 w-1.5 rounded-full bg-[rgb(43,138,62)]" />
-              <span className="h-1.5 w-1.5 rounded-full bg-[rgb(43,138,62)]" />
-            </div>
-          </div>
-          <div className="flex flex-col gap-1 pt-0.5">
-            {[78, 64, 45].map((pct, idx) => (
-              <div key={idx} className="flex items-center justify-between gap-1.5">
-                <div className="flex items-center gap-1">
-                  <span className={cn('h-1 w-1 rounded-full', idx < 2 && live ? 'bg-[rgb(43,138,62)] animate-pulse' : 'bg-[rgb(43,138,62)]')} />
-                  <Bar w={idx === 0 ? 42 : idx === 1 ? 36 : 30} h={3} />
-                </div>
-                <div className="relative h-1 w-20 rounded-full bg-[rgba(10,10,10,0.08)] overflow-hidden">
-                  <span className="absolute inset-y-0 left-0 rounded-full bg-[rgb(43,138,62)]" style={{ width: `${pct}%` }} />
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      <div className="flex items-center justify-between border-t border-[var(--scaffold-hairline)] pt-1.5">
-        <div className="flex items-center gap-1">
-          <span className="h-1 w-1 rounded-full bg-[rgb(43,138,62)]" />
-          <span className="text-[9.5px] font-medium text-[rgba(10,10,10,0.45)]">policy</span>
-        </div>
-        <span className="text-[9.5px] font-medium text-[rgba(10,10,10,0.45)]">versioned</span>
-      </div>
-    </div>
-  );
-}
-
-function OffersPillarCard({ live }: { live: boolean }) {
-  return (
-    <div className="flex flex-col justify-between rounded-[14px] border border-[var(--scaffold-hairline)] bg-white p-2.5 shadow-xs">
-      <div>
-        {/* Column Header */}
-        <div className="flex items-center justify-between border-b border-[var(--scaffold-hairline)] pb-1.5">
-          <div className="flex items-center gap-1.5">
-            <span className="h-1.5 w-1.5 rounded-sm bg-[var(--scaffold-accent)]" />
-            <span className="text-[11px] font-semibold text-[rgba(10,10,10,0.85)]">offers</span>
-          </div>
-          <span className="flex items-center gap-1 rounded-full bg-[var(--scaffold-accent-row)] px-1.5 py-0.5 text-[9px] font-medium text-[var(--scaffold-accent)]">
-            <span className="h-1 w-1 rounded-full bg-[var(--scaffold-accent)]" />
-            <span>offer match</span>
-          </span>
-        </div>
-
-        {/* Primary Offering Card — Managed System Package */}
-        <div className="mt-2 flex flex-col gap-1.5 rounded-[8px] border border-[rgba(255,85,0,0.22)] bg-gradient-to-b from-white to-[rgba(255,85,0,0.03)] p-2 shadow-2xs">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-1.5">
-              <span className="flex h-4 w-4 items-center justify-center rounded-[4px] bg-[var(--scaffold-accent)] text-white shadow-xs">
-                <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                  <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
-                </svg>
-              </span>
-              <Bar w={54} h={4.5} tint={true} />
-            </div>
-            <div className="flex items-center gap-1 rounded-full bg-[rgba(255,85,0,0.1)] px-1.5 py-0.5">
-              <span className="h-1 w-1 rounded-full bg-[var(--scaffold-accent)]" />
-              <Bar w={18} h={3} tint={true} />
-            </div>
-          </div>
-
-          {/* 5 Deliverables Fan-Out Pipeline Icons */}
-          <div className="grid grid-cols-5 gap-1 pt-1">
-            {[0, 1, 2, 3, 4].map((i) => (
-              <div key={i} className="flex flex-col items-center gap-0.5 rounded-[4px] border border-[rgba(10,10,10,0.05)] bg-white py-1">
-                <span className="text-[rgba(10,10,10,0.6)]">
-                  {i === 0 && (
-                    <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <polygon points="5 3 19 12 5 21 5 3" />
-                    </svg>
-                  )}
-                  {i === 1 && (
-                    <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-                    </svg>
-                  )}
-                  {i === 2 && (
-                    <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <line x1="8" y1="6" x2="21" y2="6" /><line x1="8" y1="12" x2="21" y2="12" /><line x1="8" y1="18" x2="21" y2="18" />
-                    </svg>
-                  )}
-                  {i === 3 && (
-                    <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <circle cx="18" cy="5" r="3" /><circle cx="6" cy="12" r="3" /><circle cx="18" cy="19" r="3" />
-                      <line x1="8.59" y1="13.51" x2="15.42" y2="17.49" /><line x1="15.41" y1="6.51" x2="8.59" y2="10.49" />
-                    </svg>
-                  )}
-                  {i === 4 && (
-                    <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <line x1="22" y1="2" x2="11" y2="13" /><polygon points="22 2 15 22 11 13 2 9 22 2" />
-                    </svg>
-                  )}
-                </span>
-                <Bar w={12} h={2.5} />
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Software Platform Engine Modules */}
-        <div className="mt-2 flex flex-col gap-1 rounded-[8px] border border-[rgba(10,10,10,0.06)] bg-[var(--scaffold-panel)] p-2">
-          <div className="flex items-center justify-between pb-1 border-b border-[rgba(10,10,10,0.04)]">
-            <Bar w={44} h={3.5} />
-            <span className="flex h-3.5 w-3.5 items-center justify-center rounded-full bg-[rgba(43,138,62,0.12)] text-[rgb(43,138,62)]">
-              <svg width="6" height="6" viewBox="0 0 9 9" fill="none">
-                <path d="M1.8 4.8 L3.6 6.8 L7.4 2.4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
-              </svg>
-            </span>
-          </div>
-
-          <div className="flex flex-col gap-1 pt-0.5">
-            {[0, 1, 2].map((i) => (
-              <div key={i} className="flex items-center justify-between rounded-[4px] bg-white px-2 py-1 border border-[rgba(10,10,10,0.04)]">
-                <div className="flex items-center gap-1.5">
-                  <span className="h-1 w-1 rounded-full bg-[var(--scaffold-accent)]" />
-                  <Bar w={i === 0 ? 50 : i === 1 ? 58 : 42} h={3.5} />
-                </div>
-                <Bar w={16} h={3} />
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Value Vector Alignment Meter */}
-        <div className="mt-2 flex items-center justify-between rounded-[8px] border border-[rgba(10,10,10,0.05)] bg-[var(--scaffold-panel)] px-2 py-1.5">
-          <div className="flex items-center gap-1.5">
-            <span className="h-1.5 w-1.5 rounded-full bg-[rgb(43,138,62)]" />
-            <Bar w={48} h={3.5} />
-          </div>
-          <div className="flex items-center gap-1">
-            <Bar w={20} h={3} />
-            <span className="h-1 w-1 rounded-full bg-[var(--scaffold-accent)]" />
-          </div>
-        </div>
-      </div>
-
-      <div className="flex items-center justify-between border-t border-[var(--scaffold-hairline)] pt-1.5">
-        <div className="flex items-center gap-1">
-          <span className="h-1 w-1 rounded-full bg-[var(--scaffold-accent)]" />
-          <span className="text-[9.5px] font-medium text-[rgba(10,10,10,0.45)]">offer match</span>
-        </div>
-        <span className="text-[9.5px] font-medium text-[rgba(10,10,10,0.45)]">evidence</span>
-      </div>
-    </div>
-  );
-}
-
-function IcpsPillarCard({ live }: { live: boolean }) {
-  return (
-    <div className="flex flex-col justify-between rounded-[14px] border border-[var(--scaffold-hairline)] bg-white p-2.5 shadow-xs">
-      <div>
-        {/* Column Header */}
-        <div className="flex items-center justify-between border-b border-[var(--scaffold-hairline)] pb-1.5">
-          <div className="flex items-center gap-1.5">
-            <span className="h-1.5 w-1.5 rotate-45 bg-[rgb(43,138,62)]" />
-            <span className="text-[11px] font-semibold text-[rgba(10,10,10,0.85)]">icps</span>
-          </div>
-          <span className="flex items-center gap-1 rounded-full bg-[rgba(43,138,62,0.1)] px-1.5 py-0.5 text-[9px] font-medium text-[rgb(43,138,62)]">
-            <span className="h-1 w-1 rounded-full bg-[rgb(43,138,62)]" />
-            <span>qualification</span>
-          </span>
-        </div>
-
-        {/* 3 Target Segments Pills */}
-        <div className="mt-2 flex flex-col gap-1 rounded-[8px] border border-[rgba(10,10,10,0.06)] bg-[var(--scaffold-panel)] p-2">
-          <div className="flex items-center justify-between pb-1 border-b border-[rgba(10,10,10,0.04)]">
-            <Bar w={44} h={3.5} />
-            <div className="flex items-center gap-1">
-              <span className="h-1.5 w-1.5 rotate-45 bg-[rgb(43,138,62)]" />
-              <span className="h-1.5 w-1.5 rotate-45 bg-[rgb(43,138,62)]" />
-              <span className="h-1.5 w-1.5 rotate-45 bg-[rgb(43,138,62)]" />
-            </div>
-          </div>
-          <div className="grid grid-cols-3 gap-1 pt-0.5">
-            {[0, 1, 2].map((i) => (
-              <div key={i} className="flex flex-col items-center gap-1 rounded-[4px] bg-white p-1 border border-[rgba(10,10,10,0.04)]">
-                <span className="h-1 w-1 rounded-full bg-[rgb(43,138,62)]" />
-                <Bar w={i === 0 ? 24 : i === 1 ? 20 : 22} h={3} />
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* 10-Point Qualification Checklist Matrix */}
-        <div className="mt-2 flex flex-col gap-1 rounded-[8px] border border-[rgba(10,10,10,0.06)] bg-[var(--scaffold-panel)] p-2">
-          <div className="flex items-center justify-between pb-1 border-b border-[rgba(10,10,10,0.04)]">
-            <div className="flex items-center gap-1">
-              <span className="h-1 w-1 rotate-45 bg-[rgb(43,138,62)]" />
-              <Bar w={48} h={3.5} />
-            </div>
-            <span className="flex h-3.5 w-3.5 items-center justify-center rounded-full bg-[rgba(43,138,62,0.12)] text-[rgb(43,138,62)]">
-              <svg width="7" height="7" viewBox="0 0 9 9" fill="none">
-                <path d="M1.8 4.8 L3.6 6.8 L7.4 2.4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
-              </svg>
-            </span>
-          </div>
-
-          <div className="grid grid-cols-2 gap-x-2 gap-y-1 pt-0.5">
-            {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9].map((i) => (
-              <div key={i} className="flex items-center gap-1">
-                <svg width="6" height="6" viewBox="0 0 9 9" fill="none" className="text-[rgb(43,138,62)] shrink-0">
-                  <path d="M1.8 4.8 L3.6 6.8 L7.4 2.4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
-                </svg>
-                <Bar w={i % 3 === 0 ? 36 : i % 3 === 1 ? 30 : 26} h={2.8} />
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Qualification Bar Threshold & Universal Suppression */}
-        <div className="mt-2 flex flex-col gap-1.5 rounded-[8px] border border-[rgba(10,10,10,0.06)] bg-[var(--scaffold-panel)] p-2">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-1">
-              <span className="h-1.5 w-1.5 rounded-full bg-[rgb(43,138,62)]" />
-              <Bar w={38} h={3.5} />
-            </div>
-            <div className="flex items-center gap-1">
-              <Bar w={14} h={3} />
-              <Bar w={16} h={3} />
-            </div>
-          </div>
-
-          {/* 10 Segmented Qualification Gate Ticks (7 Active Emerald, 3 Reserve) */}
-          <div className="flex items-center gap-1">
-            {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9].map((i) => (
-              <span
-                key={i}
-                className={cn(
-                  'h-1.5 flex-1 rounded-full transition-colors',
-                  i < 7 ? 'bg-[rgb(43,138,62)]' : 'bg-[rgba(10,10,10,0.1)]',
-                )}
-              />
-            ))}
-          </div>
-        </div>
-      </div>
-
-      <div className="flex items-center justify-between border-t border-[var(--scaffold-hairline)] pt-1.5">
-        <div className="flex items-center gap-1">
-          <span className="h-1 w-1 rotate-45 bg-[rgb(43,138,62)]" />
-          <span className="text-[9.5px] font-medium text-[rgba(10,10,10,0.45)]">qualification</span>
-        </div>
-        <span className="text-[9.5px] font-medium text-[rgba(10,10,10,0.45)]">provenance</span>
-      </div>
-    </div>
-  );
-}
-
-function KnowledgeCoreView({
-  live,
-  onSelectPillar,
-}: {
-  live: boolean;
-  onSelectPillar: (pillar: 'profile' | 'offers' | 'icps') => void;
-}) {
-  return (
-    <div className="relative flex h-full flex-col justify-between rounded-[18px] border border-[var(--scaffold-hairline)] bg-white p-3.5 shadow-xs">
-      {/* Central Neural Brain Vector Emblem */}
-      <div className="relative flex flex-1 items-center justify-center py-1 overflow-hidden">
-        {/* Ambient Synaptic Guides */}
-        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-          <div className="h-44 w-44 rounded-full border border-[rgba(255,85,0,0.08)]" />
-          <div className="absolute h-64 w-64 rounded-full border border-[rgba(10,10,10,0.04)]" />
-        </div>
-
-        {/* Realistic Brain Emblem */}
-        <div className="relative z-10">
-          <BrainDesign className="scale-[0.72] origin-center" />
-        </div>
-
-        {/* 3 Interactive Satellite Nodes */}
-        <button
-          type="button"
-          onClick={() => onSelectPillar('profile')}
-          className="group absolute left-4 top-4 flex items-center gap-1.5 rounded-full border border-[var(--scaffold-hairline)] bg-white px-2.5 py-1 shadow-2xs transition-all hover:border-[var(--scaffold-accent)] hover:shadow-xs cursor-pointer"
-        >
-          <span className="h-1.5 w-1.5 rounded-full bg-[var(--scaffold-accent)]" />
-          <span className="text-[10px] font-medium text-[rgba(10,10,10,0.7)] group-hover:text-black">profile</span>
-        </button>
-
-        <button
-          type="button"
-          onClick={() => onSelectPillar('offers')}
-          className="group absolute right-4 top-4 flex items-center gap-1.5 rounded-full border border-[var(--scaffold-hairline)] bg-white px-2.5 py-1 shadow-2xs transition-all hover:border-[var(--scaffold-accent)] hover:shadow-xs cursor-pointer"
-        >
-          <span className="h-1.5 w-1.5 rounded-sm bg-[var(--scaffold-accent)]" />
-          <span className="text-[10px] font-medium text-[rgba(10,10,10,0.7)] group-hover:text-black">offers</span>
-        </button>
-
-        <button
-          type="button"
-          onClick={() => onSelectPillar('icps')}
-          className="group absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-1.5 rounded-full border border-[var(--scaffold-hairline)] bg-white px-2.5 py-1 shadow-2xs transition-all hover:border-[var(--scaffold-accent)] hover:shadow-xs cursor-pointer"
-        >
-          <span className="h-1.5 w-1.5 rotate-45 bg-[rgb(43,138,62)]" />
-          <span className="text-[10px] font-medium text-[rgba(10,10,10,0.7)] group-hover:text-black">icps</span>
-        </button>
-      </div>
-
-      {/* Status Telemetry Strip: profile · offers · icps */}
-      <div className="flex w-full items-center justify-between border-t border-[var(--scaffold-hairline)] pt-2.5">
-        <div className="flex items-center gap-1.5">
-          <span className="flex h-[18px] items-center gap-1 rounded-full bg-[rgba(43,138,62,0.1)] px-2">
-            <span className="h-1.5 w-1.5 rounded-full bg-[rgb(43,138,62)]" />
-            <span className="text-[10px] font-medium text-[rgb(43,138,62)]">profile</span>
-          </span>
-          <span className="flex h-[18px] items-center gap-1 rounded-full bg-[rgba(43,138,62,0.1)] px-2">
-            <span className="h-1.5 w-1.5 rounded-full bg-[rgb(43,138,62)]" />
-            <span className="text-[10px] font-medium text-[rgb(43,138,62)]">offers</span>
-          </span>
-          <span className="flex h-[18px] items-center gap-1 rounded-full bg-[rgba(43,138,62,0.1)] px-2">
-            <span className="h-1.5 w-1.5 rounded-full bg-[rgb(43,138,62)]" />
-            <span className="text-[10px] font-medium text-[rgb(43,138,62)]">icps</span>
-          </span>
-        </div>
-
-        <span className="text-[10px] font-medium text-[rgba(10,10,10,0.45)]">versioned</span>
-      </div>
-    </div>
-  );
-}
-
-/* One brain, six inputs. Replaces the pillars / knowledge-core subviews, which
-   were another way of showing the same six categories. The previous version is
-   at /tmp/AgenticDashboard.pillars-backup.tsx for this session only. */
 function ConfigureStageView() {
   return <ConfigureBrain />;
 }
 
-function OverviewStageView() {
+function OverviewStageView({ onSelectStage }: { onSelectStage?: (stage: StageId) => void }) {
   const rail: StageId[] = [
     'configure',
     'discover',
@@ -1420,92 +967,102 @@ function OverviewStageView() {
         <div className="flex items-center gap-2">
           <span className="flex h-[22px] items-center gap-1.5 rounded-full border border-[rgba(43,138,62,0.22)] bg-[rgba(43,138,62,0.08)] px-2.5 shadow-2xs">
             <span className="h-1.5 w-1.5 rounded-full bg-[rgb(43,138,62)] animate-pulse" />
-            <span className="text-[10px] font-medium text-[rgb(43,138,62)]">versioned</span>
+            <span className="text-[10px] font-medium text-[rgb(43,138,62)]">Pipeline Active</span>
+          </span>
+          <span className="hidden sm:flex h-[22px] items-center gap-1 rounded-full border border-[rgba(10,10,10,0.08)] bg-white px-2 text-[10px] font-medium text-[rgba(10,10,10,0.55)] shadow-2xs">
+            <span className="h-1.5 w-1.5 rounded-full bg-[var(--scaffold-accent)]" />
+            <span>Live Sync</span>
           </span>
         </div>
       </div>
 
-      {/* Connected 7-Node Stage Bus Rail */}
+      {/* Connected 7-Node Stage Bus Rail — Fully Interactive */}
       <div className="relative rounded-[14px] border border-[var(--scaffold-hairline)] bg-white p-2.5 shadow-xs">
         <div className="relative flex items-center justify-between">
-          {/* Animated Connecting Track Wire */}
+          {/* Connecting Track Wire */}
           <span
             aria-hidden="true"
-            className="absolute left-6 right-6 top-1/2 h-[2px] -translate-y-1/2 bg-gradient-to-r from-[rgba(10,10,10,0.06)] via-[var(--scaffold-accent)] to-[rgb(43,138,62)] opacity-40"
+            className="absolute left-6 right-6 top-1/2 h-[2px] -translate-y-1/2 bg-gradient-to-r from-[rgba(10,10,10,0.08)] via-[var(--scaffold-accent)] to-[rgb(43,138,62)] opacity-40"
           />
 
           {rail.map((stage, idx) => (
-            <div key={stage} className="relative z-10 flex flex-col items-center gap-1">
+            <button
+              key={stage}
+              type="button"
+              onClick={() => onSelectStage?.(stage)}
+              title={stage}
+              className="group relative z-10 flex flex-col items-center gap-1 cursor-pointer transition-transform hover:scale-105"
+            >
               <span
                 className={cn(
-                  'flex items-center justify-center rounded-[9px] border transition-all shadow-xs',
+                  'flex items-center justify-center rounded-[9px] border transition-all shadow-xs group-hover:border-[var(--scaffold-accent)]',
                   idx === rail.length - 1
                     ? 'border-[rgb(43,138,62)] bg-[rgba(43,138,62,0.08)]'
                     : idx === 0
                     ? 'border-[var(--scaffold-accent)] bg-[var(--scaffold-accent-row)]'
-                    : 'border-[var(--scaffold-hairline)] bg-white hover:border-[rgba(10,10,10,0.2)]',
+                    : 'border-[var(--scaffold-hairline)] bg-white',
                 )}
                 style={{ width: 32, height: 32 }}
               >
                 <StageGlyphIcon stage={stage} size={13} />
               </span>
 
-              <span className="text-[9px] font-medium text-[rgba(10,10,10,0.65)]">
+              <span className="text-[9px] font-medium text-[rgba(10,10,10,0.65)] group-hover:text-black">
                 {stage}
               </span>
-            </div>
+            </button>
           ))}
         </div>
       </div>
 
-      {/* 3 Telemetry Cards Grid */}
+      {/* 3 Telemetry Cards Grid — Realistic B2B Prospect Data */}
       <div className="grid min-h-0 flex-1 grid-cols-1 sm:grid-cols-3 gap-2.5">
-        {/* Card 1: Prospects & Provenance */}
-        <div className="flex flex-col justify-between rounded-[14px] border border-[var(--scaffold-hairline)] bg-white p-2.5 shadow-xs">
+        {/* Card 1: Target accounts */}
+        <div className="flex flex-col justify-between rounded-[14px] border border-[var(--scaffold-hairline)] bg-white p-3 shadow-xs">
           <div>
             <div className="flex items-center justify-between border-b border-[var(--scaffold-hairline)] pb-1.5">
               <div className="flex items-center gap-1.5">
                 <span className="h-1.5 w-1.5 rounded-full bg-[var(--scaffold-accent)]" />
-                <span className="text-[11px] font-semibold text-[rgba(10,10,10,0.85)]">prospects</span>
+                <span className="text-[11px] font-semibold text-[rgba(10,10,10,0.85)]">Target accounts</span>
               </div>
               <span className="flex items-center gap-1 rounded-full bg-[rgba(43,138,62,0.1)] px-1.5 py-0.5 text-[9px] font-medium text-[rgb(43,138,62)]">
                 <span className="h-1 w-1 rounded-full bg-[rgb(43,138,62)]" />
-                <span>versioned</span>
+                <span>Active</span>
               </span>
             </div>
 
-            {/* Profile Row with Dalian Carter avatar */}
-            <div className="mt-2 flex items-center justify-between rounded-[8px] border border-[rgba(10,10,10,0.06)] bg-[var(--scaffold-panel)] p-1.5">
+            {/* Target Account Profile */}
+            <div className="mt-2.5 flex items-center justify-between rounded-[10px] border border-[rgba(10,10,10,0.06)] bg-[var(--scaffold-panel)] p-2">
               <div className="flex items-center gap-2">
                 <img
                   src="/journey-faces/daniel.png"
-                  alt=""
-                  aria-hidden="true"
-                  className="h-7 w-7 rounded-full object-cover border border-[var(--scaffold-hairline)] shadow-2xs"
+                  alt="Dalian Carter"
+                  className="h-8 w-8 rounded-full object-cover border border-[var(--scaffold-hairline)] shadow-2xs"
                 />
-                <div className="flex flex-col gap-1">
-                  <Bar w={52} h={4} />
-                  <Bar w={32} h={3} />
+                <div className="flex flex-col">
+                  <span className="text-[11px] font-semibold text-[rgba(10,10,10,0.9)]">Dalian Carter</span>
+                  <span className="text-[9.5px] font-medium text-[rgba(10,10,10,0.5)]">Founder & CEO</span>
                 </div>
               </div>
-              <span className="flex h-3.5 w-3.5 items-center justify-center rounded-full bg-[rgba(43,138,62,0.15)] text-[rgb(43,138,62)]">
-                <svg width="7" height="7" viewBox="0 0 9 9" fill="none">
-                  <path d="M1.8 4.8 L3.6 6.8 L7.4 2.4" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
-                </svg>
+              <span className="rounded-md border border-[rgba(10,10,10,0.08)] bg-white px-1.5 py-0.5 text-[9px] font-medium text-[rgba(10,10,10,0.7)] shadow-2xs">
+                Cartwright
               </span>
             </div>
 
-            {/* 4 Inbound Sources Streams */}
-            <div className="mt-2 flex flex-col gap-1">
-              {[0, 1, 2, 3].map((i) => (
-                <div key={i} className="flex items-center justify-between rounded-[4px] border border-[rgba(10,10,10,0.04)] bg-white px-2 py-1">
-                  <div className="flex items-center gap-1.5">
-                    <span className="h-1 w-1 rounded-full bg-[var(--scaffold-accent)]" />
-                    <Bar w={i === 0 ? 44 : i === 1 ? 52 : i === 2 ? 38 : 46} h={3.2} />
-                  </div>
-                  <Bar w={18} h={3} />
-                </div>
-              ))}
+            {/* Account Details & Public Signals */}
+            <div className="mt-2 flex flex-col gap-1.5">
+              <div className="flex items-center justify-between rounded-[6px] border border-[rgba(10,10,10,0.04)] bg-white px-2 py-1">
+                <span className="text-[9.5px] text-[rgba(10,10,10,0.55)]">Series B · $18M</span>
+                <span className="text-[9px] font-medium text-[rgba(10,10,10,0.4)]">40 employees · SaaS</span>
+              </div>
+              <div className="flex items-center gap-1.5 rounded-[6px] border border-[rgba(10,10,10,0.04)] bg-white px-2 py-1">
+                <span className="h-1 w-1 rounded-full bg-[var(--scaffold-accent)]" />
+                <span className="text-[9.5px] text-[rgba(10,10,10,0.65)]">Active hiring signals</span>
+              </div>
+              <div className="flex items-center gap-1.5 rounded-[6px] border border-[rgba(10,10,10,0.04)] bg-white px-2 py-1">
+                <span className="h-1 w-1 rounded-full bg-[rgb(43,138,62)]" />
+                <span className="text-[9.5px] text-[rgba(10,10,10,0.65)]">Europe and North America</span>
+              </div>
             </div>
           </div>
 
@@ -1515,22 +1072,22 @@ function OverviewStageView() {
           </div>
         </div>
 
-        {/* Card 2: Qualification & Policy */}
-        <div className="flex flex-col justify-between rounded-[14px] border border-[var(--scaffold-hairline)] bg-white p-2.5 shadow-xs">
+        {/* Card 2: Qualification */}
+        <div className="flex flex-col justify-between rounded-[14px] border border-[var(--scaffold-hairline)] bg-white p-3 shadow-xs">
           <div>
             <div className="flex items-center justify-between border-b border-[var(--scaffold-hairline)] pb-1.5">
               <div className="flex items-center gap-1.5">
                 <span className="h-1.5 w-1.5 rotate-45 bg-[rgb(43,138,62)]" />
-                <span className="text-[11px] font-semibold text-[rgba(10,10,10,0.85)]">qualification</span>
+                <span className="text-[11px] font-semibold text-[rgba(10,10,10,0.85)]">Qualification</span>
               </div>
-              <span className="flex items-center gap-1 rounded-full bg-[var(--scaffold-accent-row)] px-1.5 py-0.5 text-[9px] font-medium text-[var(--scaffold-accent)]">
-                <span className="h-1 w-1 rounded-full bg-[var(--scaffold-accent)]" />
-                <span>offer match</span>
+              <span className="flex items-center gap-1 rounded-full bg-[rgba(43,138,62,0.1)] px-1.5 py-0.5 text-[9px] font-semibold text-[rgb(43,138,62)]">
+                <span className="h-1 w-1 rounded-full bg-[rgb(43,138,62)]" />
+                <span>94% ICP Match</span>
               </span>
             </div>
 
-            {/* Radial Score Gauge Simulation */}
-            <div className="mt-2 flex items-center justify-between rounded-[8px] border border-[rgba(10,10,10,0.06)] bg-[var(--scaffold-panel)] p-2">
+            {/* Score Ring & Summary */}
+            <div className="mt-2.5 flex items-center justify-between rounded-[10px] border border-[rgba(10,10,10,0.06)] bg-[var(--scaffold-panel)] p-2">
               <div className="flex items-center gap-2">
                 <div className="relative flex h-8 w-8 items-center justify-center">
                   <svg className="h-full w-full -rotate-90" viewBox="0 0 36 36">
@@ -1543,28 +1100,37 @@ function OverviewStageView() {
                       stroke="rgb(43,138,62)"
                       strokeWidth="3"
                       strokeDasharray="88"
-                      strokeDashoffset="12"
+                      strokeDashoffset="6"
                       strokeLinecap="round"
                     />
                   </svg>
-                  <span className="absolute h-1.5 w-1.5 rounded-full bg-[rgb(43,138,62)]" />
+                  <span className="absolute text-[8.5px] font-bold text-[rgb(43,138,62)]">94</span>
                 </div>
-                <div className="flex flex-col gap-1">
-                  <Bar w={46} h={4} />
-                  <Bar w={28} h={3} />
+                <div className="flex flex-col">
+                  <span className="text-[10px] font-semibold text-[rgba(10,10,10,0.85)]">94% ICP Match</span>
+                  <span className="text-[9px] text-[rgba(10,10,10,0.45)]">All systems active</span>
                 </div>
               </div>
-              <span className="h-2 w-2 rounded-full bg-[rgb(43,138,62)]" />
+              <span className="flex h-4 w-4 items-center justify-center rounded-full bg-[rgba(43,138,62,0.15)] text-[rgb(43,138,62)]">
+                <svg width="8" height="8" viewBox="0 0 9 9" fill="none">
+                  <path d="M1.8 4.8 L3.6 6.8 L7.4 2.4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+                </svg>
+              </span>
             </div>
 
-            {/* Checklist items */}
-            <div className="mt-2 grid grid-cols-2 gap-1">
-              {[0, 1, 2, 3].map((i) => (
-                <div key={i} className="flex items-center gap-1 rounded-[4px] border border-[rgba(10,10,10,0.04)] bg-white p-1">
-                  <svg width="6" height="6" viewBox="0 0 9 9" fill="none" className="text-[rgb(43,138,62)] shrink-0">
+            {/* Checklist Matrix */}
+            <div className="mt-2 flex flex-col gap-1">
+              {[
+                'Company size (20-200)',
+                'Modern tech stack',
+                'C-Suite decision maker',
+                'Active hiring signals',
+              ].map((item) => (
+                <div key={item} className="flex items-center gap-1.5 rounded-[4px] border border-[rgba(10,10,10,0.04)] bg-white px-2 py-1">
+                  <svg width="7" height="7" viewBox="0 0 9 9" fill="none" className="text-[rgb(43,138,62)] shrink-0">
                     <path d="M1.8 4.8 L3.6 6.8 L7.4 2.4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
                   </svg>
-                  <Bar w={i % 2 === 0 ? 32 : 26} h={3} />
+                  <span className="text-[9.5px] text-[rgba(10,10,10,0.7)]">{item}</span>
                 </div>
               ))}
             </div>
@@ -1572,26 +1138,26 @@ function OverviewStageView() {
 
           <div className="flex items-center justify-between border-t border-[var(--scaffold-hairline)] pt-1.5">
             <span className="text-[9.5px] font-medium text-[rgba(10,10,10,0.45)]">policy</span>
-            <span className="text-[9.5px] font-medium text-[rgba(10,10,10,0.45)]">qualification</span>
+            <span className="text-[9.5px] font-medium text-[rgb(43,138,62)]">Ready</span>
           </div>
         </div>
 
-        {/* Card 3: Sent Mails & Replies */}
-        <div className="flex flex-col justify-between rounded-[14px] border border-[var(--scaffold-hairline)] bg-white p-2.5 shadow-xs">
+        {/* Card 3: Outreach & Meetings */}
+        <div className="flex flex-col justify-between rounded-[14px] border border-[var(--scaffold-hairline)] bg-white p-3 shadow-xs">
           <div>
             <div className="flex items-center justify-between border-b border-[var(--scaffold-hairline)] pb-1.5">
               <div className="flex items-center gap-1.5">
                 <span className="h-1.5 w-1.5 rounded-full bg-[var(--scaffold-accent)]" />
-                <span className="text-[11px] font-semibold text-[rgba(10,10,10,0.85)]">sent mails</span>
+                <span className="text-[11px] font-semibold text-[rgba(10,10,10,0.85)]">Outreach & Meetings</span>
               </div>
               <span className="flex items-center gap-1 rounded-full bg-[rgba(43,138,62,0.1)] px-1.5 py-0.5 text-[9px] font-medium text-[rgb(43,138,62)]">
                 <span className="h-1 w-1 rounded-full bg-[rgb(43,138,62)]" />
-                <span>intent</span>
+                <span>Booked call</span>
               </span>
             </div>
 
-            {/* Inbound Booking confirmation preview */}
-            <div className="mt-2 flex flex-col gap-1.5 rounded-[8px] border border-[rgba(10,10,10,0.06)] bg-[var(--scaffold-panel)] p-2">
+            {/* Scheduled Discovery Call Banner */}
+            <div className="mt-2.5 flex flex-col gap-1 rounded-[10px] border border-[rgba(43,138,62,0.2)] bg-[rgba(43,138,62,0.04)] p-2">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-1.5">
                   <span className="flex h-4 w-4 items-center justify-center rounded-[4px] bg-[rgba(43,138,62,0.15)] text-[rgb(43,138,62)]">
@@ -1602,46 +1168,38 @@ function OverviewStageView() {
                       <line x1="3" y1="10" x2="21" y2="10" />
                     </svg>
                   </span>
-                  <Bar w={48} h={4} />
+                  <span className="text-[10px] font-semibold text-[rgba(10,10,10,0.85)]">Discovery call scheduled</span>
                 </div>
                 <div className="flex -space-x-1">
-                  <img src="/journey-faces/marcus.png" alt="" aria-hidden="true" className="h-4 w-4 rounded-full border border-white object-cover" />
-                  <img src="/journey-faces/sophia.png" alt="" aria-hidden="true" className="h-4 w-4 rounded-full border border-white object-cover" />
+                  <img src="/journey-faces/daniel.png" alt="" className="h-4 w-4 rounded-full border border-white object-cover" />
+                  <img src="/journey-faces/marcus.png" alt="" className="h-4 w-4 rounded-full border border-white object-cover" />
                 </div>
               </div>
-
-              <div className="flex items-center justify-between pt-1 border-t border-[rgba(10,10,10,0.04)]">
-                <Bar w={56} h={3} />
-                <span className="flex h-3 w-3 items-center justify-center rounded-full bg-[rgba(43,138,62,0.2)] text-[rgb(43,138,62)]">
-                  <svg width="6" height="6" viewBox="0 0 9 9" fill="none">
-                    <path d="M1.8 4.8 L3.6 6.8 L7.4 2.4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
-                  </svg>
-                </span>
-              </div>
+              <span className="text-[9.5px] font-medium text-[rgb(43,138,62)]">Thursday, Nov 13 · 2:00 PM</span>
             </div>
 
-            {/* Conversation activity stream */}
+            {/* Outreach Activity Stream */}
             <div className="mt-2 flex flex-col gap-1">
               <div className="flex items-center justify-between rounded-[4px] border border-[rgba(10,10,10,0.04)] bg-white px-2 py-1">
                 <div className="flex items-center gap-1.5">
                   <span className="h-1 w-1 rounded-full bg-[rgb(43,138,62)]" />
-                  <Bar w={48} h={3.2} />
+                  <span className="text-[9.5px] text-[rgba(10,10,10,0.7)]">Personalized email sent</span>
                 </div>
-                <span className="text-[9px] font-medium text-[rgba(10,10,10,0.4)]">replies</span>
+                <span className="text-[9px] font-medium text-[rgba(10,10,10,0.4)]">Dispatched</span>
               </div>
               <div className="flex items-center justify-between rounded-[4px] border border-[rgba(10,10,10,0.04)] bg-white px-2 py-1">
                 <div className="flex items-center gap-1.5">
-                  <span className="h-1 w-1 rounded-full bg-[var(--scaffold-accent)]" />
-                  <Bar w={40} h={3.2} />
+                  <span className="h-1 w-1 rounded-full bg-[rgb(43,138,62)]" />
+                  <span className="text-[9.5px] text-[rgba(10,10,10,0.7)]">Positive reply received</span>
                 </div>
-                <Bar w={16} h={3} />
+                <span className="text-[9px] font-medium text-[rgb(43,138,62)]">Inbound response</span>
               </div>
             </div>
           </div>
 
           <div className="flex items-center justify-between border-t border-[var(--scaffold-hairline)] pt-1.5">
             <span className="text-[9.5px] font-medium text-[rgba(10,10,10,0.45)]">replies</span>
-            <span className="text-[9.5px] font-medium text-[rgba(10,10,10,0.45)]">drafts</span>
+            <span className="text-[9.5px] font-medium text-[rgba(10,10,10,0.45)]">Synced</span>
           </div>
         </div>
       </div>
@@ -1716,8 +1274,62 @@ export default function AgenticDashboard({
   /* The rail collapses like a Notion sidebar: closed, the workspace takes
      the full width and every scene gets more room. */
   const [railOpen, setRailOpen] = useState(true);
+  const [sidebarWidth, setSidebarWidth] = useState(175);
+  const [isResizing, setIsResizing] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
   const [botDrawerOpen, setBotDrawerOpen] = useState(false);
   const idleTimerRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Global Cmd+K / Ctrl+K keyboard shortcut to open interactive search palette
+  useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault();
+        setSearchOpen((prev) => !prev);
+      }
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, []);
+
+  // Draggable sidebar resizer
+  const handleMouseDownResize = (e: React.MouseEvent) => {
+    e.preventDefault();
+    setIsResizing(true);
+    const startX = e.clientX;
+    const startW = sidebarWidth;
+
+    const onMouseMove = (moveEvent: MouseEvent) => {
+      const delta = moveEvent.clientX - startX;
+      const nextW = Math.max(58, Math.min(260, startW + delta));
+      if (nextW <= 75) {
+        setRailOpen(false);
+        setSidebarWidth(58);
+      } else {
+        setRailOpen(true);
+        setSidebarWidth(nextW);
+      }
+    };
+
+    const onMouseUp = () => {
+      setIsResizing(false);
+      window.removeEventListener('mousemove', onMouseMove);
+      window.removeEventListener('mouseup', onMouseUp);
+    };
+
+    window.addEventListener('mousemove', onMouseMove);
+    window.addEventListener('mouseup', onMouseUp);
+  };
+
+  const handleToggleRail = () => {
+    if (railOpen) {
+      setRailOpen(false);
+      setSidebarWidth(58);
+    } else {
+      setRailOpen(true);
+      setSidebarWidth(175);
+    }
+  };
 
   // Concept sync: Map the PlatformSection scroll step to workflow stage
   const scrollMappedStage: StageId = useMemo(() => {
@@ -1892,7 +1504,7 @@ export default function AgenticDashboard({
                     />
                   </div>
                   <div className="flex items-center justify-between border-t border-[var(--scaffold-hairline)] pt-1">
-                    <span className="text-[9px] font-medium text-[rgba(10,10,10,0.5)]">delivered</span>
+                    <span className="text-[9px] font-medium text-[rgba(10,10,10,0.5)]">dispatched</span>
                     <span className="h-[4px] w-[4px] rounded-full bg-[var(--scaffold-accent-dot)]" />
                   </div>
                 </>
@@ -1929,33 +1541,53 @@ export default function AgenticDashboard({
       }}
     >
       {/* Inner Workspace Container */}
-      <div className="flex h-[510px] overflow-hidden rounded-[20px] border border-[var(--scaffold-hairline)] bg-[var(--scaffold-panel)]">
-        {/* ── L1 SIDEBAR (168px desktop, 46px mobile icon rail) ── */}
+      <div className="flex min-h-[580px] md:h-[620px] overflow-hidden rounded-[20px] border border-[var(--scaffold-hairline)] bg-[var(--scaffold-panel)]">
+        {/* ── L1 SIDEBAR (resizable, 58px collapsed icon rail) ── */}
         <aside
+          style={{ width: railOpen ? `${sidebarWidth}px` : '58px' }}
           className={cn(
-            'flex shrink-0 flex-col border-r border-[var(--scaffold-hairline)] bg-white p-1.5 md:p-2.5 transition-[width] duration-300 ease-[cubic-bezier(0.16,1,0.3,1)]',
-            railOpen ? 'w-[46px] md:w-[168px]' : 'w-[46px] md:w-[46px]',
+            'relative flex shrink-0 flex-col border-r border-[var(--scaffold-hairline)] bg-white p-1.5 select-none transition-[width]',
+            isResizing ? 'duration-0' : 'duration-200 ease-out',
           )}
         >
+          {/* Draggable Resizer Handle */}
+          <div
+            onMouseDown={handleMouseDownResize}
+            role="separator"
+            aria-orientation="vertical"
+            aria-label="Resize tab bar"
+            title="Drag to resize sidebar"
+            className="absolute -right-1.5 top-0 bottom-0 w-3 cursor-col-resize z-30 group flex items-center justify-center hover:bg-[var(--scaffold-accent)]/15 active:bg-[var(--scaffold-accent)]/30 transition-colors"
+          >
+            <div className="h-8 w-[2px] rounded-full bg-[rgba(10,10,10,0.15)] group-hover:bg-[var(--scaffold-accent)] transition-colors" />
+          </div>
+
           {/* Workspace Header Switcher / rail toggle */}
           <button
             type="button"
-            onClick={() => setRailOpen((v) => !v)}
+            onClick={handleToggleRail}
             aria-expanded={railOpen}
             aria-label={railOpen ? 'Collapse sidebar' : 'Expand sidebar'}
             title={railOpen ? 'Collapse sidebar' : 'Expand sidebar'}
-            className="flex w-full items-center justify-center md:justify-start gap-2 rounded-[9px] px-1 md:px-2 py-2 text-left transition-colors hover:bg-[rgba(10,10,10,0.03)]"
+            className={cn(
+              'flex w-full items-center rounded-[9px] py-2 text-left transition-colors hover:bg-[rgba(10,10,10,0.03)] cursor-pointer',
+              railOpen && sidebarWidth > 75 ? 'justify-start gap-2 px-2' : 'justify-center px-0',
+            )}
           >
             <span className="flex h-[26px] w-[26px] shrink-0 items-center justify-center rounded-[7px] bg-[rgba(10,10,10,0.06)] shadow-2xs">
               <span className="h-[7px] w-[7px] rounded-full bg-[var(--scaffold-accent)]" />
             </span>
-            <div className="hidden md:flex flex-col gap-1">
-              <Bar w={52} h={7} />
-              <Bar w={34} h={5} />
-            </div>
-            <svg width="7" height="5" viewBox="0 0 8 6" fill="none" className="hidden md:block ml-auto opacity-35">
-              <path d="M1 1.5L4 4.5L7 1.5" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
+            {railOpen && sidebarWidth > 75 ? (
+              <>
+                <div className="hidden md:flex flex-col gap-1 min-w-0">
+                  <Bar w={52} h={7} />
+                  <Bar w={34} h={5} />
+                </div>
+                <svg width="7" height="5" viewBox="0 0 8 6" fill="none" className="hidden md:block ml-auto opacity-35">
+                  <path d="M1 1.5L4 4.5L7 1.5" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </>
+            ) : null}
           </button>
 
           <span className="my-1.5 block h-px w-full bg-[var(--scaffold-hairline)]" />
@@ -1976,8 +1608,10 @@ export default function AgenticDashboard({
                   type="button"
                   data-dash-stage={st}
                   onClick={() => handleSelectStage(st)}
+                  title={st}
                   className={cn(
-                    'group relative flex h-[35px] w-full items-center justify-center md:justify-start gap-2 rounded-[8px] px-1 md:px-2 text-left transition-colors',
+                    'group relative flex h-[35px] w-full items-center rounded-[8px] text-left transition-colors cursor-pointer',
+                    railOpen && sidebarWidth > 75 ? 'justify-start gap-2 px-2' : 'justify-center px-0',
                     isCurrent ? 'bg-[var(--scaffold-accent-row)]' : 'hover:bg-[rgba(10,10,10,0.03)]',
                   )}
                 >
@@ -1989,17 +1623,20 @@ export default function AgenticDashboard({
                     />
                   ) : null}
 
-                  <span className="relative">
-                    <StageGlyphIcon stage={st} size={12} />
+                  <span className="relative flex h-[28px] w-[28px] items-center justify-center shrink-0">
+                    <StageGlyphIcon stage={st} size={13} />
                   </span>
 
-                  <span className={cn('hidden md:inline relative text-[11.5px] font-medium tracking-tight text-[rgba(10,10,10,0.85)]', !railOpen && 'md:hidden')}>
-                    {st}
-                  </span>
-
-                  <span className="hidden md:inline relative ml-auto">
-                    <StatusBadge status={status} live={live} />
-                  </span>
+                  {railOpen && sidebarWidth > 75 ? (
+                    <>
+                      <span className="relative truncate text-[11.5px] font-medium tracking-tight text-[rgba(10,10,10,0.85)]">
+                        {st}
+                      </span>
+                      <span className="relative ml-auto">
+                        <StatusBadge status={status} live={live} />
+                      </span>
+                    </>
+                  ) : null}
                 </button>
               );
             })}
@@ -2009,34 +1646,52 @@ export default function AgenticDashboard({
 
             <button
               type="button"
+              data-dash-stage="overview"
               onClick={() => handleSelectStage('overview')}
+              title="overview"
               className={cn(
-                'group relative flex h-[34px] w-full items-center justify-center md:justify-start gap-2 rounded-[8px] px-1 md:px-2 text-left transition-colors',
+                'group relative flex h-[34px] w-full items-center rounded-[8px] text-left transition-colors cursor-pointer',
+                railOpen && sidebarWidth > 75 ? 'justify-start gap-2 px-2' : 'justify-center px-0',
                 activeStage === 'overview'
                   ? 'bg-[var(--scaffold-accent-row)]'
                   : 'hover:bg-[rgba(10,10,10,0.03)]',
               )}
             >
-              <StageGlyphIcon stage="overview" size={12} />
-              <span className={cn('hidden md:inline text-[11.5px] font-medium tracking-tight text-[rgba(10,10,10,0.85)]', !railOpen && 'md:hidden')}>
-                overview
+              <span className="relative flex h-[28px] w-[28px] items-center justify-center shrink-0">
+                <StageGlyphIcon stage="overview" size={13} />
               </span>
-              <span className="hidden md:inline ml-auto">
-                <StatusBadge status={activeStage === 'overview' ? 'running' : 'idle'} live={live} />
-              </span>
+              {railOpen && sidebarWidth > 75 ? (
+                <>
+                  <span className="text-[11.5px] font-medium tracking-tight text-[rgba(10,10,10,0.85)]">
+                    overview
+                  </span>
+                  <span className="ml-auto">
+                    <StatusBadge status={activeStage === 'overview' ? 'running' : 'idle'} live={live} />
+                  </span>
+                </>
+              ) : null}
             </button>
           </nav>
 
           {/* Bottom User Profile Block */}
-          <div className="mt-auto flex items-center justify-center md:justify-start gap-2 border-t border-[var(--scaffold-hairline)] px-1 md:px-1.5 pt-2">
+          <div
+            className={cn(
+              'mt-auto flex items-center border-t border-[var(--scaffold-hairline)] pt-2',
+              railOpen && sidebarWidth > 75 ? 'justify-start gap-2 px-1.5' : 'justify-center px-0',
+            )}
+          >
             <span className="flex h-[24px] w-[24px] shrink-0 items-center justify-center rounded-full bg-[color-mix(in_oklch,var(--color-brand)_10%,rgba(255,255,255,1))]">
               <span className="h-[5px] w-[5px] rounded-full bg-[var(--scaffold-accent-dot)]" />
             </span>
-            <div className="hidden md:flex flex-col gap-1">
-              <Bar w={54} h={5} />
-              <Bar w={32} h={4} />
-            </div>
-            <span className="hidden md:block ml-auto h-[4.5px] w-[4.5px] rounded-full bg-[var(--scaffold-accent-dot)]" />
+            {railOpen && sidebarWidth > 75 ? (
+              <>
+                <div className="hidden md:flex flex-col gap-1 min-w-0">
+                  <Bar w={54} h={5} />
+                  <Bar w={32} h={4} />
+                </div>
+                <span className="hidden md:block ml-auto h-[4.5px] w-[4.5px] rounded-full bg-[var(--scaffold-accent-dot)]" />
+              </>
+            ) : null}
           </div>
         </aside>
 
@@ -2058,7 +1713,7 @@ export default function AgenticDashboard({
             </div>
 
             {/* Live Command Bar */}
-            <CommandBar live={live} activeStage={activeStage} />
+            <CommandBar live={live} activeStage={activeStage} onOpenSearch={() => setSearchOpen(true)} />
 
             {/* Agent Presence Avatars Cluster */}
             <AgentPresenceCluster live={live} />
@@ -2083,7 +1738,7 @@ export default function AgenticDashboard({
                 {activeStage === 'outreach' && <OutreachStageView live={live} />}
                 {activeStage === 'converse' && <ConverseStageView live={live} />}
                 {activeStage === 'configure' && <ConfigureStageView />}
-                {activeStage === 'overview' && <OverviewStageView />}
+                {activeStage === 'overview' && <OverviewStageView onSelectStage={handleSelectStage} />}
               </motion.div>
             </AnimatePresence>
             </StageSettledContext.Provider>
@@ -2138,6 +1793,17 @@ export default function AgenticDashboard({
           </div>
         </div>
       </div>
+
+      {/* Interactive Command Palette Modal */}
+      {searchOpen && (
+        <SearchPalette
+          onClose={() => setSearchOpen(false)}
+          onSelectStage={(st) => {
+            handleSelectStage(st);
+            setSearchOpen(false);
+          }}
+        />
+      )}
     </div>
   );
 }

@@ -12,7 +12,6 @@
 import React from 'react';
 import type { FragmentDef, ChipDef } from './poses';
 import { FragmentCard } from './Fragments';
-import { Chip } from './Chip';
 import { ScrollCueIcon } from './icons';
 
 interface CanvasAct1Props {

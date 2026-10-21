@@ -24,6 +24,7 @@ import { CanvasAct1 } from './CanvasAct1';
 import { CanvasAct2 } from './CanvasAct2';
 import { CanvasAct3 } from './CanvasAct3';
 import { KineticTypography } from './KineticTypography';
+import { StageSpine } from './StageSpine';
 import { ScrollCueIcon } from './icons';
 
 interface PlaybookTriptychProps {
@@ -158,6 +159,7 @@ export function PlaybookTriptych({ isPortrait = false }: PlaybookTriptychProps) 
             isPortrait={isPortrait}
             staticState="brain"
           />
+          <StageSpine isPortrait={isPortrait} staticMode />
           <KineticTypography staticAct={4} isPortrait={isPortrait} />
         </div>
       </div>

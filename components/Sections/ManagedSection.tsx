@@ -45,12 +45,15 @@ const TILE = 52; // small orbiting tile
 const CENTER = 128; // centre platform tile
 const ANCHOR = 84; // the two run-mode anchors
 
-type OrbitTile = { angle: number; Icon: typeof SearchIcon };
+export type OrbitTile = { angle: number; Icon: typeof SearchIcon };
 
 /* One ring: a hairline circle carrying three small tiles at fixed rest
    angles. Each tile counter-rotates by its own angle so its icon stays
    upright while its position sits on the ring. */
-function OrbitRing({ radius, tiles }: { radius: number; tiles: OrbitTile[] }) {
+export const ORBIT_TILE = TILE;
+export const ORBIT_CENTRE = CENTER;
+
+export function OrbitRing({ radius, tiles }: { radius: number; tiles: OrbitTile[] }) {
   const d = radius * 2;
   return (
     <div
@@ -64,6 +67,7 @@ function OrbitRing({ radius, tiles }: { radius: number; tiles: OrbitTile[] }) {
         {tiles.map(({ angle, Icon }, i) => (
           <div
             key={i}
+            data-orbit-tile
             className="absolute left-1/2 top-1/2"
             style={{
               transform: `rotate(${angle}deg) translateY(${-radius}px)`,

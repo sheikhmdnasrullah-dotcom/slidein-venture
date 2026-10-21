@@ -21,8 +21,8 @@ interface BrainDesignProps {
 }
 
 export function BrainDesign({ className, isPortrait = false }: BrainDesignProps) {
-  const w = isPortrait ? 210 : 260;
-  const h = isPortrait ? 175 : 220;
+  const w = isPortrait ? 240 : 340;
+  const h = isPortrait ? 205 : 290;
 
   return (
     <div
@@ -34,9 +34,9 @@ export function BrainDesign({ className, isPortrait = false }: BrainDesignProps)
     >
       {/* 1. Radiant Knowledge Aura Rings */}
       <div className="absolute inset-0 flex items-center justify-center pointer-events-none -z-10">
-        <span className="brain-pulse-ring absolute h-[240px] w-[240px] sm:h-[290px] sm:w-[290px] rounded-full border border-[rgba(10,10,10,0.06)]" />
-        <span className="brain-pulse-ring absolute h-[290px] w-[290px] sm:h-[350px] sm:w-[350px] rounded-full border border-[rgba(10,10,10,0.04)]" />
-        <span className="brain-pulse-ring absolute h-[340px] w-[340px] sm:h-[410px] sm:w-[410px] rounded-full border border-[rgba(10,10,10,0.02)]" />
+        <span className="brain-pulse-ring absolute h-[310px] w-[310px] sm:h-[375px] sm:w-[375px] rounded-full border border-[rgba(10,10,10,0.06)]" />
+        <span className="brain-pulse-ring absolute h-[375px] w-[375px] sm:h-[455px] sm:w-[455px] rounded-full border border-[rgba(10,10,10,0.04)]" />
+        <span className="brain-pulse-ring absolute h-[435px] w-[435px] sm:h-[535px] sm:w-[535px] rounded-full border border-[rgba(10,10,10,0.02)]" />
       </div>
 
       {/* 2. Elevated Sculpted Pedestal with Glassmorphism */}

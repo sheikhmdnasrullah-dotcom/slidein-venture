@@ -18,23 +18,17 @@ import { cn } from '@/lib/utils';
 import { BOOK_LANDSCAPE, BOOK_PORTRAIT, PLAYBOOK_CONFIG } from './poses';
 import { HashCoverGlyph, LockGlyph } from './icons';
 import { BrainDesign } from './BrainDesign';
-import { HOME } from '@/content/home';
 
 interface CanvasAct3Props {
   isPortrait?: boolean;
-  bookOpen?: boolean;
   staticState?: 'animated' | 'book' | 'brain';
 }
 
 export function CanvasAct3({
   isPortrait = false,
-  bookOpen = true,
   staticState = 'animated',
 }: CanvasAct3Props) {
   const book = isPortrait ? BOOK_PORTRAIT : BOOK_LANDSCAPE;
-
-  // Split tagline into word tokens for exact Rule 0 DOM text-node alignment
-  const taglineWords = HOME.persistentKnowledgeTagline.split(' ');
 
   return (
     <div
@@ -160,10 +154,7 @@ export function CanvasAct3({
           {/* Book Cover (CSS 3D openable flap) */}
           <div
             data-testid="book-cover"
-            className={cn(
-              'absolute inset-y-0 left-0 w-1/2 rounded-l-[24px] bg-gradient-to-br from-white via-[#FAFAFA] to-[#F2F2F4] border border-[rgba(10,10,10,0.12)] p-6 flex flex-col justify-between origin-left transition-transform duration-700 ease-out z-30',
-              bookOpen ? 'act3-cover-open' : 'act3-cover-closed',
-            )}
+            className="absolute inset-y-0 left-0 w-1/2 rounded-l-[24px] bg-gradient-to-br from-white via-[#FAFAFA] to-[#F2F2F4] border border-[rgba(10,10,10,0.12)] p-6 flex flex-col justify-between origin-left z-30"
             style={{
               transformStyle: 'preserve-3d',
               backfaceVisibility: 'hidden',
