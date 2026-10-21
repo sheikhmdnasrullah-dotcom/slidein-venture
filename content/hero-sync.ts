@@ -1,7 +1,8 @@
 /**
  * HERO SYNC — subline phrases ↔ workflow stages.
  * ---------------------------------------------------------------------------
- * The four subline phrases that light up with the hero master loop. If the
+ * The four phrases inside the tagline that light up with the hero master
+ * loop, in order, so the line resolves left to right. If the
  * copy changes, update the phrase strings HERE — the component looks them up
  * and wraps matches in spans, never hard-coding them. A phrase that no
  * longer matches renders as plain text (no crash, nothing invented).
@@ -22,19 +23,19 @@ export interface HeroPhraseSync {
 
 export const HERO_PHRASE_SYNC: HeroPhraseSync[] = [
   {
-    phrase: 'finds and researches each prospect',
+    phrase: 'The internet\u2019s most powerful',
     stages: ['configure', 'discover', 'research'],
   },
   {
-    phrase: 'matches them to your offers',
+    phrase: 'client acquisition secrets',
     stages: ['qualify'],
   },
   {
-    phrase: 'writes each one a personal email',
+    phrase: 'unified into',
     stages: ['personalize', 'outreach'],
   },
   {
-    phrase: 'keeps working until they are convinced',
+    phrase: 'one framework',
     stages: ['converse', 'overview'],
   },
 ];

@@ -59,7 +59,11 @@ export const HOME = {
        is booked" to "until they are convinced" — that wording is the
        current one. */
     line1:
-      'An end-to-end system that finds and researches each prospect, matches them to your offers, and writes each one a personal email. It keeps working until they are convinced.',
+      /* OWNER COPY. Replaced the long end-to-end description with the tagline.
+         The four phrases that light with the master loop live in
+         HERO_PHRASE_SYNC (content/hero-sync.ts) and must stay exact
+         substrings of this line. */
+      'The internet\u2019s most powerful client acquisition secrets, unified into one framework.',
     line2: '',
     /* Optional accent-tinted phrase, split out of line1 by the component.
        EMPTY — nothing is tinted over the owner's copy. Fill it with a
@@ -258,3 +262,64 @@ export const HOME_CONTENT: {
     ],
   },
 };
+
+export const CONFIGURE_FEEDS = [
+  'Business knowledge',
+  'Offers',
+  'Business profile',
+  'Ideal customer profile',
+  'Exclusions',
+  'Operating rules',
+] as const;
+
+export const DASHBOARD_STRINGS = [
+  'Pipeline Active',
+  'Target accounts',
+  'Cartwright',
+  'Dalian Carter',
+  'Founder & CEO',
+  '40 employees · SaaS',
+  'Series B · $18M',
+  'Qualification',
+  '94% ICP Match',
+  'Company size (20-200)',
+  'Modern tech stack',
+  'C-Suite decision maker',
+  'Active hiring signals',
+  'Outreach & Meetings',
+  'Personalized email sent',
+  'Positive reply received',
+  'Discovery call scheduled',
+  'Thursday, Nov 13 · 2:00 PM',
+  'Live Sync',
+  'All systems active',
+  'Search stages, accounts, insights...',
+  'Search stages...',
+  'Stages',
+  'Accounts',
+  'Quick actions',
+  'Scheduled drafts',
+  'Dispatched',
+  'Delivery verified',
+  'Tracking active',
+  'Inbound response',
+  'Booked call',
+  'Ready',
+  'Synced',
+  'Active',
+  'Marcus Chen',
+  'Sophia Martinez',
+  'Olivia Vance',
+  'Horizon Dynamics',
+  'Meridian Analytics',
+  'Apex Velocity',
+  'VP Operations',
+  'Head of Growth',
+  'Europe and North America',
+  'Run research dossier',
+  'Inspect qualification matrix',
+  'Inspect outbound delivery',
+  'View booked discovery calls',
+  'No matching results',
+  'Esc',
+] as const;

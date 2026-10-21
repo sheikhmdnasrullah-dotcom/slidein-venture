@@ -58,8 +58,12 @@ import {
   SlidersGlyph,
 } from '@/components/StorySpine/icons';
 import { type StageId } from '@/content/stages';
+import ConfigureBrain from './ConfigureBrain';
 import React from 'react';
 import { cn } from '@/lib/utils';
+import { PEOPLE } from '@/components/prospect-journey/journey';
+
+const PEOPLE_KEYS = ['daniel', 'olivia', 'marcus', 'sophia'] as const;
 import { sceneMarkup } from '@/components/prospect-journey/journey';
 import '@/components/prospect-journey/journey.css';
 import { BrainDesign } from '@/components/Playbook/BrainDesign';
@@ -304,7 +308,7 @@ function JourneyScene({ stage, live }: { stage: number; live: boolean }) {
           }
           t.to(el, { backgroundColor: 'rgb(43 138 62)', borderColor: 'rgb(43 138 62)', color: 'rgb(255 255 255)', duration: 0.15 }, at);
         });
-        t.to(scene.querySelector('.qualified-card'), { borderColor: 'rgb(43 138 62)', boxShadow: '0 0 0 2px rgb(43 138 62)', duration: 0.3 }, 1.75);
+        t.to(scene.querySelector('.qualified-card'), { borderColor: 'rgb(43 138 62)', borderWidth: '1px', duration: 0.3 }, 1.75);
       }
 
       if (stage === 4) {
@@ -682,10 +686,194 @@ function PersonalizeStageView({ live }: { live: boolean }) {
 }
 
 /* 5. OUTREACH VIEW — outbound queue, policy safeguards matrix, and delivery pipeline */
+/* ── Outreach column bodies ─────────────────────────────────────────────
+   Authored once and reused by the desktop grid and the stacked mobile tabs,
+   so the two layouts can never drift apart. */
+
+function OutreachQueueColumn({ live }: { live: boolean }) {
+  return (
+    <div className="flex h-full flex-col justify-between gap-2 rounded-[14px] border border-[var(--scaffold-hairline)] bg-white p-2.5 shadow-xs">
+      <div>
+        <div className="flex items-center justify-between border-b border-[var(--scaffold-hairline)] pb-1.5">
+          <div className="flex items-center gap-1.5">
+            <span className="text-[11px] font-semibold text-[rgba(10,10,10,0.85)]">message</span>
+            <span className="text-[10px] text-[rgba(10,10,10,0.4)]">·</span>
+            <span className="text-[10px] font-medium text-[rgba(10,10,10,0.5)]">personalized</span>
+          </div>
+          <div className="flex items-center gap-1">
+            {[0, 1, 2].map((idx) => (
+              <span
+                key={idx}
+                className="flex h-[15px] items-center gap-1 rounded-[4px] border border-[rgba(10,10,10,0.06)] bg-[var(--scaffold-panel)] px-1"
+              >
+                <span
+                  className={cn(
+                    'h-1.5 w-1.5 rounded-full',
+                    idx === 0 ? 'bg-[var(--scaffold-accent)]' : 'bg-[rgba(10,10,10,0.25)]',
+                  )}
+                />
+                <Bar w={10} h={3} />
+              </span>
+            ))}
+          </div>
+        </div>
+        <div className="mt-2 rounded-[10px] border border-[var(--scaffold-accent-chip)] bg-[var(--scaffold-accent-row)]/30 p-2">
+          <div className="flex items-center gap-2">
+            <img
+              src="/journey-faces/daniel.png"
+              alt=""
+              aria-hidden="true"
+              className="h-7 w-7 rounded-full object-cover shadow-2xs border border-white"
+            />
+            <div className="flex min-w-0 flex-1 flex-col gap-1">
+              <Bar w="65%" h={5} />
+              <Bar w="40%" h={4} />
+            </div>
+            <span className="flex h-4 items-center rounded-full bg-[rgba(43,138,62,0.12)] px-1.5">
+              <span className="h-1 w-1 rounded-full bg-[rgb(43,138,62)]" />
+            </span>
+          </div>
+          <div className="mt-2 flex flex-col gap-1 rounded-[6px] border border-[rgba(10,10,10,0.06)] bg-white p-1.5">
+            <div className="flex items-center gap-1.5">
+              <EnvelopeGlyph id="out-env-icon" size="9px" />
+              <Bar w="45%" h={4} />
+            </div>
+            <Bar w="88%" h={4} />
+            <div className="flex items-center gap-1">
+              <Bar w="35%" h={4} tint />
+              <Bar w="40%" h={4} />
+            </div>
+          </div>
+          <div className="mt-2 flex items-center justify-between gap-2">
+            <div className="relative h-[3px] flex-1 rounded-full bg-[rgba(10,10,10,0.08)] overflow-hidden">
+              <motion.div
+                className="absolute inset-y-0 bg-[var(--scaffold-accent)] rounded-full"
+                animate={live ? { left: ['0%', '100%'], width: ['20%', '40%'] } : { left: '30%', width: '35%' }}
+                transition={{ duration: 1.8, repeat: Infinity, ease: 'easeInOut' }}
+              />
+            </div>
+            <Bar w={24} h={3} />
+          </div>
+        </div>
+        <div className="mt-1.5 flex items-center gap-2 rounded-[8px] border border-[rgba(10,10,10,0.06)] bg-[var(--scaffold-panel)] p-1.5">
+          <img
+            src="/journey-faces/marcus.png"
+            alt=""
+            aria-hidden="true"
+            className="h-5 w-5 rounded-full object-cover opacity-80"
+          />
+          <div className="flex min-w-0 flex-1 flex-col gap-1">
+            <Bar w="50%" h={4} />
+            <Bar w="30%" h={3} />
+          </div>
+          <span className="h-1.5 w-1.5 rounded-full bg-[rgba(10,10,10,0.25)]" />
+        </div>
+      </div>
+      <div className="flex items-center justify-between border-t border-[var(--scaffold-hairline)] pt-1.5">
+        <Bar w={28} h={4} />
+      </div>
+    </div>
+  );
+}
+
+function OutreachChecksColumn({ live }: { live: boolean }) {
+  return (
+    <div className="flex h-full flex-col justify-between gap-2 rounded-[14px] border border-[var(--scaffold-hairline)] bg-white p-2.5 shadow-xs">
+      <div>
+        <div className="flex items-center justify-between border-b border-[var(--scaffold-hairline)] pb-1.5">
+          <span className="text-[11px] font-semibold text-[rgba(10,10,10,0.85)]">checks</span>
+          <span className="flex h-[15px] items-center gap-1 rounded-full border border-[var(--scaffold-hairline)] bg-white px-1.5">
+            <Bar w={16} h={3} />
+          </span>
+        </div>
+        <div className="my-2 flex flex-col gap-1.5">
+          {[72, 58, 64, 52].map((w) => (
+            <div
+              key={w}
+              className="flex items-center justify-between rounded-[6px] border border-[rgba(10,10,10,0.05)] bg-[var(--scaffold-panel)] px-2 py-1"
+            >
+              <div className="flex items-center gap-1.5">
+                <span className="flex h-3.5 w-3.5 items-center justify-center rounded-full bg-[rgba(43,138,62,0.12)] text-[rgb(43,138,62)]">
+                  <svg width="7" height="7" viewBox="0 0 9 9" fill="none">
+                    <path d="M1.8 4.8 L3.6 6.8 L7.4 2.4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+                  </svg>
+                </span>
+                <Bar w={w} h={4} />
+              </div>
+              <span className="h-1.5 w-1.5 rounded-full bg-[rgba(10,10,10,0.25)]" />
+            </div>
+          ))}
+        </div>
+      </div>
+      <div className="flex items-center justify-between border-t border-[var(--scaffold-hairline)] pt-1.5">
+        <div className="flex items-center gap-1">
+          <span className="h-1.5 w-1.5 rounded-full bg-[rgb(43,138,62)]" />
+          <Bar w={32} h={4} />
+        </div>
+        <Bar w={20} h={3} />
+      </div>
+    </div>
+  );
+}
+
+function OutreachDeliveryColumn({ live }: { live: boolean }) {
+  return (
+    <div className="flex h-full flex-col justify-between gap-2 rounded-[14px] border border-[var(--scaffold-hairline)] bg-white p-2.5 shadow-xs">
+      <div>
+        <div className="flex items-center justify-between border-b border-[var(--scaffold-hairline)] pb-1.5">
+          <span className="text-[11px] font-semibold text-[rgba(10,10,10,0.85)]">delivered</span>
+          <span className="flex h-[14px] w-[14px] items-center justify-center rounded-full bg-[rgba(43,138,62,0.12)]">
+            <span className="h-1 w-1 rounded-full bg-[rgb(43,138,62)]" />
+          </span>
+        </div>
+        <div className="mt-2 flex flex-col items-center justify-center rounded-[10px] border border-[var(--scaffold-hairline)] bg-white p-3 text-center">
+          <span className="flex h-8 w-8 items-center justify-center rounded-full border border-[rgba(43,138,62,0.25)] text-[rgb(43,138,62)]">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M5 12.5l4.5 4.5L19 7.5" />
+            </svg>
+          </span>
+          <div className="mt-2 flex w-full flex-col items-center gap-1">
+            <Bar w="55%" h={5} />
+            <Bar w="35%" h={4} />
+          </div>
+        </div>
+        <div className="mt-2 flex flex-col gap-1.5 rounded-[8px] border border-[rgba(10,10,10,0.06)] bg-[var(--scaffold-panel)] p-2">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-1.5">
+              <span className="h-1.5 w-1.5 rounded-full bg-[rgba(10,10,10,0.25)]" />
+              <Bar w={40} h={4} />
+            </div>
+            <Bar w={24} h={4} />
+          </div>
+          <div className="flex flex-col gap-1 pt-1">
+            <div className="flex items-center justify-between">
+              <Bar w={48} h={3} />
+              <Bar w={16} h={3} />
+            </div>
+            <div className="relative h-1.5 w-full rounded-full bg-[rgba(10,10,10,0.08)] overflow-hidden">
+              <span
+                className="absolute inset-y-0 left-0 rounded-full bg-[rgba(10,10,10,0.3)]"
+                style={{ width: '84%' }}
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+      <div className="flex items-center justify-between border-t border-[var(--scaffold-hairline)] pt-1.5">
+        <div className="flex items-center gap-1">
+          <span className="h-1 w-1 rounded-full bg-[rgba(10,10,10,0.25)]" />
+          <Bar w={24} h={4} />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* 5. OUTREACH VIEW — outbound queue, policy safeguards matrix, and delivery pipeline */
 function OutreachStageView({ live }: { live: boolean }) {
   const [mobileTab, setMobileTab] = useState<'queue' | 'checks' | 'delivery'>('queue');
 
-  // In live mode, auto-cycle mobile tabs every 3.5s if mobile
+  // In live mode, auto-cycle mobile tabs every 3.5s so the phone view keeps moving
   useEffect(() => {
     if (!live) return;
     const interval = setInterval(() => {
@@ -756,564 +944,29 @@ function OutreachStageView({ live }: { live: boolean }) {
           </button>
         </div>
       </div>
-
       {/* Main Content Area */}
       <div className="relative min-h-0 flex-1 overflow-hidden">
         {/* DESKTOP: 3 COLUMNS SIDE-BY-SIDE */}
         <div className="hidden md:grid h-full grid-cols-3 gap-2.5">
-          {/* 1. COLUMN 1: OUTBOUND DISPATCH QUEUE & MAILBOX POOL */}
-          <div className="flex flex-col justify-evenly gap-2 rounded-[14px] border border-[var(--scaffold-hairline)] bg-white p-2.5 shadow-xs">
-            <div>
-              <div className="flex items-center justify-between border-b border-[var(--scaffold-hairline)] pb-1.5">
-                <div className="flex items-center gap-1.5">
-                  <span className="text-[11px] font-semibold text-[rgba(10,10,10,0.85)]">message</span>
-                  <span className="text-[10px] text-[rgba(10,10,10,0.4)]">·</span>
-                  <span className="text-[10px] font-medium text-[rgba(10,10,10,0.5)]">personalized</span>
-                </div>
-                {/* 3 Mailbox Channels in Rotation */}
-                <div className="flex items-center gap-1">
-                  {[0, 1, 2].map((idx) => (
-                    <span
-                      key={idx}
-                      className="flex h-[15px] items-center gap-1 rounded-[4px] border border-[rgba(10,10,10,0.06)] bg-[var(--scaffold-panel)] px-1"
-                    >
-                      <span
-                        className={cn(
-                          'h-1.5 w-1.5 rounded-full',
-                          idx === 0 ? 'bg-[var(--scaffold-accent)]' : 'bg-[rgba(10,10,10,0.25)]',
-                        )}
-                      />
-                      <Bar w={10} h={3} />
-                    </span>
-                  ))}
-                </div>
-              </div>
-
-              {/* Active Dispatch Card (In Flight) */}
-              <div className="mt-2 rounded-[10px] border border-[var(--scaffold-accent-chip)] bg-[var(--scaffold-accent-row)]/30 p-2">
-                <div className="flex items-center gap-2">
-                  <img
-                    src="/journey-faces/daniel.png"
-                    alt=""
-                    aria-hidden="true"
-                    className="h-7 w-7 rounded-full object-cover shadow-2xs border border-white"
-                  />
-                  <div className="flex min-w-0 flex-1 flex-col gap-1">
-                    <Bar w="65%" h={5} />
-                    <Bar w="40%" h={4} />
-                  </div>
-                  <span className="flex h-4 items-center rounded-full bg-[rgba(43,138,62,0.12)] px-1.5">
-                    <span className="h-1 w-1 rounded-full bg-[rgb(43,138,62)]" />
-                  </span>
-                </div>
-
-                {/* Message Envelope & Personalized Payload Preview */}
-                <div className="mt-2 flex flex-col gap-1 rounded-[6px] border border-[rgba(10,10,10,0.06)] bg-white p-1.5">
-                  <div className="flex items-center gap-1.5">
-                    <EnvelopeGlyph id="out-env-icon" size="9px" />
-                    <Bar w="45%" h={4} />
-                  </div>
-                  <Bar w="88%" h={4} />
-                  <div className="flex items-center gap-1">
-                    <Bar w="35%" h={4} tint />
-                    <Bar w="40%" h={4} />
-                  </div>
-                </div>
-
-                {/* Transmission Meter */}
-                <div className="mt-2 flex items-center justify-between gap-2">
-                  <div className="relative h-[3px] flex-1 rounded-full bg-[rgba(10,10,10,0.08)] overflow-hidden">
-                    <motion.div
-                      className="absolute inset-y-0 bg-[var(--scaffold-accent)] rounded-full"
-                      animate={live ? { left: ['0%', '100%'], width: ['20%', '40%'] } : { left: '30%', width: '35%' }}
-                      transition={{ duration: 1.8, repeat: Infinity, ease: 'easeInOut' }}
-                    />
-                  </div>
-                  <Bar w={24} h={3} />
-                </div>
-              </div>
-
-              {/* Secondary Queued Lead */}
-              <div className="mt-1.5 flex items-center gap-2 rounded-[8px] border border-[rgba(10,10,10,0.06)] bg-[var(--scaffold-panel)] p-1.5">
-                <img
-                  src="/journey-faces/marcus.png"
-                  alt=""
-                  aria-hidden="true"
-                  className="h-5 w-5 rounded-full object-cover opacity-80"
-                />
-                <div className="flex min-w-0 flex-1 flex-col gap-1">
-                  <Bar w="50%" h={4} />
-                  <Bar w="30%" h={3} />
-                </div>
-                <span className="h-1.5 w-1.5 rounded-full bg-[rgba(10,10,10,0.25)]" />
-              </div>
-            </div>
-
-            <div className="flex items-center justify-between border-t border-[var(--scaffold-hairline)] pt-1.5">
-              
-              <Bar w={28} h={4} />
-            </div>
-          </div>
-
-          {/* 2. COLUMN 2: SAFEGUARDS ENGINE & TRANSMISSION CONDUIT */}
-          <div className="flex flex-col justify-evenly gap-2 rounded-[14px] border border-[var(--scaffold-hairline)] bg-white p-2.5 shadow-xs">
-            <div>
-              <div className="flex items-center justify-between border-b border-[var(--scaffold-hairline)] pb-1.5">
-                <div className="flex items-center gap-1.5">
-                  <span className="text-[11px] font-semibold text-[rgba(10,10,10,0.85)]">checks</span>
-                </div>
-                <span className="flex h-[15px] items-center gap-1 rounded-full bg-[rgba(43,138,62,0.1)] px-1.5">
-                  <span className="h-1 w-1 rounded-full bg-[rgb(43,138,62)]" />
-                  <Bar w={16} h={3} />
-                </span>
-              </div>
-
-              {/* SVG Animated Transmission Route */}
-              <div className="relative my-2 h-[42px] w-full overflow-hidden rounded-[8px] border border-[rgba(10,10,10,0.06)] bg-gradient-to-r from-[rgba(10,10,10,0.01)] via-[var(--scaffold-accent-row)]/20 to-[rgba(10,10,10,0.01)]">
-                <svg className="absolute inset-0 h-full w-full" preserveAspectRatio="none" viewBox="0 0 100 42">
-                  <path
-                    d="M 10,21 C 35,6 65,36 90,21"
-                    fill="none"
-                    stroke="rgba(255,85,0,0.25)"
-                    strokeWidth="1.5"
-                    strokeDasharray="3 3"
-                  />
-                  {live && (
-                    <motion.circle
-                      r="3.5"
-                      fill="var(--scaffold-accent)"
-                      animate={{
-                        cx: [10, 35, 65, 90],
-                        cy: [21, 10, 32, 21],
-                      }}
-                      transition={{
-                        duration: 2.2,
-                        repeat: Infinity,
-                        ease: 'easeInOut',
-                      }}
-                    />
-                  )}
-                </svg>
-                <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                  <span className="flex items-center gap-1 rounded-full bg-white/90 px-2 py-0.5 shadow-2xs backdrop-blur-xs border border-[rgba(10,10,10,0.08)]">
-                    <PlaneGlyph id="conduit-plane-icon" size="9px" />
-                    <Bar w={20} h={3} />
-                  </span>
-                </div>
-              </div>
-
-              {/* 4 Policy Safeguards Gate Rows (grounded in content/workflow.ts) */}
-              <div className="flex flex-col gap-1.5">
-                <div className="flex items-center justify-between rounded-[6px] border border-[rgba(10,10,10,0.05)] bg-[var(--scaffold-panel)] px-2 py-1">
-                  <div className="flex items-center gap-1.5">
-                    <span className="flex h-3.5 w-3.5 items-center justify-center rounded-full bg-[rgba(43,138,62,0.15)] text-[rgb(43,138,62)]">
-                      <svg width="7" height="7" viewBox="0 0 9 9" fill="none">
-                        <path d="M1.8 4.8 L3.6 6.8 L7.4 2.4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-                      </svg>
-                    </span>
-                    <Bar w={72} h={4} />
-                  </div>
-                  <span className="h-1.5 w-1.5 rounded-full bg-[rgb(43,138,62)]" />
-                </div>
-
-                <div className="flex items-center justify-between rounded-[6px] border border-[rgba(10,10,10,0.05)] bg-[var(--scaffold-panel)] px-2 py-1">
-                  <div className="flex items-center gap-1.5">
-                    <span className="flex h-3.5 w-3.5 items-center justify-center rounded-full bg-[rgba(43,138,62,0.15)] text-[rgb(43,138,62)]">
-                      <svg width="7" height="7" viewBox="0 0 9 9" fill="none">
-                        <path d="M1.8 4.8 L3.6 6.8 L7.4 2.4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-                      </svg>
-                    </span>
-                    <Bar w={58} h={4} />
-                  </div>
-                  <span className="h-1.5 w-1.5 rounded-full bg-[rgb(43,138,62)]" />
-                </div>
-
-                <div className="flex items-center justify-between rounded-[6px] border border-[rgba(10,10,10,0.05)] bg-[var(--scaffold-panel)] px-2 py-1">
-                  <div className="flex items-center gap-1.5">
-                    <span className="flex h-3.5 w-3.5 items-center justify-center rounded-full bg-[rgba(43,138,62,0.15)] text-[rgb(43,138,62)]">
-                      <svg width="7" height="7" viewBox="0 0 9 9" fill="none">
-                        <path d="M1.8 4.8 L3.6 6.8 L7.4 2.4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-                      </svg>
-                    </span>
-                    <Bar w={64} h={4} />
-                  </div>
-                  <span className="h-1.5 w-1.5 rounded-full bg-[rgb(43,138,62)]" />
-                </div>
-
-                <div className="flex items-center justify-between rounded-[6px] border border-[rgba(10,10,10,0.05)] bg-[var(--scaffold-panel)] px-2 py-1">
-                  <div className="flex items-center gap-1.5">
-                    <span className="flex h-3.5 w-3.5 items-center justify-center rounded-full bg-[rgba(43,138,62,0.15)] text-[rgb(43,138,62)]">
-                      <svg width="7" height="7" viewBox="0 0 9 9" fill="none">
-                        <path d="M1.8 4.8 L3.6 6.8 L7.4 2.4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-                      </svg>
-                    </span>
-                    <Bar w={52} h={4} />
-                  </div>
-                  <span className="h-1.5 w-1.5 rounded-full bg-[rgb(43,138,62)]" />
-                </div>
-              </div>
-            </div>
-
-            <div className="flex items-center justify-between border-t border-[var(--scaffold-hairline)] pt-1.5">
-              <div className="flex items-center gap-1">
-                <span className="h-1.5 w-1.5 rounded-full bg-[rgb(43,138,62)]" />
-                <Bar w={32} h={4} />
-              </div>
-              <Bar w={20} h={3} />
-            </div>
-          </div>
-
-          {/* 3. COLUMN 3: DELIVERY RECEIPT & DELIVERABILITY TELEMETRY */}
-          <div className="flex flex-col justify-evenly gap-2 rounded-[14px] border border-[var(--scaffold-hairline)] bg-white p-2.5 shadow-xs">
-            <div>
-              <div className="flex items-center justify-between border-b border-[var(--scaffold-hairline)] pb-1.5">
-                <span className="text-[11px] font-semibold text-[rgba(10,10,10,0.85)]">delivered</span>
-                <span className="flex h-[14px] w-[14px] items-center justify-center rounded-full bg-[rgba(43,138,62,0.12)]">
-                  <span className="h-1 w-1 rounded-full bg-[rgb(43,138,62)]" />
-                </span>
-              </div>
-
-              {/* Delivery Confirmation Receipt Card */}
-              <div className="mt-2 flex flex-col items-center justify-center rounded-[10px] border border-[rgba(43,138,62,0.18)] bg-[rgba(43,138,62,0.03)] p-3 text-center">
-                <div className="relative flex h-10 w-10 items-center justify-center">
-                  {live && (
-                    <motion.span
-                      className="absolute inset-0 rounded-full bg-[rgba(43,138,62,0.2)]"
-                      animate={{ scale: [1, 1.4, 1], opacity: [0.6, 0, 0.6] }}
-                      transition={{ duration: 2.4, repeat: Infinity, ease: 'easeInOut' }}
-                    />
-                  )}
-                  <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[rgb(43,138,62)] text-white shadow-xs">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M5 12.5l4.5 4.5L19 7.5" />
-                    </svg>
-                  </span>
-                </div>
-
-                <div className="mt-2 flex w-full flex-col items-center gap-1">
-                  <Bar w="55%" h={5} />
-                  <Bar w="35%" h={4} />
-                </div>
-              </div>
-
-              {/* Deliverability Health & Safe Ramp Panel */}
-              <div className="mt-2 flex flex-col gap-1.5 rounded-[8px] border border-[rgba(10,10,10,0.06)] bg-[var(--scaffold-panel)] p-2">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-1.5">
-                    <span className="h-1.5 w-1.5 rounded-full bg-[rgb(43,138,62)]" />
-                    <Bar w={40} h={4} />
-                  </div>
-                  <Bar w={24} h={4} />
-                </div>
-
-                <div className="flex flex-col gap-1 pt-1">
-                  <div className="flex items-center justify-between">
-                    <Bar w={48} h={3} />
-                    <Bar w={16} h={3} />
-                  </div>
-                  <div className="relative h-1.5 w-full rounded-full bg-[rgba(10,10,10,0.08)] overflow-hidden">
-                    <span
-                      className="absolute inset-y-0 left-0 rounded-full bg-[rgb(43,138,62)]"
-                      style={{ width: '84%' }}
-                    />
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="flex items-center justify-between border-t border-[var(--scaffold-hairline)] pt-1.5">
-              <div className="flex items-center gap-1">
-                <span className="h-1 w-1 rounded-full bg-[rgb(43,138,62)]" />
-                
-              </div>
-              <Bar w={24} h={4} />
-            </div>
-          </div>
+          <OutreachQueueColumn live={live} />
+          <OutreachChecksColumn live={live} />
+          <OutreachDeliveryColumn live={live} />
         </div>
 
-        {/* MOBILE: ACTIVE TAB CARD (100% WIDTH, CLEAN & UNCROWDED) */}
+        {/* MOBILE: ONE COLUMN AT A TIME */}
         <div className="block md:hidden h-full">
           <AnimatePresence mode="wait">
-            {mobileTab === 'queue' && (
-              <motion.div
-                key="mobile-queue"
-                initial={{ opacity: 0, y: 6 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -6 }}
-                className="flex h-full flex-col justify-between rounded-[14px] border border-[var(--scaffold-hairline)] bg-white p-2.5 shadow-xs"
-              >
-                <div>
-                  <div className="flex items-center justify-between border-b border-[var(--scaffold-hairline)] pb-1.5">
-                    <div className="flex items-center gap-1.5">
-                      <span className="text-[11px] font-semibold text-[rgba(10,10,10,0.85)]">message</span>
-                      <span className="text-[10px] text-[rgba(10,10,10,0.4)]">·</span>
-                      <span className="text-[10px] font-medium text-[rgba(10,10,10,0.5)]">personalized</span>
-                    </div>
-                    <div className="hidden sm:flex items-center gap-1">
-                      {[0, 1, 2].map((idx) => (
-                        <span
-                          key={idx}
-                          className="flex h-[15px] items-center gap-1 rounded-[4px] border border-[rgba(10,10,10,0.06)] bg-[var(--scaffold-panel)] px-1"
-                        >
-                          <span
-                            className={cn(
-                              'h-1.5 w-1.5 rounded-full',
-                              idx === 0 ? 'bg-[var(--scaffold-accent)]' : 'bg-[rgba(10,10,10,0.25)]',
-                            )}
-                          />
-                          <Bar w={10} h={3} />
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div className="mt-2 rounded-[10px] border border-[var(--scaffold-accent-chip)] bg-[var(--scaffold-accent-row)]/30 p-2">
-                    <div className="flex items-center gap-2">
-                      <img
-                        src="/journey-faces/daniel.png"
-                        alt=""
-                        aria-hidden="true"
-                        className="h-7 w-7 rounded-full object-cover shadow-2xs border border-white"
-                      />
-                      <div className="flex min-w-0 flex-1 flex-col gap-1">
-                        <Bar w="65%" h={5} />
-                        <Bar w="40%" h={4} />
-                      </div>
-                      <span className="flex h-4 items-center rounded-full bg-[rgba(43,138,62,0.12)] px-1.5">
-                        <span className="h-1 w-1 rounded-full bg-[rgb(43,138,62)]" />
-                      </span>
-                    </div>
-
-                    <div className="mt-2 flex flex-col gap-1 rounded-[6px] border border-[rgba(10,10,10,0.06)] bg-white p-1.5">
-                      <div className="flex items-center gap-1.5">
-                        <EnvelopeGlyph id="out-env-icon-m" size="9px" />
-                        <Bar w="45%" h={4} />
-                      </div>
-                      <Bar w="88%" h={4} />
-                      <div className="flex items-center gap-1">
-                        <Bar w="35%" h={4} tint />
-                        <Bar w="40%" h={4} />
-                      </div>
-                    </div>
-
-                    <div className="mt-2 flex items-center justify-between gap-2">
-                      <div className="relative h-[3px] flex-1 rounded-full bg-[rgba(10,10,10,0.08)] overflow-hidden">
-                        <motion.div
-                          className="absolute inset-y-0 bg-[var(--scaffold-accent)] rounded-full"
-                          animate={live ? { left: ['0%', '100%'], width: ['20%', '40%'] } : { left: '30%', width: '35%' }}
-                          transition={{ duration: 1.8, repeat: Infinity, ease: 'easeInOut' }}
-                        />
-                      </div>
-                      <Bar w={24} h={3} />
-                    </div>
-                  </div>
-
-                  <div className="mt-1.5 flex items-center gap-2 rounded-[8px] border border-[rgba(10,10,10,0.06)] bg-[var(--scaffold-panel)] p-1.5">
-                    <img
-                      src="/journey-faces/marcus.png"
-                      alt=""
-                      aria-hidden="true"
-                      className="h-5 w-5 rounded-full object-cover opacity-80"
-                    />
-                    <div className="flex min-w-0 flex-1 flex-col gap-1">
-                      <Bar w="50%" h={4} />
-                      <Bar w="30%" h={3} />
-                    </div>
-                    <span className="h-1.5 w-1.5 rounded-full bg-[rgba(10,10,10,0.25)]" />
-                  </div>
-                </div>
-
-                <div className="flex items-center justify-between border-t border-[var(--scaffold-hairline)] pt-1.5">
-                  
-                  <Bar w={28} h={4} />
-                </div>
-              </motion.div>
-            )}
-
-            {mobileTab === 'checks' && (
-              <motion.div
-                key="mobile-policy"
-                initial={{ opacity: 0, y: 6 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -6 }}
-                className="flex h-full flex-col justify-between rounded-[14px] border border-[var(--scaffold-hairline)] bg-white p-2.5 shadow-xs"
-              >
-                <div>
-                  <div className="flex items-center justify-between border-b border-[var(--scaffold-hairline)] pb-1.5">
-                    <div className="flex items-center gap-1.5">
-                      <span className="text-[11px] font-semibold text-[rgba(10,10,10,0.85)]">checks</span>
-                    </div>
-                    <span className="flex h-[15px] items-center gap-1 rounded-full bg-[rgba(43,138,62,0.1)] px-1.5">
-                      <span className="h-1 w-1 rounded-full bg-[rgb(43,138,62)]" />
-                      <Bar w={16} h={3} />
-                    </span>
-                  </div>
-
-                  <div className="relative my-2 h-[38px] w-full overflow-hidden rounded-[8px] border border-[rgba(10,10,10,0.06)] bg-gradient-to-r from-[rgba(10,10,10,0.01)] via-[var(--scaffold-accent-row)]/20 to-[rgba(10,10,10,0.01)]">
-                    <svg className="absolute inset-0 h-full w-full" preserveAspectRatio="none" viewBox="0 0 100 38">
-                      <path
-                        d="M 10,19 C 35,6 65,32 90,19"
-                        fill="none"
-                        stroke="rgba(255,85,0,0.25)"
-                        strokeWidth="1.5"
-                        strokeDasharray="3 3"
-                      />
-                      {live && (
-                        <motion.circle
-                          r="3.5"
-                          fill="var(--scaffold-accent)"
-                          animate={{
-                            cx: [10, 35, 65, 90],
-                            cy: [19, 10, 28, 19],
-                          }}
-                          transition={{
-                            duration: 2.2,
-                            repeat: Infinity,
-                            ease: 'easeInOut',
-                          }}
-                        />
-                      )}
-                    </svg>
-                    <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                      <span className="flex items-center gap-1 rounded-full bg-white/90 px-2 py-0.5 shadow-2xs backdrop-blur-xs border border-[rgba(10,10,10,0.08)]">
-                        <PlaneGlyph id="conduit-plane-icon-m" size="9px" />
-                        <Bar w={20} h={3} />
-                      </span>
-                    </div>
-                  </div>
-
-                  <div className="flex flex-col gap-1.5">
-                    <div className="flex items-center justify-between rounded-[6px] border border-[rgba(10,10,10,0.05)] bg-[var(--scaffold-panel)] px-2 py-1">
-                      <div className="flex items-center gap-1.5">
-                        <span className="flex h-3.5 w-3.5 items-center justify-center rounded-full bg-[rgba(43,138,62,0.15)] text-[rgb(43,138,62)]">
-                          <svg width="7" height="7" viewBox="0 0 9 9" fill="none">
-                            <path d="M1.8 4.8 L3.6 6.8 L7.4 2.4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-                          </svg>
-                        </span>
-                        <Bar w={72} h={4} />
-                      </div>
-                      <span className="h-1.5 w-1.5 rounded-full bg-[rgb(43,138,62)]" />
-                    </div>
-
-                    <div className="flex items-center justify-between rounded-[6px] border border-[rgba(10,10,10,0.05)] bg-[var(--scaffold-panel)] px-2 py-1">
-                      <div className="flex items-center gap-1.5">
-                        <span className="flex h-3.5 w-3.5 items-center justify-center rounded-full bg-[rgba(43,138,62,0.15)] text-[rgb(43,138,62)]">
-                          <svg width="7" height="7" viewBox="0 0 9 9" fill="none">
-                            <path d="M1.8 4.8 L3.6 6.8 L7.4 2.4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-                          </svg>
-                        </span>
-                        <Bar w={58} h={4} />
-                      </div>
-                      <span className="h-1.5 w-1.5 rounded-full bg-[rgb(43,138,62)]" />
-                    </div>
-
-                    <div className="flex items-center justify-between rounded-[6px] border border-[rgba(10,10,10,0.05)] bg-[var(--scaffold-panel)] px-2 py-1">
-                      <div className="flex items-center gap-1.5">
-                        <span className="flex h-3.5 w-3.5 items-center justify-center rounded-full bg-[rgba(43,138,62,0.15)] text-[rgb(43,138,62)]">
-                          <svg width="7" height="7" viewBox="0 0 9 9" fill="none">
-                            <path d="M1.8 4.8 L3.6 6.8 L7.4 2.4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-                          </svg>
-                        </span>
-                        <Bar w={64} h={4} />
-                      </div>
-                      <span className="h-1.5 w-1.5 rounded-full bg-[rgb(43,138,62)]" />
-                    </div>
-
-                    <div className="flex items-center justify-between rounded-[6px] border border-[rgba(10,10,10,0.05)] bg-[var(--scaffold-panel)] px-2 py-1">
-                      <div className="flex items-center gap-1.5">
-                        <span className="flex h-3.5 w-3.5 items-center justify-center rounded-full bg-[rgba(43,138,62,0.15)] text-[rgb(43,138,62)]">
-                          <svg width="7" height="7" viewBox="0 0 9 9" fill="none">
-                            <path d="M1.8 4.8 L3.6 6.8 L7.4 2.4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-                          </svg>
-                        </span>
-                        <Bar w={52} h={4} />
-                      </div>
-                      <span className="h-1.5 w-1.5 rounded-full bg-[rgb(43,138,62)]" />
-                    </div>
-                  </div>
-                </div>
-
-                <div className="flex items-center justify-between border-t border-[var(--scaffold-hairline)] pt-1.5">
-                  <div className="flex items-center gap-1">
-                    <span className="h-1.5 w-1.5 rounded-full bg-[rgb(43,138,62)]" />
-                    <Bar w={32} h={4} />
-                  </div>
-                  <Bar w={20} h={3} />
-                </div>
-              </motion.div>
-            )}
-
-            {mobileTab === 'delivery' && (
-              <motion.div
-                key="mobile-delivery"
-                initial={{ opacity: 0, y: 6 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -6 }}
-                className="flex h-full flex-col justify-between rounded-[14px] border border-[var(--scaffold-hairline)] bg-white p-2.5 shadow-xs"
-              >
-                <div>
-                  <div className="flex items-center justify-between border-b border-[var(--scaffold-hairline)] pb-1.5">
-                    <span className="text-[11px] font-semibold text-[rgba(10,10,10,0.85)]">delivered</span>
-                    <span className="flex h-[14px] w-[14px] items-center justify-center rounded-full bg-[rgba(43,138,62,0.12)]">
-                      <span className="h-1 w-1 rounded-full bg-[rgb(43,138,62)]" />
-                    </span>
-                  </div>
-
-                  <div className="mt-2 flex flex-col items-center justify-center rounded-[10px] border border-[rgba(43,138,62,0.18)] bg-[rgba(43,138,62,0.03)] p-3 text-center">
-                    <div className="relative flex h-10 w-10 items-center justify-center">
-                      {live && (
-                        <motion.span
-                          className="absolute inset-0 rounded-full bg-[rgba(43,138,62,0.2)]"
-                          animate={{ scale: [1, 1.4, 1], opacity: [0.6, 0, 0.6] }}
-                          transition={{ duration: 2.4, repeat: Infinity, ease: 'easeInOut' }}
-                        />
-                      )}
-                      <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[rgb(43,138,62)] text-white shadow-xs">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                          <path d="M5 12.5l4.5 4.5L19 7.5" />
-                        </svg>
-                      </span>
-                    </div>
-
-                    <div className="mt-2 flex w-full flex-col items-center gap-1">
-                      <Bar w="55%" h={5} />
-                      <Bar w="35%" h={4} />
-                    </div>
-                  </div>
-
-                  <div className="mt-2 flex flex-col gap-1.5 rounded-[8px] border border-[rgba(10,10,10,0.06)] bg-[var(--scaffold-panel)] p-2">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-1.5">
-                        <span className="h-1.5 w-1.5 rounded-full bg-[rgb(43,138,62)]" />
-                        <Bar w={40} h={4} />
-                      </div>
-                      <Bar w={24} h={4} />
-                    </div>
-
-                    <div className="flex flex-col gap-1 pt-1">
-                      <div className="flex items-center justify-between">
-                        <Bar w={48} h={3} />
-                        <Bar w={16} h={3} />
-                      </div>
-                      <div className="relative h-1.5 w-full rounded-full bg-[rgba(10,10,10,0.08)] overflow-hidden">
-                        <span
-                          className="absolute inset-y-0 left-0 rounded-full bg-[rgb(43,138,62)]"
-                          style={{ width: '84%' }}
-                        />
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="flex items-center justify-between border-t border-[var(--scaffold-hairline)] pt-1.5">
-                  <div className="flex items-center gap-1">
-                    <span className="h-1 w-1 rounded-full bg-[rgb(43,138,62)]" />
-                    
-                  </div>
-                  <Bar w={24} h={4} />
-                </div>
-              </motion.div>
-            )}
+            <motion.div
+              key={mobileTab}
+              initial={{ opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -6 }}
+              className="h-full"
+            >
+              {mobileTab === 'queue' && <OutreachQueueColumn live={live} />}
+              {mobileTab === 'checks' && <OutreachChecksColumn live={live} />}
+              {mobileTab === 'delivery' && <OutreachDeliveryColumn live={live} />}
+            </motion.div>
           </AnimatePresence>
         </div>
       </div>
@@ -1735,217 +1388,27 @@ function KnowledgeCoreView({
   );
 }
 
-function ConfigureStageView({
-  live = false,
-  stageProgress = 0,
-}: {
-  live?: boolean;
-  stageProgress?: number;
-}) {
-  const [activeView, setActiveView] = useState<'pillars' | 'knowledge'>('pillars');
-  const [mobileTab, setMobileTab] = useState<'profile' | 'offers' | 'icps' | 'knowledge'>('profile');
-
-  const handleSelectPillarFromCore = (pillar: 'profile' | 'offers' | 'icps') => {
-    setActiveView('pillars');
-    setMobileTab(pillar);
-  };
-
-  return (
-    <div className="flex h-full flex-col justify-between gap-2.5">
-      {/* Configure Header with Stage Name & View Controls */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <span className="flex h-[24px] w-[24px] items-center justify-center rounded-[7px] border border-[rgba(10,10,10,0.08)] bg-white shadow-xs">
-            <SlidersGlyph id="cfg-view-icon" size="13px" />
-          </span>
-          <span className="text-[12px] font-medium text-[rgba(10,10,10,0.8)]">configure</span>
-          <span className="flex items-center gap-1 rounded-full bg-[rgba(43,138,62,0.1)] px-2 py-0.5 border border-[rgba(43,138,62,0.18)] text-[10px] font-medium text-[rgb(43,138,62)]">
-            <span className={cn('h-1.5 w-1.5 rounded-full bg-[rgb(43,138,62)]', live && 'animate-pulse')} />
-            <span>versioned</span>
-          </span>
-        </div>
-
-        {/* Desktop View Switcher (3 Pillars vs Knowledge Core) */}
-        <div className="hidden md:flex items-center gap-1 rounded-full border border-[var(--scaffold-hairline)] bg-white p-0.5 shadow-2xs">
-          <button
-            type="button"
-            onClick={() => setActiveView('pillars')}
-            className={cn(
-              'flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10.5px] font-medium transition-colors cursor-pointer',
-              activeView === 'pillars'
-                ? 'bg-[var(--scaffold-accent-row)] text-[var(--scaffold-accent)]'
-                : 'text-[rgba(10,10,10,0.5)] hover:text-black',
-            )}
-          >
-            <span className={cn('h-1.5 w-1.5 rounded-full', activeView === 'pillars' ? 'bg-[var(--scaffold-accent)]' : 'bg-[rgba(10,10,10,0.3)]')} />
-            <span>profile</span>
-            <span className="h-0.5 w-0.5 rounded-full bg-current opacity-40" />
-            <span>offers</span>
-            <span className="h-0.5 w-0.5 rounded-full bg-current opacity-40" />
-            <span>icps</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => setActiveView('knowledge')}
-            className={cn(
-              'flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10.5px] font-medium transition-colors cursor-pointer',
-              activeView === 'knowledge'
-                ? 'bg-[var(--scaffold-accent-row)] text-[var(--scaffold-accent)]'
-                : 'text-[rgba(10,10,10,0.5)] hover:text-black',
-            )}
-          >
-            <span className={cn('h-1.5 w-1.5 rounded-full', activeView === 'knowledge' && live ? 'bg-[var(--scaffold-accent)] animate-pulse' : 'bg-[rgba(10,10,10,0.3)]')} />
-            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M12 2a4 4 0 0 0-4 4v1a4 4 0 0 0-3 3.86 4 4 0 0 0 1.5 3.14 4 4 0 0 0 .5 5A4 4 0 0 0 10 22h4a4 4 0 0 0 3-2.86 4 4 0 0 0 .5-5 4 4 0 0 0 1.5-3.14A4 4 0 0 0 16 7V6a4 4 0 0 0-4-4z" />
-            </svg>
-          </button>
-        </div>
-
-        {/* Mobile Pillar Tab Switcher */}
-        <div className="flex md:hidden items-center gap-1 rounded-full border border-[var(--scaffold-hairline)] bg-white p-0.5 shadow-2xs">
-          <button
-            type="button"
-            onClick={() => setMobileTab('profile')}
-            className={cn(
-              'flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-medium transition-colors',
-              mobileTab === 'profile' ? 'bg-[var(--scaffold-accent-row)] text-[var(--scaffold-accent)]' : 'text-[rgba(10,10,10,0.5)]',
-            )}
-          >
-            <span className="h-1.5 w-1.5 rounded-full bg-[var(--scaffold-accent)]" />
-            <span>profile</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => setMobileTab('offers')}
-            className={cn(
-              'flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-medium transition-colors',
-              mobileTab === 'offers' ? 'bg-[var(--scaffold-accent-row)] text-[var(--scaffold-accent)]' : 'text-[rgba(10,10,10,0.5)]',
-            )}
-          >
-            <span className="h-1.5 w-1.5 rounded-sm bg-[var(--scaffold-accent)]" />
-            <span>offers</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => setMobileTab('icps')}
-            className={cn(
-              'flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-medium transition-colors',
-              mobileTab === 'icps' ? 'bg-[var(--scaffold-accent-row)] text-[var(--scaffold-accent)]' : 'text-[rgba(10,10,10,0.5)]',
-            )}
-          >
-            <span className="h-1.5 w-1.5 rotate-45 bg-[rgb(43,138,62)]" />
-            <span>icps</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => setMobileTab('knowledge')}
-            className={cn(
-              'flex items-center justify-center h-6 w-6 rounded-full transition-colors',
-              mobileTab === 'knowledge' ? 'bg-[var(--scaffold-accent-row)] text-[var(--scaffold-accent)]' : 'text-[rgba(10,10,10,0.5)]',
-            )}
-          >
-            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M12 2a4 4 0 0 0-4 4v1a4 4 0 0 0-3 3.86 4 4 0 0 0 1.5 3.14 4 4 0 0 0 .5 5A4 4 0 0 0 10 22h4a4 4 0 0 0 3-2.86 4 4 0 0 0 .5-5 4 4 0 0 0 1.5-3.14A4 4 0 0 0 16 7V6a4 4 0 0 0-4-4z" />
-            </svg>
-          </button>
-        </div>
-      </div>
-
-      {/* Main Canvas Body */}
-      <div className="relative min-h-0 flex-1 overflow-hidden">
-        {/* DESKTOP VIEW: PANORAMIC 3 PILLARS OR KNOWLEDGE CORE */}
-        <div className="hidden md:block h-full">
-          <AnimatePresence mode="wait">
-            {activeView === 'pillars' ? (
-              <motion.div
-                key="desktop-pillars"
-                initial={{ opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -8 }}
-                transition={{ duration: 0.3, ease: EASE_SMOOTH }}
-                className="grid h-full grid-cols-3 gap-2.5"
-              >
-                <ProfilePillarCard live={live} />
-                <OffersPillarCard live={live} />
-                <IcpsPillarCard live={live} />
-              </motion.div>
-            ) : (
-              <motion.div
-                key="desktop-knowledge"
-                initial={{ opacity: 0, scale: 0.96 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.96 }}
-                transition={{ duration: 0.3, ease: EASE_SMOOTH }}
-                className="h-full"
-              >
-                <KnowledgeCoreView live={live} onSelectPillar={handleSelectPillarFromCore} />
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
-
-        {/* MOBILE VIEW: SINGLE FOCUSED PILLAR CARD WITH SMOOTH TRANSITION */}
-        <div className="block md:hidden h-full">
-          <AnimatePresence mode="wait">
-            {mobileTab === 'profile' && (
-              <motion.div
-                key="mobile-profile"
-                initial={{ opacity: 0, y: 6 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -6 }}
-                className="h-full"
-              >
-                <ProfilePillarCard live={live} />
-              </motion.div>
-            )}
-            {mobileTab === 'offers' && (
-              <motion.div
-                key="mobile-offers"
-                initial={{ opacity: 0, y: 6 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -6 }}
-                className="h-full"
-              >
-                <OffersPillarCard live={live} />
-              </motion.div>
-            )}
-            {mobileTab === 'icps' && (
-              <motion.div
-                key="mobile-icps"
-                initial={{ opacity: 0, y: 6 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -6 }}
-                className="h-full"
-              >
-                <IcpsPillarCard live={live} />
-              </motion.div>
-            )}
-            {mobileTab === 'knowledge' && (
-              <motion.div
-                key="mobile-knowledge"
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.95 }}
-                className="h-full"
-              >
-                <KnowledgeCoreView live={live} onSelectPillar={handleSelectPillarFromCore} />
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
-      </div>
-    </div>
-  );
+/* One brain, six inputs. Replaces the pillars / knowledge-core subviews, which
+   were another way of showing the same six categories. The previous version is
+   at /tmp/AgenticDashboard.pillars-backup.tsx for this session only. */
+function ConfigureStageView() {
+  return <ConfigureBrain />;
 }
 
-/* 8. OVERVIEW VIEW — throughput funnel and agent execution health */
-function OverviewStageView({ live }: { live: boolean }) {
+function OverviewStageView() {
+  const rail: StageId[] = [
+    'configure',
+    'discover',
+    'research',
+    'qualify',
+    'personalize',
+    'outreach',
+    'converse',
+  ];
+
   return (
-    <div className="flex h-full flex-col justify-between gap-2.5">
+    <div className="flex h-full flex-col gap-2.5">
+      {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <span className="flex h-[24px] w-[24px] items-center justify-center rounded-[7px] border border-[rgba(10,10,10,0.08)] bg-white shadow-xs">
@@ -1953,46 +1416,232 @@ function OverviewStageView({ live }: { live: boolean }) {
           </span>
           <span className="text-[12px] font-medium text-[rgba(10,10,10,0.8)]">overview</span>
         </div>
-        <span className="text-[11px] font-medium text-[rgba(10,10,10,0.4)]">activity</span>
+
+        <div className="flex items-center gap-2">
+          <span className="flex h-[22px] items-center gap-1.5 rounded-full border border-[rgba(43,138,62,0.22)] bg-[rgba(43,138,62,0.08)] px-2.5 shadow-2xs">
+            <span className="h-1.5 w-1.5 rounded-full bg-[rgb(43,138,62)] animate-pulse" />
+            <span className="text-[10px] font-medium text-[rgb(43,138,62)]">versioned</span>
+          </span>
+        </div>
       </div>
 
-      <div className="flex min-h-0 flex-1 flex-col justify-between rounded-[14px] border border-[var(--scaffold-hairline)] bg-white p-3 shadow-xs">
-        {/* Metric summary strip */}
-        <div className="grid grid-cols-3 gap-2">
-          {[0, 1, 2].map((i) => (
-            <div key={i} className="flex flex-col gap-1 rounded-[8px] border border-[rgba(10,10,10,0.06)] bg-[var(--scaffold-panel)] p-2">
-              <div className="flex items-center justify-between">
-                <Bar w={26} h={5} />
-                {i === 1 ? <span className="h-[4px] w-[4px] rounded-full bg-[var(--scaffold-accent)]" /> : null}
-              </div>
-              <Bar w={i === 1 ? 44 : 32} h={7} tint={i === 1} />
+      {/* Connected 7-Node Stage Bus Rail */}
+      <div className="relative rounded-[14px] border border-[var(--scaffold-hairline)] bg-white p-2.5 shadow-xs">
+        <div className="relative flex items-center justify-between">
+          {/* Animated Connecting Track Wire */}
+          <span
+            aria-hidden="true"
+            className="absolute left-6 right-6 top-1/2 h-[2px] -translate-y-1/2 bg-gradient-to-r from-[rgba(10,10,10,0.06)] via-[var(--scaffold-accent)] to-[rgb(43,138,62)] opacity-40"
+          />
+
+          {rail.map((stage, idx) => (
+            <div key={stage} className="relative z-10 flex flex-col items-center gap-1">
+              <span
+                className={cn(
+                  'flex items-center justify-center rounded-[9px] border transition-all shadow-xs',
+                  idx === rail.length - 1
+                    ? 'border-[rgb(43,138,62)] bg-[rgba(43,138,62,0.08)]'
+                    : idx === 0
+                    ? 'border-[var(--scaffold-accent)] bg-[var(--scaffold-accent-row)]'
+                    : 'border-[var(--scaffold-hairline)] bg-white hover:border-[rgba(10,10,10,0.2)]',
+                )}
+                style={{ width: 32, height: 32 }}
+              >
+                <StageGlyphIcon stage={stage} size={13} />
+              </span>
+
+              <span className="text-[9px] font-medium text-[rgba(10,10,10,0.65)]">
+                {stage}
+              </span>
             </div>
           ))}
         </div>
+      </div>
 
-        {/* 12-bar Sparkline */}
-        <div className="flex flex-col gap-1.5 border-t border-[var(--scaffold-hairline)] pt-2">
-          <div className="flex items-center justify-between">
-            <span className="text-[10px] font-medium text-[rgba(10,10,10,0.5)]">activity</span>
-            <Bar w={24} h={4} />
+      {/* 3 Telemetry Cards Grid */}
+      <div className="grid min-h-0 flex-1 grid-cols-1 sm:grid-cols-3 gap-2.5">
+        {/* Card 1: Prospects & Provenance */}
+        <div className="flex flex-col justify-between rounded-[14px] border border-[var(--scaffold-hairline)] bg-white p-2.5 shadow-xs">
+          <div>
+            <div className="flex items-center justify-between border-b border-[var(--scaffold-hairline)] pb-1.5">
+              <div className="flex items-center gap-1.5">
+                <span className="h-1.5 w-1.5 rounded-full bg-[var(--scaffold-accent)]" />
+                <span className="text-[11px] font-semibold text-[rgba(10,10,10,0.85)]">prospects</span>
+              </div>
+              <span className="flex items-center gap-1 rounded-full bg-[rgba(43,138,62,0.1)] px-1.5 py-0.5 text-[9px] font-medium text-[rgb(43,138,62)]">
+                <span className="h-1 w-1 rounded-full bg-[rgb(43,138,62)]" />
+                <span>versioned</span>
+              </span>
+            </div>
+
+            {/* Profile Row with Dalian Carter avatar */}
+            <div className="mt-2 flex items-center justify-between rounded-[8px] border border-[rgba(10,10,10,0.06)] bg-[var(--scaffold-panel)] p-1.5">
+              <div className="flex items-center gap-2">
+                <img
+                  src="/journey-faces/daniel.png"
+                  alt=""
+                  aria-hidden="true"
+                  className="h-7 w-7 rounded-full object-cover border border-[var(--scaffold-hairline)] shadow-2xs"
+                />
+                <div className="flex flex-col gap-1">
+                  <Bar w={52} h={4} />
+                  <Bar w={32} h={3} />
+                </div>
+              </div>
+              <span className="flex h-3.5 w-3.5 items-center justify-center rounded-full bg-[rgba(43,138,62,0.15)] text-[rgb(43,138,62)]">
+                <svg width="7" height="7" viewBox="0 0 9 9" fill="none">
+                  <path d="M1.8 4.8 L3.6 6.8 L7.4 2.4" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+                </svg>
+              </span>
+            </div>
+
+            {/* 4 Inbound Sources Streams */}
+            <div className="mt-2 flex flex-col gap-1">
+              {[0, 1, 2, 3].map((i) => (
+                <div key={i} className="flex items-center justify-between rounded-[4px] border border-[rgba(10,10,10,0.04)] bg-white px-2 py-1">
+                  <div className="flex items-center gap-1.5">
+                    <span className="h-1 w-1 rounded-full bg-[var(--scaffold-accent)]" />
+                    <Bar w={i === 0 ? 44 : i === 1 ? 52 : i === 2 ? 38 : 46} h={3.2} />
+                  </div>
+                  <Bar w={18} h={3} />
+                </div>
+              ))}
+            </div>
           </div>
-          <div className="flex h-[36px] items-end justify-between gap-1">
-            {[8, 14, 18, 12, 22, 28, 19, 32, 24, 34, 29, 36].map((h, i) => (
-              <motion.span
-                key={i}
-                className={cn(
-                  'w-full rounded-t-[2px]',
-                  i >= 9 ? 'bg-[var(--scaffold-accent)]' : 'bg-[rgba(10,10,10,0.12)]',
-                )}
-                style={{ height: `${h}px` }}
-                animate={
-                  live && i >= 9
-                    ? { opacity: [0.7, 1, 0.7] }
-                    : undefined
-                }
-                transition={{ duration: 2, repeat: Infinity, delay: i * 0.1 }}
-              />
-            ))}
+
+          <div className="flex items-center justify-between border-t border-[var(--scaffold-hairline)] pt-1.5">
+            <span className="text-[9.5px] font-medium text-[rgba(10,10,10,0.45)]">provenance</span>
+            <span className="text-[9.5px] font-medium text-[rgba(10,10,10,0.45)]">evidence</span>
+          </div>
+        </div>
+
+        {/* Card 2: Qualification & Policy */}
+        <div className="flex flex-col justify-between rounded-[14px] border border-[var(--scaffold-hairline)] bg-white p-2.5 shadow-xs">
+          <div>
+            <div className="flex items-center justify-between border-b border-[var(--scaffold-hairline)] pb-1.5">
+              <div className="flex items-center gap-1.5">
+                <span className="h-1.5 w-1.5 rotate-45 bg-[rgb(43,138,62)]" />
+                <span className="text-[11px] font-semibold text-[rgba(10,10,10,0.85)]">qualification</span>
+              </div>
+              <span className="flex items-center gap-1 rounded-full bg-[var(--scaffold-accent-row)] px-1.5 py-0.5 text-[9px] font-medium text-[var(--scaffold-accent)]">
+                <span className="h-1 w-1 rounded-full bg-[var(--scaffold-accent)]" />
+                <span>offer match</span>
+              </span>
+            </div>
+
+            {/* Radial Score Gauge Simulation */}
+            <div className="mt-2 flex items-center justify-between rounded-[8px] border border-[rgba(10,10,10,0.06)] bg-[var(--scaffold-panel)] p-2">
+              <div className="flex items-center gap-2">
+                <div className="relative flex h-8 w-8 items-center justify-center">
+                  <svg className="h-full w-full -rotate-90" viewBox="0 0 36 36">
+                    <circle cx="18" cy="18" r="14" fill="none" stroke="rgba(10,10,10,0.08)" strokeWidth="3" />
+                    <circle
+                      cx="18"
+                      cy="18"
+                      r="14"
+                      fill="none"
+                      stroke="rgb(43,138,62)"
+                      strokeWidth="3"
+                      strokeDasharray="88"
+                      strokeDashoffset="12"
+                      strokeLinecap="round"
+                    />
+                  </svg>
+                  <span className="absolute h-1.5 w-1.5 rounded-full bg-[rgb(43,138,62)]" />
+                </div>
+                <div className="flex flex-col gap-1">
+                  <Bar w={46} h={4} />
+                  <Bar w={28} h={3} />
+                </div>
+              </div>
+              <span className="h-2 w-2 rounded-full bg-[rgb(43,138,62)]" />
+            </div>
+
+            {/* Checklist items */}
+            <div className="mt-2 grid grid-cols-2 gap-1">
+              {[0, 1, 2, 3].map((i) => (
+                <div key={i} className="flex items-center gap-1 rounded-[4px] border border-[rgba(10,10,10,0.04)] bg-white p-1">
+                  <svg width="6" height="6" viewBox="0 0 9 9" fill="none" className="text-[rgb(43,138,62)] shrink-0">
+                    <path d="M1.8 4.8 L3.6 6.8 L7.4 2.4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+                  </svg>
+                  <Bar w={i % 2 === 0 ? 32 : 26} h={3} />
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="flex items-center justify-between border-t border-[var(--scaffold-hairline)] pt-1.5">
+            <span className="text-[9.5px] font-medium text-[rgba(10,10,10,0.45)]">policy</span>
+            <span className="text-[9.5px] font-medium text-[rgba(10,10,10,0.45)]">qualification</span>
+          </div>
+        </div>
+
+        {/* Card 3: Sent Mails & Replies */}
+        <div className="flex flex-col justify-between rounded-[14px] border border-[var(--scaffold-hairline)] bg-white p-2.5 shadow-xs">
+          <div>
+            <div className="flex items-center justify-between border-b border-[var(--scaffold-hairline)] pb-1.5">
+              <div className="flex items-center gap-1.5">
+                <span className="h-1.5 w-1.5 rounded-full bg-[var(--scaffold-accent)]" />
+                <span className="text-[11px] font-semibold text-[rgba(10,10,10,0.85)]">sent mails</span>
+              </div>
+              <span className="flex items-center gap-1 rounded-full bg-[rgba(43,138,62,0.1)] px-1.5 py-0.5 text-[9px] font-medium text-[rgb(43,138,62)]">
+                <span className="h-1 w-1 rounded-full bg-[rgb(43,138,62)]" />
+                <span>intent</span>
+              </span>
+            </div>
+
+            {/* Inbound Booking confirmation preview */}
+            <div className="mt-2 flex flex-col gap-1.5 rounded-[8px] border border-[rgba(10,10,10,0.06)] bg-[var(--scaffold-panel)] p-2">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-1.5">
+                  <span className="flex h-4 w-4 items-center justify-center rounded-[4px] bg-[rgba(43,138,62,0.15)] text-[rgb(43,138,62)]">
+                    <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4">
+                      <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+                      <line x1="16" y1="2" x2="16" y2="6" />
+                      <line x1="8" y1="2" x2="8" y2="6" />
+                      <line x1="3" y1="10" x2="21" y2="10" />
+                    </svg>
+                  </span>
+                  <Bar w={48} h={4} />
+                </div>
+                <div className="flex -space-x-1">
+                  <img src="/journey-faces/marcus.png" alt="" aria-hidden="true" className="h-4 w-4 rounded-full border border-white object-cover" />
+                  <img src="/journey-faces/sophia.png" alt="" aria-hidden="true" className="h-4 w-4 rounded-full border border-white object-cover" />
+                </div>
+              </div>
+
+              <div className="flex items-center justify-between pt-1 border-t border-[rgba(10,10,10,0.04)]">
+                <Bar w={56} h={3} />
+                <span className="flex h-3 w-3 items-center justify-center rounded-full bg-[rgba(43,138,62,0.2)] text-[rgb(43,138,62)]">
+                  <svg width="6" height="6" viewBox="0 0 9 9" fill="none">
+                    <path d="M1.8 4.8 L3.6 6.8 L7.4 2.4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+                  </svg>
+                </span>
+              </div>
+            </div>
+
+            {/* Conversation activity stream */}
+            <div className="mt-2 flex flex-col gap-1">
+              <div className="flex items-center justify-between rounded-[4px] border border-[rgba(10,10,10,0.04)] bg-white px-2 py-1">
+                <div className="flex items-center gap-1.5">
+                  <span className="h-1 w-1 rounded-full bg-[rgb(43,138,62)]" />
+                  <Bar w={48} h={3.2} />
+                </div>
+                <span className="text-[9px] font-medium text-[rgba(10,10,10,0.4)]">replies</span>
+              </div>
+              <div className="flex items-center justify-between rounded-[4px] border border-[rgba(10,10,10,0.04)] bg-white px-2 py-1">
+                <div className="flex items-center gap-1.5">
+                  <span className="h-1 w-1 rounded-full bg-[var(--scaffold-accent)]" />
+                  <Bar w={40} h={3.2} />
+                </div>
+                <Bar w={16} h={3} />
+              </div>
+            </div>
+          </div>
+
+          <div className="flex items-center justify-between border-t border-[var(--scaffold-hairline)] pt-1.5">
+            <span className="text-[9.5px] font-medium text-[rgba(10,10,10,0.45)]">replies</span>
+            <span className="text-[9.5px] font-medium text-[rgba(10,10,10,0.45)]">drafts</span>
           </div>
         </div>
       </div>
@@ -2035,11 +1684,11 @@ function BottomActivityStrip({ live, activeStage }: { live: boolean; activeStage
         ))}
       </div>
 
-      {/* Right: Telemetry label & live pill */}
+      {/* Right: live marker only. The dot carries the state; the word did not
+          add anything the rail beside it does not already say. */}
       <div className="flex items-center gap-2">
-        <span className="inline-flex h-[20px] items-center gap-1.5 rounded-full border border-[rgba(10,10,10,0.08)] bg-[var(--scaffold-panel)] px-2">
+        <span className="flex h-[20px] w-[20px] items-center justify-center rounded-full border border-[rgba(10,10,10,0.08)] bg-[var(--scaffold-panel)]">
           <span className="h-[3.5px] w-[3.5px] rounded-full bg-[var(--scaffold-accent)]" />
-          <span className="text-[10px] font-medium text-[rgba(10,10,10,0.6)]">activity</span>
         </span>
       </div>
     </footer>
@@ -2064,6 +1713,9 @@ export default function AgenticDashboard({
   onStageSettled?: (stage: StageId) => void;
 }) {
   const [selectedStageOverride, setSelectedStageOverride] = useState<StageId | null>(null);
+  /* The rail collapses like a Notion sidebar: closed, the workspace takes
+     the full width and every scene gets more room. */
+  const [railOpen, setRailOpen] = useState(true);
   const [botDrawerOpen, setBotDrawerOpen] = useState(false);
   const idleTimerRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -2278,21 +1930,30 @@ export default function AgenticDashboard({
     >
       {/* Inner Workspace Container */}
       <div className="flex h-[510px] overflow-hidden rounded-[20px] border border-[var(--scaffold-hairline)] bg-[var(--scaffold-panel)]">
-        {/* ── L1 SIDEBAR (168px) ── */}
-        <aside className="flex w-[168px] shrink-0 flex-col border-r border-[var(--scaffold-hairline)] bg-white p-2.5">
-          {/* Workspace Header Switcher Button */}
+        {/* ── L1 SIDEBAR (168px desktop, 46px mobile icon rail) ── */}
+        <aside
+          className={cn(
+            'flex shrink-0 flex-col border-r border-[var(--scaffold-hairline)] bg-white p-1.5 md:p-2.5 transition-[width] duration-300 ease-[cubic-bezier(0.16,1,0.3,1)]',
+            railOpen ? 'w-[46px] md:w-[168px]' : 'w-[46px] md:w-[46px]',
+          )}
+        >
+          {/* Workspace Header Switcher / rail toggle */}
           <button
             type="button"
-            className="flex w-full items-center gap-2 rounded-[9px] px-2 py-2 text-left transition-colors hover:bg-[rgba(10,10,10,0.03)]"
+            onClick={() => setRailOpen((v) => !v)}
+            aria-expanded={railOpen}
+            aria-label={railOpen ? 'Collapse sidebar' : 'Expand sidebar'}
+            title={railOpen ? 'Collapse sidebar' : 'Expand sidebar'}
+            className="flex w-full items-center justify-center md:justify-start gap-2 rounded-[9px] px-1 md:px-2 py-2 text-left transition-colors hover:bg-[rgba(10,10,10,0.03)]"
           >
             <span className="flex h-[26px] w-[26px] shrink-0 items-center justify-center rounded-[7px] bg-[rgba(10,10,10,0.06)] shadow-2xs">
               <span className="h-[7px] w-[7px] rounded-full bg-[var(--scaffold-accent)]" />
             </span>
-            <div className="flex flex-col gap-1">
+            <div className="hidden md:flex flex-col gap-1">
               <Bar w={52} h={7} />
               <Bar w={34} h={5} />
             </div>
-            <svg width="7" height="5" viewBox="0 0 8 6" fill="none" className="ml-auto opacity-35">
+            <svg width="7" height="5" viewBox="0 0 8 6" fill="none" className="hidden md:block ml-auto opacity-35">
               <path d="M1 1.5L4 4.5L7 1.5" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
           </button>
@@ -2316,7 +1977,7 @@ export default function AgenticDashboard({
                   data-dash-stage={st}
                   onClick={() => handleSelectStage(st)}
                   className={cn(
-                    'group relative flex h-[35px] w-full items-center gap-2 rounded-[8px] px-2 text-left transition-colors',
+                    'group relative flex h-[35px] w-full items-center justify-center md:justify-start gap-2 rounded-[8px] px-1 md:px-2 text-left transition-colors',
                     isCurrent ? 'bg-[var(--scaffold-accent-row)]' : 'hover:bg-[rgba(10,10,10,0.03)]',
                   )}
                 >
@@ -2332,11 +1993,11 @@ export default function AgenticDashboard({
                     <StageGlyphIcon stage={st} size={12} />
                   </span>
 
-                  <span className="relative text-[11.5px] font-medium tracking-tight text-[rgba(10,10,10,0.85)]">
+                  <span className={cn('hidden md:inline relative text-[11.5px] font-medium tracking-tight text-[rgba(10,10,10,0.85)]', !railOpen && 'md:hidden')}>
                     {st}
                   </span>
 
-                  <span className="relative ml-auto">
+                  <span className="hidden md:inline relative ml-auto">
                     <StatusBadge status={status} live={live} />
                   </span>
                 </button>
@@ -2350,32 +2011,32 @@ export default function AgenticDashboard({
               type="button"
               onClick={() => handleSelectStage('overview')}
               className={cn(
-                'group relative flex h-[34px] w-full items-center gap-2 rounded-[8px] px-2 text-left transition-colors',
+                'group relative flex h-[34px] w-full items-center justify-center md:justify-start gap-2 rounded-[8px] px-1 md:px-2 text-left transition-colors',
                 activeStage === 'overview'
                   ? 'bg-[var(--scaffold-accent-row)]'
                   : 'hover:bg-[rgba(10,10,10,0.03)]',
               )}
             >
               <StageGlyphIcon stage="overview" size={12} />
-              <span className="text-[11.5px] font-medium tracking-tight text-[rgba(10,10,10,0.85)]">
+              <span className={cn('hidden md:inline text-[11.5px] font-medium tracking-tight text-[rgba(10,10,10,0.85)]', !railOpen && 'md:hidden')}>
                 overview
               </span>
-              <span className="ml-auto">
+              <span className="hidden md:inline ml-auto">
                 <StatusBadge status={activeStage === 'overview' ? 'running' : 'idle'} live={live} />
               </span>
             </button>
           </nav>
 
           {/* Bottom User Profile Block */}
-          <div className="mt-auto flex items-center gap-2 border-t border-[var(--scaffold-hairline)] px-1.5 pt-2">
+          <div className="mt-auto flex items-center justify-center md:justify-start gap-2 border-t border-[var(--scaffold-hairline)] px-1 md:px-1.5 pt-2">
             <span className="flex h-[24px] w-[24px] shrink-0 items-center justify-center rounded-full bg-[color-mix(in_oklch,var(--color-brand)_10%,rgba(255,255,255,1))]">
               <span className="h-[5px] w-[5px] rounded-full bg-[var(--scaffold-accent-dot)]" />
             </span>
-            <div className="flex flex-col gap-1">
+            <div className="hidden md:flex flex-col gap-1">
               <Bar w={54} h={5} />
               <Bar w={32} h={4} />
             </div>
-            <span className="ml-auto h-[4.5px] w-[4.5px] rounded-full bg-[var(--scaffold-accent-dot)]" />
+            <span className="hidden md:block ml-auto h-[4.5px] w-[4.5px] rounded-full bg-[var(--scaffold-accent-dot)]" />
           </div>
         </aside>
 
@@ -2404,7 +2065,7 @@ export default function AgenticDashboard({
           </header>
 
           {/* Focal Stage Canvas */}
-          <main className="flex min-h-0 flex-1 flex-col overflow-hidden p-3.5">
+          <main className="flex min-h-0 flex-1 flex-col overflow-hidden p-2 sm:p-2.5 md:p-3.5">
             <StageSettledContext.Provider value={activeStageReport}>
             <AnimatePresence mode="wait">
               <motion.div
@@ -2421,8 +2082,8 @@ export default function AgenticDashboard({
                 {activeStage === 'personalize' && <PersonalizeStageView live={live} />}
                 {activeStage === 'outreach' && <OutreachStageView live={live} />}
                 {activeStage === 'converse' && <ConverseStageView live={live} />}
-                {activeStage === 'configure' && <ConfigureStageView live={live} />}
-                {activeStage === 'overview' && <OverviewStageView live={live} />}
+                {activeStage === 'configure' && <ConfigureStageView />}
+                {activeStage === 'overview' && <OverviewStageView />}
               </motion.div>
             </AnimatePresence>
             </StageSettledContext.Provider>
@@ -2456,8 +2117,8 @@ export default function AgenticDashboard({
                 <Bar w="90%" h={5} />
                 <div className="mt-1.5 flex items-center justify-between pt-1">
                   <Bar w={38} h={4} />
-                  <span className="inline-flex h-[16px] items-center rounded-full bg-[var(--scaffold-accent-row)] px-1.5">
-                    <span className="text-[9px] font-medium text-[var(--scaffold-accent)]">activity</span>
+                  <span className="inline-flex h-[16px] w-[16px] items-center justify-center rounded-full bg-[var(--scaffold-accent-row)]">
+                    <span className="h-[3px] w-[3px] rounded-full bg-[var(--scaffold-accent)]" />
                   </span>
                 </div>
               </motion.div>
