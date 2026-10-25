@@ -13,9 +13,13 @@ jobs:
         with:
           clean: true
 
+      - name: Link project
+        run: |
+          mkdir -p .vercel
+          echo "{\"projectId\":\"$VERCEL_PROJECT_ID\",\"orgId\":\"$VERCEL_ORG_ID\"}" > .vercel/project.json
+
       - name: Deploy to Vercel
         run: |
-          rm -rf .vercel
           npx --yes vercel@latest deploy --token $VERCEL_TOKEN --prod --yes
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
