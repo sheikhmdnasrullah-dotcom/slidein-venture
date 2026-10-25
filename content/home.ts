@@ -28,6 +28,12 @@ export const NAV_SLOTS = {
  * To recall the previous headline, copy its lines into HOME.headline below.
  */
 export const ARCHIVED_HEADLINES = {
+  /* Getting Clients Simplified */
+  gettingClients: {
+    line1: 'Getting Clients',
+    line2: '',
+    highlight: 'Simplified',
+  },
   /* Original 3-line headline */
   threeLineSystem: {
     line1: 'We find your prospects,',
@@ -38,6 +44,8 @@ export const ARCHIVED_HEADLINES = {
 } as const;
 
 export const HOME = {
+  /* The hero tagline requested by the owner */
+  tagline: 'The Internet’s Most Powerful Client Acquisition Secrets, unified into one actionable Framework.',
   announcement: {
     /* The primary CTA pill below the subhead (the hero's only button).
        Grounded, claim-free copy: "Video" names the medium (the pill opens
@@ -48,10 +56,9 @@ export const HOME = {
     label: 'See how it works',
   },
   headline: {
-    line1: 'Getting Clients',
+    line1: 'The Internet’s Most Powerful Client Acquisition Secrets,',
     line2: '',
-    /* The highlighted word — artistically highlighted in creative brand orange */
-    highlight: 'Simplified',
+    highlight: 'unified into one actionable Framework.',
   },
   subhead: {
     /* THE OWNER'S COPY. Verbatim, supplied directly. Do not paraphrase.

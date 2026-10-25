@@ -120,11 +120,10 @@ function PrimaryCTAButton({
    rounded but irregular, two bumps on the top edge, one tail flick at the
    left end. Gradient accent-300 → accent-500 at 100° (x/y for 100°:
    sin=0.985, -cos=+0.17). Decorative: aria-hidden, pointer-events none. */
-function Swash() {
+/* Preserved from original 3-word headline for future recall
+function _Swash() {
   return (
     <span data-testid="hero-swash" className="hero-swash" aria-hidden="true">
-      {/* The shape draws via clip-path; the sparkles are siblings so the
-          clip never swallows them mid-draw. */}
       <svg
         data-testid="hero-swash-shape"
         className="hero-swash-shape"
@@ -171,10 +170,7 @@ function Swash() {
   );
 }
 
-/* One headline word: scroll/parallax shell > entrance mask > rise
-   traveller. Per-letter spans exist only on "Simplified" (10 letters),
-   which carries the swash and is composed inline below. */
-function Word({ index, children }: { index: number; children?: React.ReactNode }) {
+function _Word({ index, children }: { index: number; children?: React.ReactNode }) {
   return (
     <span data-testid="hero-word" data-word={index} className="hero-word" aria-hidden="true">
       <span className="hero-mask">
@@ -183,36 +179,18 @@ function Word({ index, children }: { index: number; children?: React.ReactNode }
     </span>
   );
 }
+*/
 
 /* THE HEADLINE — exactly one h1 with the three words. The aria-label is the
    full sentence (read once); the visual word spans are aria-hidden. The
    empty line2 slot and its skeleton bar are gone; the break after "Clients"
    matches the previous two-line setting. Copy is never altered here. */
+/* THE HEADLINE — the hero tagline in big display text. */
 function Headline() {
-  const { line1, highlight } = HOME.headline;
-  const [first, second] = line1.split(' ');
+  const tagline = HOME.tagline;
   return (
-    <h1 data-testid="hero-headline" className="hero-h1" aria-label={`${line1} ${highlight}`}>
-      <Word index={0}>{first}</Word> <Word index={1}>{second}</Word>
-      <br aria-hidden="true" />
-      <span data-testid="hero-word" data-word={2} className="hero-word" aria-hidden="true">
-        <Swash />
-        <span className="hero-mask">
-          <span className="hero-rise">
-            {highlight.split('').map((ch, i) => (
-              <span
-                key={i}
-                data-testid="hero-letter"
-                data-letter={i}
-                className="hero-letter"
-                style={{ '--li': i } as React.CSSProperties}
-              >
-                {ch}
-              </span>
-            ))}
-          </span>
-        </span>
-      </span>
+    <h1 data-testid="hero-headline" className="hero-h1">
+      {tagline}
     </h1>
   );
 }
@@ -389,14 +367,17 @@ export default function Hero() {
           <div data-testid="hero-column" className="hero-column">
             <Gap token="--hero-gap-top" line i={0} />
             <Headline />
-            <Gap token="--hero-gap-head-sub" line i={1} />
-            <Subhead />
-            <Gap token="--hero-gap-sub-cta" line i={2} />
-            <CTARow
-              onOpenStory={() => setStoryOpen(true)}
-              ctaRef={storyBtnRef}
-            />
-            <Gap token="--hero-gap-bottom" line i={3} />
+            <Gap token="--hero-gap-bottom" line i={1} />
+            {/* Hidden for now: subheadline and video see how it works section will be redesigned later */}
+            {false && (
+              <>
+                <Subhead />
+                <CTARow
+                  onOpenStory={() => setStoryOpen(true)}
+                  ctaRef={storyBtnRef}
+                />
+              </>
+            )}
           </div>
         </div>
 
