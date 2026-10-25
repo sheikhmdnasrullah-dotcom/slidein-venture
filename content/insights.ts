@@ -28,24 +28,49 @@ export interface InsightSection {
 export interface InsightArticle {
   date: string;
   formattedDate: string;
+  /** Publication taxonomy. One honest category per article, drawn from the
+     article's own subject matter — never invented for navigation. */
+  category: string;
   topic: string;
   slug: string;
+  /** Full canonical https URL. Single source of truth for metadata
+     canonicals, OG urls and the sitemap. */
   articleUrl: string;
   title: string;
   excerpt: string;
   /** Same pull-quote convention as `InsightSection.paragraphs`. */
   intro: Array<string | { pull: true; text: string }>;
   sections: InsightSection[];
+  /** ISO date (YYYY-MM-DD) of the last substantive revision. When present
+     the reader shows an "Updated" line alongside the publication date. */
+  updatedAt?: string;
+  /** Pin this article to the featured slot on the index. At most one
+     article should carry this; when none does, the newest published
+     article is featured. */
+  featured?: boolean;
+  /** Unpublished. Drafts are excluded from the index, static params, the
+     sitemap and every derived helper. The article body stays in the file. */
+  draft?: boolean;
+  /** Byline. Defaults are applied by the helpers, not duplicated per
+     article, when omitted. */
+  author?: string;
 }
+
+/** Default byline for articles that do not name one explicitly. */
+export const DEFAULT_AUTHOR = 'Nasrullah Tanim';
 
 export const ARTICLES: InsightArticle[] = [
   {
     date: "2026-10-13",
     formattedDate: "October 13, 2026",
+    category: "Pipeline Systems",
     topic:
       "Building an AI-Powered Buyer Pipeline for Executive Mortgage Advisors",
     slug: "ai-pipeline-emas",
-    articleUrl: "www.slideinventure.com/ai-pipeline-emas",
+    articleUrl:
+      "https://www.slideinventure.com/insights/ai-pipeline-emas",
+    author: "Nasrullah Tanim",
+    featured: true,
     title:
       "You Have 6 Referrals This Month. Last Month It Was 11. The Month Before That, 14.",
     excerpt:
@@ -143,6 +168,79 @@ export const ARTICLES: InsightArticle[] = [
     ],
   },
 ];
+
+/* ── DERIVED HELPERS ─────────────────────────────────────────────────────────
+   Everything the index, the reader and the route layer needs — reading time,
+   publishing order, the featured slot, categories — is computed HERE, from
+   the articles, so the components stay presentation-only and no number or
+   label is ever written twice.
+   ─────────────────────────────────────────────────────────────────────────── */
+
+const WORDS_PER_MINUTE = 200;
+
+const textOf = (p: string | { pull: true; text: string }) =>
+  typeof p === "string" ? p : p.text;
+
+/**
+ * Estimated reading time in whole minutes, from a word count over the
+ * article's full body: intro + every section paragraph + every system
+ * component body. The title, excerpt and headings are chrome, not body.
+ * Never zero — a real article reads as at least one minute.
+ */
+export function getReadingTime(article: InsightArticle): number {
+  let words = 0;
+  const count = (s: string) => {
+    const trimmed = s.trim();
+    if (trimmed) words += trimmed.split(/\s+/).length;
+  };
+
+  article.intro.forEach((p) => count(textOf(p)));
+  article.sections.forEach((section) => {
+    section.paragraphs.forEach((p) => count(textOf(p)));
+    section.components?.forEach((component) => {
+      count(component.leadBold);
+      component.body.forEach(count);
+    });
+  });
+
+  return Math.max(1, Math.ceil(words / WORDS_PER_MINUTE));
+}
+
+/** Every article that is live: drafts excluded, newest first. */
+export function getPublishedArticles(): InsightArticle[] {
+  return ARTICLES.filter((article) => !article.draft).sort(
+    (a, b) => Date.parse(b.date) - Date.parse(a.date),
+  );
+}
+
+/**
+ * The featured article for the index. An explicit `featured: true` wins;
+ * otherwise the newest published article takes the slot.
+ */
+export function getFeaturedArticle(): InsightArticle | undefined {
+  const published = getPublishedArticles();
+  return published.find((article) => article.featured) ?? published[0];
+}
+
+/**
+ * The distinct categories of the published collection, ordered by first
+ * appearance. The index builds its topic filter from this — and renders
+ * nothing until there are at least two, because a one-item filter is a
+ * control that filters nothing.
+ */
+export function getCategories(articles?: InsightArticle[]): string[] {
+  const list = articles ?? getPublishedArticles();
+  const seen = new Set<string>();
+  for (const article of list) {
+    if (!seen.has(article.category)) seen.add(article.category);
+  }
+  return [...seen];
+}
+
+/** The byline, with the site default applied when the article names none. */
+export function getAuthor(article: InsightArticle): string {
+  return article.author ?? DEFAULT_AUTHOR;
+}
 
 export function getArticleBySlug(slug: string): InsightArticle | undefined {
   return ARTICLES.find((article) => article.slug === slug);

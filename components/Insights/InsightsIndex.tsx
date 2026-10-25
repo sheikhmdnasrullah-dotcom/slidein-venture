@@ -1,34 +1,43 @@
 "use client";
 
 /**
- * INSIGHTS INDEX — an editorial masthead, not a card grid.
+ * INSIGHTS INDEX — the article directory.
  * ---------------------------------------------------------------------------
- * WHY NOT A CARD GRID
- * A one-item directory rendered as a rounded box with a shadow, an arrow and
- * a hover lift is the shape every content list defaults to, and it is the
- * shape that reads as filler: the box says "item" without saying anything
- * about what the item IS. So there is no box.
+ * A quiet journal: a publication header, one featured article set as an
+ * editorial spread, and a hairline archive beneath it. The articles are the
+ * product; this page exists for discovery. If every animation were removed
+ * the page would still hold together — the composition is type, hierarchy
+ * and spacing, not motion.
  *
- * What is here instead is the article's own front page, built from the
- * article's own words: the topic line as a masthead eyebrow, the headline
- * set as a masthead, the opening paragraph as a standfirst, and the
- * article's own section headings as the contents. Every string is read out
- * of the article object — the headings are the article's headings, not a
- * navigation menu written for the page.
+ * ── RULES THAT HOLD HERE ────────────────────────────────────────────────────
  *
- * ── NOTHING INVENTED ────────────────────────────────────────────────────────
- * There is no page heading, no date, no "read more", no category label, no
- * byline, no reading time, no count of anything. None of those strings exist
- * in content/insights.ts, so writing them here would put words on the site
- * that nobody approved. The arrow is a glyph for the same reason.
+ *  NO CARDS. No rounded rectangles, shadows, hover lifts or glass. An entry
+ *  is a headline, a date and a hairline — the box is what filler looks like.
+ *
+ *  THE FEATURED ARTICLE IS ALSO IN THE ARCHIVE. The featured spread is a
+ *  lens on the newest (or pinned) piece; the archive below is the complete
+ *  directory. One must not silently hide the other.
+ *
+ *  THE FILTER RENDERS ONLY WHEN IT FILTERS. The topic filter is built from
+ *  the real categories in the collection and activates automatically the
+ *  moment a second category exists. With one category it would be a control
+ *  that controls nothing, so it is not rendered.
+ *
+ *  NOTHING INVENTED. Headlines, excerpts, dates, categories and reading
+ *  times all come out of content/insights.ts (reading time derived from
+ *  word count there). The only strings authored here are the sanctioned
+ *  interface labels: the "Insights" masthead, the owner-approved index
+ *  description passed in as a prop, "All articles", "Read article" and the
+ *  "min read" unit.
  *
  * ── HYDRATION ───────────────────────────────────────────────────────────────
- * The reduced-motion preference reaches MotionConfig and the transition
- * duration only. It never reaches the rendered tree or an initial style:
- * both are serialised into the SSR HTML, so branching either on
- * useReducedMotion makes the first client render disagree with the server.
+ * The reduced-motion preference reaches the transition duration only. It
+ * never reaches the rendered tree or an initial style: both are serialised
+ * into the SSR HTML, so branching either on useReducedMotion makes the first
+ * client render disagree with the server.
  */
 
+import { useState } from "react";
 import Link from "next/link";
 import {
   motion,
@@ -37,200 +46,316 @@ import {
   type Variants,
 } from "framer-motion";
 import { Section } from "@/components/Section";
-import { cn } from "@/lib/utils";
-import type { InsightArticle } from "@/content/insights";
+import {
+  getCategories,
+  getFeaturedArticle,
+  getReadingTime,
+  type InsightArticle,
+} from "@/content/insights";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 
+/** Long headlines stack; short ones may sit beside a measure of metadata. */
+const STACKED_HEADLINE = 64;
+
 export default function InsightsIndex({
   articles,
+  description,
 }: {
   articles: InsightArticle[];
+  description: string;
 }) {
   const still = !!useReducedMotion();
 
   const rise: Variants = {
-    hidden: { opacity: 0, y: 12 },
+    hidden: { opacity: 0, y: 10 },
     show: {
       opacity: 1,
       y: 0,
-      transition: still ? { duration: 0 } : { duration: 0.6, ease: EASE },
+      transition: still ? { duration: 0 } : { duration: 0.55, ease: EASE },
     },
   };
 
+  const featured = getFeaturedArticle();
+  const categories = getCategories(articles);
+
+  /* Topic-filter plumbing. `active` stays null (All) until the reader picks
+     a category; the control itself renders only when there is more than one
+     category to choose between. */
+  const [active, setActive] = useState<string | null>(null);
+  const visible = active
+    ? articles.filter((article) => article.category === active)
+    : articles;
+
   return (
     <MotionConfig reducedMotion="user">
-      {articles.map((article, ai) => (
-        <Section
-          key={article.slug}
-          tone={ai === 0 ? "hero" : "base"}
-          pad="none"
-          className="insights-paper"
-        >
-          <EditorialEntry
-            article={article}
+      <Section
+        tone="base"
+        pad="none"
+        className="insights-paper pt-[calc(96px+clamp(2.5rem,5vw,4.5rem))] pb-24 md:pb-32"
+      >
+        <div className="mx-auto max-w-[68rem] px-6 md:px-10">
+          {/* ── Publication header ─────────────────────────────────────── */}
+          <motion.header variants={rise} initial="hidden" animate="show">
+            <h1 className="font-display-xl text-[clamp(2.75rem,7vw,5.5rem)] leading-[1.02] tracking-tight text-[var(--on-surface)]">
+              Insights
+            </h1>
+            <p className="mt-6 max-w-[42rem] text-[1.0625rem] leading-[1.7] text-[var(--muted)] md:text-[1.125rem]">
+              {description}
+            </p>
+            <div
+              aria-hidden="true"
+              className="mt-12 h-px w-full"
+              style={{ background: "var(--rule)" }}
+            />
+          </motion.header>
+
+          {/* ── Featured article ───────────────────────────────────────── */}
+          {featured && (
+            <FeaturedSpread article={featured} variants={rise} />
+          )}
+
+          {/* ── Archive ────────────────────────────────────────────────── */}
+          <motion.section
+            aria-labelledby="insights-archive"
+            className="mt-20 md:mt-28"
             variants={rise}
-            first={ai === 0}
-            last={ai === articles.length - 1}
-          />
-        </Section>
-      ))}
+            initial="hidden"
+            whileInView="show"
+            viewport={{ once: true, amount: 0.2 }}
+          >
+            <div className="flex flex-wrap items-baseline justify-between gap-4">
+              <h2
+                id="insights-archive"
+                className="font-display-md text-[clamp(1.4rem,2.4vw,1.9rem)] leading-tight text-[var(--on-surface)]"
+              >
+                All articles
+              </h2>
+
+              {/* The topic filter — only when there is a real choice. */}
+              {categories.length >= 2 && (
+                <nav aria-label="Filter articles by topic">
+                  <ul className="flex flex-wrap items-baseline gap-x-5 gap-y-2">
+                    <li>
+                      <FilterButton
+                        label="All"
+                        current={active === null}
+                        onSelect={() => setActive(null)}
+                      />
+                    </li>
+                    {categories.map((category) => (
+                      <li key={category}>
+                        <FilterButton
+                          label={category}
+                          current={active === category}
+                          onSelect={() => setActive(category)}
+                        />
+                      </li>
+                    ))}
+                  </ul>
+                </nav>
+              )}
+            </div>
+
+            {/* The featured article appears here too: the spread above is a
+                lens on one piece, this list is the whole directory. */}
+            <ul
+              className="mt-8 border-t md:mt-10"
+              style={{ borderColor: "var(--rule)" }}
+            >
+              {visible.map((article) => (
+                <ArchiveEntry
+                  key={article.slug}
+                  article={article}
+                  variants={rise}
+                />
+              ))}
+            </ul>
+          </motion.section>
+        </div>
+      </Section>
     </MotionConfig>
   );
 }
 
-/**
- * One article as a front page. With a single article the masthead, the
- * standfirst and the contents all sit in one column; the contents link
- * straight into the article, so the index is a way in rather than a summary.
- */
-function EditorialEntry({
+/* ─── The featured spread ─────────────────────────────────────────────────── */
+function FeaturedSpread({
   article,
   variants,
-  first,
-  last,
 }: {
   article: InsightArticle;
   variants: Variants;
-  first: boolean;
-  last: boolean;
+}) {
+  const href = `/insights/${article.slug}`;
+  const stacked = article.title.length > STACKED_HEADLINE;
+
+  return (
+    <motion.article
+      aria-label={article.title}
+      className="pt-16 md:pt-24"
+      variants={variants}
+      initial="hidden"
+      whileInView="show"
+      viewport={{ once: true, amount: 0.2 }}
+    >
+      <ArticleMeta article={article} />
+
+      <div
+        className={
+          stacked
+            ? "mt-8"
+            : "mt-8 grid gap-10 md:grid-cols-[minmax(0,1fr)_minmax(0,22rem)] md:gap-16"
+        }
+      >
+        <h2 className="font-display-xl text-[clamp(2rem,4.6vw,3.5rem)] leading-[1.08] tracking-tight text-[var(--on-surface)]">
+          <Link
+            href={href}
+            className="outline-none transition-colors duration-300 hover:text-[var(--accent)] focus-visible:ring-2 focus-visible:ring-[var(--accent-ring)] focus-visible:ring-offset-4 focus-visible:ring-offset-[var(--scaffold-bg)]"
+          >
+            {article.title}
+          </Link>
+        </h2>
+
+        <div className={stacked ? "mt-8 max-w-[42rem]" : "self-end"}>
+          <p className="text-[1.0625rem] leading-[1.75] text-[var(--muted)] md:text-[1.125rem]">
+            {article.excerpt}
+          </p>
+          <div className="mt-8">
+            <ReadArticleLink href={href} />
+          </div>
+        </div>
+      </div>
+    </motion.article>
+  );
+}
+
+/* ─── One archive entry ───────────────────────────────────────────────────── */
+function ArchiveEntry({
+  article,
+  variants,
+}: {
+  article: InsightArticle;
+  variants: Variants;
 }) {
   const href = `/insights/${article.slug}`;
 
   return (
-    <div
-      /* Top clearance belongs to the FIRST entry; bottom room to the LAST.
-         Driving both off `last` meant that with a single article — which is
-         first AND last — the masthead got no top padding at all and ran
-         straight under the fixed nav. */
-      className={cn(
-        "mx-auto max-w-[840px] px-6 md:px-10",
-        first && "pt-[calc(96px+clamp(2.5rem,5vw,4.5rem))]",
-        last ? "pb-28" : "pb-20",
-      )}
+    <motion.li
+      variants={variants}
+      initial="hidden"
+      whileInView="show"
+      viewport={{ once: true, amount: 0.3 }}
+      className="border-b"
+      style={{ borderColor: "var(--rule)" }}
     >
-      {/* Masthead eyebrow — the article's own topic line. */}
-      <motion.p
-        variants={variants}
-        initial="hidden"
-        animate="show"
-        style={{
-          color: "var(--accent)",
-          fontSize: "0.8125rem",
-          letterSpacing: "0.08em",
-        }}
-      >
-        {article.topic}
-      </motion.p>
+      <article className="grid gap-3 py-8 md:grid-cols-[11rem_minmax(0,1fr)_auto] md:gap-10 md:py-10">
+        {/* Left column — date and category, mono, muted. */}
+        <div className="flex items-baseline gap-3 md:flex-col md:gap-1.5">
+          <time
+            dateTime={article.date}
+            className="font-label text-[var(--muted)]"
+          >
+            {article.formattedDate}
+          </time>
+          <span className="font-label text-[var(--muted)]">
+            <span
+              aria-hidden="true"
+              className="mr-1.5 inline-block h-[0.45em] w-[0.45em] rounded-full align-baseline"
+              style={{ background: "var(--accent)" }}
+            />
+            {article.category}
+          </span>
+        </div>
 
-      {/* Masthead — the headline, unedited, at display scale. */}
-      <motion.h1
-        variants={variants}
-        initial="hidden"
-        animate="show"
-        transition={undefined}
-        className="font-display-xl mt-6 text-[clamp(2.1rem,5.2vw,4rem)] leading-[1.06] tracking-tight text-[var(--on-surface)]"
-      >
-        {article.title}
-      </motion.h1>
-
-      {/* The accent rule: one hairline that opens out to the full measure. */}
-      <motion.div
-        variants={variants}
-        initial="hidden"
-        animate="show"
-        aria-hidden="true"
-        className="mt-10 h-px w-full origin-left"
-        style={{ background: "var(--rule)" }}
-      />
-
-      <div className="mt-10 grid gap-10 md:grid-cols-[minmax(0,1fr)_auto] md:gap-16">
-        {/* Standfirst — the article's own opening words. */}
-        <motion.div
-          variants={variants}
-          initial="hidden"
-          animate="show"
-          className="min-w-0 space-y-5 text-[1.0625rem] leading-[1.75] text-[var(--on-surface)] md:text-[1.125rem]"
-        >
-          {article.intro.slice(0, 3).map((p, i) => (
-            <p
-              key={i}
-              className={
-                i === 0 ? "text-[var(--on-surface)]" : "text-[var(--muted)]"
-              }
+        {/* Main column — the headline is the dominant element. */}
+        <div className="min-w-0">
+          <h3 className="font-display-md text-[clamp(1.35rem,2.6vw,1.85rem)] leading-[1.15] tracking-tight text-[var(--on-surface)]">
+            <Link
+              href={href}
+              className="outline-none transition-colors duration-300 hover:text-[var(--accent)] focus-visible:ring-2 focus-visible:ring-[var(--accent-ring)] focus-visible:ring-offset-4 focus-visible:ring-offset-[var(--scaffold-bg)]"
             >
-              {typeof p === "string" ? p : p.text}
-            </p>
-          ))}
-        </motion.div>
+              {article.title}
+            </Link>
+          </h3>
+          <p className="mt-3 max-w-[46rem] text-[0.9375rem] leading-[1.65] text-[var(--muted)]">
+            {article.excerpt}
+          </p>
+        </div>
 
-        {/* Contents — the article's OWN section headings and indices. */}
-        <motion.nav
-          variants={variants}
-          initial="hidden"
-          animate="show"
-          aria-hidden="true"
-          className="md:w-[248px] md:shrink-0"
-        >
-          <ol className="flex flex-col gap-3.5">
-            {article.sections.map((section) => (
-              <li key={section.index}>
-                <Link
-                  href={`${href}#${section.index}`}
-                  tabIndex={-1}
-                  data-testid="insight-toc"
-                  className="group flex items-baseline gap-3 outline-none"
-                >
-                  <span
-                    className="font-mono text-[0.6875rem] tabular-nums"
-                    style={{ color: "var(--accent)" }}
-                  >
-                    {section.index}
-                  </span>
-                  <span className="text-[0.9375rem] leading-snug text-[var(--muted)] transition-colors duration-300 group-hover:text-[var(--on-surface)]">
-                    {section.heading}
-                  </span>
-                </Link>
-              </li>
-            ))}
-          </ol>
-        </motion.nav>
-      </div>
-
-      {/* The single affordance: an arrow glyph, not a label. */}
-      <motion.div
-        variants={variants}
-        initial="hidden"
-        animate="show"
-        className="mt-12"
-      >
-        <Link
-          href={href}
-          data-testid="insight-card"
-          className="group inline-flex items-center gap-3 rounded-full outline-none focus-visible:ring-2 focus-visible:ring-offset-4 focus-visible:ring-[color-mix(in_oklch,var(--color-brand)_60%,transparent)] focus-visible:ring-offset-[var(--scaffold-bg)]"
-          aria-label={article.title}
-        >
+        {/* Right column — reading time and a quiet directional mark. */}
+        <div className="flex items-center gap-4 md:flex-col md:items-end md:gap-1.5">
+          <span className="font-label text-[var(--muted)]">
+            {getReadingTime(article)} min read
+          </span>
           <span
             aria-hidden="true"
-            className="flex h-11 w-11 items-center justify-center rounded-full border transition-colors duration-300 group-hover:border-[var(--scaffold-rule)]"
-            style={{
-              borderColor: "var(--scaffold-hairline)",
-              background: "var(--scaffold-accent-row)",
-            }}
+            className="font-label text-[var(--faint)] md:mt-2"
           >
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-              <path
-                d="M3.5 12.5 L12.5 3.5 M12.5 3.5 H6.5 M12.5 3.5 V9.5"
-                stroke="var(--accent)"
-                strokeWidth="1.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                className="transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
-              />
-            </svg>
+            →
           </span>
-        </Link>
-      </motion.div>
-    </div>
+        </div>
+      </article>
+    </motion.li>
+  );
+}
+
+/* ─── Shared small parts ──────────────────────────────────────────────────── */
+
+/** Category · date · reading time, in one muted mono line. */
+function ArticleMeta({ article }: { article: InsightArticle }) {
+  return (
+    <p className="flex flex-wrap items-baseline gap-x-4 gap-y-1.5 font-label text-[var(--muted)]">
+      <span style={{ color: "var(--accent)" }}>{article.category}</span>
+      <span aria-hidden="true" className="text-[var(--faint)]">
+        /
+      </span>
+      <time dateTime={article.date}>{article.formattedDate}</time>
+      <span aria-hidden="true" className="text-[var(--faint)]">
+        /
+      </span>
+      <span>{getReadingTime(article)} min read</span>
+    </p>
+  );
+}
+
+/** The one sanctioned call to action: text, a small arrow, a quiet hover. */
+function ReadArticleLink({ href }: { href: string }) {
+  return (
+    <Link
+      href={href}
+      data-testid="insight-card"
+      className="group inline-flex items-baseline gap-2 font-label text-[var(--on-surface)] outline-none transition-colors duration-300 hover:text-[var(--accent)] focus-visible:ring-2 focus-visible:ring-[var(--accent-ring)] focus-visible:ring-offset-4 focus-visible:ring-offset-[var(--scaffold-bg)]"
+    >
+      Read article
+      <span
+        aria-hidden="true"
+        className="inline-block transition-transform duration-300 group-hover:translate-x-1"
+        style={{ color: "var(--accent)" }}
+      >
+        →
+      </span>
+    </Link>
+  );
+}
+
+function FilterButton({
+  label,
+  current,
+  onSelect,
+}: {
+  label: string;
+  current: boolean;
+  onSelect: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onSelect}
+      aria-pressed={current}
+      className="font-label outline-none transition-colors duration-300 focus-visible:ring-2 focus-visible:ring-[var(--accent-ring)] focus-visible:ring-offset-4 focus-visible:ring-offset-[var(--scaffold-bg)]"
+      style={{ color: current ? "var(--accent)" : "var(--muted)" }}
+    >
+      {label}
+    </button>
   );
 }

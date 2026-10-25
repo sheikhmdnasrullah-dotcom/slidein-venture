@@ -15,6 +15,9 @@
 | `/solutions` | Exists |
 | `/pricing` | Exists |
 | `/portfolio` | **Missing — linked from header nav, 404s today** |
+| `/insights` | Exists — article directory (rebuilt 2026-10-25) |
+| `/insights/{slug}` | Exists — long-form article reader |
+| `/ai-pipeline-emas` | Removed — permanent redirect to `/insights/ai-pipeline-emas` |
 
 The `Footer` component declares **24 links; 22 resolve to nothing** (`/product/ai`,
 `/product/agents`, `/product/wikis`, `/product/calendar`, `/product/projects`,
@@ -102,6 +105,8 @@ graph TD
 | Portfolio | `/portfolio` | Home | Header | High | **Broken link** |
 | Case study | `/portfolio/{slug}` | Portfolio | Contextual | Medium | To build |
 | Pricing | `/pricing` | Home | Header | High | Live |
+| Insights | `/insights` | Home | Header | Medium | Live |
+| Insight article | `/insights/{slug}` | Insights | Contextual | Medium | Live |
 | About | `/about` | Home | Footer | Low | To build |
 | Contact | `/contact` | Home | Header CTA | High | To build |
 | Privacy | `/privacy` | Home | Footer | Low | To build |

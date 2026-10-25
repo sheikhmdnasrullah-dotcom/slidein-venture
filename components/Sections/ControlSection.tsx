@@ -76,7 +76,7 @@ function Row({
         onClick={onToggle}
         aria-expanded={open}
         aria-controls={id}
-        className="flex w-full items-center justify-between gap-6 py-6 text-left"
+        className="flex w-full items-center justify-between gap-6 rounded-[6px] px-3 py-6 text-left transition-colors duration-300 hover:bg-[color-mix(in_oklch,var(--color-paper-25)_4%,transparent)]"
       >
         {/* title slot — h3 scale */}
         <span className="min-w-0">

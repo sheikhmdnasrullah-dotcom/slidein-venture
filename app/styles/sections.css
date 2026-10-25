@@ -245,3 +245,84 @@
 @media (prefers-reduced-motion: reduce) {
   .shine::after { display: none; }
 }
+
+/* ── Capabilities hover micro-scenes ──────────────────────────────────────
+   Rest states are identical to the static reference frames; the gestures
+   below run only while the matching cell is hovered (one-shot, never
+   looping), and the global reduced-motion backstop collapses them to 1ms. */
+
+/* The scan line sweeps across the well once on hover. */
+@keyframes cap-scan-sweep {
+  from { left: 26px; }
+  to { left: calc(100% - 28px); }
+}
+
+.cap-well:hover .cap-scan {
+  animation: cap-scan-sweep 1.5s var(--ease-expo) 1;
+}
+
+/* Scanned rows earn a whisper of wash as the line passes — hover-only. */
+.cap-well .cap-row {
+  transition: background-color 0.4s var(--ease-expo);
+  border-radius: var(--radius-sm);
+}
+
+.cap-well:hover .cap-row {
+  background: rgb(10 10 10 / 2.5%);
+}
+
+/* Compose: the saved versions drift apart and the caret blinks once. */
+@keyframes cap-caret-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.25; }
+}
+
+.cap-well:hover .cap-version-a {
+  transform: translateX(-3px);
+}
+
+.cap-well:hover .cap-version-b {
+  transform: translateX(-6px);
+}
+
+.cap-well:hover .cap-caret {
+  animation: cap-caret-blink 0.9s var(--ease-std) 2;
+}
+
+.cap-version-a,
+.cap-version-b {
+  transition: transform 0.5s var(--ease-expo);
+}
+
+.cap-caret {
+  transition: opacity 0.3s var(--ease-std);
+}
+
+/* Send: the plane nudges toward the gate on hover. (Tailwind v4 keeps the
+   -translate-y-1/2 in the `translate` property, so only X moves here.) */
+.cap-well:hover .cap-plane {
+  transform: translateX(-7px);
+}
+
+.cap-plane {
+  transition: transform 0.5s var(--ease-expo);
+}
+
+/* Reply: the bubble settles in and the spike dot answers on hover. */
+@keyframes cap-dot-ping {
+  0% { box-shadow: 0 0 0 0 color-mix(in oklch, var(--color-brand) 30%, transparent); }
+  100% { box-shadow: 0 0 0 9px color-mix(in oklch, var(--color-brand) 0%, transparent); }
+}
+
+.cap-well:hover .cap-bubble {
+  animation: cap-bubble-in 0.6s var(--ease-expo) 1;
+}
+
+.cap-well:hover .cap-dot {
+  animation: cap-dot-ping 0.9s var(--ease-std) 1;
+}
+
+@keyframes cap-bubble-in {
+  0% { transform: translateY(-6px) scale(0.94); opacity: 0.6; }
+  100% { transform: translateY(0) scale(1); opacity: 1; }
+}

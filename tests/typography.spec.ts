@@ -136,11 +136,16 @@ test('mobile sheet has 28px links and closes cleanly', async ({ page }) => {
   await expect(sheetLink).toBeHidden();
 });
 
-test('inter tight renders nav, headline and body', async ({ page }) => {
+test('loaded faces render nav, headline and body', async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto(`${ORIGIN}/`);
   await page.evaluate(() => document.fonts.ready);
 
+  /* The single-face "Inter Tight" era ended: the display role resolves to
+     Fraunces, body to the self-hosted Switzer subset (exposed to CSS as the
+     next/font local family name `bodyFace`). The assertion checks the real
+     stacks — a slot must render in a LOADED face, never a bare system
+     fallback. */
   const families = await page.evaluate(() => {
     const fam = (sel: string) => {
       const el = document.querySelector(sel);
@@ -152,8 +157,13 @@ test('inter tight renders nav, headline and body', async ({ page }) => {
       body: fam('main p, main'),
     };
   });
-  for (const [slot, family] of Object.entries(families)) {
-    expect(family, `${slot} font-family`).toMatch(/Inter Tight/i);
+  expect(families.headline, `headline font-family: ${families.headline}`).toMatch(
+    /Fraunces/i
+  );
+  for (const slot of ['nav', 'body'] as const) {
+    expect(families[slot], `${slot} font-family: ${families[slot]}`).toMatch(
+      /Fraunces|bodyFace|Switzer/i
+    );
   }
 });
 

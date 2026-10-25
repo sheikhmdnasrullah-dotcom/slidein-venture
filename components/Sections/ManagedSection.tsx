@@ -11,14 +11,19 @@
  * anchor sits its item slot: the two ways to run the same platform,
  * visually feeding the middle.
  *
- * Static by story rule (the page's loops belong to the hero): the orbit
- * rests at its reference angles and the beams run ink-only. Mobile drops
- * the orbit entirely: centre tile on top, anchors stacked below with
- * short vertical hairlines and a single static accent dot between them.
+ * Static by story rule (the page's loops belong to the hero), except for one
+ * scroll-linked drift: the rings rotate slowly in opposite directions as the
+ * band travels through the viewport, every tile counter-rotating to stay
+ * upright. The orbit still rests wherever the scroll rests, and reduced
+ * motion gets the fully static stage. Mobile drops the orbit entirely:
+ * centre tile on top, anchors stacked below with short vertical hairlines
+ * and a single static accent dot between them.
  * Every visual is aria-hidden; the slots are the only readable content.
  */
 
 import { useEffect, useRef, useState } from 'react';
+import { gsap } from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { HOME_CONTENT } from '@/content/home';
 import { BAND_DISORDER } from '@/content/stages';
 import {
@@ -41,6 +46,10 @@ import {
   UserIcon,
 } from '@/components/Sections/icons';
 
+if (typeof window !== 'undefined') {
+  gsap.registerPlugin(ScrollTrigger);
+}
+
 const TILE = 52; // small orbiting tile
 const CENTER = 128; // centre platform tile
 const ANCHOR = 84; // the two run-mode anchors
@@ -49,14 +58,24 @@ export type OrbitTile = { angle: number; Icon: typeof SearchIcon };
 
 /* One ring: a hairline circle carrying three small tiles at fixed rest
    angles. Each tile counter-rotates by its own angle so its icon stays
-   upright while its position sits on the ring. */
+   upright while its position sits on the ring. The ring may also take a
+   ref so the section can scroll-link a slow orbit drift. */
 export const ORBIT_TILE = TILE;
 export const ORBIT_CENTRE = CENTER;
 
-export function OrbitRing({ radius, tiles }: { radius: number; tiles: OrbitTile[] }) {
+export function OrbitRing({
+  radius,
+  tiles,
+  ringRef,
+}: {
+  radius: number;
+  tiles: OrbitTile[];
+  ringRef?: React.RefObject<HTMLDivElement | null>;
+}) {
   const d = radius * 2;
   return (
     <div
+      ref={ringRef}
       className="absolute left-1/2 top-1/2"
       style={{ width: d, height: d, marginLeft: -radius, marginTop: -radius }}
     >
@@ -75,7 +94,7 @@ export function OrbitRing({ radius, tiles }: { radius: number; tiles: OrbitTile[
               marginTop: -TILE / 2,
             }}
           >
-            <div style={{ transform: `rotate(${-angle}deg)` }}>
+            <div data-orbit-counter style={{ transform: `rotate(${-angle}deg)` }}>
               <GlossTile size={TILE} icon={<Icon />} />
             </div>
           </div>
@@ -92,6 +111,8 @@ function Beam({ d }: { d: string }) {
 
 function DesktopStage({ items }: { items: { title: string; body: string }[] }) {
   const stageRef = useRef<HTMLDivElement>(null);
+  const outerRingRef = useRef<HTMLDivElement>(null);
+  const innerRingRef = useRef<HTMLDivElement>(null);
   const [size, setSize] = useState({ w: 1080, h: 480 });
 
   useEffect(() => {
@@ -102,6 +123,31 @@ function DesktopStage({ items }: { items: { title: string; body: string }[] }) {
     const ro = new ResizeObserver(measure);
     ro.observe(el);
     return () => ro.disconnect();
+  }, []);
+
+  /* Scroll-linked orbit drift: as the band travels through the viewport the
+     rings rotate slowly in opposite directions while every tile
+     counter-rotates to stay upright. Not a loop — the orbit rests wherever
+     the scroll rests — and skipped entirely under reduced motion. */
+  useEffect(() => {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const trigger = stageRef.current;
+    if (!trigger) return;
+    const ctx = gsap.context(() => {
+      const spins: [React.RefObject<HTMLDivElement | null>, number][] = [
+        [outerRingRef, 26],
+        [innerRingRef, -18],
+      ];
+      spins.forEach(([ref, deg]) => {
+        const ring = ref.current;
+        if (!ring) return;
+        const counters = ring.querySelectorAll('[data-orbit-counter]');
+        const st = { trigger, start: 'top bottom', end: 'bottom top', scrub: 0.8 };
+        gsap.to(ring, { rotation: deg, ease: 'none', scrollTrigger: st });
+        gsap.to(counters, { rotation: `-=${deg}`, ease: 'none', scrollTrigger: { ...st } });
+      });
+    }, trigger);
+    return () => ctx.revert();
   }, []);
 
   const cx = size.w / 2;
@@ -120,6 +166,7 @@ function DesktopStage({ items }: { items: { title: string; body: string }[] }) {
         {/* concentric hairline rings with the orbiting small tiles */}
         <OrbitRing
           radius={215}
+          ringRef={outerRingRef}
           tiles={[
             { angle: 0, Icon: SearchIcon },
             { angle: 120, Icon: SendIcon },
@@ -128,6 +175,7 @@ function DesktopStage({ items }: { items: { title: string; body: string }[] }) {
         />
         <OrbitRing
           radius={150}
+          ringRef={innerRingRef}
           tiles={[
             { angle: 60, Icon: EyeIcon },
             { angle: 180, Icon: PenIcon },
@@ -149,8 +197,11 @@ function DesktopStage({ items }: { items: { title: string; body: string }[] }) {
           <GlossTile size={ANCHOR} icon={<GearIcon />} />
         </div>
 
-        {/* the platform at the exact centre */}
-        <div className="absolute left-1/2 top-1/2" style={{ marginLeft: -CENTER / 2, marginTop: -CENTER / 2 }}>
+        {/* the platform at the exact centre — hover gives it a breath of lift */}
+        <div
+          className="absolute left-1/2 top-1/2 transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] hover:scale-[1.04]"
+          style={{ marginLeft: -CENTER / 2, marginTop: -CENTER / 2 }}
+        >
           <GlossTile size={CENTER} icon={<StackIcon />} />
         </div>
       </Scene>

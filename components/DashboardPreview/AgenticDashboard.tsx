@@ -61,9 +61,6 @@ import { type StageId } from '@/content/stages';
 import ConfigureBrain from './ConfigureBrain';
 import React from 'react';
 import { cn } from '@/lib/utils';
-import { PEOPLE } from '@/components/prospect-journey/journey';
-
-const PEOPLE_KEYS = ['daniel', 'olivia', 'marcus', 'sophia'] as const;
 import { sceneMarkup } from '@/components/prospect-journey/journey';
 import '@/components/prospect-journey/journey.css';
 import { BrainDesign } from '@/components/Playbook/BrainDesign';
@@ -554,7 +551,10 @@ export const SCROLL_STAGES: StageId[] = [...SIDEBAR_STAGES, 'overview'];
 type SearchItem = {
   id: string;
   category: 'Stages' | 'Accounts' | 'Quick actions';
-  title: string;
+  /* Wordless rows render bars instead of a title; stage rows keep their
+     real equation word. */
+  title?: string;
+  bars?: [string, string];
   badge?: string;
   stage: StageId;
 };
@@ -569,15 +569,17 @@ const SEARCH_ITEMS: SearchItem[] = [
   { id: 's-converse', category: 'Stages', title: 'converse', badge: 'Active', stage: 'converse' },
   { id: 's-overview', category: 'Stages', title: 'overview', badge: 'Active', stage: 'overview' },
 
-  { id: 'a-cartwright', category: 'Accounts', title: 'Cartwright', badge: 'Dalian Carter', stage: 'research' },
-  { id: 'a-horizon', category: 'Accounts', title: 'Horizon Dynamics', badge: 'Marcus Chen', stage: 'discover' },
-  { id: 'a-meridian', category: 'Accounts', title: 'Meridian Analytics', badge: 'Sophia Martinez', stage: 'personalize' },
-  { id: 'a-apex', category: 'Accounts', title: 'Apex Velocity', badge: 'Olivia Vance', stage: 'converse' },
+  /* Accounts and quick actions carry no invented names or copy — a glyph
+     tile and two skeleton bars say "a result" without faking one. */
+  { id: 'a-1', category: 'Accounts', bars: ['58%', '38%'], stage: 'research' },
+  { id: 'a-2', category: 'Accounts', bars: ['46%', '30%'], stage: 'discover' },
+  { id: 'a-3', category: 'Accounts', bars: ['64%', '42%'], stage: 'personalize' },
+  { id: 'a-4', category: 'Accounts', bars: ['52%', '34%'], stage: 'converse' },
 
-  { id: 'q-research', category: 'Quick actions', title: 'Run research dossier', badge: 'Cartwright', stage: 'research' },
-  { id: 'q-qualify', category: 'Quick actions', title: 'Inspect qualification matrix', badge: '94% ICP Match', stage: 'qualify' },
-  { id: 'q-outreach', category: 'Quick actions', title: 'Inspect outbound delivery', badge: 'Dispatched', stage: 'outreach' },
-  { id: 'q-converse', category: 'Quick actions', title: 'View booked discovery calls', badge: 'Booked call', stage: 'converse' },
+  { id: 'q-1', category: 'Quick actions', bars: ['62%', '44%'], stage: 'research' },
+  { id: 'q-2', category: 'Quick actions', bars: ['70%', '48%'], stage: 'qualify' },
+  { id: 'q-3', category: 'Quick actions', bars: ['54%', '40%'], stage: 'outreach' },
+  { id: 'q-4', category: 'Quick actions', bars: ['60%', '36%'], stage: 'converse' },
 ];
 
 function SearchPalette({
@@ -600,7 +602,7 @@ function SearchPalette({
     if (!q) return SEARCH_ITEMS;
     return SEARCH_ITEMS.filter(
       (item) =>
-        item.title.toLowerCase().includes(q) ||
+        (item.title ?? '').toLowerCase().includes(q) ||
         (item.badge && item.badge.toLowerCase().includes(q)) ||
         item.category.toLowerCase().includes(q) ||
         item.stage.toLowerCase().includes(q),
@@ -718,13 +720,24 @@ function SearchPalette({
                       >
                         <StageGlyphIcon stage={item.stage} size={12} />
                       </span>
-                      <div className="flex flex-col min-w-0">
-                        <span className="truncate text-[12px] font-medium tracking-tight">
-                          {item.title}
-                        </span>
-                        <span className="truncate text-[9.5px] text-[rgba(10,10,10,0.45)]">
-                          {item.category}
-                        </span>
+                      <div className="flex min-w-0 flex-1 flex-col gap-1">
+                        {item.title ? (
+                          <>
+                            <span className="truncate text-[12px] font-medium tracking-tight">
+                              {item.title}
+                            </span>
+                            <span className="truncate text-[9.5px] text-[rgba(10,10,10,0.45)]">
+                              {item.category}
+                            </span>
+                          </>
+                        ) : (
+                          /* wordless result: bars say "a result" without
+                             inventing what it is */
+                          <>
+                            <Bar w={item.bars?.[0] ?? '50%'} h={6} />
+                            <Bar w={item.bars?.[1] ?? '30%'} h={5} />
+                          </>
+                        )}
                       </div>
                     </div>
 
@@ -965,13 +978,15 @@ function OverviewStageView({ onSelectStage }: { onSelectStage?: (stage: StageId)
         </div>
 
         <div className="flex items-center gap-2">
-          <span className="flex h-[22px] items-center gap-1.5 rounded-full border border-[rgba(43,138,62,0.22)] bg-[rgba(43,138,62,0.08)] px-2.5 shadow-2xs">
-            <span className="h-1.5 w-1.5 rounded-full bg-[rgb(43,138,62)] animate-pulse" />
-            <span className="text-[10px] font-medium text-[rgb(43,138,62)]">Pipeline Active</span>
+          {/* live state is carried by breathing dots, not claims */}
+          <span className="flex h-[22px] items-center rounded-full border border-[rgba(43,138,62,0.22)] bg-[rgba(43,138,62,0.08)] px-2.5 shadow-2xs">
+            <span className="relative flex h-[7px] w-[7px]">
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[rgb(43,138,62)] opacity-50" />
+              <span className="relative inline-flex h-[7px] w-[7px] rounded-full bg-[rgb(43,138,62)]" />
+            </span>
           </span>
-          <span className="hidden sm:flex h-[22px] items-center gap-1 rounded-full border border-[rgba(10,10,10,0.08)] bg-white px-2 text-[10px] font-medium text-[rgba(10,10,10,0.55)] shadow-2xs">
+          <span className="hidden sm:flex h-[22px] items-center rounded-full border border-[rgba(10,10,10,0.08)] bg-white px-2 shadow-2xs">
             <span className="h-1.5 w-1.5 rounded-full bg-[var(--scaffold-accent)]" />
-            <span>Live Sync</span>
           </span>
         </div>
       </div>
@@ -1015,54 +1030,52 @@ function OverviewStageView({ onSelectStage }: { onSelectStage?: (stage: StageId)
         </div>
       </div>
 
-      {/* 3 Telemetry Cards Grid — Realistic B2B Prospect Data */}
+      {/* 3 Telemetry Cards — wordless: every metric is a bar, a ring, a
+          dot, or a spark; the only words are the equation-vocabulary
+          footers. */}
       <div className="grid min-h-0 flex-1 grid-cols-1 sm:grid-cols-3 gap-2.5">
-        {/* Card 1: Target accounts */}
-        <div className="flex flex-col justify-between rounded-[14px] border border-[var(--scaffold-hairline)] bg-white p-3 shadow-xs">
+        {/* Card 1: Target account */}
+        <div className="flex flex-col justify-between rounded-[14px] border border-[var(--scaffold-hairline)] bg-white p-3 shadow-xs transition-shadow duration-300 hover:shadow-[var(--scaffold-shadow-soft)]">
           <div>
             <div className="flex items-center justify-between border-b border-[var(--scaffold-hairline)] pb-1.5">
               <div className="flex items-center gap-1.5">
                 <span className="h-1.5 w-1.5 rounded-full bg-[var(--scaffold-accent)]" />
-                <span className="text-[11px] font-semibold text-[rgba(10,10,10,0.85)]">Target accounts</span>
+                <Bar w={72} h={7} />
               </div>
-              <span className="flex items-center gap-1 rounded-full bg-[rgba(43,138,62,0.1)] px-1.5 py-0.5 text-[9px] font-medium text-[rgb(43,138,62)]">
+              <span className="flex items-center rounded-full bg-[rgba(43,138,62,0.1)] px-1.5 py-0.5">
                 <span className="h-1 w-1 rounded-full bg-[rgb(43,138,62)]" />
-                <span>Active</span>
               </span>
             </div>
 
-            {/* Target Account Profile */}
+            {/* Anonymous account profile — face, bars, no identity */}
             <div className="mt-2.5 flex items-center justify-between rounded-[10px] border border-[rgba(10,10,10,0.06)] bg-[var(--scaffold-panel)] p-2">
               <div className="flex items-center gap-2">
                 <img
                   src="/journey-faces/daniel.png"
-                  alt="Dalian Carter"
+                  alt=""
                   className="h-8 w-8 rounded-full object-cover border border-[var(--scaffold-hairline)] shadow-2xs"
                 />
-                <div className="flex flex-col">
-                  <span className="text-[11px] font-semibold text-[rgba(10,10,10,0.9)]">Dalian Carter</span>
-                  <span className="text-[9.5px] font-medium text-[rgba(10,10,10,0.5)]">Founder & CEO</span>
+                <div className="flex flex-col gap-1">
+                  <Bar w={64} h={6} />
+                  <Bar w={40} h={5} />
                 </div>
               </div>
-              <span className="rounded-md border border-[rgba(10,10,10,0.08)] bg-white px-1.5 py-0.5 text-[9px] font-medium text-[rgba(10,10,10,0.7)] shadow-2xs">
-                Cartwright
-              </span>
+              <span className="h-[18px] w-[18px] rounded-[6px] border border-[rgba(10,10,10,0.08)] bg-white shadow-2xs" />
             </div>
 
-            {/* Account Details & Public Signals */}
+            {/* Public-signal rows: dots + bars, no claims */}
             <div className="mt-2 flex flex-col gap-1.5">
-              <div className="flex items-center justify-between rounded-[6px] border border-[rgba(10,10,10,0.04)] bg-white px-2 py-1">
-                <span className="text-[9.5px] text-[rgba(10,10,10,0.55)]">Series B · $18M</span>
-                <span className="text-[9px] font-medium text-[rgba(10,10,10,0.4)]">40 employees · SaaS</span>
-              </div>
-              <div className="flex items-center gap-1.5 rounded-[6px] border border-[rgba(10,10,10,0.04)] bg-white px-2 py-1">
-                <span className="h-1 w-1 rounded-full bg-[var(--scaffold-accent)]" />
-                <span className="text-[9.5px] text-[rgba(10,10,10,0.65)]">Active hiring signals</span>
-              </div>
-              <div className="flex items-center gap-1.5 rounded-[6px] border border-[rgba(10,10,10,0.04)] bg-white px-2 py-1">
-                <span className="h-1 w-1 rounded-full bg-[rgb(43,138,62)]" />
-                <span className="text-[9.5px] text-[rgba(10,10,10,0.65)]">Europe and North America</span>
-              </div>
+              {[
+                { dot: 'var(--scaffold-accent)', w1: '52%', w2: '34%' },
+                { dot: 'rgb(43,138,62)', w1: '60%', w2: '28%' },
+                { dot: 'rgba(10,10,10,0.25)', w1: '44%', w2: '38%' },
+              ].map((row, i) => (
+                <div key={i} className="flex items-center gap-1.5 rounded-[6px] border border-[rgba(10,10,10,0.04)] bg-white px-2 py-1">
+                  <span className="h-1 w-1 shrink-0 rounded-full" style={{ background: row.dot }} />
+                  <span className="block h-[6px] rounded-full" style={{ width: row.w1, background: 'var(--scaffold-skeleton)' }} />
+                  <span className="block h-[5px] rounded-full" style={{ width: row.w2, background: 'var(--scaffold-skeleton)' }} />
+                </div>
+              ))}
             </div>
           </div>
 
@@ -1073,20 +1086,19 @@ function OverviewStageView({ onSelectStage }: { onSelectStage?: (stage: StageId)
         </div>
 
         {/* Card 2: Qualification */}
-        <div className="flex flex-col justify-between rounded-[14px] border border-[var(--scaffold-hairline)] bg-white p-3 shadow-xs">
+        <div className="flex flex-col justify-between rounded-[14px] border border-[var(--scaffold-hairline)] bg-white p-3 shadow-xs transition-shadow duration-300 hover:shadow-[var(--scaffold-shadow-soft)]">
           <div>
             <div className="flex items-center justify-between border-b border-[var(--scaffold-hairline)] pb-1.5">
               <div className="flex items-center gap-1.5">
                 <span className="h-1.5 w-1.5 rotate-45 bg-[rgb(43,138,62)]" />
-                <span className="text-[11px] font-semibold text-[rgba(10,10,10,0.85)]">Qualification</span>
+                <Bar w={58} h={7} />
               </div>
-              <span className="flex items-center gap-1 rounded-full bg-[rgba(43,138,62,0.1)] px-1.5 py-0.5 text-[9px] font-semibold text-[rgb(43,138,62)]">
+              <span className="flex items-center rounded-full bg-[rgba(43,138,62,0.1)] px-1.5 py-0.5">
                 <span className="h-1 w-1 rounded-full bg-[rgb(43,138,62)]" />
-                <span>94% ICP Match</span>
               </span>
             </div>
 
-            {/* Score Ring & Summary */}
+            {/* Score ring + fit bars — the ring is the number */}
             <div className="mt-2.5 flex items-center justify-between rounded-[10px] border border-[rgba(10,10,10,0.06)] bg-[var(--scaffold-panel)] p-2">
               <div className="flex items-center gap-2">
                 <div className="relative flex h-8 w-8 items-center justify-center">
@@ -1104,11 +1116,13 @@ function OverviewStageView({ onSelectStage }: { onSelectStage?: (stage: StageId)
                       strokeLinecap="round"
                     />
                   </svg>
-                  <span className="absolute text-[8.5px] font-bold text-[rgb(43,138,62)]">94</span>
+                  <svg width="9" height="9" viewBox="0 0 9 9" className="absolute text-[rgb(43,138,62)]">
+                    <path d="M1.8 4.8 L3.6 6.8 L7.4 2.4" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" fill="none" />
+                  </svg>
                 </div>
-                <div className="flex flex-col">
-                  <span className="text-[10px] font-semibold text-[rgba(10,10,10,0.85)]">94% ICP Match</span>
-                  <span className="text-[9px] text-[rgba(10,10,10,0.45)]">All systems active</span>
+                <div className="flex flex-col gap-1">
+                  <Bar w={62} h={6} />
+                  <Bar w={42} h={5} />
                 </div>
               </div>
               <span className="flex h-4 w-4 items-center justify-center rounded-full bg-[rgba(43,138,62,0.15)] text-[rgb(43,138,62)]">
@@ -1118,19 +1132,14 @@ function OverviewStageView({ onSelectStage }: { onSelectStage?: (stage: StageId)
               </span>
             </div>
 
-            {/* Checklist Matrix */}
+            {/* Checklist matrix: earned checks + criterion bars */}
             <div className="mt-2 flex flex-col gap-1">
-              {[
-                'Company size (20-200)',
-                'Modern tech stack',
-                'C-Suite decision maker',
-                'Active hiring signals',
-              ].map((item) => (
-                <div key={item} className="flex items-center gap-1.5 rounded-[4px] border border-[rgba(10,10,10,0.04)] bg-white px-2 py-1">
+              {['58%', '66%', '48%', '62%'].map((w, i) => (
+                <div key={i} className="flex items-center gap-1.5 rounded-[4px] border border-[rgba(10,10,10,0.04)] bg-white px-2 py-1">
                   <svg width="7" height="7" viewBox="0 0 9 9" fill="none" className="text-[rgb(43,138,62)] shrink-0">
                     <path d="M1.8 4.8 L3.6 6.8 L7.4 2.4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
                   </svg>
-                  <span className="text-[9.5px] text-[rgba(10,10,10,0.7)]">{item}</span>
+                  <span className="block h-[6px] rounded-full" style={{ width: w, background: 'var(--scaffold-skeleton)' }} />
                 </div>
               ))}
             </div>
@@ -1138,26 +1147,25 @@ function OverviewStageView({ onSelectStage }: { onSelectStage?: (stage: StageId)
 
           <div className="flex items-center justify-between border-t border-[var(--scaffold-hairline)] pt-1.5">
             <span className="text-[9.5px] font-medium text-[rgba(10,10,10,0.45)]">policy</span>
-            <span className="text-[9.5px] font-medium text-[rgb(43,138,62)]">Ready</span>
+            <span className="h-1.5 w-1.5 rounded-full bg-[rgb(43,138,62)]" />
           </div>
         </div>
 
-        {/* Card 3: Outreach & Meetings */}
-        <div className="flex flex-col justify-between rounded-[14px] border border-[var(--scaffold-hairline)] bg-white p-3 shadow-xs">
+        {/* Card 3: Outreach & meetings */}
+        <div className="flex flex-col justify-between rounded-[14px] border border-[var(--scaffold-hairline)] bg-white p-3 shadow-xs transition-shadow duration-300 hover:shadow-[var(--scaffold-shadow-soft)]">
           <div>
             <div className="flex items-center justify-between border-b border-[var(--scaffold-hairline)] pb-1.5">
               <div className="flex items-center gap-1.5">
                 <span className="h-1.5 w-1.5 rounded-full bg-[var(--scaffold-accent)]" />
-                <span className="text-[11px] font-semibold text-[rgba(10,10,10,0.85)]">Outreach & Meetings</span>
+                <Bar w={76} h={7} />
               </div>
-              <span className="flex items-center gap-1 rounded-full bg-[rgba(43,138,62,0.1)] px-1.5 py-0.5 text-[9px] font-medium text-[rgb(43,138,62)]">
+              <span className="flex items-center rounded-full bg-[rgba(43,138,62,0.1)] px-1.5 py-0.5">
                 <span className="h-1 w-1 rounded-full bg-[rgb(43,138,62)]" />
-                <span>Booked call</span>
               </span>
             </div>
 
-            {/* Scheduled Discovery Call Banner */}
-            <div className="mt-2.5 flex flex-col gap-1 rounded-[10px] border border-[rgba(43,138,62,0.2)] bg-[rgba(43,138,62,0.04)] p-2">
+            {/* Scheduled-call banner: calendar mark + bars + attendees */}
+            <div className="mt-2.5 flex flex-col gap-1.5 rounded-[10px] border border-[rgba(43,138,62,0.2)] bg-[rgba(43,138,62,0.04)] p-2">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-1.5">
                   <span className="flex h-4 w-4 items-center justify-center rounded-[4px] bg-[rgba(43,138,62,0.15)] text-[rgb(43,138,62)]">
@@ -1168,38 +1176,37 @@ function OverviewStageView({ onSelectStage }: { onSelectStage?: (stage: StageId)
                       <line x1="3" y1="10" x2="21" y2="10" />
                     </svg>
                   </span>
-                  <span className="text-[10px] font-semibold text-[rgba(10,10,10,0.85)]">Discovery call scheduled</span>
+                  <span className="block h-[6px] w-[88px] rounded-full" style={{ background: 'var(--scaffold-skeleton)' }} />
                 </div>
                 <div className="flex -space-x-1">
                   <img src="/journey-faces/daniel.png" alt="" className="h-4 w-4 rounded-full border border-white object-cover" />
                   <img src="/journey-faces/marcus.png" alt="" className="h-4 w-4 rounded-full border border-white object-cover" />
                 </div>
               </div>
-              <span className="text-[9.5px] font-medium text-[rgb(43,138,62)]">Thursday, Nov 13 · 2:00 PM</span>
+              <div className="flex items-center gap-1.5">
+                <span className="block h-[5px] w-[56px] rounded-full bg-[rgba(43,138,62,0.35)]" />
+                <span className="block h-[5px] w-[32px] rounded-full" style={{ background: 'var(--scaffold-skeleton)' }} />
+              </div>
             </div>
 
-            {/* Outreach Activity Stream */}
+            {/* Outreach activity stream: dots + bars, no log lines */}
             <div className="mt-2 flex flex-col gap-1">
-              <div className="flex items-center justify-between rounded-[4px] border border-[rgba(10,10,10,0.04)] bg-white px-2 py-1">
-                <div className="flex items-center gap-1.5">
-                  <span className="h-1 w-1 rounded-full bg-[rgb(43,138,62)]" />
-                  <span className="text-[9.5px] text-[rgba(10,10,10,0.7)]">Personalized email sent</span>
+              {[
+                { dot: 'rgb(43,138,62)', w: '64%' },
+                { dot: 'rgb(43,138,62)', w: '52%' },
+              ].map((row, i) => (
+                <div key={i} className="flex items-center gap-1.5 rounded-[4px] border border-[rgba(10,10,10,0.04)] bg-white px-2 py-1">
+                  <span className="h-1 w-1 shrink-0 rounded-full" style={{ background: row.dot }} />
+                  <span className="block h-[6px] rounded-full" style={{ width: row.w, background: 'var(--scaffold-skeleton)' }} />
+                  <span className="ml-auto h-[5px] w-[24px] rounded-full" style={{ background: 'var(--scaffold-skeleton)' }} />
                 </div>
-                <span className="text-[9px] font-medium text-[rgba(10,10,10,0.4)]">Dispatched</span>
-              </div>
-              <div className="flex items-center justify-between rounded-[4px] border border-[rgba(10,10,10,0.04)] bg-white px-2 py-1">
-                <div className="flex items-center gap-1.5">
-                  <span className="h-1 w-1 rounded-full bg-[rgb(43,138,62)]" />
-                  <span className="text-[9.5px] text-[rgba(10,10,10,0.7)]">Positive reply received</span>
-                </div>
-                <span className="text-[9px] font-medium text-[rgb(43,138,62)]">Inbound response</span>
-              </div>
+              ))}
             </div>
           </div>
 
           <div className="flex items-center justify-between border-t border-[var(--scaffold-hairline)] pt-1.5">
             <span className="text-[9.5px] font-medium text-[rgba(10,10,10,0.45)]">replies</span>
-            <span className="text-[9.5px] font-medium text-[rgba(10,10,10,0.45)]">Synced</span>
+            <span className="block h-[5px] w-[28px] rounded-full" style={{ background: 'var(--scaffold-skeleton)' }} />
           </div>
         </div>
       </div>
@@ -1208,6 +1215,29 @@ function OverviewStageView({ onSelectStage }: { onSelectStage?: (stage: StageId)
 }
 
 /* ─── Integrated Bottom Activity & Telemetry Strip ────────────────────────── */
+
+/* Wordless live trace: a compact run of bars that breathe in sequence —
+   activity as rhythm, no log lines. */
+function ActivityTrace({ live }: { live: boolean }) {
+  const bars = [5, 9, 6, 12, 7, 10, 5, 8, 6, 11, 7, 9];
+  return (
+    <span className="hidden lg:flex h-[14px] items-end gap-[2.5px]" aria-hidden="true">
+      {bars.map((h, i) => (
+        <motion.span
+          key={i}
+          className="block w-[2.5px] rounded-full"
+          style={{
+            height: h,
+            background:
+              i === 7 ? 'var(--scaffold-accent-dot)' : 'rgba(10,10,10,0.14)',
+          }}
+          animate={live ? { opacity: [0.35, 1, 0.35], scaleY: [0.7, 1, 0.7] } : undefined}
+          transition={live ? { duration: 1.8, repeat: Infinity, ease: 'easeInOut', delay: i * 0.12 } : undefined}
+        />
+      ))}
+    </span>
+  );
+}
 
 function BottomActivityStrip({ live, activeStage }: { live: boolean; activeStage: StageId }) {
   return (
@@ -1222,6 +1252,11 @@ function BottomActivityStrip({ live, activeStage }: { live: boolean; activeStage
         </span>
       </div>
 
+      {/* Center-left: wordless live trace */}
+      <div className="ml-6 mr-auto">
+        <ActivityTrace live={live} />
+      </div>
+
       {/* Center: 10-tick progress meter */}
       <div className="flex items-center gap-[3px] w-[90px]">
         {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9].map((i) => (
@@ -1230,7 +1265,9 @@ function BottomActivityStrip({ live, activeStage }: { live: boolean; activeStage
             className="h-[5px] flex-1 rounded-[1.5px]"
             style={{
               background:
-                i < 7 ? 'var(--scaffold-accent)' : 'rgba(10,10,10,0.10)',
+                i < 7
+                  ? 'color-mix(in oklch, var(--color-brand) 55%, rgba(255,255,255,1))'
+                  : 'rgba(10,10,10,0.10)',
             }}
             animate={
               live && i === 6
@@ -1254,6 +1291,27 @@ function BottomActivityStrip({ live, activeStage }: { live: boolean; activeStage
 }
 
 /* ─── MAIN AGENTIC DASHBOARD COMPONENT ───────────────────────────────────── */
+
+/* Cursor-reactive ambient light for the workspace canvas: tracks the
+   pointer into --mx / --my and lets a faint brand-hue wash follow it.
+   Fine pointers only; touch and reduced motion keep the rest state. */
+function useCanvasSpotlight<T extends HTMLElement>() {
+  const ref = useRef<T>(null);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    if (!window.matchMedia('(pointer: fine)').matches) return;
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const onMove = (e: PointerEvent) => {
+      const r = el.getBoundingClientRect();
+      el.style.setProperty('--mx', `${e.clientX - r.left}px`);
+      el.style.setProperty('--my', `${e.clientY - r.top}px`);
+    };
+    el.addEventListener('pointermove', onMove, { passive: true });
+    return () => el.removeEventListener('pointermove', onMove);
+  }, []);
+  return ref;
+}
 
 export default function AgenticDashboard({
   step = 0,
@@ -1361,6 +1419,7 @@ export default function AgenticDashboard({
   }, []);
 
   const live = !still && !compact;
+  const canvasRef = useCanvasSpotlight<HTMLDivElement>();
 
   /* Configure and overview have no scene timeline to report completion, so
      they are settled as soon as they are on screen. */
@@ -1611,6 +1670,7 @@ export default function AgenticDashboard({
                   title={st}
                   className={cn(
                     'group relative flex h-[35px] w-full items-center rounded-[8px] text-left transition-colors cursor-pointer',
+                    'before:absolute before:left-[3px] before:top-1/2 before:h-[16px] before:w-[2px] before:-translate-y-1/2 before:rounded-full before:bg-[color-mix(in_oklch,var(--color-brand)_60%,rgba(255,255,255,1))] before:opacity-0 before:transition-opacity before:duration-200 hover:before:opacity-100',
                     railOpen && sidebarWidth > 75 ? 'justify-start gap-2 px-2' : 'justify-center px-0',
                     isCurrent ? 'bg-[var(--scaffold-accent-row)]' : 'hover:bg-[rgba(10,10,10,0.03)]',
                   )}
@@ -1651,6 +1711,7 @@ export default function AgenticDashboard({
               title="overview"
               className={cn(
                 'group relative flex h-[34px] w-full items-center rounded-[8px] text-left transition-colors cursor-pointer',
+                'before:absolute before:left-[3px] before:top-1/2 before:h-[16px] before:w-[2px] before:-translate-y-1/2 before:rounded-full before:bg-[color-mix(in_oklch,var(--color-brand)_60%,rgba(255,255,255,1))] before:opacity-0 before:transition-opacity before:duration-200 hover:before:opacity-100',
                 railOpen && sidebarWidth > 75 ? 'justify-start gap-2 px-2' : 'justify-center px-0',
                 activeStage === 'overview'
                   ? 'bg-[var(--scaffold-accent-row)]'
@@ -1696,7 +1757,20 @@ export default function AgenticDashboard({
         </aside>
 
         {/* ── MAIN WORKSPACE CANVAS ── */}
-        <div className="relative flex min-w-0 flex-1 flex-col">
+        <div
+          ref={canvasRef}
+          className="relative flex min-w-0 flex-1 flex-col"
+          style={{ '--mx': '-400px', '--my': '-400px' } as React.CSSProperties}
+        >
+          {/* cursor-reactive ambient wash — pure light, wordless */}
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-0 z-[1]"
+            style={{
+              background:
+                'radial-gradient(280px circle at var(--mx) var(--my), color-mix(in oklch, var(--color-brand) 5%, transparent), transparent 70%)',
+            }}
+          />
           {/* L1 TOP BAR (48px) */}
           <header className="flex h-[48px] shrink-0 items-center justify-between border-b border-[var(--scaffold-hairline)] bg-white px-4">
             {/* Breadcrumb */}

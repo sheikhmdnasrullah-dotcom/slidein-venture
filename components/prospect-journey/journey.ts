@@ -1,13 +1,14 @@
 // Prospect-journey engine: scroll-driven, six stages, zero invented copy.
 // Framework-independent rendering (no global selectors or persistent
-// listeners outside its own root). Mounted by ProspectJourney.tsx.
+// listeners outside its own root). Mounted by ProspectJourney.tsx and
+// embedded per-stage in the AgenticDashboard scenes.
 //
 // Text contract: the ONLY words ever rendered are the six stage equation
-// words (compiler-gated through `word()`), the current-stage word in the
-// progress header and live region, and the portrait identities supplied by
-// the reference design (`PEOPLE` below). Every metric remains a skeleton
-// bar, gauge, or geometric state. No invented numbers, emails, or meetings
-// anywhere in these scenes.
+// words (compiler-gated through `word()`) and the current-stage word in the
+// progress header and live region. Identities, findings, criteria, notes,
+// drafts and replies all render as skeleton bars, glyph tiles, and
+// geometric state — no invented names, roles, claims, numbers, or
+// conversation anywhere in these scenes.
 import type { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
@@ -42,29 +43,34 @@ type JourneyAPI = {
 };
 
 /* ─── People ────────────────────────────────────────────────────────────────
-   Portraits and identities come from the supplied reference design
-   (slidein-prototype/journey.js). Cropped 160×160 transparent PNGs live
-   in /public/journey-faces. `SUBJECT` is the prospect carried through the
-   pipeline; `SOURCES` are the others discovered around them. */
+   Portraits are anonymous faces (cropped 160×160 transparent PNGs in
+   /public/journey-faces). Nothing on or under a portrait is allowed to
+   invent an identity — no names, no roles — so `identity()` renders two
+   skeleton bars of a per-person fixed width instead. `SUBJECT` is the
+   prospect carried through the pipeline; `SOURCES` are the others
+   discovered around them. */
 
-export const PEOPLE = {
-  daniel: { name: 'Dalian Carter', role: 'Founder' },
-  olivia: { name: 'Olivia Vance', role: 'Growth Lead' },
-  marcus: { name: 'Marcus Chen', role: 'Head of Sales' },
-  sophia: { name: 'Sophia Martinez', role: 'Marketing Director' },
-} as const;
-
-type PersonKey = keyof typeof PEOPLE;
+type PersonKey = 'daniel' | 'olivia' | 'marcus' | 'sophia';
 
 const SUBJECT: PersonKey = 'daniel';
 const SOURCES: readonly PersonKey[] = ['olivia', 'marcus', 'sophia', 'daniel'];
 
+/* Per-person bar widths: a stable silhouette per portrait so the same face
+   keeps the same shape through every scene, without ever spelling a name. */
+const IDENTITY_BARS: Record<PersonKey, [string, string]> = {
+  daniel: ['58%', '38%'],
+  olivia: ['46%', '30%'],
+  marcus: ['52%', '34%'],
+  sophia: ['62%', '40%'],
+};
+
 const avatar = (key: PersonKey, size = ''): string =>
   `<img class="avatar ${size}" src="/journey-faces/${key}.png" alt="" aria-hidden="true" loading="lazy" width="160" height="160" style="object-fit:cover" />`;
 
-/* Identity line: name over role. Never a metric — metrics stay skeleton bars. */
+/* Identity silhouette: two skeleton bars where a name and role would sit.
+   Never a metric, never a word — metrics stay skeleton bars too. */
 const identity = (key: PersonKey): string =>
-  `<div class="person-lines"><span class="person-name">${PEOPLE[key].name}</span><span class="person-role">${PEOPLE[key].role}</span></div>`;
+  `<div class="person-lines"><span class="sk" style="width:${IDENTITY_BARS[key][0]}"></span><span class="sk dim" style="width:${IDENTITY_BARS[key][1]}"></span></div>`;
 
 /* Where a note came from. The path data is the current official mark from
    Simple Icons; the colour comes from CSS, never from here. */
@@ -105,18 +111,20 @@ const INSIGHT_GLYPH: Record<string, string> = {
   stack: '<rect x="3" y="3" width="10" height="3" rx="1"/><rect x="3" y="7.4" width="10" height="3" rx="1"/><path d="M3 11.8h10"/>',
 };
 
-const insightNode = (id: number, glyph: string, title: string, detail: string): string =>
-  `<div class="insight-row" id="insight-${id}"><span class="insight-glyph" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.35" stroke-linecap="round" stroke-linejoin="round">${INSIGHT_GLYPH[glyph]}</svg></span><div class="insight-text"><span class="insight-title">${title}</span><span class="insight-detail">${detail}</span></div></div>`;
+const insightNode = (id: number, glyph: string, titleW: string, detailW: string): string =>
+  `<div class="insight-row" id="insight-${id}"><span class="insight-glyph" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.35" stroke-linecap="round" stroke-linejoin="round">${INSIGHT_GLYPH[glyph]}</svg></span><div class="insight-text"><span class="sk" style="width:${titleW}"></span><span class="sk dim" style="width:${detailW}"></span></div></div>`;
 
-/* One public note: the mark it came from, and what it said. */
-const sourceNote = (kind: SourceMark, text: string): string =>
-  `<div class="context-event">${mark(kind)}<span class="source-note">${text}</span></div>`;
+/* One public note: the mark it came from, and two bars where its text would
+   sit. The mark carries the meaning; the bars carry only rhythm. */
+const sourceNote = (kind: SourceMark, w1: string, w2: string): string =>
+  `<div class="context-event">${mark(kind)}<span class="source-note"><span class="sk" style="width:${w1}"></span><span class="sk dim" style="width:${w2}"></span></span></div>`;
 
-/* One written line. `phrases` are the spans a signal is woven into — each
-   carries the id the connector geometry is drawn against. */
-const mailLine = (text: string, phrases: [string, number][]): string =>
-  `<p class="mail-text">${phrases.reduce((acc, [word, id], n) =>
-    acc.replace(`{{${n}}}`, `<span class="socket" id="socket-${id}">${word}</span>`), text)}</p>`;
+/* One written line of the draft: plain skeleton bars with a socket woven
+   in — the tinted chip a signal is wired into. Each socket carries the id
+   the connector geometry is drawn against; its inside is a bar, never a
+   phrase. */
+const mailLine = (beforeW: string, socketId: number, afterW: string): string =>
+  `<p class="mail-text"><span class="sk" style="width:${beforeW}"></span> <span class="socket" id="socket-${socketId}"><span class="sk" style="width:34px;display:block"></span></span> <span class="sk dim" style="width:${afterW}"></span></p>`;
 
 /* Skeleton bar. Widths are illustrative geometry, never measurements. */
 const sk = (w: string, cls = ''): string =>
@@ -144,14 +152,14 @@ export function sceneMarkup(i: number): string {
   if (i === 0)
     return `<div class="scene discover-scene">${svg}<div class="source-list">${['t1', 't2', 't3', 't4'].map((t, n) => sourceCard(String(n), t, SOURCES[n]!)).join('')}</div><div class="ui-card target-card" id="discover-target">${personRow(SUBJECT, 'large')}<div class="chips"><span class="chip sk-pill"></span><span class="chip sk-pill"></span><span class="chip sk-pill tint"></span></div></div></div>`;
   if (i === 1)
-    return `<div class="scene research-scene">${svg}<div class="ui-card research-card" id="research-profile">${personRow(SUBJECT, 'large')}<div class="details">${['Cartwright, remote first', 'Europe and North America', 'Software, 40 people'].map((d) => `<span class="detail-line">${d}</span>`).join('')}</div></div><div class="insights">${insightNode(0, 'trend', 'Recently raised a funding round', 'Closed three weeks ago')}${insightNode(1, 'reach', 'Expanding into new markets', 'Europe and enterprise segments')}${insightNode(2, 'team', 'Hiring a growth team', 'Open growth and performance roles')}${insightNode(3, 'stack', 'Tooling already in place', 'Active technology signal')}</div></div>`;
+    return `<div class="scene research-scene">${svg}<div class="ui-card research-card" id="research-profile">${personRow(SUBJECT, 'large')}<div class="details">${sk('68%')}${sk('84%', 'dim')}${sk('52%', 'dim')}</div></div><div class="insights">${insightNode(0, 'trend', '62%', '78%')}${insightNode(1, 'reach', '54%', '70%')}${insightNode(2, 'team', '70%', '48%')}${insightNode(3, 'stack', '46%', '62%')}</div></div>`;
   if (i === 2)
-    return `<div class="scene qualify-scene">${svg}<div class="ui-card qualified-card" id="qualified-target"><div class="person">${avatar(SUBJECT)}${identity(SUBJECT)}<span class="state-dot pass" aria-hidden="true"></span></div><div class="check-list">${['Company size', 'Target industry', 'Relevant role', 'Hiring plan'].map((crit) => `<div class="check-row"><span class="check" aria-hidden="true">${TICKPATH}</span><span class="check-label">${crit}</span></div>`).join('')}</div><div class="score"><span class="score-ring" aria-hidden="true"></span><div class="person-lines">${sk('40%')}${sk('58%', 'dim')}</div></div></div><div class="ui-card rejected-card" id="rejected-target"><div class="person">${avatar('olivia', 'small')}${identity('olivia')}</div><div class="hold-bars" aria-hidden="true"><span></span><span></span></div><div class="details">${sk('72%')}${sk('56%', 'dim')}${sk('63%', 'dim')}</div></div></div>`;
+    return `<div class="scene qualify-scene">${svg}<div class="ui-card qualified-card" id="qualified-target"><div class="person">${avatar(SUBJECT)}${identity(SUBJECT)}<span class="state-dot pass" aria-hidden="true"></span></div><div class="check-list">${['64%', '52%', '70%', '46%'].map((w) => `<div class="check-row"><span class="check" aria-hidden="true">${TICKPATH}</span><span class="check-label">${sk(w)}</span></div>`).join('')}</div><div class="score"><span class="score-ring" aria-hidden="true"></span><div class="person-lines">${sk('40%')}${sk('58%', 'dim')}</div></div></div><div class="ui-card rejected-card" id="rejected-target"><div class="person">${avatar('olivia', 'small')}${identity('olivia')}</div><div class="hold-bars" aria-hidden="true"><span></span><span></span></div><div class="details">${sk('72%')}${sk('56%', 'dim')}${sk('63%', 'dim')}</div></div></div>`;
   if (i === 3)
-    return `<div class="scene personalize-scene">${svg}<div class="ui-card context-card">${personRow(SUBJECT)}<div class="context-events">${sourceNote('linkedin', 'Hiring a growth team').replace('<div class="context-event">', '<div class="context-event" id="context-0">')}${sourceNote('facebook', 'Expanding into new markets').replace('<div class="context-event">', '<div class="context-event" id="context-1">')}${sourceNote('web', 'Raised a funding round').replace('<div class="context-event">', '<div class="context-event" id="context-2">')}${sourceNote('instagram', 'Team offsite in Lisbon')}</div></div><div class="ui-card composer"><div class="composer-head"><span class="mail-recipient">Dalian Carter · Cartwright</span></div><div class="email-body">${mailLine('Hi Dalian, congrats on the {{0}} you are putting together.', [['growth team', 0]])}${mailLine('Saw Cartwright is {{0}} this year too.', [['expanding into new markets', 1]])}${mailLine('Given you just {{0}}, now feels like a good time. 20 minutes?', [['raised a round', 2]])}</div><div class="composer-foot"></div></div></div>`;
+    return `<div class="scene personalize-scene">${svg}<div class="ui-card context-card">${personRow(SUBJECT)}<div class="context-events">${sourceNote('linkedin', '58%', '40%').replace('<div class="context-event">', '<div class="context-event" id="context-0">')}${sourceNote('facebook', '64%', '46%').replace('<div class="context-event">', '<div class="context-event" id="context-1">')}${sourceNote('web', '44%', '58%').replace('<div class="context-event">', '<div class="context-event" id="context-2">')}${sourceNote('instagram', '52%', '36%')}</div></div><div class="ui-card composer"><div class="composer-head">${sk('46%')}</div><div class="email-body">${mailLine('52%', 0, '34%')}${mailLine('38%', 1, '44%')}${mailLine('58%', 2, '26%')}</div><div class="composer-foot"></div></div></div>`;
   if (i === 4)
     return `<div class="scene outreach-scene">${svg}<div class="outbound-list"><div class="ui-card draft-card" id="send-source">${personRow(SUBJECT)}<div class="draft-preview" aria-hidden="true"><span class="envelope"><i class="env-flap"></i><i class="env-line"></i><i class="env-line hl"></i><i class="env-line short"></i></span></div><div class="dot-row"><span class="state-dot pass" aria-hidden="true"></span><span class="state-dot idle" aria-hidden="true"></span></div></div>${(['marcus', 'sophia'] as PersonKey[]).map((q) => `<div class="ui-card queue-item">${avatar(q, 'small')}${identity(q)}<span class="queue-track" aria-hidden="true"><i></i></span><span class="state-dot idle" aria-hidden="true"></span></div>`).join('')}</div><div class="delivery" id="send-target"><span class="delivery-check" aria-hidden="true"><i class="check-ring"></i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 12.5l4.2 4.2L18 8.5"/></svg></span></div></div>`;
-  return `<div class="scene converse-scene"><div class="inbox"><div class="inbox-head"><span class="inbox-title">Reply</span><span class="reply-when">just now</span></div><div class="inbox-content"><div class="reply-card"><div class="person">${avatar(SUBJECT, 'small')}${identity(SUBJECT)}${TICK('confirmed')}</div><div class="reply-lines"><span class="reply-text">Happy to chat. Thursday afternoon works on our side, send something over.</span></div></div><div class="meeting-card"><div class="meeting-top">${CALENDAR}<div class="meeting-meta"><span class="meeting-title">Discovery call</span><span class="meeting-time">Thursday, 13 November<br>2:00 to 2:30 PM</span></div></div><div class="meeting-slot">${[0, 1, 2, 3, 4, 5, 6].map((d) => `<i class="${d === 3 ? 'on' : ''}"></i>`).join('')}</div><div class="meeting-foot">${avatar('marcus', 'tiny')}${avatar('sophia', 'tiny')}<span class="meeting-seen">On the calendar</span></div></div></div></div></div>`;
+  return `<div class="scene converse-scene"><div class="inbox"><div class="inbox-head"><span class="inbox-title">${sk('22%')}</span><span class="reply-when">${sk('14%')}</span></div><div class="inbox-content"><div class="reply-card"><div class="person">${avatar(SUBJECT, 'small')}${identity(SUBJECT)}${TICK('confirmed')}</div><div class="reply-lines"><span class="reply-text"><span class="sk ondark" style="width:88%"></span><span class="sk ondark dim" style="width:64%"></span></span></div></div><div class="meeting-card"><div class="meeting-top">${CALENDAR}<div class="meeting-meta"><span class="meeting-title">${sk('38%')}</span><span class="meeting-time">${sk('58%')}${sk('42%', 'dim')}</span></div></div><div class="meeting-slot">${[0, 1, 2, 3, 4, 5, 6].map((d) => `<i class="${d === 3 ? 'on' : ''}"></i>`).join('')}</div><div class="meeting-foot">${avatar('marcus', 'tiny')}${avatar('sophia', 'tiny')}<span class="meeting-seen"><span class="sk" style="width:34px"></span></span></div></div></div></div></div>`;
 }
 
 /* Links per scene, by element id. Ids are unique across all six scenes,

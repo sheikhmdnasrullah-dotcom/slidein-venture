@@ -39,10 +39,21 @@ import {
 } from "framer-motion";
 import { Section } from "@/components/Section";
 import { MonoLabel } from "@/components/System/System";
-import type { InsightArticle } from "@/content/insights";
+import {
+  getAuthor,
+  getReadingTime,
+  type InsightArticle,
+} from "@/content/insights";
 
 interface ArticleReaderProps {
   article: InsightArticle;
+  /**
+   * The next article to point to at the foot of the page. Wired but empty
+   * on purpose: the page passes the newest published article that is not
+   * this one, and when none exists (today) nothing is rendered — no fake
+   * forward link.
+   */
+  nextArticle?: InsightArticle;
 }
 
 /** One paragraph entry: either plain copy or an authored pull-quote. */
@@ -54,7 +65,10 @@ const textOf = (p: Para) => (typeof p === "string" ? p : p.text);
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 
-export default function ArticleReader({ article }: ArticleReaderProps) {
+export default function ArticleReader({
+  article,
+  nextArticle,
+}: ArticleReaderProps) {
   const still = !!useReducedMotion();
   const rootRef = useRef<HTMLDivElement>(null);
 
@@ -107,35 +121,64 @@ export default function ArticleReader({ article }: ArticleReaderProps) {
           pad="none"
           className="insights-paper pt-[calc(96px+clamp(2.5rem,5vw,4.5rem))] pb-12 md:pb-16"
         >
-          <div className="mx-auto max-w-[840px] px-6 md:px-10">
+          <div className="mx-auto max-w-[42rem] px-6 md:px-10">
             <motion.div variants={block} initial="hidden" animate="show">
               <Link
                 href="/insights"
-                className="group inline-flex items-center gap-2 text-[var(--muted)] transition-colors hover:text-[var(--on-surface)]"
+                className="group inline-flex items-center gap-2 outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-ring)] focus-visible:ring-offset-4 focus-visible:ring-offset-[var(--scaffold-bg)]"
               >
                 <span
-                  className="inline-block transition-transform duration-200 group-hover:-translate-x-1"
-                  style={{ color: "var(--accent)" }}
+                  className="inline-block text-[var(--muted)] transition-transform duration-200 group-hover:-translate-x-1"
                   aria-hidden="true"
                 >
                   ←
                 </span>
                 <MonoLabel className="transition-colors group-hover:text-[var(--on-surface)]">
-                  Back to Insights
+                  All insights
                 </MonoLabel>
               </Link>
 
-              {/* The tagline only. No date line: the owner asked for the
-                  tagline and the article, and a date is neither. The
-                  formattedDate field stays in the content file — it is the
-                  article's to publish when it wants to be published. */}
-              <div className="mt-10 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-[var(--muted)]">
-                <span style={{ color: "var(--accent)" }}>{article.topic}</span>
-              </div>
+              {/* Publication metadata: category, dates, reading time, byline.
+                  Every value is derived in the content file; the "Updated"
+                  line renders only when the article carries an updatedAt. */}
+              <p className="mt-12 flex flex-wrap items-baseline gap-x-4 gap-y-1.5 font-label text-[var(--muted)]">
+                <span style={{ color: "var(--accent)" }}>
+                  {article.category}
+                </span>
+                <span aria-hidden="true" className="text-[var(--faint)]">
+                  /
+                </span>
+                <span>
+                  By {getAuthor(article)}
+                </span>
+                <span aria-hidden="true" className="text-[var(--faint)]">
+                  /
+                </span>
+                <time dateTime={article.date}>{article.formattedDate}</time>
+                {article.updatedAt && (
+                  <>
+                    <span aria-hidden="true" className="text-[var(--faint)]">
+                      /
+                    </span>
+                    <time dateTime={article.updatedAt}>
+                      Updated {article.updatedAt}
+                    </time>
+                  </>
+                )}
+                <span aria-hidden="true" className="text-[var(--faint)]">
+                  /
+                </span>
+                <span>{getReadingTime(article)} min read</span>
+              </p>
 
-              <h1 className="font-display-xl mt-6 text-[clamp(2.1rem,4.5vw,3.6rem)] leading-[1.12] tracking-tight text-[var(--on-surface)]">
+              <h1 className="font-display-xl mt-8 text-[clamp(2.1rem,4.5vw,3.4rem)] leading-[1.12] tracking-tight text-[var(--on-surface)]">
                 {article.title}
               </h1>
+
+              {/* The article's own topic line, set as a quiet standfirst. */}
+              <p className="mt-8 text-[1.0625rem] leading-[1.7] text-[var(--muted)] md:text-[1.125rem]">
+                {article.topic}
+              </p>
             </motion.div>
           </div>
         </Section>
@@ -147,7 +190,7 @@ export default function ArticleReader({ article }: ArticleReaderProps) {
           className="insights-paper py-12 md:py-20"
           seam
         >
-          <div className="mx-auto max-w-[760px] px-6 md:px-8">
+          <div className="mx-auto max-w-[42rem] px-6 md:px-10">
             <div className="space-y-6 text-[1.0625rem] leading-[1.8] text-[var(--on-surface)] md:text-[1.125rem]">
               {article.intro.map((p, i) => {
                 if (i === 0) {
@@ -254,6 +297,49 @@ export default function ArticleReader({ article }: ArticleReaderProps) {
                   )}
                 </motion.section>
               ))}
+
+              {/* ── End of article ─────────────────────────────────────────
+                  The return link is always there. The forward link is not:
+                  nextArticle is wired, but with a single published article
+                  it is undefined and this block renders nothing rather than
+                  a fake "next" suggestion. */}
+              <footer className="mt-16 border-t pt-10 md:mt-20" style={{ borderColor: "var(--rule)" }}>
+                <nav aria-label="Article navigation">
+                  <div className="flex flex-col gap-6 sm:flex-row sm:items-baseline sm:justify-between">
+                    <Link
+                      href="/insights"
+                      className="group inline-flex items-center gap-2 outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-ring)] focus-visible:ring-offset-4 focus-visible:ring-offset-[var(--scaffold-bg)]"
+                    >
+                      <span
+                        aria-hidden="true"
+                        className="inline-block text-[var(--muted)] transition-transform duration-200 group-hover:-translate-x-1"
+                      >
+                        ←
+                      </span>
+                      <MonoLabel className="transition-colors group-hover:text-[var(--on-surface)]">
+                        All insights
+                      </MonoLabel>
+                    </Link>
+
+                    {nextArticle && (
+                      <Link
+                        href={`/insights/${nextArticle.slug}`}
+                        className="group inline-flex items-baseline gap-2 outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-ring)] focus-visible:ring-offset-4 focus-visible:ring-offset-[var(--scaffold-bg)]"
+                      >
+                        <MonoLabel className="transition-colors group-hover:text-[var(--on-surface)]">
+                          Next: {nextArticle.title}
+                        </MonoLabel>
+                        <span
+                          aria-hidden="true"
+                          className="inline-block text-[var(--muted)] transition-transform duration-200 group-hover:translate-x-1"
+                        >
+                          →
+                        </span>
+                      </Link>
+                    )}
+                  </div>
+                </nav>
+              </footer>
             </div>
           </div>
         </Section>

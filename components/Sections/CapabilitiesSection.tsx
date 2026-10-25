@@ -20,7 +20,10 @@
  *                notification bubble settled in.
  *
  * Static by story rule: the page allows 2 loops and the hero owns 1, so the
- * cells keep their design but not their loops (entrance-only Reveal).
+ * cells keep their design but not their loops (entrance-only Reveal). The
+ * only motion since is hover-driven: a one-shot scan sweep, version layers
+ * drifting apart, the plane nudging toward the gate, the bubble settling
+ * in — none of it loops, all of it collapses under reduced motion.
  * Mobile: cells stack full-width.
  */
 
@@ -45,12 +48,13 @@ import {
   WordTag,
 } from '@/components/Sections/primitives';
 
-/* The inner stage every micro-scene plays on. */
+/* The inner stage every micro-scene plays on. `cap-well` scopes the
+   hover gestures defined in sections.css. */
 function Well({ children, className }: { children: ReactNode; className?: string }) {
   return (
     <div
       className={cn(
-        'relative h-[220px] overflow-hidden rounded-[20px] border border-[var(--scaffold-hairline)] bg-[var(--scaffold-panel)] p-5',
+        'cap-well group relative h-[220px] overflow-hidden rounded-[20px] border border-[var(--scaffold-hairline)] bg-[var(--scaffold-panel)] p-5',
         className,
       )}
     >
@@ -93,11 +97,11 @@ function ScanScene() {
       <div className="relative flex h-full flex-col justify-between">
         <span
           aria-hidden="true"
-          className="absolute bottom-[-90px] left-[26px] top-[-90px] w-[2px] rounded-full"
+          className="cap-scan absolute bottom-[-90px] left-[26px] top-[-90px] w-[2px] rounded-full"
           style={{ background: 'var(--scaffold-accent)', opacity: 0.55 }}
         />
         {SCAN_ROWS.map((w, i) => (
-          <div key={i} className="flex items-center gap-3">
+          <div key={i} className="cap-row -mx-1 flex items-center gap-3 px-1">
             <ScanChip />
             <span
               className="block h-[8px] rounded-full"
@@ -120,12 +124,12 @@ function ComposeScene() {
         {/* saved versions: 6px and 12px down, ink 4% and 2% */}
         <span
           aria-hidden="true"
-          className="absolute inset-0 translate-y-[12px] rounded-[12px] border border-[var(--scaffold-hairline)]"
+          className="cap-version-b absolute inset-0 translate-y-[12px] rounded-[12px] border border-[var(--scaffold-hairline)]"
           style={{ background: 'rgba(10,10,10,0.02)' }}
         />
         <span
           aria-hidden="true"
-          className="absolute inset-0 translate-y-[6px] rounded-[12px] border border-[var(--scaffold-hairline)]"
+          className="cap-version-a absolute inset-0 translate-y-[6px] rounded-[12px] border border-[var(--scaffold-hairline)]"
           style={{ background: 'rgba(10,10,10,0.04)' }}
         />
         <div
@@ -146,7 +150,7 @@ function ComposeScene() {
                 style={{ width: '44%', background: 'var(--scaffold-skeleton)' }}
               />
               <span
-                className="block h-[16px] w-[8px] rounded-[3px]"
+                className="cap-caret block h-[16px] w-[8px] rounded-[3px]"
                 style={{ background: 'var(--scaffold-accent)' }}
               />
             </div>
@@ -215,7 +219,7 @@ function QueueScene() {
         <WordTag w="policy" />
       </div>
       {/* the plane waiting past the gate at the right end */}
-      <div className="absolute right-4 top-1/2 -translate-y-1/2">
+      <div className="cap-plane absolute right-4 top-1/2 -translate-y-1/2">
         <GlossTile size={44} rotate={0} icon={<PlaneGlyph id="cap-outreach-plane" size={22} />} />
       </div>
     </Well>
@@ -267,12 +271,14 @@ function ReplyScene() {
       </svg>
       {/* the accent dot on the tallest spike */}
       <span
-        className="absolute left-[28%] top-[58%] h-[7px] w-[7px] rounded-full"
+        className="cap-dot absolute left-[28%] top-[58%] h-[7px] w-[7px] rounded-full"
         style={{ background: 'var(--scaffold-accent-dot)' }}
       />
       {/* the notification bubble */}
       <div className="absolute right-5 top-5">
-        <ReplyBubble />
+        <div className="cap-bubble">
+          <ReplyBubble />
+        </div>
       </div>
       {/* the read intent, under the line at the dotted spike */}
       <div className="absolute left-[28%] top-[74%] -translate-x-1/2">

@@ -160,37 +160,6 @@
   justify-items: center;
 }
 
-/* ── Person identity: name over role ───────────────────────────────────────
-   Brand ink only. Type is never set in the vivid accent or the faint
-   token — the role line carries the muted step, per the type rules. */
-
-.sj .person-name {
-  font-size: 14px;
-  font-weight: 600;
-  line-height: 1.25;
-  letter-spacing: -0.01em;
-  color: var(--scaffold-ink);
-}
-
-.sj .person-role {
-  font-size: 12px;
-  line-height: 1.3;
-  color: var(--scaffold-lead-ink);
-}
-
-.sj .research-card .person-lines {
-  justify-items: center;
-}
-
-/* The dark inbox inverts with the theme rather than hardcoding light ink. */
-.sj .reply-card .person-name {
-  color: var(--sj-ondark);
-}
-
-.sj .reply-card .person-role {
-  color: var(--sj-ondark-dim);
-}
-
 .sj .avatar {
   width: 56px;
   height: 56px;
@@ -325,11 +294,9 @@
   text-align: center;
 }
 
-.sj .detail-line {
-  display: block;
-  font-size: 12.5px;
-  line-height: 1.7;
-  color: var(--scaffold-body-ink);
+.sj .research-card .person-lines {
+  justify-items: center;
+  width: 100%;
 }
 
 .sj .details {
@@ -374,21 +341,10 @@
 
 .sj .insight-text {
   display: grid;
-  gap: 3px;
+  gap: 5px;
   min-width: 0;
-}
-
-.sj .insight-title {
-  font-size: 13px;
-  font-weight: 600;
-  line-height: 1.3;
-  color: var(--scaffold-ink);
-}
-
-.sj .insight-detail {
-  font-size: 12px;
-  line-height: 1.35;
-  color: var(--scaffold-lead-ink);
+  flex: 1;
+  align-content: center;
 }
 
 .sj .insight-row:last-child {
@@ -565,9 +521,8 @@
 }
 
 .sj .check-label {
-  font-size: 12.5px;
-  line-height: 1.4;
-  color: var(--scaffold-body-ink);
+  flex: 1;
+  min-width: 0;
 }
 
 .sj .context-event {
@@ -599,9 +554,11 @@
 .sj .source-mark-instagram { color: #d62976; }
 
 .sj .source-note {
-  font-size: 12.5px;
-  line-height: 1.4;
-  color: var(--scaffold-body-ink);
+  display: grid;
+  gap: 5px;
+  min-width: 0;
+  flex: 1;
+  align-content: center;
 }
 
 .sj .context-event::before {
@@ -634,36 +591,45 @@
   gap: 14px;
 }
 
-/* Written copy: the email reads as a person wrote it. Body ink for the
-   sentences, never the vivid accent. */
+/* Written copy: the draft reads as bars with sockets woven in — body ink
+   geometry, never sentences. */
 .sj .mail-text {
   margin: 0;
-  font-size: 13.5px;
-  line-height: 1.65;
-  color: var(--scaffold-body-ink);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
 }
 
-.sj .mail-recipient {
-  font-size: 12.5px;
-  font-weight: 600;
-  color: var(--scaffold-ink);
-}
-
-
-
-/* A socket is a phrase woven in from a signal: an inline highlight the
-   connector geometry is drawn against, not an empty placeholder. */
-.sj .socket {
+.sj .mail-text .sk {
   display: inline-block;
-  padding: 0 5px;
+  height: 7px;
+}
+
+.sj .composer-head .sk {
+  display: block;
+  height: 8px;
+}
+
+
+
+/* A socket is where a signal is woven into the draft: a tinted chip the
+   connector geometry is drawn against. Its inside is a skeleton bar, never
+   a phrase. */
+.sj .socket {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 5px;
   border-radius: 5px;
   background: var(--scaffold-skeleton);
-  font-size: 12.5px;
-  font-weight: 500;
-  line-height: 1.5;
-  color: var(--scaffold-ink);
   box-decoration-break: clone;
   -webkit-box-decoration-break: clone;
+}
+
+.sj .socket .sk {
+  display: block;
+  height: 6px;
+  background: color-mix(in oklch, var(--color-brand) 26%, rgb(255 255 255 / 100%));
 }
 
 .sj .envelope {
@@ -861,14 +827,19 @@
 }
 
 .sj .inbox-title {
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--scaffold-ink);
+  display: block;
+  width: 56px;
+}
+
+.sj .inbox-title .sk,
+.sj .reply-when .sk {
+  display: block;
+  height: 7px;
 }
 
 .sj .reply-when {
-  font-size: 11.5px;
-  color: var(--scaffold-lead-ink);
+  display: block;
+  width: 40px;
 }
 
 .sj .inbox-content {
@@ -901,10 +872,9 @@
 }
 
 .sj .reply-text {
-  display: block;
-  font-size: 13px;
-  line-height: 1.6;
-  color: var(--scaffold-body-ink);
+  display: grid;
+  gap: 7px;
+  width: 100%;
 }
 
 /* Status marks. Same 1.5px stroke as the rest of the outline family. */
@@ -941,20 +911,27 @@
 
 .sj .meeting-meta {
   display: grid;
-  gap: 3px;
+  gap: 5px;
   min-width: 0;
+  flex: 1;
+  align-content: start;
 }
 
 .sj .meeting-title {
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--scaffold-ink);
+  display: block;
+  width: 72px;
+}
+
+.sj .meeting-title .sk,
+.sj .meeting-time .sk {
+  display: block;
+  height: 7px;
 }
 
 .sj .meeting-time {
-  font-size: 12px;
-  line-height: 1.5;
-  color: var(--scaffold-lead-ink);
+  display: grid;
+  gap: 4px;
+  max-width: 150px;
 }
 
 /* One week strip; the booked day is the only filled one. */
@@ -986,8 +963,13 @@
 
 .sj .meeting-seen {
   margin-left: auto;
-  font-size: 11.5px;
-  color: var(--scaffold-lead-ink);
+  display: block;
+  width: 34px;
+}
+
+.sj .meeting-seen .sk {
+  display: block;
+  height: 6px;
 }
 
 /* ─── Dashboard Scene Embed Overrides ───────────────────────────────────────

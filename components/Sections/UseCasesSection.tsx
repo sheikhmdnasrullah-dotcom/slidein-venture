@@ -37,12 +37,12 @@ const FAN = [
   { rotate: 2, x: 64, y: 26 },
 ];
 
-/* One skeleton email card in the fan. */
+/* One skeleton email card in the fan. Lifts gently on hover — rest state
+   is identical to the reference frame. */
 function FanCard({ accent }: { accent?: boolean }) {
   return (
     <div
-      className="relative w-[300px] rounded-[20px] border border-[var(--scaffold-hairline)] bg-white p-5"
-      style={{ boxShadow: 'var(--scaffold-shadow-object)' }}
+      className="relative w-[300px] rounded-[20px] border border-[var(--scaffold-hairline)] bg-white p-5 shadow-[var(--scaffold-shadow-object)] transition-[transform,box-shadow] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-1 hover:shadow-[var(--scaffold-shadow-float)]"
     >
       <div className="flex items-center gap-3">
         {/* blank tinted avatar — no initials, ever */}

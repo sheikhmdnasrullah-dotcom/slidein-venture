@@ -36,6 +36,18 @@ const nextConfig: NextConfig = {
   env: {
     NEXT_PUBLIC_BUILD_SHA: BUILD_SHA,
   },
+  async redirects() {
+    /* /insights/[slug] is the canonical article location. The old direct
+       article route lives on as a permanent redirect so external links and
+       the article's previously shared URL keep working. */
+    return [
+      {
+        source: "/ai-pipeline-emas",
+        destination: "/insights/ai-pipeline-emas",
+        permanent: true,
+      },
+    ];
+  },
 };
 
 export default withBundleAnalyzer(nextConfig);

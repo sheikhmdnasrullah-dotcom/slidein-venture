@@ -114,17 +114,22 @@ export default function AgenticDashboardSection() {
     if (SCROLL_STAGES[r.shown] === stage) r.settled = true;
   }, []);
 
+  /* Arm the tall track. This only flips the layout flag; the trigger is
+     built in a separate effect that runs after the pinned render has
+     actually landed (keyed on `pinned`), so the measurement below always
+     sees the md:h-[420vh] track. */
   useEffect(() => {
-    const root = rootRef.current;
-    if (!root) return;
-
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const wide = window.matchMedia('(min-width: 768px)').matches;
     if (reduce || !wide) return;
     /* Deferred out of the effect body so the layout flag lands in its own
        render rather than cascading synchronously here. */
     const pinFrame = window.requestAnimationFrame(() => setPinned(true));
+    return () => window.cancelAnimationFrame(pinFrame);
+  }, []);
 
+  useEffect(() => {
+    if (!pinned) return;
     const track = rootRef.current;
     if (!track) return;
 
@@ -229,7 +234,6 @@ export default function AgenticDashboardSection() {
 
     return () => {
       window.cancelAnimationFrame(raf);
-      window.cancelAnimationFrame(pinFrame);
       window.clearTimeout(rail.current.failSafe);
       window.clearTimeout(settle);
       window.clearTimeout(resizeTimer);
@@ -237,7 +241,7 @@ export default function AgenticDashboardSection() {
       setPinned(false);
       ctx.revert();
     };
-  }, []);
+  }, [pinned]);
 
   return (
     <Band tone="flat" id="dashboard" className="relative">
