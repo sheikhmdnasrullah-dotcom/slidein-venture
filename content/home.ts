@@ -45,7 +45,11 @@ export const ARCHIVED_HEADLINES = {
 
 export const HOME = {
   /* The hero tagline requested by the owner */
-  tagline: 'The Internet’s Most Powerful Client Acquisition Secrets, unified into one actionable Framework.',
+  tagline: {
+    lead: 'The Internet’s Most Powerful Client Acquisition Secrets,',
+    highlight: 'Unified into one actionable Framework.',
+    full: 'The Internet’s Most Powerful Client Acquisition Secrets, Unified into one actionable Framework.',
+  },
   announcement: {
     /* The primary CTA pill below the subhead (the hero's only button).
        Grounded, claim-free copy: "Video" names the medium (the pill opens
@@ -58,7 +62,7 @@ export const HOME = {
   headline: {
     line1: 'The Internet’s Most Powerful Client Acquisition Secrets,',
     line2: '',
-    highlight: 'unified into one actionable Framework.',
+    highlight: 'Unified into one actionable Framework.',
   },
   subhead: {
     /* THE OWNER'S COPY. Verbatim, supplied directly. Do not paraphrase.
