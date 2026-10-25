@@ -21,11 +21,6 @@ jobs:
         run: |
           mkdir -p .vercel
           echo "{\"projectId\":\"$VERCEL_PROJECT_ID\",\"orgId\":\"$VERCEL_ORG_ID\"}" > .vercel/project.json
-          echo "len(VERCEL_TOKEN)=${#VERCEL_TOKEN}"
-          echo "len(VERCEL_ORG_ID)=${#VERCEL_ORG_ID}"
-          echo "len(VERCEL_PROJECT_ID)=${#VERCEL_PROJECT_ID}"
-          echo "hash(VERCEL_ORG_ID)=$(printf %s "$VERCEL_ORG_ID" | sha256sum | cut -c1-8)"
-          echo "hash(VERCEL_PROJECT_ID)=$(printf %s "$VERCEL_PROJECT_ID" | sha256sum | cut -c1-8)"
 
       - name: Deploy to Vercel
         run: |
