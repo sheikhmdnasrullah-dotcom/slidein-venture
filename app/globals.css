@@ -11,6 +11,8 @@
 /* Scaffold tokens for the rebuilt hero + page scaffold. Imported after the
    tone layer so its --page-fill override (flat #FDFDFD) wins at :root. */
 @import "./styles/assemble.css";
+/* Hero convergence visual + headline. */
+@import "./styles/convergence.css";
 /* Section shells + scene vocabulary for the bands below the hero. */
 @import "./styles/sections.css";
 @import "./styles/story-home.css";

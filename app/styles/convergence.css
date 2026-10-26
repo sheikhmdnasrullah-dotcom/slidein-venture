@@ -1,0 +1,311 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   HERO CONVERGENCE — layout, headline and the visual's surface language.
+   One radius (8, plate 12), one hairline weight (1px), one thread weight
+   (1.5px). Orange is spent on: the plate, the threads, the dock beads and the
+   headline underline. Everything else is ink on paper.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.cv-hero {
+  --cv-ink: var(--scaffold-ink);
+  --cv-line: rgb(10 10 10 / 13%);
+  --cv-line-strong: rgb(10 10 10 / 82%);
+  --cv-fill: rgb(10 10 10 / 9%);
+  --cv-fill-dark: rgb(10 10 10 / 72%);
+  --cv-radius: 8px;
+  --cv-size: clamp(2.1rem, min(4.3vw, 6.9svh), 3.9rem);
+
+  position: relative;
+  isolation: isolate;
+  max-width: 1264px;
+  margin-inline: auto;
+  padding: calc(var(--hero-nav-h, 72px) + clamp(20px, 4.5svh, 48px)) 32px clamp(28px, 5svh, 56px);
+}
+
+/* paper: a static, very faint grain (no animation, no blend cost) */
+.cv-paper {
+  position: absolute;
+  inset: 0 calc(50% - 50vw);
+  z-index: -1;
+  pointer-events: none;
+  opacity: 0.3;
+  mask-image: linear-gradient(to bottom, rgb(0 0 0 / 100%) 70%, rgb(0 0 0 / 0%));
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 .055 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+}
+
+/* ── Headline ─────────────────────────────────────────────────────────── */
+.cv-h1 {
+  margin: 0;
+  font-family: var(--font-display), Georgia, serif;
+  font-size: var(--cv-size);
+  color: var(--cv-ink);
+  font-kerning: normal;
+  hyphens: none;
+}
+
+.cv-h1__lead {
+  display: block;
+  max-width: 15.5em;
+  font-weight: 600;
+  line-height: 1.04;
+  letter-spacing: -0.035em;
+  text-wrap: balance;
+}
+
+.cv-h1__tail {
+  display: block;
+  margin-top: 0.3em;
+  font-size: 0.62em;
+  font-weight: 420;
+  line-height: 1.28;
+  letter-spacing: -0.025em;
+  /* starts exactly above the plate, where the unification begins */
+  padding-left: 40.33%;
+}
+
+/* the printed accent: a band under the lower third of the type, not a blob */
+.cv-mark {
+  background-image: linear-gradient(var(--color-brand), var(--color-brand));
+  background-repeat: no-repeat;
+  background-position: 0 86%;
+  background-size: 100% 0.2em;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+  padding-inline: 0.04em;
+}
+
+:root[data-hero-boot='play'] .cv-mark {
+  animation: cv-underline 700ms cubic-bezier(0.22, 1, 0.36, 1) 350ms both;
+}
+
+@keyframes cv-underline {
+  from { background-size: 0% 0.2em; }
+  to   { background-size: 100% 0.2em; }
+}
+
+/* ── Visual box: reserves its height, so nothing ever shifts ──────────── */
+.cv-outer {
+  --cv-s: 1;
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1200 / 420;
+  margin-top: clamp(28px, 5.5svh, 56px);
+}
+
+.cv {
+  position: absolute;
+  left: 0;
+  top: 0;
+  transform: scale(var(--cv-s));
+  transform-origin: 0 0;
+  font-family: var(--font-mono), ui-monospace, monospace;
+}
+
+.cv-svg {
+  position: absolute;
+  left: 0;
+  top: 0;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.cv-rule { stroke: rgb(10 10 10 / 6%); stroke-width: 1; }
+.cv-rel  { stroke: rgb(10 10 10 / 26%); stroke-width: 1; fill: none; stroke-dasharray: 1; }
+
+.cv-thread {
+  stroke: var(--color-brand);
+  stroke-width: 1.5;
+  fill: none;
+  stroke-linecap: round;
+  transition: opacity 240ms ease;
+}
+.cv-thread--out { stroke-dasharray: 1; }
+
+.cv-mark-line, .cv-mark-path { fill: none; }
+.cv-marks .cv-mark { stroke: rgb(10 10 10 / 45%); stroke-width: 1; fill: none; background: none; animation: none; }
+
+/* ── Cards ────────────────────────────────────────────────────────────── */
+.cv-card {
+  position: absolute;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 12px;
+  background: var(--scaffold-surface);
+  border: 1px solid var(--cv-line);
+  border-radius: var(--cv-radius);
+  overflow: hidden;
+  will-change: transform, opacity;
+  transition: opacity 240ms ease;
+}
+
+.cv-raw { box-shadow: 0 6px 14px -9px rgb(10 10 10 / 22%); }
+
+.cv-out {
+  border-color: var(--cv-line-strong);
+  box-shadow: 0 8px 18px -12px rgb(10 10 10 / 28%);
+}
+
+.cv-out::before { /* the orange tick where the thread attaches */
+  content: '';
+  position: absolute;
+  left: -1px;
+  top: 50%;
+  width: 3px;
+  height: 20px;
+  margin-top: -10px;
+  background: var(--color-brand);
+}
+
+.cv-col { display: flex; flex-direction: column; justify-content: center; gap: 5px; min-width: 0; flex: 1; }
+.cv-col--out { gap: 6px; }
+.cv-toprow { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.cv-line { display: flex; align-items: center; gap: 6px; }
+
+.cv-lab {
+  font-size: 11px;
+  line-height: 1;
+  letter-spacing: 0.01em;
+  color: rgb(10 10 10 / 58%);
+  white-space: nowrap;
+}
+.cv-lab--out { color: var(--cv-ink); font-weight: 500; }
+
+.cv-tag {
+  font-size: 10px;
+  line-height: 1;
+  padding: 3px 6px;
+  border: 1px solid var(--cv-line);
+  border-radius: 4px;
+  color: rgb(10 10 10 / 70%);
+  white-space: nowrap;
+}
+
+.cv-bar { display: block; height: 5px; border-radius: 3px; background: var(--cv-fill); }
+.cv-bar--dark { background: var(--cv-fill-dark); }
+
+.cv-glyph { display: grid; place-items: center; width: 28px; height: 28px; flex: none; color: var(--cv-ink); }
+
+.cv-avatar { flex: none; width: 24px; height: 24px; border-radius: 50%; background: rgb(10 10 10 / 13%); box-shadow: inset 0 0 0 1px rgb(10 10 10 / 8%); }
+.cv-avatar--sm { width: 20px; height: 20px; }
+.cv-quote { flex: none; align-self: stretch; width: 2px; margin: 9px 0; border-radius: 1px; background: rgb(10 10 10 / 38%); }
+
+.cv-sq  { flex: none; width: 7px; height: 7px; border: 1px solid rgb(10 10 10 / 45%); border-radius: 2px; }
+.cv-dia { flex: none; width: 8px; height: 8px; border: 1px solid rgb(10 10 10 / 55%); transform: rotate(45deg); }
+.cv-run { flex: 1; height: 1px; background: rgb(10 10 10 / 30%); }
+.cv-flow { gap: 5px; }
+.cv-chip { height: 14px; border-radius: 4px; border: 1px solid var(--cv-line); background: rgb(10 10 10 / 4%); }
+.cv-chip--a { width: 44px; }
+.cv-chip--b { width: 30px; }
+
+/* folded corner on the document fragment */
+.cv-raw--doc::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 14px;
+  height: 14px;
+  background: linear-gradient(225deg, var(--scaffold-bg) 50%, rgb(10 10 10 / 10%) 50%);
+}
+.cv-doc { display: flex; flex-direction: column; gap: 5px; flex: 1; min-width: 0; }
+
+/* ── The plate ────────────────────────────────────────────────────────── */
+.cv-plate {
+  position: absolute;
+  top: 0;
+  background: var(--color-brand);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.cv-ghost, .cv-slot {
+  position: absolute;
+  top: 0;
+  box-sizing: border-box;
+  border: 1px dashed rgb(10 10 10 / 22%);
+}
+.cv-ghost { border-radius: 12px; }
+.cv-slot  { border-radius: var(--cv-radius); }
+
+.cv-prow {
+  position: absolute;
+  left: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 18px 0 22px;
+  box-sizing: border-box;
+  border-top: 1px solid rgb(10 10 10 / 22%);
+  transition: opacity 240ms ease;
+}
+.cv-prow:first-child { border-top: 0; }
+
+.cv-pword { font-size: 12px; letter-spacing: 0.01em; color: var(--cv-ink); font-weight: 500; }
+
+.cv-lock {
+  --lk: 0;
+  position: relative;
+  width: 10px;
+  height: 10px;
+  border: 1.5px solid var(--cv-ink);
+  border-radius: 2px;
+}
+
+.cv-lock::after {
+  content: '';
+  position: absolute;
+  inset: 1px;
+  background: var(--cv-ink);
+  transform: scale(var(--lk));
+}
+
+.cv-dock {
+  position: absolute;
+  box-sizing: border-box;
+  width: 9px;
+  height: 9px;
+  margin: -4.5px 0 0 -4.5px;
+  border-radius: 50%;
+  background: var(--scaffold-bg);
+  border: 1.5px solid var(--cv-ink);
+  transition: opacity 240ms ease;
+}
+
+/* ── Hover trace ──────────────────────────────────────────────────────── */
+.cv[data-state='done'] .cv-card { cursor: default; }
+.cv [data-dim] { opacity: 0.32; }
+.cv .cv-prow[data-dim] { opacity: 0.55; }
+
+/* ── Narrow: same story, same rows, tighter faces ─────────────────────── */
+.cv[data-mode='narrow'] .cv-hide-n { display: none; }
+.cv[data-mode='narrow'] .cv-card { padding: 0 8px; gap: 6px; }
+.cv[data-mode='narrow'] .cv-lab { font-size: 10px; }
+.cv[data-mode='narrow'] .cv-pword { font-size: 10px; letter-spacing: 0; }
+.cv[data-mode='narrow'] .cv-prow { padding: 0 10px 0 12px; }
+.cv[data-mode='narrow'] .cv-avatar { width: 16px; height: 16px; }
+.cv[data-mode='narrow'] .cv-avatar--sm { width: 14px; height: 14px; }
+.cv[data-mode='narrow'] .cv-chip--a { width: 24px; }
+.cv[data-mode='narrow'] .cv-chip--b { width: 16px; }
+.cv[data-mode='narrow'] .cv-lock { width: 8px; height: 8px; }
+
+@media (width <= 959px) {
+  .cv-hero {
+    --cv-size: clamp(2rem, 9.4vw, 3.2rem);
+    padding-inline: 16px;
+  }
+  .cv-h1__lead { max-width: 12em; }
+  .cv-h1__tail { padding-left: 0; font-size: 0.64em; margin-top: 0.45em; }
+
+  .cv-outer {
+    aspect-ratio: 358 / 420;
+    max-width: 520px;
+    margin-inline: auto;
+    margin-top: 28px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cv-mark { animation: none !important; }
+}

@@ -139,7 +139,7 @@ export default function Navbar() {
           24px vertical padding cannot coexist with a 48px CTA in a 72px
           bar, so the height carries the vertical rhythm instead.) */}
       <motion.nav
-        className="fixed inset-x-0 top-0 z-[1000] flex h-[72px] items-center justify-between px-8 transition-[background-color,border-color] duration-150"
+        className="fixed inset-x-0 top-0 z-[1000] flex h-[72px] items-center justify-between px-[max(2rem,calc((100%_-_1200px)/2))] transition-[background-color,border-color] duration-150"
         style={
           scrolled
             ? {

@@ -29,35 +29,7 @@ import { useHeroPointer } from './useHeroPointer';
 import { useHeroSync } from './useHeroSync';
 import { useHeroScroll } from './useHeroScroll';
 import { HeroBootScript } from './HeroBootScript';
-
-/* A spacing gap between two stack blocks. When `line` is set, a full-bleed
-   hairline renders centered in the gap via ::after (see assemble.css), so it
-   always sits between text blocks and can never cross a heading. */
-function Gap({ token, line = false, i = 0 }: { token: string; line?: boolean; i?: number }) {
-  return (
-    <div
-      aria-hidden="true"
-      data-testid={line ? 'hero-hairline' : undefined}
-      className="hero-gap"
-      style={{ height: `var(${token})`, '--gap-i': i } as React.CSSProperties}
-      data-line={line ? 'true' : undefined}
-    />
-  );
-}
-
-/* A barely-there white lift behind the headline (≤3% difference). */
-function HeadlineLift() {
-  return (
-    <div
-      aria-hidden="true"
-      className="pointer-events-none absolute left-1/2 top-[140px] h-[520px] w-[min(90vw,1100px)] -translate-x-1/2"
-      style={{
-        background:
-          'radial-gradient(closest-side, rgba(255,255,255,0.75), rgba(255,255,255,0))',
-      }}
-    />
-  );
-}
+import { HeroConvergence } from './convergence/HeroConvergence';
 
 /* THE PRIMARY CTA — the story button, and the hero's only button. A white
  * pill: accent-tinted chip (static play triangle + slot) beside a muted
@@ -185,113 +157,17 @@ function _Word({ index, children }: { index: number; children?: React.ReactNode 
    full sentence (read once); the visual word spans are aria-hidden. The
    empty line2 slot and its skeleton bar are gone; the break after "Clients"
    matches the previous two-line setting. Copy is never altered here. */
-function SwashSVG({ id = 'hero-swash-grad' }: { id?: string }) {
-  return (
-    <span
-      data-testid="hero-swash"
-      className="hero-swash"
-      aria-hidden="true"
-      style={{
-        zIndex: 0,
-        inset: '-0.06em -0.3em',
-        transform: 'rotate(-0.5deg)',
-      }}
-    >
-      <svg
-        data-testid="hero-swash-shape"
-        className="hero-swash-shape"
-        viewBox="0 0 120 26"
-        preserveAspectRatio="none"
-        focusable="false"
-        style={{
-          animation: 'hero-swash-draw 800ms cubic-bezier(0.22, 1, 0.36, 1) both',
-          animationDelay: '350ms',
-        }}
-      >
-        <defs>
-          <linearGradient id={id} x1="0" y1="0" x2="0.985" y2="0.17">
-            <stop offset="0" style={{ stopColor: 'var(--hero-accent-300)' }} />
-            <stop offset="1" style={{ stopColor: 'var(--hero-accent-500)' }} />
-          </linearGradient>
-        </defs>
-        <path
-          d="M2.5 17.5 C4.5 12.5 7.5 9.5 12.5 8.2 L30 6.6 C35 6.3 37.5 4.3 43.5 4.5 C49.5 4.7 51.5 6.5 57.5 6.3 L70 6.1 C75.5 5.9 77.5 4.1 83.5 4.3 C89.5 4.5 91.5 6.1 97.5 6.3 L109.5 6.7 C114.5 6.9 117.5 9.2 117.5 13 C117.5 16.8 114.5 19.2 109.5 19.6 L96 20.4 C88 20.8 80 20.4 72 20.8 C60 21.4 48 20.8 36 21.2 C26 21.5 16 21.2 10.5 20.2 C5.5 19.4 3 18.7 2.5 17.5 Z"
-          fill={`url(#${id})`}
-        />
-      </svg>
-      <span
-        data-testid="hero-spark"
-        data-spark="0"
-        className="hero-spark"
-        aria-hidden="true"
-        style={{
-          animation: 'hero-spark-twinkle 450ms cubic-bezier(0.22, 1, 0.36, 1) both',
-          animationDelay: '1050ms',
-        }}
-      >
-        <svg viewBox="0 0 24 24" focusable="false">
-          <path
-            d="M12 0 C13 8 16 11 24 12 C16 13 13 16 12 24 C11 16 8 13 0 12 C8 11 11 8 12 0 Z"
-            style={{ fill: 'var(--hero-accent-500)' }}
-          />
-        </svg>
-      </span>
-      <span
-        data-testid="hero-spark"
-        data-spark="1"
-        className="hero-spark"
-        aria-hidden="true"
-        style={{
-          animation: 'hero-spark-twinkle 450ms cubic-bezier(0.22, 1, 0.36, 1) both',
-          animationDelay: '1150ms',
-        }}
-      >
-        <svg viewBox="0 0 24 24" focusable="false">
-          <path
-            d="M12 0 C13 8 16 11 24 12 C16 13 13 16 12 24 C11 16 8 13 0 12 C8 11 11 8 12 0 Z"
-            style={{ fill: 'var(--hero-accent-300)' }}
-          />
-        </svg>
-      </span>
-      <span
-        data-testid="hero-spark"
-        data-spark="2"
-        className="hero-spark"
-        aria-hidden="true"
-        style={{
-          animation: 'hero-spark-twinkle 450ms cubic-bezier(0.22, 1, 0.36, 1) both',
-          animationDelay: '1250ms',
-        }}
-      >
-        <svg viewBox="0 0 24 24" focusable="false">
-          <path
-            d="M12 0 C13 8 16 11 24 12 C16 13 13 16 12 24 C11 16 8 13 0 12 C8 11 11 8 12 0 Z"
-            style={{ fill: 'var(--hero-accent-500)' }}
-          />
-        </svg>
-      </span>
-    </span>
-  );
-}
-
-/* THE HEADLINE — the hero tagline with relaxed spacing and animated orange highlight. */
+/* THE HEADLINE — approved tagline, unchanged wording. The lead sets on two
+   balanced lines; the closing clause sits one step down, indented to the
+   plate of the visual below, with a printed underline band (see
+   convergence.css) in place of the old swash and sparkles. */
 function Headline() {
   const { lead, full } = HOME.tagline;
   return (
-    <h1 data-testid="hero-headline" className="hero-h1 text-center" aria-label={full}>
-      <span className="block text-balance tracking-[-0.035em] text-[clamp(2.25rem,5cqi,3.85rem)] leading-[1.16]">
-        {lead}
-      </span>
-      <span className="mt-7 md:mt-10 block text-[clamp(1.65rem,3.6cqi,2.65rem)] leading-[1.28] tracking-[-0.03em]">
-        <span className="inline-block relative">
-          <SwashSVG id="hero-swash-1" />
-          <span className="relative z-10 whitespace-nowrap">Unified into one</span>
-        </span>
-        {' '}
-        <span className="inline-block relative">
-          <SwashSVG id="hero-swash-2" />
-          <span className="relative z-10 whitespace-nowrap">actionable Framework.</span>
-        </span>
+    <h1 data-testid="hero-headline" className="cv-h1" aria-label={full}>
+      <span className="cv-h1__lead">{lead}</span>
+      <span className="cv-h1__tail">
+        <span className="cv-mark">Unified into one actionable Framework.</span>
       </span>
     </h1>
   );
@@ -456,31 +332,19 @@ export default function Hero() {
         className="relative bg-[var(--scaffold-bg)]"
         style={{ overflowX: 'clip', minHeight: '100svh' }}
       >
-        <div className="hero-grid relative">
-          {/* Spotlight dot grid: base ink-6% dots everywhere, a pointer-
-              following mask revealing accent-500 dots (35%) with ink-14%
-              neighbours. Behind everything, decorative, never intercepts. */}
-          <div data-testid="hero-grid" className="hero-bg" aria-hidden="true">
-            <div className="hero-dots hero-dots-base" />
-            <div className="hero-dots hero-dots-near" />
-            <div className="hero-dots hero-dots-hot" />
-          </div>
-          <HeadlineLift />
-          <div data-testid="hero-column" className="hero-column">
-            <Gap token="--hero-gap-top" line i={0} />
+        <div className="cv-hero">
+          <div className="cv-paper" aria-hidden="true" />
+          <div data-testid="hero-column">
             <Headline />
-            <Gap token="--hero-gap-bottom" line i={1} />
-            {/* Hidden for now: subheadline and video see how it works section will be redesigned later */}
-            {false && (
-              <>
-                <Subhead />
-                <CTARow
-                  onOpenStory={() => setStoryOpen(true)}
-                  ctaRef={storyBtnRef}
-                />
-              </>
-            )}
           </div>
+          <HeroConvergence />
+          {/* Hidden for now: subheadline and video "see how it works" will be redesigned later */}
+          {false && (
+            <>
+              <Subhead />
+              <CTARow onOpenStory={() => setStoryOpen(true)} ctaRef={storyBtnRef} />
+            </>
+          )}
         </div>
 
         {/* Story Video Card Modal (current player) */}
