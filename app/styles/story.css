@@ -78,7 +78,7 @@
 .hs-loop {
   fill: none;
   stroke: var(--color-brand);
-  stroke-width: 1.5;
+  stroke-width: 2;
   stroke-linecap: round;
   stroke-dasharray: 1;
 }
@@ -121,9 +121,9 @@
   position: absolute;
   display: grid;
   place-items: center;
-  width: 38px;
-  height: 38px;
-  margin: -19px 0 0 -19px;
+  width: 46px;
+  height: 46px;
+  margin: -23px 0 0 -23px;
   box-sizing: border-box;
   border-radius: 50%;
   background: var(--scaffold-surface);
@@ -144,7 +144,7 @@
 .hs-word {
   position: absolute;
   padding: 2px 6px;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 500;
   line-height: 1;
   letter-spacing: 0.01em;
@@ -165,9 +165,9 @@
 .hs-token {
   position: absolute;
   display: block;
-  width: 16px;
-  height: 16px;
-  margin: -8px 0 0 -8px;
+  width: 20px;
+  height: 20px;
+  margin: -10px 0 0 -10px;
   border-radius: 50%;
   background: var(--color-brand);
   box-shadow:
@@ -261,9 +261,9 @@
   position: absolute;
   display: grid;
   place-items: center;
-  width: 30px;
-  height: 30px;
-  margin: -15px 0 0 -15px;
+  width: 36px;
+  height: 36px;
+  margin: -18px 0 0 -18px;
   box-sizing: border-box;
   border: 1px solid rgb(10 10 10 / 70%);
   border-radius: 50%;
@@ -278,12 +278,12 @@
 /* ── Booked slot ─────────────────────────────────────────────────────────── */
 .hs-slot {
   position: absolute;
-  width: 30px;
-  height: 30px;
-  margin: -15px 0 0 -15px;
+  width: 38px;
+  height: 38px;
+  margin: -19px 0 0 -19px;
   box-sizing: border-box;
   border: 1px solid rgb(10 10 10 / 55%);
-  border-radius: 8px;
+  border-radius: 10px;
   background: var(--scaffold-surface);
   overflow: hidden;
 }

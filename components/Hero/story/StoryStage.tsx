@@ -91,7 +91,7 @@ export function StoryStage({ mode }: { mode: TrackMode }) {
                 className="hs-node"
                 style={{ left: px(n.x), top: px(n.y) }}
               >
-                {Glyph && STAGE_ICON_ID[stage] ? <Glyph id={`hs-${stage}`} size={stage === 'discover' ? 22 : 18} /> : null}
+                {Glyph && STAGE_ICON_ID[stage] ? <Glyph id={`hs-${stage}`} size={stage === 'discover' ? 26 : 22} /> : null}
               </div>
               <span
                 data-s="word"
