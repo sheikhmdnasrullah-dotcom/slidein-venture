@@ -23,12 +23,45 @@ test.describe('hero', () => {
     await expect(page.getByTestId('hero-cta-primary')).toBeVisible();
   });
 
-  test('stage plate lists the loop stages in order', async ({ page }) => {
+  test('convergence visual draws the seven stage rows and settles', async ({ page }) => {
     await page.goto('/');
-    const items = page.getByTestId('hero-stage-plate').locator('li');
-    await expect(items).toHaveCount(7);
-    const words = (await items.allTextContents()).map((t) => t.trim());
+    const visual = page.getByTestId('hero-convergence');
+    await expect(visual).toBeVisible();
+    await expect(visual.locator('.cv[data-state="done"]')).toBeAttached({ timeout: 15000 });
+    const words = (await visual.locator('[data-pword]').allTextContents()).map((t) => t.trim());
     expect(words).toEqual(PLATE_STAGES.map((s) => STAGE_WORD[s]));
+  });
+
+  test('orbit and flow ornaments are present and hidden from assistive tech', async ({ page }) => {
+    await page.goto('/');
+    for (const id of ['hero-orbit', 'hero-flow']) {
+      await expect(page.getByTestId(id)).toHaveAttribute('aria-hidden', 'true');
+    }
+  });
+
+  test('headline is one face, one weight, one ink', async ({ page }) => {
+    await page.goto('/');
+    await page.waitForTimeout(900);
+    const [lead, tail] = await Promise.all(
+      ['.hm-h1__lead', '.hm-h1__tail'].map((sel) =>
+        page.locator(sel).evaluate((el) => {
+          const c = getComputedStyle(el);
+          return [c.fontFamily, c.fontWeight, c.fontSize, c.color].join('|');
+        }),
+      ),
+    );
+    expect(tail).toBe(lead);
+  });
+
+  test('scroll flow draws as the hero leaves', async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto('/');
+    const dash = () =>
+      page.getByTestId('hero-flow').locator('line').nth(1).evaluate((el) => (el as SVGElement).style.strokeDashoffset);
+    const before = Number(await dash());
+    await page.mouse.wheel(0, 700);
+    await page.waitForTimeout(1200);
+    expect(Number(await dash())).toBeLessThan(before);
   });
 
   for (const w of WIDTHS) {
@@ -40,6 +73,8 @@ test.describe('hero', () => {
         const hero = document.querySelector('[data-testid="hero"]')!;
         let max = hero.getBoundingClientRect().right;
         hero.querySelectorAll('*').forEach((el) => {
+          // The orbit bleeds off the edge on purpose; the hero clips it (overflow-x: clip).
+          if (el.closest('[data-testid="hero-orbit"]')) return;
           max = Math.max(max, el.getBoundingClientRect().right);
         });
         return max - window.innerWidth;
@@ -77,7 +112,11 @@ test.describe('hero', () => {
   test('hero has no axe violations', async ({ page }) => {
     await page.goto('/');
     await page.waitForTimeout(900); // let the entrance fade finish
-    const results = await new AxeBuilder({ page }).include('[data-testid="hero"]').analyze();
+    // The convergence visual is decorative (aria-hidden) and mid-animation here.
+    const results = await new AxeBuilder({ page })
+      .include('[data-testid="hero"]')
+      .exclude('[data-testid="hero-convergence"]')
+      .analyze();
     expect(results.violations).toEqual([]);
   });
 });

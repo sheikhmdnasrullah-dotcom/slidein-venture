@@ -14,26 +14,31 @@
   --hm-ink-2: rgb(10 10 10 / 72%); /* AA on #FDFDFD and on the marker wash */
   --hm-gap: 24px;
   --hm-ease: var(--ease-out, cubic-bezier(0.23, 1, 0.32, 1));
-  padding: clamp(7rem, 15vh, 9.5rem) 32px clamp(4rem, 9vh, 6rem);
+  position: relative;
+  padding: clamp(6rem, 11vh, 7.5rem) 32px clamp(7rem, 12vh, 9rem);
   overflow-x: clip;
 }
 
 .hm-hero__grid {
+  position: relative;
+  z-index: 1;
   width: min(1200px, 100%);
   margin-inline: auto;
   display: grid;
   grid-template-columns: minmax(0, 1fr);
-  row-gap: clamp(2rem, 5vh, 3.25rem);
+  row-gap: clamp(1.5rem, 3.5vh, 2.5rem);
 }
 
-/* ── Headline: lead ink, tail lighter weight with the one marker wash ───── */
+/* ── Headline: one face, one weight, one ink. The tail differs from the lead
+   only by the marker wash behind it, never by font, weight or colour. ───── */
 .hm-h1 {
   margin: 0;
   display: grid;
   grid-template-columns: subgrid;
   grid-column: 1 / -1;
   color: var(--scaffold-ink);
-  font-size: clamp(2.125rem, 1rem + 5vw, 4.75rem);
+  font-size: clamp(2.125rem, 1rem + 4.1vw, 4rem);
+  font-weight: 600; /* typography.spec caps nav/hero text at 600; display-xl is 650 */
   line-height: 1.03;
   letter-spacing: -0.036em;
   text-wrap: balance;
@@ -46,8 +51,9 @@
 .hm-h1__tail {
   display: block;
   margin-top: 0.08em;
-  color: var(--hm-ink-2);
-  font-weight: 400;
+  color: inherit;
+  font: inherit;
+  letter-spacing: inherit;
 }
 
 /* Marker wash: translucent brand orange behind the lower half of the tail
@@ -158,70 +164,6 @@
   }
 }
 
-/* ── Stage plate: a stacked sheet. Hairline grid, a paper lip beneath, and a
-   soft ambient shadow give three depth levels without any new colour. ───── */
-.hm-hero__plate {
-  grid-column: 1 / -1;
-  border-radius: var(--scaffold-r-md);
-  box-shadow:
-    0 8px 0 -4px var(--scaffold-lip),
-    var(--scaffold-shadow-soft);
-}
-
-.hm-plate {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 1px;
-  background: var(--scaffold-rule);
-  border: 1px solid var(--scaffold-rule);
-  border-radius: var(--scaffold-r-md);
-  overflow: hidden;
-  /* overflow clips outer shadows on the ul itself, so depth is drawn on the
-     wrapper below */
-}
-
-.hm-plate__item {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 18px;
-  min-height: 92px;
-  padding: 16px;
-  background: var(--color-paper-25);
-  color: var(--scaffold-ink);
-  font-size: 13px;
-  font-weight: 500;
-  transition: background-color 200ms var(--hm-ease);
-}
-
-.hm-plate__item:last-child:nth-child(odd) {
-  grid-column: 1 / -1;
-}
-
-@media (hover: hover) and (pointer: fine) {
-  .hm-plate__item:hover {
-    background: var(--scaffold-accent-row);
-  }
-}
-
-@media (width >= 720px) {
-  .hm-plate {
-    grid-template-columns: repeat(7, minmax(0, 1fr));
-  }
-
-  .hm-plate__item:last-child:nth-child(odd) {
-    grid-column: auto;
-  }
-
-  .hm-plate__item {
-    min-height: 104px;
-  }
-}
-
 /* Tablet: tail steps in slightly so the two lines still read as a pair. */
 @media (width >= 640px) {
   .hm-h1__tail {
@@ -280,8 +222,8 @@
     row-gap: 0;
   }
 
-  .hm-hero__plate {
-    grid-column: 3 / -1;
+  .hm-hero__visual {
+    grid-column: 1 / -1;
   }
 }
 
@@ -296,10 +238,6 @@
     animation-delay: calc(var(--i, 0) * 90ms);
   }
 
-  .hm-plate__item {
-    animation: hm-settle 420ms var(--hm-ease) backwards;
-    animation-delay: calc(380ms + var(--n, 0) * 40ms);
-  }
 }
 
 @keyframes hm-settle {
@@ -312,4 +250,106 @@
     opacity: 1;
     transform: none;
   }
+}
+
+/* ── Visual slot: the convergence canvas spans the full measure. ─────────── */
+.hm-hero__visual {
+  grid-column: 1 / -1;
+  min-width: 0;
+}
+
+/* ── Orbit: concentric hairlines behind the headline. Turns on its own, and
+   a little more with scroll. Transform only. ─────────────────────────────── */
+.hm-orbit {
+  position: absolute;
+  z-index: 0;
+  top: clamp(-9rem, -12vw, -3rem);
+  right: clamp(-16rem, -14vw, -4rem);
+  width: clamp(22rem, 52vw, 40rem);
+  aspect-ratio: 1;
+  pointer-events: none;
+  opacity: 0.9;
+  -webkit-mask-image: radial-gradient(closest-side, rgb(0 0 0 / 100%) 55%, transparent);
+  mask-image: radial-gradient(closest-side, rgb(0 0 0 / 100%) 55%, transparent);
+}
+
+.hm-orbit__turn {
+  width: 100%;
+  height: 100%;
+  transform: rotate(calc(var(--scroll-y, 0) * 0.025deg));
+  will-change: transform;
+}
+
+.hm-orbit svg {
+  display: block;
+  overflow: visible;
+}
+
+.hm-orbit__ring {
+  fill: none;
+  stroke: rgb(10 10 10 / 11%);
+  stroke-width: 1;
+}
+
+.hm-orbit__spoke {
+  stroke: rgb(10 10 10 / 6%);
+  stroke-width: 1;
+}
+
+.hm-orbit__node {
+  fill: var(--scaffold-bg);
+  stroke: rgb(10 10 10 / 55%);
+  stroke-width: 1.25;
+}
+
+.hm-orbit__node--hot {
+  fill: var(--color-brand);
+  stroke: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .hm-orbit svg {
+    animation: hm-orbit-spin 180s linear infinite;
+    transform-origin: 50% 50%;
+  }
+}
+
+@keyframes hm-orbit-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ── Flow: a line that draws out of the hero as you scroll. ──────────────── */
+.hm-flow {
+  position: absolute;
+  z-index: 1;
+  left: 50%;
+  bottom: 0;
+  translate: -50% 0;
+  height: 96px;
+  pointer-events: none;
+}
+
+.hm-flow svg {
+  display: block;
+  overflow: visible;
+}
+
+.hm-flow__rail {
+  stroke: rgb(10 10 10 / 10%);
+  stroke-width: 1;
+  stroke-dasharray: 2 4;
+}
+
+.hm-flow__line {
+  stroke: var(--color-brand);
+  stroke-width: 1.5;
+  stroke-linecap: round;
+}
+
+.hm-flow__bead {
+  fill: var(--scaffold-bg);
+  stroke: var(--color-brand);
+  stroke-width: 1.5;
 }

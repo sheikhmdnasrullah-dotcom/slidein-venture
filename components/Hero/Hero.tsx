@@ -12,7 +12,9 @@
 import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { StoryModal } from './StoryModal';
-import { StagePlate } from './StagePlate';
+import { HeroConvergence } from './convergence/HeroConvergence';
+import { HeroOrbit } from './HeroOrbit';
+import { HeroFlow } from './HeroFlow';
 import { TextSlot } from './Skeleton';
 import { VideoPlayerV2 } from '@/how-it-works-video/core/player';
 import { HOME, NAV_SLOTS } from '@/content/home';
@@ -104,6 +106,7 @@ export default function Hero() {
       data-disorder={BAND_DISORDER.hero}
       className="hm-hero bg-[var(--scaffold-bg)]"
     >
+      <HeroOrbit />
       <div className="hm-hero__grid">
         <Headline />
         <div className="hm-hero__copy hm-in" style={{ '--i': 2 } as React.CSSProperties}>
@@ -134,10 +137,12 @@ export default function Hero() {
             ) : null}
           </div>
         </div>
-        <div className="hm-hero__plate hm-in" style={{ '--i': 3 } as React.CSSProperties}>
-          <StagePlate />
+        <div className="hm-hero__visual hm-in" style={{ '--i': 3 } as React.CSSProperties}>
+          <HeroConvergence />
         </div>
       </div>
+
+      <HeroFlow />
 
       <StoryModal
         open={storyOpen}
