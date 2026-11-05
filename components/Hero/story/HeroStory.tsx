@@ -187,7 +187,7 @@ export function HeroStory() {
       const tl = gsap.timeline({ paused: true, defaults: { ease: 'none' } });
 
       /* 1 · mess: fragments loosen, their tangle draws */
-      fs.forEach((f, i) => {
+      fs.forEach((f) => {
         tl.fromTo(
           f,
           { loose: 0 },

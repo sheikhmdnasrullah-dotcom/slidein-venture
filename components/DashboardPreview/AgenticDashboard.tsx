@@ -684,7 +684,7 @@ function SearchPalette({
         </div>
 
         {/* Results List */}
-        <div className="flex-1 overflow-y-auto p-2">
+        <div data-lenis-prevent className="flex-1 overflow-y-auto p-2">
           {filtered.length === 0 ? (
             <div className="p-6 text-center text-[12px] text-[rgba(10,10,10,0.4)]">
               No matching results
@@ -1652,7 +1652,7 @@ export default function AgenticDashboard({
           <span className="my-1.5 block h-px w-full bg-[var(--scaffold-hairline)]" />
 
           {/* 7 Workflow Stages */}
-          <nav className="flex flex-1 flex-col gap-0.5 overflow-y-auto">
+          <nav data-lenis-prevent className="flex flex-1 flex-col gap-0.5 overflow-y-auto">
             {SIDEBAR_STAGES.map((st) => {
               const isCurrent = st === activeStage;
               const status: AgentStatus = isCurrent

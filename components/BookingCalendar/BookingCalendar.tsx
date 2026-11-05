@@ -308,7 +308,7 @@ export default function BookingCalendar() {
                     </p>
 
                     {availableSlots.length > 0 ? (
-                      <div className="flex flex-col gap-[6px] max-h-[360px] overflow-y-auto pr-1">
+                      <div data-lenis-prevent className="flex flex-col gap-[6px] max-h-[360px] overflow-y-auto pr-1">
                         {availableSlots.map((slot) => (
                           <button
                             key={slot}
