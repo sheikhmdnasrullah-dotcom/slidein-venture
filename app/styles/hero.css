@@ -1,0 +1,199 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   HERO — type-first. One idea, one action, one quiet plate.
+   Uses the scaffold tokens (assemble.css) and the .font-display-xl role.
+   Class prefix `hm-` keeps this isolated from legacy `hero-*` rules.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.hm-hero {
+  --hm-muted: rgb(10 10 10 / 66%); /* 4.5:1+ on #FDFDFD for body-size text */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: clamp(7.5rem, 17vh, 11rem) 24px clamp(4rem, 9vh, 6rem);
+  overflow-x: clip;
+  text-align: center;
+}
+
+.hm-hero__col {
+  width: 100%;
+  max-width: 62rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.hm-hero__wide {
+  width: 100%;
+  max-width: 62rem;
+  margin-top: clamp(3rem, 7vh, 4.5rem);
+}
+
+.hm-h1 {
+  margin: 0;
+  color: var(--scaffold-ink);
+  font-size: clamp(2rem, 1.2rem + 3.6vw, 4.25rem);
+  line-height: 1.06;
+  letter-spacing: -0.035em;
+  text-wrap: balance;
+}
+
+.hm-h1__tail {
+  color: var(--hm-muted);
+}
+
+.hm-sub {
+  margin: clamp(1.25rem, 2.6vh, 1.75rem) 0 0;
+  max-width: 38rem;
+  color: var(--hm-muted);
+  font-size: clamp(1rem, 0.94rem + 0.3vw, 1.1875rem);
+  line-height: 1.55;
+  text-wrap: pretty;
+}
+
+.hm-actions {
+  margin-top: clamp(1.75rem, 3.6vh, 2.25rem);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 12px 28px;
+}
+
+/* Primary: one white pill, one hairline border. No beam, no glow. */
+.hm-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  height: 48px;
+  max-width: calc(100vw - 48px);
+  padding: 0 22px 0 6px;
+  cursor: pointer;
+  color: var(--scaffold-ink);
+  background: var(--scaffold-surface);
+  border: 1px solid var(--scaffold-rule);
+  border-radius: var(--radius-pill);
+  font-size: 15px;
+  transition:
+    background-color 200ms var(--ease-out, cubic-bezier(0.22, 1, 0.36, 1)),
+    transform 160ms var(--ease-out, cubic-bezier(0.22, 1, 0.36, 1));
+}
+
+.hm-pill:hover {
+  background: var(--scaffold-accent-row);
+}
+
+.hm-pill:active {
+  transform: scale(0.98);
+}
+
+.hm-pill:focus-visible,
+.hm-link:focus-visible {
+  outline: 2px solid color-mix(in oklch, var(--color-brand) 60%, transparent);
+  outline-offset: 3px;
+}
+
+.hm-pill__chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 36px;
+  padding: 0 16px;
+  font-weight: 500;
+  border-radius: var(--radius-pill);
+  background: var(--scaffold-accent-chip);
+}
+
+.hm-pill__label {
+  color: var(--hm-muted);
+}
+
+/* Secondary: a plain text link. */
+.hm-link {
+  color: var(--scaffold-ink);
+  font-size: 15px;
+  text-decoration: none;
+  border-radius: var(--radius-sm);
+}
+
+.hm-link:hover {
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+/* Stage plate: 1px gaps over a rule-coloured ground draw the hairlines. */
+.hm-plate {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1px;
+  background: var(--scaffold-rule);
+  border: 1px solid var(--scaffold-rule);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.hm-plate__item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 56px;
+  padding: 0 12px;
+  background: var(--scaffold-surface);
+  color: var(--scaffold-ink);
+  font-size: 13px;
+  font-weight: 500;
+  transition: background-color 200ms var(--ease-out, cubic-bezier(0.22, 1, 0.36, 1));
+}
+
+.hm-plate__item:last-child:nth-child(odd) {
+  grid-column: 1 / -1;
+}
+
+.hm-plate__item:hover {
+  background: var(--scaffold-accent-row);
+}
+
+@media (width >= 960px) {
+  .hm-plate {
+    grid-template-columns: repeat(7, 1fr);
+  }
+
+  .hm-plate__item:last-child:nth-child(odd) {
+    grid-column: auto;
+  }
+}
+
+@media (width < 640px) {
+  .hm-actions {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .hm-pill {
+    width: 100%;
+    justify-content: flex-start;
+  }
+}
+
+/* Entrance: a quiet fade-up, three groups, 80ms apart. */
+@media (prefers-reduced-motion: no-preference) {
+  .hm-in {
+    animation: hm-rise 420ms var(--ease-out, cubic-bezier(0.22, 1, 0.36, 1)) both;
+    animation-delay: calc(var(--i, 0) * 80ms);
+  }
+}
+
+@keyframes hm-rise {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
