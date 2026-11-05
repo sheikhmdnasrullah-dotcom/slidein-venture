@@ -369,6 +369,7 @@ function DetailPanel({ m, onClose }: { m: Module; onClose: () => void }) {
       <motion.aside
         initial={{ x: '104%' }} animate={{ x: 0 }} exit={{ x: '104%' }}
         transition={{ duration: 0.45, ease: EASE }}
+        data-lenis-prevent
         className="os-drawer fixed top-0 right-0 bottom-0 z-50 w-full max-w-87.5 overflow-y-auto border-l border-(--rule) bg-(--surface)"
       >
         <div className="sticky top-0 bg-[var(--surface-glass)] backdrop-blur border-b border-[var(--rule)] px-5 py-3.5 flex items-center gap-3">

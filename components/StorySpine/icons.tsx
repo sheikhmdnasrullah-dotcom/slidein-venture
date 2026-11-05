@@ -8,7 +8,7 @@
  * exempt primitives (bars/dots) and carry no registry id.
  *
  * Voice: 48-grid, ~3px strokes, round caps; ink + soft grey + one accent
- * dot max — the FloatingTiles voice (which imports from here).
+ * dot max.
  */
 
 const INK = 'rgba(10,10,10,1)';

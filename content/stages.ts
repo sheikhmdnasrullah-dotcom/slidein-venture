@@ -91,10 +91,8 @@ export const BAND_DISORDER: Record<string, number> = {
 };
 
 /**
- * The hero loop's eight stages in story order — the index↔id table the
- * master clock (components/Hero/field/clock.ts) and the subline sync
- * (content/hero-sync.ts) share. `activity` is not a loop stage. The field's
- * STAGE_ORDER re-exports this; there is exactly one copy.
+ * The loop's eight stages in story order. `activity` is not a loop stage.
+ * There is exactly one copy of this table.
  */
 export const LOOP_STAGE_ORDER: StageId[] = [
   'configure',

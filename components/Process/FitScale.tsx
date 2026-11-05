@@ -98,7 +98,7 @@ export default function FitScale({
 
   if (isMobile) {
     return (
-      <div className={`relative flex overflow-y-auto overscroll-contain ${className}`}>
+      <div data-lenis-prevent className={`relative flex overflow-y-auto overscroll-contain ${className}`}>
         <div className="my-auto w-full">{children}</div>
       </div>
     );

@@ -182,6 +182,7 @@ export function StoryModal({ open, onClose, triggerRef }: Props) {
           <motion.div
             ref={modalRef}
             role="dialog"
+            data-lenis-prevent
             aria-modal="true"
             aria-label="How SlideIn Works Video Walkthrough"
             initial={{ opacity: 0, y: 8 }}

@@ -226,6 +226,7 @@ export default function ProcessDeck() {
               initial="enter"
               animate="center"
               exit="exit"
+              data-lenis-prevent
               className="absolute inset-0 p-6 sm:p-8 md:p-10 flex flex-col overflow-y-auto"
             >
               <SlideContent
@@ -351,7 +352,7 @@ export default function ProcessDeck() {
                 </button>
               </div>
 
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 overflow-y-auto pr-1">
+              <div data-lenis-prevent className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 overflow-y-auto pr-1">
                 {SLIDES_DATA.map((s, idx) => (
                   <button
                     key={s.id}

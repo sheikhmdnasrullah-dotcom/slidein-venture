@@ -1,0 +1,216 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   HERO — type-first, asymmetric. One idea, one action, one layered plate.
+   Uses the scaffold tokens (assemble.css) and the .font-display-xl role.
+   Class prefix `hm-` keeps this isolated from legacy `hero-*` rules.
+
+   Composition: the hero is exactly one viewport tall (the story pins it). A
+   12-column grid on the navbar's 1200px measure carries the headline; the
+   tail steps in to column 3 on desktop. The story fills the remaining height.
+   Below 1180px the grid collapses to a single left-aligned stack.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.hm-hero {
+  --hm-ink-2: rgb(10 10 10 / 72%); /* AA on #FDFDFD and on the marker wash */
+  --hm-gap: 24px;
+  --hm-ease: var(--ease-out, cubic-bezier(0.23, 1, 0.32, 1));
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  height: 100svh;
+  min-height: 600px;
+  box-sizing: border-box;
+  padding: clamp(5.25rem, 11vh, 6.25rem) 32px 12px;
+  overflow: clip;
+}
+
+@media (width < 640px) {
+  .hm-hero {
+    padding-inline: 20px;
+  }
+}
+
+.hm-hero__grid {
+  position: relative;
+  z-index: 1;
+  flex: none;
+  width: min(1200px, 100%);
+  margin-inline: auto;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  row-gap: clamp(0.875rem, 2.4vh, 1.5rem);
+}
+
+/* ── Headline: one face, one weight, one ink. The tail differs from the lead
+   only by the marker wash behind it, never by font, weight or colour. ───── */
+.hm-h1 {
+  margin: 0;
+  display: grid;
+  grid-template-columns: subgrid;
+  grid-column: 1 / -1;
+  color: var(--scaffold-ink);
+  font-size: clamp(1.75rem, 0.9rem + 2.9vw, 3.25rem);
+  font-weight: 600; /* typography.spec caps nav/hero text at 600; display-xl is 650 */
+  line-height: 1.03;
+  letter-spacing: -0.036em;
+  text-wrap: balance;
+}
+
+.hm-h1__lead {
+  display: block;
+}
+
+.hm-h1__tail {
+  display: block;
+  margin-top: 0.08em;
+  color: inherit;
+  font: inherit;
+  letter-spacing: inherit;
+}
+
+/* Marker wash: translucent brand orange behind the lower half of the tail
+   only. Colour keeps its meaning: this is the single highlight. */
+.hm-h1__mark {
+  background: linear-gradient(
+    transparent 60%,
+    var(--scaffold-accent-pill) 60% 92%,
+    transparent 92%
+  );
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+  padding-inline: 0.04em;
+}
+
+/* ── Copy row: hairline rule, subhead, actions ───────────────────────────── */
+.hm-hero__copy {
+  display: grid;
+  grid-template-columns: subgrid;
+  grid-column: 1 / -1;
+}
+
+.hm-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 14px 28px;
+}
+
+/* Primary: one paper pill, one hairline border. No beam, no glow. */
+.hm-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  height: 48px;
+  max-width: 100%;
+  padding: 0 22px 0 6px;
+  cursor: pointer;
+  color: var(--scaffold-ink);
+  background: var(--color-paper-25);
+  border: 1px solid var(--scaffold-rule);
+  border-radius: var(--radius-pill);
+  font-size: 15px;
+  transition:
+    background-color 200ms var(--hm-ease),
+    transform 160ms var(--hm-ease);
+}
+
+.hm-pill:active {
+  transform: scale(0.97);
+}
+
+.hm-pill:focus-visible,
+.hm-link:focus-visible {
+  outline: 2px solid color-mix(in oklch, var(--color-brand) 60%, transparent);
+  outline-offset: 3px;
+}
+
+.hm-pill__chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 36px;
+  padding: 0 16px;
+  font-weight: 500;
+  border-radius: var(--radius-pill);
+  background: var(--scaffold-accent-chip);
+}
+
+.hm-pill__label {
+  color: var(--hm-ink-2);
+}
+
+/* Secondary: a plain text link. */
+.hm-link {
+  color: var(--scaffold-ink);
+  font-size: 15px;
+  text-decoration: none;
+  border-radius: var(--radius-sm);
+}
+
+.hm-link__arrow {
+  display: inline-block;
+  vertical-align: middle;
+  margin-left: 2px;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .hm-pill:hover {
+    background: var(--scaffold-accent-row);
+  }
+
+  .hm-link:hover {
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+}
+
+/* Tablet: tail steps in slightly so the two lines still read as a pair. */
+@media (width >= 640px) {
+  .hm-h1__tail {
+    padding-left: clamp(0rem, 8vw - 2rem, 4rem);
+  }
+}
+
+/* ── Desktop: the layered, asymmetric composition ────────────────────────── */
+@media (width >= 1180px) {
+  .hm-hero__grid {
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    column-gap: var(--hm-gap);
+  }
+
+  .hm-h1__lead {
+    grid-column: 1 / span 10;
+  }
+
+  .hm-h1__tail {
+    grid-column: 3 / span 10;
+    padding-left: 0;
+  }
+
+  .hm-hero__copy .hm-actions {
+    grid-column: 1 / -1;
+  }
+}
+
+/* ── Entrance: one orchestrated settle, then rest ────────────────────────────
+   CSS keyframes only. No stylesheet rule hides anything: `backwards` fill
+   holds the start frame only while a delayed animation waits to run, and the
+   resting state is the element's natural, fully visible one. No-JS and
+   reduced-motion therefore render complete. transform + opacity only. */
+@media (prefers-reduced-motion: no-preference) {
+  .hm-in {
+    animation: hm-settle 520ms var(--hm-ease) backwards;
+    animation-delay: calc(var(--i, 0) * 90ms);
+  }
+}
+
+@keyframes hm-settle {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import Navbar from "@/components/Navbar/Navbar";
+import { SmoothScroll } from "@/components/SmoothScroll";
 
 import { displayFace, bodyFace, monoFace } from "./fonts";
 import { cn } from "@/lib/utils";
@@ -44,9 +45,6 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      /* suppressHydrationWarning covers the hero boot script's client-only
-          attributes (data-hero-boot / data-hero-boot-t), set during parse
-          before React hydrates. See components/Hero/HeroBootScript.tsx. */
       suppressHydrationWarning
       className={cn(
         "font-sans",
@@ -67,6 +65,7 @@ export default function RootLayout({
           from top to bottom — it flattened every band it crossed. Ambient
           light now belongs to the section that is the light source. */}
       <body className="antialiased">
+        <SmoothScroll />
         <Navbar />
         <main>{children}</main>
         {/* No footer. The terminal band — wordmark, link columns, the consent

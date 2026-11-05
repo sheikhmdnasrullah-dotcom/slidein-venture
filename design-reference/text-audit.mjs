@@ -16,7 +16,6 @@ import { chromium } from '@playwright/test';
 import { HOME, NAV_SLOTS, HOME_CONTENT, CONFIGURE_FEEDS, DASHBOARD_STRINGS } from '../content/home.ts';
 import { STAGE_WORD, EQUATION_WORDS } from '../content/stages.ts';
 import { WORKFLOW_CAPTIONS, STORY_CHROME } from '../content/workflowCaptions.ts';
-import { HERO_PHRASE_SYNC } from '../content/hero-sync.ts';
 
 /* ── Build the allowed set from the content modules ─────────────────────── */
 
@@ -43,7 +42,6 @@ for (const ch of HOME.headline.highlight.split('')) add(ch);
 add(HOME.subhead.line1);
 add(HOME.subhead.line2);
 add([HOME.subhead.line1, HOME.subhead.line2].filter(Boolean).join(' '));
-for (const p of HERO_PHRASE_SYNC) add(p.phrase);
 add(HOME.cta.primary);
 add(HOME.cta.primaryVideo);
 add(HOME.cta.secondary);
