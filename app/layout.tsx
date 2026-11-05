@@ -44,9 +44,6 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      /* suppressHydrationWarning covers the hero boot script's client-only
-          attributes (data-hero-boot / data-hero-boot-t), set during parse
-          before React hydrates. See components/Hero/HeroBootScript.tsx. */
       suppressHydrationWarning
       className={cn(
         "font-sans",

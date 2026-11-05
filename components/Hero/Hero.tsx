@@ -1,11 +1,12 @@
 'use client';
 
 /**
- * HERO — type-first. Headline, subhead, one primary action (the story pill),
- * one quiet text link, and a static stage plate. Flat #FDFDFD ground.
- * Copy is read from content/home.ts and never altered here; empty slots
- * render skeleton bars (Rule 0). Entrance is a CSS-only fade (hero.css),
- * disabled under prefers-reduced-motion.
+ * HERO — type-first, asymmetric. Headline, subhead, one primary action (the
+ * story pill), one quiet text link, and a static stage plate, all hung on one
+ * vertical axis (hero.css). Flat #FDFDFD ground. Copy is read from
+ * content/home.ts and never altered here; empty slots render skeleton bars
+ * (Rule 0). Entrance is a CSS-only settle (hero.css), disabled under
+ * prefers-reduced-motion.
  */
 
 import { useEffect, useRef, useState } from 'react';
@@ -23,7 +24,12 @@ function Headline() {
   const { lead, highlight, full } = HOME.tagline;
   return (
     <h1 data-testid="hero-headline" className="hm-h1 font-display-xl" aria-label={full}>
-      <span className="hm-h1__lead">{lead}</span> <span className="hm-h1__tail">{highlight}</span>
+      <span className="hm-h1__lead hm-in" style={{ '--i': 0 } as React.CSSProperties}>
+        {lead}
+      </span>{' '}
+      <span className="hm-h1__tail hm-in" style={{ '--i': 1 } as React.CSSProperties}>
+        <span className="hm-h1__mark">{highlight}</span>
+      </span>
     </h1>
   );
 }
@@ -88,7 +94,6 @@ export default function Hero() {
       setStoryOpen(true);
     }
     if (params.get('video') === 'v2') {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setVideoV2Open(true);
     }
   }, []);
@@ -99,22 +104,39 @@ export default function Hero() {
       data-disorder={BAND_DISORDER.hero}
       className="hm-hero bg-[var(--scaffold-bg)]"
     >
-      <div className="hm-hero__col hm-in" style={{ '--i': 0 } as React.CSSProperties}>
+      <div className="hm-hero__grid">
         <Headline />
-      </div>
-      <div className="hm-hero__col hm-in" style={{ '--i': 1 } as React.CSSProperties}>
-        <Subhead />
-        <div className="hm-actions">
-          <StoryPill onOpen={() => setStoryOpen(true)} btnRef={storyBtnRef} />
-          {PRICING ? (
-            <Link href={PRICING.href} className="hm-link">
-              {PRICING.label} <span aria-hidden="true">→</span>
-            </Link>
-          ) : null}
+        <div className="hm-hero__copy hm-in" style={{ '--i': 2 } as React.CSSProperties}>
+          <Subhead />
+          <div className="hm-actions">
+            <StoryPill onOpen={() => setStoryOpen(true)} btnRef={storyBtnRef} />
+            {PRICING ? (
+              <Link href={PRICING.href} className="hm-link">
+                {PRICING.label}{' '}
+                <svg
+                  className="hm-link__arrow"
+                  viewBox="0 0 16 10"
+                  width="14"
+                  height="9"
+                  aria-hidden="true"
+                  focusable="false"
+                >
+                  <path
+                    d="M1 5h13M10 1l4 4-4 4"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.4"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              </Link>
+            ) : null}
+          </div>
         </div>
-      </div>
-      <div className="hm-hero__wide hm-in" style={{ '--i': 2 } as React.CSSProperties}>
-        <StagePlate />
+        <div className="hm-hero__plate hm-in" style={{ '--i': 3 } as React.CSSProperties}>
+          <StagePlate />
+        </div>
       </div>
 
       <StoryModal

@@ -1,89 +1,115 @@
 /* ═══════════════════════════════════════════════════════════════════════════
-   HERO — type-first. One idea, one action, one quiet plate.
+   HERO — type-first, asymmetric. One idea, one action, one layered plate.
    Uses the scaffold tokens (assemble.css) and the .font-display-xl role.
    Class prefix `hm-` keeps this isolated from legacy `hero-*` rules.
+
+   Composition: a 12-column grid on the navbar's 1200px measure. The headline
+   lead hangs from column 1; everything after it (headline tail, subhead,
+   plate) shares one axis at column 3, so the empty left margin reads as
+   deliberate negative space, not leftover. Below 1180px the grid collapses to
+   a single left-aligned stack.
    ═══════════════════════════════════════════════════════════════════════════ */
 
 .hm-hero {
-  --hm-muted: rgb(10 10 10 / 66%); /* 4.5:1+ on #FDFDFD for body-size text */
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: clamp(7.5rem, 17vh, 11rem) 24px clamp(4rem, 9vh, 6rem);
+  --hm-ink-2: rgb(10 10 10 / 72%); /* AA on #FDFDFD and on the marker wash */
+  --hm-gap: 24px;
+  --hm-ease: var(--ease-out, cubic-bezier(0.23, 1, 0.32, 1));
+  padding: clamp(7rem, 15vh, 9.5rem) 32px clamp(4rem, 9vh, 6rem);
   overflow-x: clip;
-  text-align: center;
 }
 
-.hm-hero__col {
-  width: 100%;
-  max-width: 62rem;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+.hm-hero__grid {
+  width: min(1200px, 100%);
+  margin-inline: auto;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  row-gap: clamp(2rem, 5vh, 3.25rem);
 }
 
-.hm-hero__wide {
-  width: 100%;
-  max-width: 62rem;
-  margin-top: clamp(3rem, 7vh, 4.5rem);
-}
-
+/* ── Headline: lead ink, tail lighter weight with the one marker wash ───── */
 .hm-h1 {
   margin: 0;
+  display: grid;
+  grid-template-columns: subgrid;
+  grid-column: 1 / -1;
   color: var(--scaffold-ink);
-  font-size: clamp(2rem, 1.2rem + 3.6vw, 4.25rem);
-  line-height: 1.06;
-  letter-spacing: -0.035em;
+  font-size: clamp(2.125rem, 1rem + 5vw, 4.75rem);
+  line-height: 1.03;
+  letter-spacing: -0.036em;
   text-wrap: balance;
 }
 
+.hm-h1__lead {
+  display: block;
+}
+
 .hm-h1__tail {
-  color: var(--hm-muted);
+  display: block;
+  margin-top: 0.08em;
+  color: var(--hm-ink-2);
+  font-weight: 400;
+}
+
+/* Marker wash: translucent brand orange behind the lower half of the tail
+   only. Colour keeps its meaning: this is the single highlight. */
+.hm-h1__mark {
+  background: linear-gradient(
+    transparent 60%,
+    var(--scaffold-accent-pill) 60% 92%,
+    transparent 92%
+  );
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+  padding-inline: 0.04em;
+}
+
+/* ── Copy row: hairline rule, subhead, actions ───────────────────────────── */
+.hm-hero__copy {
+  display: grid;
+  grid-template-columns: subgrid;
+  grid-column: 1 / -1;
+  row-gap: clamp(1.5rem, 3vh, 2rem);
+  padding-top: clamp(1.5rem, 3vh, 2rem);
+  border-top: 1px solid var(--scaffold-rule);
 }
 
 .hm-sub {
-  margin: clamp(1.25rem, 2.6vh, 1.75rem) 0 0;
+  margin: 0;
   max-width: 38rem;
-  color: var(--hm-muted);
-  font-size: clamp(1rem, 0.94rem + 0.3vw, 1.1875rem);
+  color: var(--hm-ink-2);
+  font-size: clamp(1.0625rem, 0.98rem + 0.3vw, 1.25rem);
   line-height: 1.55;
   text-wrap: pretty;
 }
 
 .hm-actions {
-  margin-top: clamp(1.75rem, 3.6vh, 2.25rem);
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  justify-content: center;
-  gap: 12px 28px;
+  gap: 14px 28px;
 }
 
-/* Primary: one white pill, one hairline border. No beam, no glow. */
+/* Primary: one paper pill, one hairline border. No beam, no glow. */
 .hm-pill {
   display: inline-flex;
   align-items: center;
   gap: 12px;
   height: 48px;
-  max-width: calc(100vw - 48px);
+  max-width: 100%;
   padding: 0 22px 0 6px;
   cursor: pointer;
   color: var(--scaffold-ink);
-  background: var(--scaffold-surface);
+  background: var(--color-paper-25);
   border: 1px solid var(--scaffold-rule);
   border-radius: var(--radius-pill);
   font-size: 15px;
   transition:
-    background-color 200ms var(--ease-out, cubic-bezier(0.22, 1, 0.36, 1)),
-    transform 160ms var(--ease-out, cubic-bezier(0.22, 1, 0.36, 1));
-}
-
-.hm-pill:hover {
-  background: var(--scaffold-accent-row);
+    background-color 200ms var(--hm-ease),
+    transform 160ms var(--hm-ease);
 }
 
 .hm-pill:active {
-  transform: scale(0.98);
+  transform: scale(0.97);
 }
 
 .hm-pill:focus-visible,
@@ -104,7 +130,7 @@
 }
 
 .hm-pill__label {
-  color: var(--hm-muted);
+  color: var(--hm-ink-2);
 }
 
 /* Secondary: a plain text link. */
@@ -115,81 +141,171 @@
   border-radius: var(--radius-sm);
 }
 
-.hm-link:hover {
-  text-decoration: underline;
-  text-underline-offset: 4px;
+.hm-link__arrow {
+  display: inline-block;
+  vertical-align: middle;
+  margin-left: 2px;
 }
 
-/* Stage plate: 1px gaps over a rule-coloured ground draw the hairlines. */
+@media (hover: hover) and (pointer: fine) {
+  .hm-pill:hover {
+    background: var(--scaffold-accent-row);
+  }
+
+  .hm-link:hover {
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+}
+
+/* ── Stage plate: a stacked sheet. Hairline grid, a paper lip beneath, and a
+   soft ambient shadow give three depth levels without any new colour. ───── */
+.hm-hero__plate {
+  grid-column: 1 / -1;
+  border-radius: var(--scaffold-r-md);
+  box-shadow:
+    0 8px 0 -4px var(--scaffold-lip),
+    var(--scaffold-shadow-soft);
+}
+
 .hm-plate {
   list-style: none;
   margin: 0;
   padding: 0;
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 1px;
   background: var(--scaffold-rule);
   border: 1px solid var(--scaffold-rule);
-  border-radius: var(--radius-md);
+  border-radius: var(--scaffold-r-md);
   overflow: hidden;
+  /* overflow clips outer shadows on the ul itself, so depth is drawn on the
+     wrapper below */
 }
 
 .hm-plate__item {
   display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  min-height: 56px;
-  padding: 0 12px;
-  background: var(--scaffold-surface);
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+  min-height: 92px;
+  padding: 16px;
+  background: var(--color-paper-25);
   color: var(--scaffold-ink);
   font-size: 13px;
   font-weight: 500;
-  transition: background-color 200ms var(--ease-out, cubic-bezier(0.22, 1, 0.36, 1));
+  transition: background-color 200ms var(--hm-ease);
 }
 
 .hm-plate__item:last-child:nth-child(odd) {
   grid-column: 1 / -1;
 }
 
-.hm-plate__item:hover {
-  background: var(--scaffold-accent-row);
+@media (hover: hover) and (pointer: fine) {
+  .hm-plate__item:hover {
+    background: var(--scaffold-accent-row);
+  }
 }
 
-@media (width >= 960px) {
+@media (width >= 720px) {
   .hm-plate {
-    grid-template-columns: repeat(7, 1fr);
+    grid-template-columns: repeat(7, minmax(0, 1fr));
   }
 
   .hm-plate__item:last-child:nth-child(odd) {
     grid-column: auto;
+  }
+
+  .hm-plate__item {
+    min-height: 104px;
+  }
+}
+
+/* Tablet: tail steps in slightly so the two lines still read as a pair. */
+@media (width >= 640px) {
+  .hm-h1__tail {
+    padding-left: clamp(0rem, 8vw - 2rem, 4rem);
   }
 }
 
 @media (width < 640px) {
   .hm-actions {
     flex-direction: column;
-    width: 100%;
+    align-items: stretch;
   }
 
   .hm-pill {
-    width: 100%;
     justify-content: flex-start;
   }
-}
 
-/* Entrance: a quiet fade-up, three groups, 80ms apart. */
-@media (prefers-reduced-motion: no-preference) {
-  .hm-in {
-    animation: hm-rise 420ms var(--ease-out, cubic-bezier(0.22, 1, 0.36, 1)) both;
-    animation-delay: calc(var(--i, 0) * 80ms);
+  .hm-link {
+    align-self: flex-start;
   }
 }
 
-@keyframes hm-rise {
+/* ── Desktop: the layered, asymmetric composition ────────────────────────── */
+@media (width >= 1180px) {
+  .hm-hero__grid {
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    column-gap: var(--hm-gap);
+  }
+
+  .hm-h1__lead {
+    grid-column: 1 / span 10;
+  }
+
+  .hm-h1__tail {
+    grid-column: 3 / span 10;
+    padding-left: 0;
+  }
+
+  /* subhead on the axis, actions hung to its right edge */
+  .hm-hero__copy .hm-sub {
+    grid-column: 3 / span 6;
+    grid-row: 1;
+  }
+
+  .hm-hero__copy .hm-actions {
+    grid-column: 9 / span 4;
+    grid-row: 1;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
+    justify-self: end;
+    gap: 14px;
+  }
+
+  .hm-hero__copy {
+    row-gap: 0;
+  }
+
+  .hm-hero__plate {
+    grid-column: 3 / -1;
+  }
+}
+
+/* ── Entrance: one orchestrated settle, then rest ────────────────────────────
+   CSS keyframes only. No stylesheet rule hides anything: `backwards` fill
+   holds the start frame only while a delayed animation waits to run, and the
+   resting state is the element's natural, fully visible one. No-JS and
+   reduced-motion therefore render complete. transform + opacity only. */
+@media (prefers-reduced-motion: no-preference) {
+  .hm-in {
+    animation: hm-settle 520ms var(--hm-ease) backwards;
+    animation-delay: calc(var(--i, 0) * 90ms);
+  }
+
+  .hm-plate__item {
+    animation: hm-settle 420ms var(--hm-ease) backwards;
+    animation-delay: calc(380ms + var(--n, 0) * 40ms);
+  }
+}
+
+@keyframes hm-settle {
   from {
     opacity: 0;
-    transform: translateY(8px);
+    transform: translateY(10px);
   }
 
   to {

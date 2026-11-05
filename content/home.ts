@@ -71,10 +71,7 @@ export const HOME = {
        current one. */
     line1:
       /* THE OWNER'S COPY. Verbatim, supplied directly. Do not paraphrase.
-         The four phrases that light with the master loop live in
-         HERO_PHRASE_SYNC (content/hero-sync.ts) and must stay exact
-         substrings of this line — a phrase that no longer matches renders
-         as plain text. */
+         Rendered as one plain paragraph. */
       'An end-to-end system that finds and researches each prospect, matches them to your offers, and writes each one a personal email. It keeps working until they are convinced.',
     line2: '',
     /* Optional accent-tinted phrase, split out of line1 by the component.

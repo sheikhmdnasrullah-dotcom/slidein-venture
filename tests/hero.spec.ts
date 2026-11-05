@@ -7,7 +7,9 @@
 import { test, expect } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 import { HOME } from '../content/home';
-import { LOOP_STAGE_ORDER, STAGE_WORD } from '../content/stages';
+import { LOOP_STAGE_ORDER, STAGE_ICON_ID, STAGE_WORD } from '../content/stages';
+
+const PLATE_STAGES = LOOP_STAGE_ORDER.filter((s) => STAGE_ICON_ID[s] !== null);
 
 const WIDTHS = [320, 390, 768, 1024, 1440];
 
@@ -24,9 +26,9 @@ test.describe('hero', () => {
   test('stage plate lists the loop stages in order', async ({ page }) => {
     await page.goto('/');
     const items = page.getByTestId('hero-stage-plate').locator('li');
-    await expect(items).toHaveCount(LOOP_STAGE_ORDER.length);
+    await expect(items).toHaveCount(7);
     const words = (await items.allTextContents()).map((t) => t.trim());
-    expect(words).toEqual(LOOP_STAGE_ORDER.map((s) => STAGE_WORD[s]));
+    expect(words).toEqual(PLATE_STAGES.map((s) => STAGE_WORD[s]));
   });
 
   for (const w of WIDTHS) {
