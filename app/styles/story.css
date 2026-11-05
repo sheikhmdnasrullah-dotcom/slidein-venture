@@ -1,0 +1,413 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   HERO STORY — the pinned scroll story's surface language.
+   One hairline weight (1px), one thread weight (1.5px). Orange is spent on:
+   the thread, the prospect, the loop and the booked slot. Everything else is
+   ink on paper. Fragment faces reuse the .cv-* classes from convergence.css.
+   The markup renders the FINISHED loop; HeroStory scrubs it from the mess.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.hs-wrap {
+  position: relative;
+  width: min(1200px, 100%);
+  margin-inline: auto;
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 0;
+  min-height: 0;
+  padding-bottom: 52px;
+}
+
+.hs {
+  --hs-s: 1;
+  --hs-ink: var(--scaffold-ink);
+  --hs-hair: rgb(10 10 10 / 14%);
+  position: relative;
+  flex: 1 1 0;
+  min-height: 0;
+  width: 100%;
+  font-family: inherit;
+}
+
+/* Hidden until the layout effect has written the starting frame, so the
+   finished loop never flashes before the mess. No-JS gets the noscript rule. */
+.hs[data-ready='false'] {
+  visibility: hidden;
+}
+
+.hs-canvas {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%) scale(var(--hs-s));
+  transform-origin: center;
+}
+
+.hs-svg {
+  position: absolute;
+  inset: 0;
+  overflow: visible;
+  pointer-events: none;
+}
+
+/* ── Paths ───────────────────────────────────────────────────────────────── */
+.hs-tangle {
+  fill: none;
+  stroke: rgb(10 10 10 / 24%);
+  stroke-width: 1;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  opacity: 0;
+}
+
+.hs-pull {
+  fill: none;
+  stroke: var(--color-brand);
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  opacity: 0;
+}
+
+.hs-rail {
+  fill: none;
+  stroke: var(--hs-hair);
+  stroke-width: 1;
+  stroke-dasharray: 1;
+}
+
+.hs-fill,
+.hs-loop {
+  fill: none;
+  stroke: var(--color-brand);
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-dasharray: 1;
+}
+
+.hs-loop {
+  stroke-dasharray: 1;
+}
+
+.hs-hair {
+  fill: none;
+  stroke: var(--hs-hair);
+  stroke-width: 1;
+  stroke-dasharray: 1;
+}
+
+.hs-hair--ink {
+  stroke: rgb(10 10 10 / 55%);
+}
+
+.hs-reply-line {
+  fill: none;
+  stroke: rgb(10 10 10 / 18%);
+  stroke-width: 1;
+  stroke-dasharray: 3 4;
+}
+
+/* ── Fragments (final state: gone) ───────────────────────────────────────── */
+.hs-frag {
+  left: 0;
+  top: 0;
+  opacity: 0;
+  pointer-events: none;
+  transform-origin: 50% 50%;
+}
+
+/* ── Stage nodes ─────────────────────────────────────────────────────────── */
+.hs-node {
+  --on: 1;
+  --pulse: 1;
+  position: absolute;
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  margin: -19px 0 0 -19px;
+  box-sizing: border-box;
+  border-radius: 50%;
+  background: var(--scaffold-surface);
+  border: 1px solid rgb(10 10 10 / calc(0.16 + var(--on) * 0.6));
+  box-shadow:
+    0 8px 16px -12px rgb(10 10 10 / calc(var(--on) * 30%)),
+    0 0 0 calc(var(--pulse) * 12px) color-mix(in oklch, var(--color-brand) calc((1 - var(--pulse)) * 50%), transparent);
+}
+
+.hs-node svg {
+  opacity: calc(0.4 + var(--on) * 0.6);
+}
+
+.hs-node svg[data-icon='hs-discover'] circle:not([fill^='var']) {
+  fill: rgb(10 10 10 / 62%);
+}
+
+.hs-word {
+  position: absolute;
+  padding: 2px 6px;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+  color: var(--hs-ink);
+  background: var(--scaffold-bg);
+}
+
+.hs-word--middle {
+  transform: translate(-50%, -50%);
+}
+
+.hs-word--start {
+  transform: translate(0, -50%);
+}
+
+/* ── Prospect token ──────────────────────────────────────────────────────── */
+.hs-token {
+  position: absolute;
+  display: block;
+  width: 16px;
+  height: 16px;
+  margin: -8px 0 0 -8px;
+  border-radius: 50%;
+  background: var(--color-brand);
+  box-shadow:
+    0 0 0 4px var(--scaffold-bg),
+    0 0 0 5px rgb(10 10 10 / 18%),
+    0 10px 18px -8px color-mix(in oklch, var(--color-brand) 70%, transparent);
+  will-change: transform;
+}
+
+.hs-reply-token {
+  position: absolute;
+  left: 0;
+  top: 0;
+  display: block;
+  width: 16px;
+  height: 11px;
+  margin: -5.5px 0 0 -8px;
+  box-sizing: border-box;
+  border: 1.5px solid var(--hs-ink);
+  border-radius: 3px;
+  background: var(--scaffold-surface);
+  opacity: 0;
+  will-change: transform;
+}
+
+.hs-reply-token::after {
+  content: '';
+  position: absolute;
+  left: 2px;
+  right: 2px;
+  top: 2px;
+  height: 1.5px;
+  background: rgb(10 10 10 / 55%);
+  transform: skewY(0deg);
+}
+
+/* ── Approval gate ───────────────────────────────────────────────────────── */
+.hs-gate {
+  position: absolute;
+  width: 0;
+  height: 0;
+}
+
+/* the open slot the bar lifts out of */
+.hs-gate::before {
+  content: '';
+  position: absolute;
+  box-sizing: border-box;
+  border: 1px dashed rgb(10 10 10 / 30%);
+  border-radius: 4px;
+}
+
+.hs-gate[data-axis='vertical']::before {
+  left: -4px;
+  top: -26px;
+  width: 8px;
+  height: 52px;
+}
+
+.hs-gate[data-axis='horizontal']::before {
+  left: -26px;
+  top: -4px;
+  width: 52px;
+  height: 8px;
+}
+
+.hs-gate__bar {
+  position: absolute;
+  display: block;
+  background: var(--hs-ink);
+  border-radius: 3px;
+  opacity: 0.18;
+  will-change: transform;
+}
+
+.hs-gate[data-axis='vertical'] .hs-gate__bar {
+  left: -3px;
+  top: -24px;
+  width: 6px;
+  height: 48px;
+}
+
+.hs-gate[data-axis='horizontal'] .hs-gate__bar {
+  left: -24px;
+  top: -3px;
+  width: 48px;
+  height: 6px;
+}
+
+.hs-ring {
+  position: absolute;
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  margin: -15px 0 0 -15px;
+  box-sizing: border-box;
+  border: 1px solid rgb(10 10 10 / 70%);
+  border-radius: 50%;
+  color: var(--hs-ink);
+  background: var(--scaffold-surface);
+}
+
+.hs-ring path {
+  stroke-dasharray: 1;
+}
+
+/* ── Booked slot ─────────────────────────────────────────────────────────── */
+.hs-slot {
+  position: absolute;
+  width: 30px;
+  height: 30px;
+  margin: -15px 0 0 -15px;
+  box-sizing: border-box;
+  border: 1px solid rgb(10 10 10 / 55%);
+  border-radius: 8px;
+  background: var(--scaffold-surface);
+  overflow: hidden;
+}
+
+.hs-slot__fill {
+  position: absolute;
+  inset: 0;
+  display: block;
+  background: var(--color-brand);
+  transform-origin: 50% 100%;
+}
+
+/* ── Progress + scroll cue (outside the canvas) ──────────────────────────── */
+.hs-progress {
+  position: absolute;
+  left: 50%;
+  bottom: 4px;
+  z-index: 2;
+  width: min(220px, 56vw);
+  height: 9px;
+  translate: -50% 0;
+  pointer-events: none;
+}
+
+.hs-progress__rail,
+.hs-progress__fill {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 4px;
+  height: 1px;
+}
+
+.hs-progress__rail {
+  background: rgb(10 10 10 / 14%);
+}
+
+.hs-progress__fill {
+  height: 1.5px;
+  top: 3.75px;
+  background: var(--color-brand);
+  transform-origin: 0 50%;
+  transform: scaleX(0);
+}
+
+.hs-progress__tick {
+  position: absolute;
+  top: 0;
+  width: 9px;
+  height: 9px;
+  margin-left: -4.5px;
+  box-sizing: border-box;
+  border: 1px solid rgb(10 10 10 / 35%);
+  border-radius: 50%;
+  background: var(--scaffold-bg);
+}
+
+.hs-progress__tick[data-on='true'] {
+  border-color: var(--color-brand);
+  background: var(--color-brand);
+}
+
+.hs-cue {
+  position: absolute;
+  left: 50%;
+  bottom: 20px;
+  z-index: 2;
+  width: 1px;
+  height: 28px;
+  background: rgb(10 10 10 / 18%);
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.hs-cue::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: -10px;
+  width: 1px;
+  height: 10px;
+  background: var(--hs-ink);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .hs-cue::after {
+    animation: hs-cue 1.8s cubic-bezier(0.65, 0, 0.35, 1) infinite;
+  }
+}
+
+@keyframes hs-cue {
+  to {
+    transform: translateY(38px);
+  }
+}
+
+/* ── Narrow tweaks for the fragment faces (mirrors convergence.css) ──────── */
+.hs[data-mode='narrow'] .cv-hide-n {
+  display: none;
+}
+
+.hs[data-mode='narrow'] .cv-card {
+  padding: 0 8px;
+  gap: 6px;
+}
+
+.hs[data-mode='narrow'] .cv-lab {
+  font-size: 10px;
+}
+
+.hs[data-mode='narrow'] .cv-avatar {
+  width: 16px;
+  height: 16px;
+}
+
+.hs[data-mode='narrow'] .cv-avatar--sm {
+  width: 14px;
+  height: 14px;
+}
+
+.hs[data-mode='narrow'] .cv-chip--a {
+  width: 24px;
+}
+
+.hs[data-mode='narrow'] .cv-chip--b {
+  width: 16px;
+}

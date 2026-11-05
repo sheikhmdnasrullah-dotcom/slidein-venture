@@ -59,8 +59,10 @@ export const T = {
   end: 1,
 } as const;
 
-/** Time at which stage i becomes the active one. */
 const STAGE_AT = [T.hop(0), T.hop(1), T.hop(2), T.hop(3), T.hop(4), T.outreach, T.converse];
+
+/** Time at which stage i becomes the active one. */
+export const stageTime = (i: number) => STAGE_AT[i];
 
 export function activeStage(p: number): number | null {
   let hit: number | null = null;
@@ -134,9 +136,9 @@ function build(mode: TrackMode): Geometry {
       ring: { x: gate.x, y: 118 },
       ringLink: `M${gate.x} 138V${y - 30}`,
       slot: { x: 1150, y },
-      slotLink: `M${x6 + 20} ${y}H1136`,
-      replyPath: `M1190 36C1190 130 1110 ${y - 8} ${x6 + 21} ${y - 4}`,
-      loopPath: `M${x6} ${y + 20}C${x6} 372 ${x0} 372 ${x0} ${y + 20}`,
+      slotLink: `M${x6} ${y}H1136`,
+      replyPath: `M1190 36C1190 150 1090 ${y} ${x6} ${y}`,
+      loopPath: `M${x6} ${y}C${x6} 372 ${x0} 372 ${x0} ${y}`,
       scatter: [
         { x: 70, y: 236, r: -4 },
         { x: 310, y: 38, r: 2.5 },
@@ -150,7 +152,7 @@ function build(mode: TrackMode): Geometry {
   }
   const W = 358;
   const H = 480;
-  const x = 104;
+  const x = 128;
   const y0 = 34;
   const y6 = 430;
   const nodes = Array.from({ length: 7 }, (_, i) => ({ x, y: lerp(y0, y6, i / 6) }));
@@ -166,12 +168,12 @@ function build(mode: TrackMode): Geometry {
     uHold: uGate - 0.05,
     gate,
     gateAxis: 'horizontal',
-    ring: { x: 262, y: gate.y },
-    ringLink: `M244 ${gate.y}H${x + 30}`,
-    slot: { x: 310, y: y6 },
-    slotLink: `M${x + 20} ${y6}H296`,
-    replyPath: `M350 476C290 476 170 476 ${x + 17} ${y6 + 16}`,
-    loopPath: `M${x - 20} ${y6}C16 ${y6} 16 ${y0} ${x - 20} ${y0}`,
+    ring: { x: 272, y: gate.y },
+    ringLink: `M256 ${gate.y}H${x + 30}`,
+    slot: { x: 318, y: y6 },
+    slotLink: `M${x} ${y6}H302`,
+    replyPath: `M352 476C300 476 170 484 ${x} ${y6}`,
+    loopPath: `M${x} ${y6}C-6 ${y6} -6 ${y0} ${x} ${y0}`,
     scatter: [
       { x: 14, y: 310, r: -5 },
       { x: 200, y: 20, r: 3 },

@@ -13,8 +13,11 @@
 @import "./styles/assemble.css";
 /* Hero: type-first headline, actions, stage plate. */
 @import "./styles/hero.css";
-/* Hero convergence visual: fragments, plate, threads. */
+/* Fragment faces (.cv-*) used by the hero story. */
 @import "./styles/convergence.css";
+
+/* Hero scroll story: pinned stage, thread, gate. */
+@import "./styles/story.css";
 /* Section shells + scene vocabulary for the bands below the hero. */
 @import "./styles/sections.css";
 @import "./styles/story-home.css";

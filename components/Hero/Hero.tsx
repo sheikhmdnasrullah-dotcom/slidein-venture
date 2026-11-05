@@ -1,20 +1,18 @@
 'use client';
 
 /**
- * HERO — type-first, asymmetric. Headline, subhead, one primary action (the
- * story pill), one quiet text link, and a static stage plate, all hung on one
- * vertical axis (hero.css). Flat #FDFDFD ground. Copy is read from
- * content/home.ts and never altered here; empty slots render skeleton bars
- * (Rule 0). Entrance is a CSS-only settle (hero.css), disabled under
- * prefers-reduced-motion.
+ * HERO — headline, one primary action (the story pill), one quiet text link,
+ * and the pinned scroll story (story/HeroStory): scattered work becomes one
+ * loop that runs for the client. The subhead is retired from the hero (it
+ * stays in content/home.ts); the story carries that message. Copy is read
+ * from content/home.ts and never altered here. Entrance is a CSS-only settle
+ * (hero.css), disabled under prefers-reduced-motion.
  */
 
 import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { StoryModal } from './StoryModal';
-import { HeroConvergence } from './convergence/HeroConvergence';
-import { HeroOrbit } from './HeroOrbit';
-import { HeroFlow } from './HeroFlow';
+import { HeroStory } from './story/HeroStory';
 import { TextSlot } from './Skeleton';
 import { VideoPlayerV2 } from '@/how-it-works-video/core/player';
 import { HOME, NAV_SLOTS } from '@/content/home';
@@ -33,15 +31,6 @@ function Headline() {
         <span className="hm-h1__mark">{highlight}</span>
       </span>
     </h1>
-  );
-}
-
-function Subhead() {
-  const text = [HOME.subhead.line1, HOME.subhead.line2].filter(Boolean).join(' ');
-  return (
-    <p data-testid="hero-subhead" className="hm-sub">
-      <TextSlot text={text} barWidth="min(32em, 80vw)" textClassName="block" />
-    </p>
   );
 }
 
@@ -87,6 +76,7 @@ export default function Hero() {
   const [storyOpen, setStoryOpen] = useState(false);
   const [videoV2Open, setVideoV2Open] = useState(false);
   const storyBtnRef = useRef<HTMLButtonElement>(null);
+  const heroRef = useRef<HTMLElement>(null);
 
   // Deep links run post-hydration (a lazy useState init would mismatch SSR).
   useEffect(() => {
@@ -100,17 +90,30 @@ export default function Hero() {
     }
   }, []);
 
+  /* The entrance runs once. Pinning (and any later layout refresh) re-parents
+     the hero, which would replay a CSS animation, so each element drops its
+     entrance class the moment its animation ends; its resting state is its
+     natural one. */
+  useEffect(() => {
+    const hero = heroRef.current;
+    if (!hero) return;
+    const done = (e: AnimationEvent) => {
+      if (e.animationName === 'hm-settle') (e.target as HTMLElement).classList.remove('hm-in');
+    };
+    hero.addEventListener('animationend', done);
+    return () => hero.removeEventListener('animationend', done);
+  }, []);
+
   return (
     <section
+      ref={heroRef}
       data-testid="hero"
       data-disorder={BAND_DISORDER.hero}
       className="hm-hero bg-[var(--scaffold-bg)]"
     >
-      <HeroOrbit />
       <div className="hm-hero__grid">
         <Headline />
         <div className="hm-hero__copy hm-in" style={{ '--i': 2 } as React.CSSProperties}>
-          <Subhead />
           <div className="hm-actions">
             <StoryPill onOpen={() => setStoryOpen(true)} btnRef={storyBtnRef} />
             {PRICING ? (
@@ -137,12 +140,9 @@ export default function Hero() {
             ) : null}
           </div>
         </div>
-        <div className="hm-hero__visual hm-in" style={{ '--i': 3 } as React.CSSProperties}>
-          <HeroConvergence />
-        </div>
       </div>
 
-      <HeroFlow />
+      <HeroStory />
 
       <StoryModal
         open={storyOpen}

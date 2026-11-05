@@ -3,11 +3,10 @@
    Uses the scaffold tokens (assemble.css) and the .font-display-xl role.
    Class prefix `hm-` keeps this isolated from legacy `hero-*` rules.
 
-   Composition: a 12-column grid on the navbar's 1200px measure. The headline
-   lead hangs from column 1; everything after it (headline tail, subhead,
-   plate) shares one axis at column 3, so the empty left margin reads as
-   deliberate negative space, not leftover. Below 1180px the grid collapses to
-   a single left-aligned stack.
+   Composition: the hero is exactly one viewport tall (the story pins it). A
+   12-column grid on the navbar's 1200px measure carries the headline; the
+   tail steps in to column 3 on desktop. The story fills the remaining height.
+   Below 1180px the grid collapses to a single left-aligned stack.
    ═══════════════════════════════════════════════════════════════════════════ */
 
 .hm-hero {
@@ -15,18 +14,30 @@
   --hm-gap: 24px;
   --hm-ease: var(--ease-out, cubic-bezier(0.23, 1, 0.32, 1));
   position: relative;
-  padding: clamp(6rem, 11vh, 7.5rem) 32px clamp(7rem, 12vh, 9rem);
-  overflow-x: clip;
+  display: flex;
+  flex-direction: column;
+  height: 100svh;
+  min-height: 600px;
+  box-sizing: border-box;
+  padding: clamp(5.25rem, 11vh, 6.25rem) 32px 12px;
+  overflow: clip;
+}
+
+@media (width < 640px) {
+  .hm-hero {
+    padding-inline: 20px;
+  }
 }
 
 .hm-hero__grid {
   position: relative;
   z-index: 1;
+  flex: none;
   width: min(1200px, 100%);
   margin-inline: auto;
   display: grid;
   grid-template-columns: minmax(0, 1fr);
-  row-gap: clamp(1.5rem, 3.5vh, 2.5rem);
+  row-gap: clamp(0.875rem, 2.4vh, 1.5rem);
 }
 
 /* ── Headline: one face, one weight, one ink. The tail differs from the lead
@@ -37,7 +48,7 @@
   grid-template-columns: subgrid;
   grid-column: 1 / -1;
   color: var(--scaffold-ink);
-  font-size: clamp(2.125rem, 1rem + 4.1vw, 4rem);
+  font-size: clamp(1.75rem, 0.9rem + 2.9vw, 3.25rem);
   font-weight: 600; /* typography.spec caps nav/hero text at 600; display-xl is 650 */
   line-height: 1.03;
   letter-spacing: -0.036em;
@@ -74,18 +85,6 @@
   display: grid;
   grid-template-columns: subgrid;
   grid-column: 1 / -1;
-  row-gap: clamp(1.5rem, 3vh, 2rem);
-  padding-top: clamp(1.5rem, 3vh, 2rem);
-  border-top: 1px solid var(--scaffold-rule);
-}
-
-.hm-sub {
-  margin: 0;
-  max-width: 38rem;
-  color: var(--hm-ink-2);
-  font-size: clamp(1.0625rem, 0.98rem + 0.3vw, 1.25rem);
-  line-height: 1.55;
-  text-wrap: pretty;
 }
 
 .hm-actions {
@@ -171,21 +170,6 @@
   }
 }
 
-@media (width < 640px) {
-  .hm-actions {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  .hm-pill {
-    justify-content: flex-start;
-  }
-
-  .hm-link {
-    align-self: flex-start;
-  }
-}
-
 /* ── Desktop: the layered, asymmetric composition ────────────────────────── */
 @media (width >= 1180px) {
   .hm-hero__grid {
@@ -202,27 +186,7 @@
     padding-left: 0;
   }
 
-  /* subhead on the axis, actions hung to its right edge */
-  .hm-hero__copy .hm-sub {
-    grid-column: 3 / span 6;
-    grid-row: 1;
-  }
-
   .hm-hero__copy .hm-actions {
-    grid-column: 9 / span 4;
-    grid-row: 1;
-    flex-direction: column;
-    align-items: flex-start;
-    justify-content: flex-start;
-    justify-self: end;
-    gap: 14px;
-  }
-
-  .hm-hero__copy {
-    row-gap: 0;
-  }
-
-  .hm-hero__visual {
     grid-column: 1 / -1;
   }
 }
@@ -237,7 +201,6 @@
     animation: hm-settle 520ms var(--hm-ease) backwards;
     animation-delay: calc(var(--i, 0) * 90ms);
   }
-
 }
 
 @keyframes hm-settle {
@@ -250,106 +213,4 @@
     opacity: 1;
     transform: none;
   }
-}
-
-/* ── Visual slot: the convergence canvas spans the full measure. ─────────── */
-.hm-hero__visual {
-  grid-column: 1 / -1;
-  min-width: 0;
-}
-
-/* ── Orbit: concentric hairlines behind the headline. Turns on its own, and
-   a little more with scroll. Transform only. ─────────────────────────────── */
-.hm-orbit {
-  position: absolute;
-  z-index: 0;
-  top: clamp(-9rem, -12vw, -3rem);
-  right: clamp(-16rem, -14vw, -4rem);
-  width: clamp(22rem, 52vw, 40rem);
-  aspect-ratio: 1;
-  pointer-events: none;
-  opacity: 0.9;
-  -webkit-mask-image: radial-gradient(closest-side, rgb(0 0 0 / 100%) 55%, transparent);
-  mask-image: radial-gradient(closest-side, rgb(0 0 0 / 100%) 55%, transparent);
-}
-
-.hm-orbit__turn {
-  width: 100%;
-  height: 100%;
-  transform: rotate(calc(var(--scroll-y, 0) * 0.025deg));
-  will-change: transform;
-}
-
-.hm-orbit svg {
-  display: block;
-  overflow: visible;
-}
-
-.hm-orbit__ring {
-  fill: none;
-  stroke: rgb(10 10 10 / 11%);
-  stroke-width: 1;
-}
-
-.hm-orbit__spoke {
-  stroke: rgb(10 10 10 / 6%);
-  stroke-width: 1;
-}
-
-.hm-orbit__node {
-  fill: var(--scaffold-bg);
-  stroke: rgb(10 10 10 / 55%);
-  stroke-width: 1.25;
-}
-
-.hm-orbit__node--hot {
-  fill: var(--color-brand);
-  stroke: none;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .hm-orbit svg {
-    animation: hm-orbit-spin 180s linear infinite;
-    transform-origin: 50% 50%;
-  }
-}
-
-@keyframes hm-orbit-spin {
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-/* ── Flow: a line that draws out of the hero as you scroll. ──────────────── */
-.hm-flow {
-  position: absolute;
-  z-index: 1;
-  left: 50%;
-  bottom: 0;
-  translate: -50% 0;
-  height: 96px;
-  pointer-events: none;
-}
-
-.hm-flow svg {
-  display: block;
-  overflow: visible;
-}
-
-.hm-flow__rail {
-  stroke: rgb(10 10 10 / 10%);
-  stroke-width: 1;
-  stroke-dasharray: 2 4;
-}
-
-.hm-flow__line {
-  stroke: var(--color-brand);
-  stroke-width: 1.5;
-  stroke-linecap: round;
-}
-
-.hm-flow__bead {
-  fill: var(--scaffold-bg);
-  stroke: var(--color-brand);
-  stroke-width: 1.5;
 }
