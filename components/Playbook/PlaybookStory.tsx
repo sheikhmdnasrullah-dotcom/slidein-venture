@@ -795,6 +795,8 @@ export function PlaybookStory() {
         className="relative w-full max-w-[1280px] rounded-[40px] border border-[rgba(10,10,10,0.06)] bg-white overflow-hidden flex items-center justify-center"
         style={{
           height: 'min(640px, calc(100svh - 190px))',
+          backgroundImage:
+            'radial-gradient(ellipse 60% 70% at 82% 78%, rgb(255 98 0 / 9%), transparent 70%), radial-gradient(ellipse 50% 60% at 6% 4%, rgb(10 10 10 / 4%), transparent 70%)',
           boxShadow: 'var(--scaffold-shadow-object)',
         }}
       >
@@ -811,7 +813,7 @@ export function PlaybookStory() {
         <div
           ref={canvasRef}
           data-testid="playbook-design-canvas"
-          className="relative pointer-events-auto"
+          className="relative pointer-events-auto flex-none"
           style={{
             width: baseW,
             height: baseH,

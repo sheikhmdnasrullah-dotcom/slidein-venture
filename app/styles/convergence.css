@@ -52,7 +52,8 @@
   font-size: 11px;
   line-height: 1;
   letter-spacing: 0.01em;
-  color: rgb(10 10 10 / 58%);
+  color: rgb(10 10 10 / 78%);
+  font-weight: 500;
   white-space: nowrap;
 }
 .cv-lab--out { color: var(--cv-ink); font-weight: 500; }
@@ -95,3 +96,30 @@
   background: linear-gradient(225deg, var(--scaffold-bg) 50%, rgb(10 10 10 / 10%) 50%);
 }
 .cv-doc { display: flex; flex-direction: column; gap: 5px; flex: 1; min-width: 0; }
+
+/* ── Tones: the fragments are paper, ink or orange tint ─────────────────── */
+
+[data-tone='ink'] > .hs-frag__mid > .cv-card,
+[data-tone='ink'] .cv-raw {
+  --cv-line: rgb(255 255 255 / 14%);
+  --cv-fill: rgb(255 255 255 / 22%);
+  --cv-fill-dark: var(--color-brand);
+  background: var(--scaffold-ink);
+  box-shadow: 0 10px 22px -12px rgb(10 10 10 / 55%);
+}
+
+[data-tone='ink'] .cv-lab { color: rgb(255 255 255 / 90%); }
+[data-tone='ink'] .cv-avatar { background: rgb(255 255 255 / 20%); box-shadow: none; }
+[data-tone='ink'] .cv-quote { background: var(--color-brand); }
+
+[data-tone='ink'] .cv-sq,
+[data-tone='ink'] .cv-dia { border-color: rgb(255 255 255 / 55%); }
+
+[data-tone='tint'] .cv-raw {
+  --cv-line: rgb(255 98 0 / 28%);
+  --cv-fill: rgb(10 10 10 / 12%);
+  background: rgb(255 240 229);
+}
+
+[data-tone='tint'] .cv-lab { color: rgb(10 10 10 / 86%); }
+[data-tone='tint'] .cv-quote { background: var(--color-brand); }

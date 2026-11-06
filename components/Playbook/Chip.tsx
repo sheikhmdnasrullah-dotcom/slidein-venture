@@ -31,6 +31,8 @@ interface ChipProps {
 
 export function Chip({ chip, className, style, compact }: ChipProps) {
   const { type, leadShape, criteriaIndex, isSkip } = chip;
+  // colour by column: profile is ink, offers and icps carry the brand orange
+  const lead = type === 'profile' ? 'bg-[rgba(10,10,10,0.82)]' : type === 'offers' ? 'bg-[var(--color-brand)]' : 'bg-[var(--color-brand)] ring-2 ring-[rgb(255_98_0/0.18)]';
 
   return (
     <div
@@ -53,13 +55,13 @@ export function Chip({ chip, className, style, compact }: ChipProps) {
       {/* 6px Lead Shape */}
       <span className="flex shrink-0 items-center justify-center">
         {leadShape === 'circle' && (
-          <span className="h-[6px] w-[6px] rounded-full bg-[rgba(10,10,10,0.78)] shadow-[inset_0_0.5px_0_rgba(255,255,255,0.4)]" />
+          <span className={`h-[6px] w-[6px] rounded-full ${lead} shadow-[inset_0_0.5px_0_rgba(255,255,255,0.4)]`} />
         )}
         {leadShape === 'square' && (
-          <span className="h-[6px] w-[6px] rounded-[1.5px] bg-[rgba(10,10,10,0.78)] shadow-[inset_0_0.5px_0_rgba(255,255,255,0.4)]" />
+          <span className={`h-[6px] w-[6px] rounded-[1.5px] ${lead} shadow-[inset_0_0.5px_0_rgba(255,255,255,0.4)]`} />
         )}
         {leadShape === 'diamond' && (
-          <span className="h-[6px] w-[6px] rotate-45 rounded-[0.5px] bg-[rgba(10,10,10,0.78)] shadow-[inset_0_0.5px_0_rgba(255,255,255,0.4)]" />
+          <span className={`h-[6px] w-[6px] rotate-45 rounded-[0.5px] ${lead} shadow-[inset_0_0.5px_0_rgba(255,255,255,0.4)]`} />
         )}
       </span>
 

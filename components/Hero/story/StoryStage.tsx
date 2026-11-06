@@ -29,6 +29,8 @@ import { STAGES, WORD_ORDER, dossierPos, geometry, type TrackMode } from './stor
 const px = (n: number) => `${n}px`;
 /** per-fragment depth (parallax px at full pointer travel) */
 const DEPTH = [14, -10, 8, -14, 11, -7, 13];
+/** card tone per fragment: paper, ink or orange tint (black, white and orange only) */
+const TONE = ['paper', 'ink', 'tint', 'paper', 'tint', 'ink', 'paper'] as const;
 
 export function StoryStage({ mode }: { mode: TrackMode }) {
   const g = geometry(mode);
@@ -220,6 +222,7 @@ export function StoryStage({ mode }: { mode: TrackMode }) {
               data-s="frag"
               data-id={r.id}
               className="hs-frag"
+              data-tone={TONE[i]}
               style={
                 {
                   width: px(r.w[m]),
@@ -232,7 +235,7 @@ export function StoryStage({ mode }: { mode: TrackMode }) {
             >
               <div data-s="frag-mid" className="hs-frag__mid">
                 <div className={`cv-card cv-raw${r.kind === 'doc' ? ' cv-raw--doc' : ''}`}>
-                  <RawFace kind={r.kind} />
+                  <RawFace kind={r.kind} label={r.label} />
                 </div>
               </div>
             </div>

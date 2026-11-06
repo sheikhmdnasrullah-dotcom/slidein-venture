@@ -241,6 +241,7 @@ export function CanvasAct2({
               <div
                 className="w-full h-full rounded-[28px] bg-white border border-[rgba(10,10,10,0.07)] p-5 flex flex-col justify-between"
                 style={{
+                  borderTop: `3px solid ${col.title === 'profile' ? 'rgb(10 10 10 / 0.85)' : col.title === 'offers' ? 'var(--color-brand)' : 'rgb(255 98 0 / 0.55)'}`,
                   boxShadow:
                     '0 14px 32px -8px rgba(0,0,0,0.05), 0 2px 6px -1px rgba(0,0,0,0.02), inset 0 1px 0 rgba(255,255,255,1)',
                 }}

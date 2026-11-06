@@ -64,18 +64,20 @@ test.describe('hero', () => {
     await expect(story.locator('[data-s="gate"]')).toHaveCount(1);
     const faces = await story.locator('[data-s="word"]').evaluateAll((els) => els.map((e) => (e.textContent ?? '').trim()));
     expect(faces).toEqual(WORD_ORDER.map((s) => STAGE_WORD[s]));
-    // nothing else in the stage is text
+    // the only other text is the seven fragment labels (stage vocabulary)
     const texts = await story.evaluate((el) => {
       const out: string[] = [];
       const walk = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
       for (let n = walk.nextNode(); n; n = walk.nextNode()) {
-        if ((n.parentElement as HTMLElement).closest('[data-s="word"]')) continue;
+        if ((n.parentElement as HTMLElement).closest('[data-s="word"], .cv-lab')) continue;
         const t = (n.textContent ?? '').trim();
         if (t) out.push(t);
       }
       return out;
     });
     expect(texts).toEqual([]);
+    const labels = await story.locator('.cv-lab').allTextContents();
+    expect(labels).toEqual(['profile', 'prospects', 'evidence', 'icps', 'offers', 'policy', 'replies']);
   });
 
   test('exactly one word is on show at a time and it follows the prospect', async ({ page }) => {
