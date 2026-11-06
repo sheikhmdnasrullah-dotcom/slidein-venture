@@ -287,7 +287,7 @@ export const LANDSCAPE_CHIPS: ChipDef[] = [
     leadShape: 'circle',
     fragId: 'frag-website',
     constellation: { x: 505, y: 14, rot: -3 },
-    docked: { x: 165, y: 296, colIndex: 0, rowIndex: 0 },
+    docked: { x: 165, y: 350, colIndex: 0, rowIndex: 0 },
   },
   {
     id: 'chip-p1',
@@ -295,7 +295,7 @@ export const LANDSCAPE_CHIPS: ChipDef[] = [
     leadShape: 'circle',
     fragId: 'frag-website',
     constellation: { x: 605, y: 14, rot: 2 },
-    docked: { x: 277, y: 296, colIndex: 0, rowIndex: 0 },
+    docked: { x: 277, y: 350, colIndex: 0, rowIndex: 0 },
   },
   {
     id: 'chip-p2',
@@ -303,7 +303,7 @@ export const LANDSCAPE_CHIPS: ChipDef[] = [
     leadShape: 'circle',
     fragId: 'frag-about',
     constellation: { x: 710, y: 18, rot: -4 },
-    docked: { x: 165, y: 332, colIndex: 0, rowIndex: 1 },
+    docked: { x: 165, y: 386, colIndex: 0, rowIndex: 1 },
   },
   {
     id: 'chip-p3',
@@ -311,7 +311,7 @@ export const LANDSCAPE_CHIPS: ChipDef[] = [
     leadShape: 'circle',
     fragId: 'frag-about',
     constellation: { x: 805, y: 18, rot: 4 },
-    docked: { x: 277, y: 332, colIndex: 0, rowIndex: 1 },
+    docked: { x: 277, y: 386, colIndex: 0, rowIndex: 1 },
   },
   {
     id: 'chip-p4',
@@ -319,7 +319,7 @@ export const LANDSCAPE_CHIPS: ChipDef[] = [
     leadShape: 'circle',
     fragId: 'frag-brochure',
     constellation: { x: 520, y: 145, rot: 3 },
-    docked: { x: 165, y: 368, colIndex: 0, rowIndex: 2 },
+    docked: { x: 165, y: 422, colIndex: 0, rowIndex: 2 },
   },
   {
     id: 'chip-p5',
@@ -327,7 +327,7 @@ export const LANDSCAPE_CHIPS: ChipDef[] = [
     leadShape: 'circle',
     fragId: 'frag-notes',
     constellation: { x: 870, y: 178, rot: -5 },
-    docked: { x: 277, y: 368, colIndex: 0, rowIndex: 2 },
+    docked: { x: 277, y: 422, colIndex: 0, rowIndex: 2 },
   },
   {
     id: 'chip-p6',
@@ -335,7 +335,7 @@ export const LANDSCAPE_CHIPS: ChipDef[] = [
     leadShape: 'circle',
     fragId: 'frag-logo',
     constellation: { x: 710, y: 340, rot: 5 },
-    docked: { x: 165, y: 404, colIndex: 0, rowIndex: 3 },
+    docked: { x: 165, y: 458, colIndex: 0, rowIndex: 3 },
   },
   {
     id: 'chip-p7',
@@ -343,7 +343,7 @@ export const LANDSCAPE_CHIPS: ChipDef[] = [
     leadShape: 'circle',
     fragId: 'frag-map',
     constellation: { x: 575, y: 380, rot: -3 },
-    docked: { x: 277, y: 404, colIndex: 0, rowIndex: 3 },
+    docked: { x: 277, y: 458, colIndex: 0, rowIndex: 3 },
   },
 
   // 8 OFFERS CHIPS (Square lead)
@@ -353,7 +353,7 @@ export const LANDSCAPE_CHIPS: ChipDef[] = [
     leadShape: 'square',
     fragId: 'frag-pricing',
     constellation: { x: 900, y: 14, rot: -2 },
-    docked: { x: 536, y: 296, colIndex: 1, rowIndex: 0 },
+    docked: { x: 536, y: 350, colIndex: 1, rowIndex: 0 },
   },
   {
     id: 'chip-o1',
@@ -361,7 +361,7 @@ export const LANDSCAPE_CHIPS: ChipDef[] = [
     leadShape: 'square',
     fragId: 'frag-pricing',
     constellation: { x: 1005, y: 14, rot: 3 },
-    docked: { x: 648, y: 296, colIndex: 1, rowIndex: 0 },
+    docked: { x: 648, y: 350, colIndex: 1, rowIndex: 0 },
   },
   {
     id: 'chip-o2',
@@ -369,7 +369,7 @@ export const LANDSCAPE_CHIPS: ChipDef[] = [
     leadShape: 'square',
     fragId: 'frag-email',
     constellation: { x: 1095, y: 16, rot: 6 },
-    docked: { x: 536, y: 332, colIndex: 1, rowIndex: 1 },
+    docked: { x: 536, y: 386, colIndex: 1, rowIndex: 1 },
   },
   {
     id: 'chip-o3',
@@ -377,7 +377,7 @@ export const LANDSCAPE_CHIPS: ChipDef[] = [
     leadShape: 'square',
     fragId: 'frag-social',
     constellation: { x: 1080, y: 22, rot: -3 },
-    docked: { x: 648, y: 332, colIndex: 1, rowIndex: 1 },
+    docked: { x: 648, y: 386, colIndex: 1, rowIndex: 1 },
   },
   {
     id: 'chip-o4',
@@ -385,7 +385,7 @@ export const LANDSCAPE_CHIPS: ChipDef[] = [
     leadShape: 'square',
     fragId: 'frag-brochure',
     constellation: { x: 625, y: 145, rot: -4 },
-    docked: { x: 536, y: 368, colIndex: 1, rowIndex: 2 },
+    docked: { x: 536, y: 422, colIndex: 1, rowIndex: 2 },
   },
   {
     id: 'chip-o5',
@@ -393,7 +393,7 @@ export const LANDSCAPE_CHIPS: ChipDef[] = [
     leadShape: 'square',
     fragId: 'frag-sheet',
     constellation: { x: 695, y: 150, rot: 2 },
-    docked: { x: 648, y: 368, colIndex: 1, rowIndex: 2 },
+    docked: { x: 648, y: 422, colIndex: 1, rowIndex: 2 },
   },
   {
     id: 'chip-o6',
@@ -401,7 +401,7 @@ export const LANDSCAPE_CHIPS: ChipDef[] = [
     leadShape: 'square',
     fragId: 'frag-review',
     constellation: { x: 1105, y: 178, rot: 4 },
-    docked: { x: 536, y: 404, colIndex: 1, rowIndex: 3 },
+    docked: { x: 536, y: 458, colIndex: 1, rowIndex: 3 },
   },
   {
     id: 'chip-o7',
@@ -409,7 +409,7 @@ export const LANDSCAPE_CHIPS: ChipDef[] = [
     leadShape: 'square',
     fragId: 'frag-calendar',
     constellation: { x: 530, y: 330, rot: -6 },
-    docked: { x: 648, y: 404, colIndex: 1, rowIndex: 3 },
+    docked: { x: 648, y: 458, colIndex: 1, rowIndex: 3 },
   },
 
   // 8 ICPS CHIPS (Diamond lead: 6 criteria + 2 skip)
@@ -420,7 +420,7 @@ export const LANDSCAPE_CHIPS: ChipDef[] = [
     criteriaIndex: 0, // Person / Role
     fragId: 'frag-social',
     constellation: { x: 975, y: 22, rot: -4 },
-    docked: { x: 907, y: 296, colIndex: 2, rowIndex: 0 },
+    docked: { x: 907, y: 350, colIndex: 2, rowIndex: 0 },
   },
   {
     id: 'chip-i1',
@@ -429,7 +429,7 @@ export const LANDSCAPE_CHIPS: ChipDef[] = [
     criteriaIndex: 1, // Building / Industry
     fragId: 'frag-sheet',
     constellation: { x: 795, y: 150, rot: 5 },
-    docked: { x: 1019, y: 296, colIndex: 2, rowIndex: 0 },
+    docked: { x: 1019, y: 350, colIndex: 2, rowIndex: 0 },
   },
   {
     id: 'chip-i2',
@@ -438,7 +438,7 @@ export const LANDSCAPE_CHIPS: ChipDef[] = [
     criteriaIndex: 2, // Size bars / Company Size
     fragId: 'frag-review',
     constellation: { x: 1000, y: 178, rot: -3 },
-    docked: { x: 907, y: 332, colIndex: 2, rowIndex: 1 },
+    docked: { x: 907, y: 386, colIndex: 2, rowIndex: 1 },
   },
   {
     id: 'chip-i3',
@@ -447,7 +447,7 @@ export const LANDSCAPE_CHIPS: ChipDef[] = [
     criteriaIndex: 3, // Globe Pin / Geography
     fragId: 'frag-map',
     constellation: { x: 470, y: 380, rot: 6 },
-    docked: { x: 1019, y: 332, colIndex: 2, rowIndex: 1 },
+    docked: { x: 1019, y: 386, colIndex: 2, rowIndex: 1 },
   },
   {
     id: 'chip-i4',
@@ -456,7 +456,7 @@ export const LANDSCAPE_CHIPS: ChipDef[] = [
     criteriaIndex: 4, // Bolt / Pain Points
     fragId: 'frag-org',
     constellation: { x: 760, y: 315, rot: -5 },
-    docked: { x: 907, y: 368, colIndex: 2, rowIndex: 2 },
+    docked: { x: 907, y: 422, colIndex: 2, rowIndex: 2 },
   },
   {
     id: 'chip-i5',
@@ -465,7 +465,7 @@ export const LANDSCAPE_CHIPS: ChipDef[] = [
     criteriaIndex: 5, // Stop Circle / Disqualifier
     fragId: 'frag-org',
     constellation: { x: 875, y: 315, rot: 3 },
-    docked: { x: 1019, y: 368, colIndex: 2, rowIndex: 2 },
+    docked: { x: 1019, y: 422, colIndex: 2, rowIndex: 2 },
   },
   {
     id: 'chip-i6',
@@ -474,7 +474,7 @@ export const LANDSCAPE_CHIPS: ChipDef[] = [
     isSkip: true, // Skip 1 (dash)
     fragId: 'frag-call',
     constellation: { x: 980, y: 310, rot: -4 },
-    docked: { x: 907, y: 404, colIndex: 2, rowIndex: 3 },
+    docked: { x: 907, y: 458, colIndex: 2, rowIndex: 3 },
   },
   {
     id: 'chip-i7',
@@ -483,15 +483,15 @@ export const LANDSCAPE_CHIPS: ChipDef[] = [
     isSkip: true, // Skip 2 (dash)
     fragId: 'frag-call',
     constellation: { x: 1095, y: 310, rot: 4 },
-    docked: { x: 1019, y: 404, colIndex: 2, rowIndex: 3 },
+    docked: { x: 1019, y: 458, colIndex: 2, rowIndex: 3 },
   },
 ];
 
 /* Act 2 Columns: profile, offers, icps (generous 348px columns with 95px safe margins) */
 export const LANDSCAPE_COLUMNS = [
-  { id: 'col-profile', title: 'profile' as const, x: 95, y: 150, w: 348, h: 380 },
-  { id: 'col-offers', title: 'offers' as const, x: 466, y: 150, w: 348, h: 380 },
-  { id: 'col-icps', title: 'icps' as const, x: 837, y: 150, w: 348, h: 380 },
+  { id: 'col-profile', title: 'profile' as const, x: 95, y: 178, w: 348, h: 340 },
+  { id: 'col-offers', title: 'offers' as const, x: 466, y: 178, w: 348, h: 340 },
+  { id: 'col-icps', title: 'icps' as const, x: 837, y: 178, w: 348, h: 340 },
 ];
 
 /* ICP Spokes: from ICP ring center (col 2 + persona card center) to criteria chips */

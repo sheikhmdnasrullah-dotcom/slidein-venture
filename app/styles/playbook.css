@@ -1,0 +1,23 @@
+/* PLAYBOOK slides: one extra colour beside black, white and brand orange.
+   --pb-sand  warm paper for the summary cards (a neutral that sits with orange)
+   --pb-ember a deeper orange, for the ICP column where the target lives */
+:root {
+  --pb-sand: rgb(250 245 238);
+  --pb-ember: rgb(190 70 10);
+}
+
+.act2-icp-halo {
+  background: radial-gradient(circle, rgb(255 98 0 / 22%), transparent 68%);
+  opacity: 0;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .act2-icp-halo {
+    animation: pb-halo 2.8s var(--ease-out, cubic-bezier(0.23, 1, 0.32, 1)) infinite;
+  }
+
+  @keyframes pb-halo {
+    0% { opacity: 0.9; transform: scale(0.8); }
+    70%, 100% { opacity: 0; transform: scale(1.7); }
+  }
+}

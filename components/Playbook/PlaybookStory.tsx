@@ -354,29 +354,10 @@ export function PlaybookStory() {
         // ==========================================
         tl.to('[data-act="distill"]', { opacity: 1, duration: 1 }, 27);
 
-        // ICP column spotlight and spokes
-        // (the three columns stay one size: the ring and spokes carry the emphasis)
-
+        // ICP emphasis: the orange dot swells once; the ring's halo (playbook.css) breathes
         if (!portrait) {
-          tl.to(
-            '.act2-icp-ring',
-            { scale: 1.3, duration: 3.2, ease: 'back.out(1.5)' },
-            33.5,
-          );
-          tl.to(
-            '.act2-icp-dot',
-            { scale: 1.25, duration: 3.2 },
-            33.5,
-          );
-          tl.fromTo(
-            '.act2-spoke',
-            { drawSVG: '0% 0%' },
-            { drawSVG: '0% 100%', stagger: 0.4, duration: 4.0, ease: 'power2.out' },
-            34,
-          );
+          tl.to('.act2-icp-dot', { scale: 1.3, duration: 3.2, ease: 'power2.out' }, 33.5);
         }
-
-        // Settle at Rest 2 (columns return to equal scale 1.0)
 
         // ==========================================
         // TRANSITION 2: SCENE 02 -> SCENE 03 (47 to 57)
@@ -388,13 +369,6 @@ export function PlaybookStory() {
           47,
         );
 
-        if (!portrait) {
-          tl.to(
-            '.act2-spoke',
-            { drawSVG: '100% 100%', duration: 3.0, ease: 'power2.in' },
-            47,
-          );
-        }
 
         // Chips fly into the book center in vortex convergence
         chips.forEach((chip, i) => {

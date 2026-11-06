@@ -30,14 +30,14 @@ function AccentRule() {
       viewBox="0 0 100 6"
       preserveAspectRatio="none"
       aria-hidden="true"
-      style={{ bottom: '-0.25em' }}
+      style={{ bottom: '0.06em' }}
     >
       <path
         d="M0,3.1 Q25,1.9 50,3 T100,3.1"
         pathLength="100"
         fill="none"
         stroke="currentColor"
-        strokeWidth="1.2"
+        strokeWidth="1.8"
         strokeLinecap="round"
         className="underline-draw"
       />
