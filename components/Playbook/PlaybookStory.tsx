@@ -207,9 +207,9 @@ export function PlaybookStory() {
         gsap.set('.act3-book-container', { xPercent: -50, yPercent: -50, opacity: 0, scale: 0.92, y: 24, rotation: 0 });
         gsap.set('[data-testid="book-cover"]', { rotateY: 0 });
         gsap.set('.act3-brain-container', { xPercent: -50, yPercent: -50, opacity: 0, scale: 0.35, rotation: 0 });
-        gsap.set('.brain-circuit', { drawSVG: '0% 0%' });
-        gsap.set('.brain-node', { scale: 0 });
-        gsap.set('.brain-core', { scale: 0 });
+        gsap.set('.lp-orbit', { drawSVG: '0% 0%' });
+        gsap.set('.lp-sat', { scale: 0 });
+        gsap.set('.lp-book', { scale: 0.9 });
         gsap.set('.brain-pulse-ring', { scale: 0.8, opacity: 0 });
 
         // ==========================================
@@ -513,30 +513,22 @@ export function PlaybookStory() {
           78,
         );
 
-        // Brain circuit lines draw in
+        // The orbit draws round the book, then the four travellers pop onto it
         tl.fromTo(
-          '.brain-circuit',
+          '.lp-orbit',
           { drawSVG: '0% 0%' },
-          { drawSVG: '0% 100%', stagger: 0.07, duration: 3.2, ease: 'power2.out' },
+          { drawSVG: '0% 100%', duration: 3.6, ease: 'power2.out' },
           79.0,
         );
-
-        // Synaptic nodes pop in
         tl.fromTo(
-          '.brain-node',
+          '.lp-sat',
           { scale: 0 },
-          { scale: 1, stagger: 0.05, duration: 2.5, ease: 'back.out(2)' },
-          80.0,
+          { scale: 1, stagger: 0.35, duration: 2.2, ease: 'back.out(2)' },
+          80.5,
         );
 
-        // Protagonist orange core dot springs to life
-        tl.fromTo(
-          '.brain-core',
-          { scale: 0 },
-          { scale: 1.35, duration: 2.0, ease: 'back.out(3)' },
-          81.0,
-        );
-        tl.to('.brain-core', { scale: 1.0, duration: 1.4, ease: 'power1.out' }, 83.5);
+        // The closed playbook settles with a small spring
+        tl.to('.lp-book', { scale: 1, duration: 2.4, ease: 'back.out(2.2)' }, 80.0);
 
         // Concentric knowledge aura rings ripple outward
         tl.fromTo(
@@ -549,7 +541,7 @@ export function PlaybookStory() {
         // ==========================================
         // SCENE 04: PERSISTENT KNOWLEDGE (84 to 100, rest4 at 96)
         // Caption 4: "1 Persistent Knowledge from the Master Playbook that evolves every time you interact with it."
-        // THE BRAIN ICON REMAINS 100% VISIBLE THROUGHOUT SCENE 04! NO DISSOLVE!
+        // THE LIVING PLAYBOOK STAYS FULLY VISIBLE THROUGHOUT SCENE 04.
         // ==========================================
         tl.to(
           '.brain-pulse-ring',

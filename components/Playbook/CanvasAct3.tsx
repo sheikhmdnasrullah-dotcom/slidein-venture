@@ -17,7 +17,7 @@ import React from 'react';
 import { cn } from '@/lib/utils';
 import { BOOK_LANDSCAPE, BOOK_PORTRAIT, PLAYBOOK_CONFIG } from './poses';
 import { HashCoverGlyph, LockGlyph } from './icons';
-import { BrainDesign } from './BrainDesign';
+import { LivingPlaybook } from './LivingPlaybook';
 
 interface CanvasAct3Props {
   isPortrait?: boolean;
@@ -225,7 +225,7 @@ export function CanvasAct3({
         </div>
       </div>
 
-      {/* 2. The Cutting-Edge Realistic Brain Design */}
+      {/* 2. The living playbook: persistent knowledge that evolves */}
       <div
         data-testid="playbook-brain-container"
         className={cn(
@@ -237,7 +237,7 @@ export function CanvasAct3({
           top: isPortrait ? book.cy - 10 : book.cy - 15,
         }}
       >
-        <BrainDesign isPortrait={isPortrait} />
+        <LivingPlaybook isPortrait={isPortrait} />
       </div>
     </div>
   );

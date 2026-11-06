@@ -52,3 +52,71 @@
     to { transform: translateY(28px); }
   }
 }
+
+/* ── Slide 4: the living playbook ─────────────────────────────────────── */
+.lp-ripple {
+  opacity: 0;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  /* the ring of travellers turns; each traveller counter-turns to stay upright */
+  .lp-ring {
+    animation: pb-spin 36s linear infinite;
+  }
+
+  .lp-unspin {
+    animation: pb-spin 36s linear infinite reverse;
+  }
+
+  /* a bead leaves each traveller and runs into the book, one after another */
+  .lp-bead {
+    opacity: 0;
+    animation: pb-bead 2.8s cubic-bezier(0.5, 0, 0.75, 0.2) infinite;
+  }
+
+  /* the book answers: a ripple and a page added to the stack */
+  .lp-ripple {
+    animation: pb-ripple 2.8s var(--ease-out, cubic-bezier(0.23, 1, 0.32, 1)) infinite;
+  }
+
+  .lp-page {
+    animation: pb-page 2.8s ease-in-out infinite;
+  }
+
+  .lp-core {
+    animation: pb-core 2.8s ease-in-out infinite;
+  }
+
+  @keyframes pb-spin {
+    to { transform: rotate(360deg); }
+  }
+
+  @keyframes pb-bead {
+    0% { opacity: 0; transform: translateX(114px) scale(1); }
+    12% { opacity: 1; }
+    80% { opacity: 1; transform: translateX(62px) scale(0.8); }
+    100% { opacity: 0; transform: translateX(56px) scale(0.3); }
+  }
+
+  @keyframes pb-ripple {
+    0%, 60% { opacity: 0; transform: scale(1); }
+    68% { opacity: 0.6; }
+    100% { opacity: 0; transform: scale(1.35); }
+  }
+
+  @keyframes pb-page {
+    0%, 100% { transform: translate(calc(var(--n) * 5px), calc(var(--n) * -3px)); opacity: calc(1 - var(--n) * 0.18); }
+    50% { transform: translate(calc(var(--n) * 8px), calc(var(--n) * -5px)); opacity: calc(1 - var(--n) * 0.1); }
+  }
+
+  @keyframes pb-core {
+    0%, 55%, 100% { transform: scale(1); }
+    68% { transform: scale(1.5); }
+  }
+}
+
+/* at rest (reduced motion): pages sit offset and the ring is still */
+.lp-page {
+  transform: translate(calc(var(--n) * 5px), calc(var(--n) * -3px));
+  opacity: calc(1 - var(--n) * 0.18);
+}
