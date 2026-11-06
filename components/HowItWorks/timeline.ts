@@ -14,7 +14,7 @@
 import gsap from 'gsap';
 import { SCENES } from '@/how-it-works-video/data/scenes.config';
 import {
-  EASE, H, W, count, cursorPath, draw, elbow, makeThread, measureAll, rounded, tokenize, travel, typeIn,
+  EASE, H, W, count, cursorPath, draw, elbow, makeThread, measureAll, resetSync, rounded, tokenize, travel, typeIn,
   type Rect, type Thread,
 } from './helpers';
 import { NODE_X } from './Scenes';
@@ -32,6 +32,7 @@ export interface Built {
 }
 
 export function buildTimeline(root: HTMLElement, art: HTMLElement): Built {
+  resetSync();
   const q = gsap.utils.selector(root);
   const M: Record<string, Rect> = measureAll(art);
   const tl = gsap.timeline({ paused: true, defaults: { ease: EASE.out } });
@@ -116,6 +117,7 @@ export function buildTimeline(root: HTMLElement, art: HTMLElement): Built {
     draw(tl, th, t + 5.85, 0.45);
     // handoff: the whole sheet becomes the profile chip in the HUD
     tl.to(cursor, { opacity: 0, duration: 0.2, ease: 'none' }, t + 6.8);
+    tl.to([th.path, th.tick, th.bead], { opacity: 0, duration: 0.3, ease: 'none' }, t + 6.9);
     const hd = M.hud;
     tl.to(sheet, {
       x: hd.x + hd.w / 2 - (160 + 480), y: hd.y + hd.h / 2 - (160 + 200), scale: 0.1, opacity: 0.0,
@@ -356,12 +358,12 @@ export function buildTimeline(root: HTMLElement, art: HTMLElement): Built {
     tl.fromTo(tb, { opacity: 0, x: START - 90 }, { opacity: 1, x: START, duration: 0.5 }, b0);
     tl.to(nodes[0], { '--hatch': 1, duration: 0.3, ease: 'none' }, b0 + 0.6);
     tl.to(nodes[0].querySelector('svg'), { opacity: 0.15, duration: 0.2, ease: 'none' }, b0 + 0.6);
-    tl.to(q('.s6-pause'), { opacity: 1, duration: 0.2, ease: 'none' }, b0 + 0.65);
+    tl.to(q('.s6-n0 .s6-pause'), { opacity: 1, duration: 0.2, ease: 'none' }, b0 + 0.65);
     tl.to(q('.s6-n0 .s6-pass'), { opacity: 0, duration: 0.2, ease: 'none' }, b0 + 0.6);
     ft(q('.s6-req'), { opacity: 0, y: 6 }, { opacity: 1, y: 0, duration: 0.35 }, b0 + 0.65);
     tl.to(q('.s6-dash'), { opacity: 1, duration: 0.5, ease: 'none' }, b0 + 0.7);
     // "held": the token tilts and drops into the tray
-    tl.to(tb, { rotation: 3, y: 548, duration: 0.6, ease: EASE.settle }, t + 5.0);
+    tl.to(tb, { rotation: 3, x: 190, y: 548, duration: 0.6, ease: EASE.settle }, t + 5.0);
     ft(q('.s6-reason'), { opacity: 0, y: 6 }, { opacity: 1, y: 0, duration: 0.4 }, t + 5.4);
     count(tl, q('.s6-count [data-c="h"]')[0], 0, 1, t + 5.4, 0.3);
     // handoff: a reply rises out of the inbox
@@ -379,8 +381,8 @@ export function buildTimeline(root: HTMLElement, art: HTMLElement): Built {
       const r = M[`rep${i}`];
       const sn = M[`sent${i}`];
       ft(rep[i], { opacity: 0, y: -40 }, { opacity: 1, y: 0, duration: 0.6, ease: EASE.settle }, at);
-      const a: [number, number] = [sn.x - 3, sn.y0];
-      const d = rounded([a, [sn.x - 14, sn.y0], [sn.x - 14, r.y0], [r.x - 3, r.y0]], 6);
+      const a: [number, number] = [sn.x - 7, sn.y0];
+      const d = rounded([a, [sn.x - 14, sn.y0], [sn.x - 14, r.y0], [r.x - 5, r.y0]], 6);
       const back = makeThread(th, d, a);
       draw(tl, back, at + 0.6, 0.5);
       return back;

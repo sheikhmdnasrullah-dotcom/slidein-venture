@@ -1381,7 +1381,7 @@ mark.hw-hl {
   position: relative;
   z-index: 0;
   display: inline;
-  color: var(--hw-ink-300);
+  color: rgb(10 10 10 / 62%);
 }
 
 .hw-cw[data-em="true"]::before {
@@ -1429,4 +1429,18 @@ mark.hw-hl {
   height: auto;
   min-height: 0;
   overflow: visible;
+}
+
+/* Narrow screens: the stage keeps its 16:9 and the caption sits right under it. */
+@media (width <= 900px) {
+  .hw {
+    justify-content: center;
+    gap: 18px;
+  }
+
+  .hw-slot {
+    flex: none;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+  }
 }

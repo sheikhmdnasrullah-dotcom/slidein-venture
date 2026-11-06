@@ -49,6 +49,18 @@ export function measureAll(stage: HTMLElement): Record<string, Rect> {
 
 type Pt = [number, number];
 
+/* ScrollTrigger renders a scrubbed timeline with events suppressed, so tween
+   onUpdate callbacks cannot be trusted to keep the DOM in step. Everything
+   that writes to the DOM from a proxy value (beads, counters) registers a
+   sync here, and the scroll handler runs them all after every scrub. */
+const syncs: Array<() => void> = [];
+export const resetSync = () => {
+  syncs.length = 0;
+};
+export const runSync = () => {
+  for (const f of syncs) f();
+};
+
 /** A polyline with rounded corners (quadratic), radius r. */
 export function rounded(pts: Pt[], r = 12): string {
   let d = `M${pts[0][0]} ${pts[0][1]}`;
@@ -132,8 +144,9 @@ export function travel(tl: gsap.core.Timeline, t: Thread, at: number, dur = 0.7)
     t.bead.setAttribute('cx', String(pt.x));
     t.bead.setAttribute('cy', String(pt.y));
   };
+  syncs.push(place);
   tl.set(t.bead, { opacity: 1 }, at);
-  tl.fromTo(o, { p: 0 }, { p: 1, duration: dur, ease: EASE.inout, onUpdate: place, onStart: place }, at);
+  tl.fromTo(o, { p: 0 }, { p: 1, duration: dur, ease: EASE.inout, onUpdate: place }, at);
   tl.set(t.bead, { opacity: 0 }, at + dur + 0.02);
 }
 
@@ -158,11 +171,15 @@ export function count(
   fmt: (n: number) => string = (n) => String(Math.round(n)),
 ) {
   const o = { v: from };
-  el.textContent = fmt(from);
-  tl.to(o, { v: to, duration: dur, ease: EASE.out, onUpdate: () => (el.textContent = fmt(o.v)) }, at);
+  const write = () => {
+    el.textContent = fmt(o.v);
+  };
+  write();
+  syncs.push(write);
+  tl.to(o, { v: to, duration: dur, ease: EASE.out, onUpdate: write }, at);
 }
 
-/** A point on a quadratic curve, for the cursor. */
+/** The cursor arcs from a to b: x and y ease differently, so the path bends. */
 export function cursorPath(
   tl: gsap.core.Timeline,
   cursor: HTMLElement,
@@ -172,15 +189,9 @@ export function cursorPath(
   dur: number,
   bend = 60,
 ) {
-  const c: Pt = [(from[0] + to[0]) / 2 + bend, (from[1] + to[1]) / 2 + bend];
-  const o = { p: 0 };
-  const place = () => {
-    const u = 1 - o.p;
-    const x = u * u * from[0] + 2 * u * o.p * c[0] + o.p * o.p * to[0];
-    const y = u * u * from[1] + 2 * u * o.p * c[1] + o.p * o.p * to[1];
-    gsap.set(cursor, { x, y });
-  };
-  tl.fromTo(o, { p: 0 }, { p: 1, duration: dur, ease: EASE.inout, onUpdate: place, onStart: place }, at);
+  const outFirst = bend >= 0;
+  tl.fromTo(cursor, { x: from[0] }, { x: to[0], duration: dur, ease: outFirst ? 'power2.in' : 'power2.out' }, at);
+  tl.fromTo(cursor, { y: from[1] }, { y: to[1], duration: dur, ease: outFirst ? 'power2.out' : 'power2.in' }, at);
 }
 
 /* ── Captions ─────────────────────────────────────────────────────────── */

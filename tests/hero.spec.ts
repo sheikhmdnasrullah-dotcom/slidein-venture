@@ -217,7 +217,7 @@ test.describe('hero', () => {
     await page.waitForTimeout(300);
     const gap = await page.evaluate(() => {
       const hero = document.querySelector('[data-testid="hero"]')!.getBoundingClientRect();
-      const next = document.querySelector('[data-testid="band-problem"]')!.getBoundingClientRect();
+      const next = document.querySelector('[data-testid="how-it-works"]')!.getBoundingClientRect();
       return Math.round(next.top - hero.bottom);
     });
     expect(Math.abs(gap)).toBeLessThanOrEqual(1);
@@ -254,15 +254,15 @@ test.describe('hero', () => {
     });
   }
 
-  test('resizing across 960px keeps exactly one pin spacer and switches the track', async ({ page }) => {
+  test('resizing across 960px keeps exactly one pin spacer per pinned section and switches the track', async ({ page }) => {
     await open(page);
     await expect(page.getByTestId('hero-story')).toHaveAttribute('data-mode', 'wide');
     await page.setViewportSize({ width: 800, height: 900 });
     await expect(page.getByTestId('hero-story')).toHaveAttribute('data-mode', 'narrow');
-    await expect(page.locator('.pin-spacer')).toHaveCount(1);
+    await expect(page.locator('.pin-spacer')).toHaveCount(2); // the hero story, then How it works
     await page.setViewportSize({ width: 1300, height: 900 });
     await expect(page.getByTestId('hero-story')).toHaveAttribute('data-mode', 'wide');
-    await expect(page.locator('.pin-spacer')).toHaveCount(1);
+    await expect(page.locator('.pin-spacer')).toHaveCount(2); // the hero story, then How it works
   });
 
   test('reduced motion: no pin, finished loop shown', async ({ browser }) => {

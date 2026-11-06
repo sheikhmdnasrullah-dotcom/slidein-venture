@@ -12,13 +12,14 @@
  * frame and the full script is written out below it.
  */
 
+import '@/app/styles/howitworks.css';
 import { Check } from 'lucide-react';
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { SCENES } from '@/how-it-works-video/data/scenes.config';
 import { useSettledStill } from '@/lib/useSettledStill';
-import { tokenize, W } from './helpers';
+import { runSync, tokenize, W } from './helpers';
 import { Persist, Scenes } from './Scenes';
 import { buildTimeline, TOTAL } from './timeline';
 
@@ -29,7 +30,7 @@ const SCROLL_VH = 9;
 
 declare global {
   interface Window {
-    __howitworks?: { seek: (p: number) => void; progress: () => number; scene: () => number; tl: gsap.core.Timeline; gsap: typeof gsap };
+    __howitworks?: { seek: (p: number) => void; progress: () => number; scene: () => number };
   }
 }
 
@@ -80,6 +81,7 @@ export function HowItWorks() {
         };
         if (still) {
           tl.time(TOTAL, false);
+          runSync();
           show(TOTAL);
           return;
         }
@@ -93,8 +95,14 @@ export function HowItWorks() {
           anticipatePin: 1,
           scrub: true,
           invalidateOnRefresh: true,
-          onUpdate: (self) => show(self.progress * TOTAL),
-          onRefresh: (self) => show(self.progress * TOTAL),
+          onUpdate: (self) => {
+            runSync();
+            show(self.progress * TOTAL);
+          },
+          onRefresh: (self) => {
+            runSync();
+            show(self.progress * TOTAL);
+          },
         });
         triggerRef.current = st;
         window.__howitworks = {
@@ -103,8 +111,6 @@ export function HowItWorks() {
           },
           progress: () => st.progress,
           scene: () => sceneAt(st.progress * TOTAL),
-          tl,
-          gsap,
         };
         ScrollTrigger.refresh();
       }, section);
