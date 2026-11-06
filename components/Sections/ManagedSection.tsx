@@ -34,6 +34,7 @@ import {
   Reveal,
   Scene,
   SectionHeader,
+  TileWord,
 } from '@/components/Sections/primitives';
 import {
   CheckIcon,
@@ -272,6 +273,7 @@ function DesktopStage({ items }: { items: { title: string; body: string }[] }) {
               <div className="relative">
                 <i className="orbit-halo" style={{ '--hd': '0s' } as React.CSSProperties} />
                 <GlossTile size={ANCHOR} icon={<UserIcon />} />
+                <TileWord w="prospects" className="absolute bottom-full left-1/2 mb-3 -translate-x-1/2" />
               </div>
             </div>
           </div>
@@ -282,6 +284,7 @@ function DesktopStage({ items }: { items: { title: string; body: string }[] }) {
               <div className="relative">
                 <i className="orbit-halo" style={{ '--hd': '1.8s' } as React.CSSProperties} />
                 <GlossTile size={ANCHOR} icon={<GearIcon />} />
+                <TileWord w="configure" className="absolute bottom-full left-1/2 mb-3 -translate-x-1/2" />
               </div>
             </div>
           </div>
@@ -294,6 +297,7 @@ function DesktopStage({ items }: { items: { title: string; body: string }[] }) {
           style={{ marginLeft: -CENTER / 2, marginTop: -CENTER / 2 }}
         >
           <GlossTile size={CENTER} icon={<StackIcon />} />
+          <TileWord w="playbook" className="absolute bottom-full left-1/2 mb-3 -translate-x-1/2" />
         </div>
       </Scene>
 

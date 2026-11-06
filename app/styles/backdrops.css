@@ -54,3 +54,15 @@
 .band-dark::after {
   background: linear-gradient(90deg, transparent, rgb(255 255 255 / 22%) 50%, transparent);
 }
+
+/* A warm glow under the one primary action (Magic UI's button light). */
+.connect-glow {
+  filter: drop-shadow(0 10px 14px rgb(255 98 0 / 18%));
+  transition: filter 300ms var(--ease-out, cubic-bezier(0.23, 1, 0.32, 1));
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .connect-glow:hover {
+    filter: drop-shadow(0 12px 18px rgb(255 98 0 / 30%));
+  }
+}

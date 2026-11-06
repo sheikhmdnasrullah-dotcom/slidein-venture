@@ -23,7 +23,7 @@ const FIXED_WORDS = [
   'qualification', 'offer match',
   'drafts', 'versioned',
   'sent mails', 'policy',
-  'replies', 'intent',
+  'replies', 'intent', 'playbook',
 ];
 
 // 1. stages.ts exactness (parsed as text — independent of its own exports).

@@ -28,6 +28,7 @@ import {
   Reveal,
   Scene,
   SectionHeader,
+  TileWord,
 } from '@/components/Sections/primitives';
 import { EnvelopeIcon } from '@/components/Sections/icons';
 
@@ -57,9 +58,7 @@ function FanCard({ accent }: { accent?: boolean }) {
           <span className="block h-[9px] w-24 rounded-full bg-[var(--scaffold-skeleton)]" />
           <span className="block h-[7px] w-16 rounded-full bg-[var(--scaffold-skeleton)]" />
         </span>
-        {accent ? (
-          <span className="ml-auto h-[6px] w-[6px] rounded-full bg-[var(--scaffold-accent)]" />
-        ) : null}
+        {accent ? <TileWord w="drafts" className="ml-auto" /> : null}
       </div>
       <div className="mt-4 flex flex-col gap-2.5">
         <span className="block h-[8px] w-[92%] rounded-full bg-[var(--scaffold-skeleton)]" />
@@ -84,6 +83,9 @@ export default function UseCasesSection() {
           <Scene className="relative z-[2] mx-auto w-fit">
             <GlossTile size={92} icon={<EnvelopeIcon />} rotate={-2} />
           </Scene>
+          <div className="relative z-[2] mt-4 flex justify-center">
+            <TileWord w="outreach" />
+          </div>
 
           {/* the fan — desktop arc, small screens stack */}
           <div className="relative mt-10 hidden justify-center lg:flex">

@@ -17,13 +17,13 @@
 
 :root {
   /* ── Ground & ink ──────────────────────────────────────────────────── */
-  --scaffold-bg:        rgb(253 253 253 / 100%);   /* #FDFDFD, flat */
+  --scaffold-bg:        rgb(251 249 245 / 100%);   /* warm paper, flat */
   --scaffold-ink:       rgb(10 10 10 / 100%);      /* #0A0A0A */
   --scaffold-muted:     rgb(10 10 10 / 55%);
   --scaffold-surface:   rgb(255 255 255 / 100%);   /* #FFFFFF panels */
-  --scaffold-panel:     rgb(250 250 250 / 100%);   /* #FAFAFA inner panel */
-  --scaffold-well:      rgb(244 244 245 / 100%);   /* #F4F4F5 tile gradient end */
-  --scaffold-lip:       rgb(233 233 235 / 100%);   /* #E9E9EB tile under-layer */
+  --scaffold-panel:     rgb(246 243 237 / 100%);   /* warm sand, inner panel */
+  --scaffold-well:      rgb(241 238 232 / 100%);   /* tile gradient end */
+  --scaffold-lip:       rgb(230 226 218 / 100%);   /* tile under-layer */
   --scaffold-button:    rgb(28 28 32 / 100%);      /* softened warm graphite charcoal, avoids harsh pitch black */
 
   /* ── Hairlines & skeletons ─────────────────────────────────────────── */

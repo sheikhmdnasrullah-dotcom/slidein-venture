@@ -51,6 +51,7 @@ export const EQUATION_WORDS = [
   'policy',
   'replies',
   'intent',
+  'playbook', // owner-authorised: one word per component (see TileWord)
 ] as const;
 
 export type EquationWord = (typeof EQUATION_WORDS)[number];

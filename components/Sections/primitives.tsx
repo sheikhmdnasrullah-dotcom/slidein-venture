@@ -260,6 +260,26 @@ export function WordTag({ w }: { w: EquationWord }) {
   );
 }
 
+/* ─── TileWord — the one word that names a component ─────────────────────
+   A small pill that sits against a tile or card. Colours come from the band's
+   --scaffold-* names, so it reads on light and dark bands alike. */
+
+export function TileWord({ w, className }: { w: EquationWord; className?: string }) {
+  return (
+    <span
+      aria-hidden="true"
+      className={cn(
+        'inline-flex items-center gap-1.5 whitespace-nowrap rounded-full border border-[var(--scaffold-rule)] bg-[var(--scaffold-surface)] px-2.5 py-[3px] text-[12px] font-medium leading-[16px] text-[var(--scaffold-small-ink)]',
+        className,
+      )}
+      style={{ letterSpacing: '-0.01em' }}
+    >
+      <span className="block h-[5px] w-[5px] rounded-full bg-[var(--scaffold-accent)]" />
+      {word(w)}
+    </span>
+  );
+}
+
 /* ─── Reveal — the one entrance per block ──────────────────────────────── */
 
 export function Reveal({

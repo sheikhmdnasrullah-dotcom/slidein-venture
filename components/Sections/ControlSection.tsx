@@ -29,6 +29,7 @@ import {
   Reveal,
   Scene,
   SectionHeader,
+  TileWord,
 } from '@/components/Sections/primitives';
 import { ChatIcon } from '@/components/Sections/icons';
 import { Bar, TextSlot } from '@/components/Hero/Skeleton';
@@ -125,6 +126,7 @@ function StickyTile() {
       <Scene>
         <GlossTile size={120} icon={<ChatIcon size="52%" />} rotate={-4} />
       </Scene>
+      <TileWord w="converse" className="mt-5 ml-3" />
     </div>
   );
 }

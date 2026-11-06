@@ -53,7 +53,7 @@ export default function LetsTalkButton({ isMobile = false }: { isMobile?: boolea
       whileTap={{ scale: 0.985 }}
       initial="rest"
       animate="rest"
-      className={isMobile ? 'w-full' : 'inline-block'}
+      className={isMobile ? 'w-full connect-glow' : 'inline-block connect-glow'}
     >
       <Link
         href="/contact"
