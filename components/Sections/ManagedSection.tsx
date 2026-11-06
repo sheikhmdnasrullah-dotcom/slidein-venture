@@ -11,13 +11,14 @@
  * anchor sits its item slot: the two ways to run the same platform,
  * visually feeding the middle.
  *
- * Static by story rule (the page's loops belong to the hero), except for one
- * scroll-linked drift: the rings rotate slowly in opposite directions as the
- * band travels through the viewport, every tile counter-rotating to stay
- * upright. The orbit still rests wherever the scroll rests, and reduced
- * motion gets the fully static stage. Mobile drops the orbit entirely:
- * centre tile on top, anchors stacked below with short vertical hairlines
- * and a single static accent dot between them.
+ * Alive: the rings truly orbit in opposite directions (every tile counter-
+ * rotating to stay upright), a comet of orange light chases round each ring,
+ * two satellites circle the platform, beads of light run down the beams into
+ * it, and ripples leave the centre like a heartbeat. On entering view the
+ * rings unfurl and the tiles pop in one by one; a scroll-linked drift adds a
+ * little extra turn. All of it rests under reduced motion and pauses off
+ * screen. Mobile drops the orbit: centre tile on top, anchors stacked below,
+ * a bead running down each hairline.
  * Every visual is aria-hidden; the slots are the only readable content.
  */
 
@@ -67,10 +68,17 @@ export function OrbitRing({
   radius,
   tiles,
   ringRef,
+  dur = 80,
+  dir = 'cw',
+  trail = true,
 }: {
   radius: number;
   tiles: OrbitTile[];
   ringRef?: React.RefObject<HTMLDivElement | null>;
+  /** seconds per full turn */
+  dur?: number;
+  dir?: 'cw' | 'ccw';
+  trail?: boolean;
 }) {
   const d = radius * 2;
   return (
@@ -80,9 +88,11 @@ export function OrbitRing({
       style={{ width: d, height: d, marginLeft: -radius, marginTop: -radius }}
     >
       <div
-        className="h-full w-full rounded-full"
-        style={{ border: '1px solid rgba(10,10,10,0.06)' }}
+        data-orbit-ring
+        className={`orbit-ring orbit-ring--${dir}`}
+        style={{ '--dur': `${dur}s` } as React.CSSProperties}
       >
+        {trail ? <i className="orbit-trail" /> : null}
         {tiles.map(({ angle, Icon }, i) => (
           <div
             key={i}
@@ -95,7 +105,9 @@ export function OrbitRing({
             }}
           >
             <div data-orbit-counter style={{ transform: `rotate(${-angle}deg)` }}>
-              <GlossTile size={TILE} icon={<Icon />} />
+              <div data-orbit-pop className="orbit-pop">
+                <GlossTile size={TILE} icon={<Icon />} className="orbit-tile" />
+              </div>
             </div>
           </div>
         ))}
@@ -104,9 +116,20 @@ export function OrbitRing({
   );
 }
 
-/* One beam: a faint hairline curve from an anchor into the centre tile. */
-function Beam({ d }: { d: string }) {
-  return <path d={d} fill="none" stroke="rgba(10,10,10,0.07)" strokeWidth={1} />;
+/* One beam: a faint hairline curve from an anchor into the centre tile, with a
+   bead of light that runs down it on a loop. */
+function Beam({ d, delay = 0 }: { d: string; delay?: number }) {
+  return (
+    <>
+      <path d={d} className="orbit-beam" />
+      <path
+        d={d}
+        pathLength={1}
+        className="orbit-beam-run"
+        style={{ '--bd': `${delay}s` } as React.CSSProperties}
+      />
+    </>
+  );
 }
 
 function DesktopStage({ items }: { items: { title: string; body: string }[] }) {
@@ -146,8 +169,38 @@ function DesktopStage({ items }: { items: { title: string; body: string }[] }) {
         gsap.to(ring, { rotation: deg, ease: 'none', scrollTrigger: st });
         gsap.to(counters, { rotation: `-=${deg}`, ease: 'none', scrollTrigger: { ...st } });
       });
+
+      /* Entrance (once): the rings unfurl, then the tiles pop in one by one. */
+      const rings = trigger.querySelectorAll('[data-orbit-ring]');
+      const pops = trigger.querySelectorAll('[data-orbit-pop]');
+      const centre = trigger.querySelector('[data-orbit-centre]');
+      const anchors = trigger.querySelectorAll('[data-orbit-anchor]');
+      gsap.set(rings, { scale: 0.55, opacity: 0 });
+      gsap.set(pops, { scale: 0, opacity: 0 });
+      gsap.set(anchors, { scale: 0.6, opacity: 0 });
+      if (centre) gsap.set(centre, { scale: 0.7, opacity: 0 });
+      ScrollTrigger.create({
+        trigger,
+        start: 'top 78%',
+        once: true,
+        onEnter: () => {
+          if (centre) gsap.to(centre, { scale: 1, opacity: 1, duration: 0.9, ease: 'back.out(1.6)' });
+          gsap.to(rings, { scale: 1, opacity: 1, duration: 1.5, ease: 'power3.out', stagger: 0.2, delay: 0.15 });
+          gsap.to(pops, { scale: 1, opacity: 1, duration: 0.7, ease: 'back.out(1.8)', stagger: 0.09, delay: 0.7 });
+          gsap.to(anchors, { scale: 1, opacity: 1, duration: 0.8, ease: 'back.out(1.6)', stagger: 0.12, delay: 0.5 });
+        },
+      });
     }, trigger);
-    return () => ctx.revert();
+
+    /* Idle motion rests while the stage is off screen. */
+    const io = new IntersectionObserver(([entry]) => {
+      trigger.dataset.live = String(entry.isIntersecting);
+    });
+    io.observe(trigger);
+    return () => {
+      io.disconnect();
+      ctx.revert();
+    };
   }, []);
 
   const cx = size.w / 2;
@@ -161,12 +214,24 @@ function DesktopStage({ items }: { items: { title: string; body: string }[] }) {
   const rightBeam = `M ${size.w - INSET - ANCHOR - 4} ${cy} Q ${size.w * 0.68} ${cy + 110} ${cx + CENTER / 2} ${cy + 4}`;
 
   return (
-    <div ref={stageRef} className="relative mx-auto h-[540px] max-w-[1080px]">
+    <div ref={stageRef} data-live="true" className="orbit relative mx-auto h-[540px] max-w-[1080px]">
       <Scene className="absolute inset-0">
-        {/* concentric hairline rings with the orbiting small tiles */}
+        {/* the platform's glow and heartbeat ripples sit under everything */}
+        <i className="orbit-glow" style={{ width: 420, height: 420 }} />
+        {[0, 1.2, 2.4].map((d) => (
+          <i
+            key={d}
+            className="orbit-ripple"
+            style={{ width: CENTER, height: CENTER, '--rd': `${d}s` } as React.CSSProperties}
+          />
+        ))}
+
+        {/* concentric hairline rings with the orbiting small tiles, turning opposite ways */}
         <OrbitRing
           radius={215}
           ringRef={outerRingRef}
+          dur={140}
+          dir="cw"
           tiles={[
             { angle: 0, Icon: SearchIcon },
             { angle: 120, Icon: SendIcon },
@@ -176,6 +241,8 @@ function DesktopStage({ items }: { items: { title: string; body: string }[] }) {
         <OrbitRing
           radius={150}
           ringRef={innerRingRef}
+          dur={95}
+          dir="ccw"
           tiles={[
             { angle: 60, Icon: EyeIcon },
             { angle: 180, Icon: PenIcon },
@@ -183,23 +250,47 @@ function DesktopStage({ items }: { items: { title: string; body: string }[] }) {
           ]}
         />
 
-        {/* beams under the tiles they feed */}
+        {/* two satellites circle the platform on a close ring */}
+        <div
+          className="orbit-sat"
+          style={{ width: 196, height: 196, marginLeft: -98, marginTop: -98, '--dur': '14s' } as React.CSSProperties}
+        >
+          <i />
+          <i />
+        </div>
+
+        {/* beams under the tiles they feed, each with a bead of light */}
         <svg className="absolute inset-0 h-full w-full" aria-hidden="true">
-          <Beam d={leftBeam} />
-          <Beam d={rightBeam} />
+          <Beam d={leftBeam} delay={0} />
+          <Beam d={rightBeam} delay={1.8} />
         </svg>
 
         {/* the two run-mode anchors, inset so their slots stay onscreen */}
         <div className="absolute left-24 top-1/2" style={{ marginTop: -ANCHOR / 2 }}>
-          <GlossTile size={ANCHOR} icon={<UserIcon />} />
+          <div data-orbit-anchor>
+            <div className="orbit-float" style={{ '--fd': '0s' } as React.CSSProperties}>
+              <div className="relative">
+                <i className="orbit-halo" style={{ '--hd': '0s' } as React.CSSProperties} />
+                <GlossTile size={ANCHOR} icon={<UserIcon />} />
+              </div>
+            </div>
+          </div>
         </div>
         <div className="absolute right-24 top-1/2" style={{ marginTop: -ANCHOR / 2 }}>
-          <GlossTile size={ANCHOR} icon={<GearIcon />} />
+          <div data-orbit-anchor>
+            <div className="orbit-float" style={{ '--fd': '-3s' } as React.CSSProperties}>
+              <div className="relative">
+                <i className="orbit-halo" style={{ '--hd': '1.8s' } as React.CSSProperties} />
+                <GlossTile size={ANCHOR} icon={<GearIcon />} />
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* the platform at the exact centre — hover gives it a breath of lift */}
         <div
-          className="absolute left-1/2 top-1/2 transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] hover:scale-[1.04]"
+          data-orbit-centre
+          className="orbit-centre absolute left-1/2 top-1/2 hover:scale-[1.04]"
           style={{ marginLeft: -CENTER / 2, marginTop: -CENTER / 2 }}
         >
           <GlossTile size={CENTER} icon={<StackIcon />} />
@@ -217,11 +308,11 @@ function DesktopStage({ items }: { items: { title: string; body: string }[] }) {
   );
 }
 
-/* Mobile connector: a short vertical hairline with one static accent dot. */
-function Connector() {
+/* Mobile connector: a short vertical hairline with a bead running down it. */
+function Connector({ delay = 0 }: { delay?: number }) {
   return (
-    <div className="relative h-12 w-px bg-[var(--scaffold-hairline)]">
-      <span className="absolute left-1/2 top-1/2 block h-[6px] w-[6px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[var(--scaffold-accent-dot)]" />
+    <div className="orbit relative h-12 w-px bg-[var(--scaffold-hairline)]">
+      <i className="orbit-drip" style={{ '--bd': `${delay}s` } as React.CSSProperties} />
     </div>
   );
 }
@@ -241,7 +332,7 @@ function MobileStage({ items }: { items: { title: string; body: string }[] }) {
           <ItemSlot item={items[0]} align="center" titleBar="7em" bodyBar="24ch" />
         </div>
         <div className="mt-9">
-          <Connector />
+          <Connector delay={1.2} />
         </div>
         <div className="mt-5">
           <GlossTile size={72} icon={<GearIcon />} />

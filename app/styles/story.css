@@ -98,11 +98,12 @@
   stroke: rgb(10 10 10 / 55%);
 }
 
-.hs-reply-line {
+.hs-arch {
   fill: none;
-  stroke: rgb(10 10 10 / 18%);
+  stroke: rgb(10 10 10 / 22%);
   stroke-width: 1;
-  stroke-dasharray: 3 4;
+  stroke-dasharray: 3 5;
+  opacity: 0;
 }
 
 /* ── Fragments (final state: gone) ───────────────────────────────────────── */
@@ -292,32 +293,6 @@
   fill: rgb(10 10 10 / 62%);
 }
 
-/* Stage pip: where a label used to be. Fills orange as the prospect arrives. */
-.hs-pip {
-  position: absolute;
-  width: 24px;
-  height: 3px;
-  border-radius: 2px;
-  background: rgb(10 10 10 / 12%);
-  overflow: hidden;
-}
-
-.hs-pip--middle {
-  margin-left: -12px;
-}
-
-.hs-pip--start {
-  margin-top: -1.5px;
-}
-
-.hs-pip__fill {
-  position: absolute;
-  inset: 0;
-  display: block;
-  background: var(--color-brand);
-  transform-origin: 0 50%;
-}
-
 /* ── Prospect token ──────────────────────────────────────────────────────── */
 .hs-token {
   position: absolute;
@@ -359,31 +334,57 @@
   }
 }
 
-.hs-reply-token {
+/* ── The stage word: one slot, eight faces, letters roll in and out ─────────── */
+.hs-words {
   position: absolute;
-  left: 0;
-  top: 0;
-  display: block;
-  width: 16px;
-  height: 11px;
-  margin: -5.5px 0 0 -8px;
-  box-sizing: border-box;
-  border: 1.5px solid var(--hs-ink);
-  border-radius: 3px;
-  background: var(--scaffold-surface);
-  opacity: 0;
-  will-change: transform;
+  inset: 0;
+  pointer-events: none;
+  color: var(--hs-ink);
+  font-size: 46px;
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: -0.035em;
 }
 
-.hs-reply-token::after {
-  content: '';
+.hs-w {
+  position: absolute;
+  display: inline-flex;
+  white-space: nowrap;
+  padding-bottom: 10px;
+  transform: translateX(-50%);
+}
+
+.hs[data-mode='narrow'] .hs-words {
+  font-size: 38px;
+}
+
+.hs-ch {
+  display: inline-block;
+  overflow: hidden;
+  padding: 0.06em 0 0.22em;
+  margin: -0.06em 0 -0.22em;
+  vertical-align: top;
+}
+
+.hs-ch i {
+  display: inline-block;
+  font-style: normal;
+}
+
+/* no-JS / reduced-motion: only the closing face (configure) rests in view */
+.hs-w:not([data-k='7']) .hs-ch i {
+  transform: translateY(-62px);
+}
+
+.hs-w__bar {
   position: absolute;
   left: 2px;
   right: 2px;
-  top: 2px;
-  height: 1.5px;
-  background: rgb(10 10 10 / 55%);
-  transform: skewY(0deg);
+  bottom: 0;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--color-brand);
+  transform-origin: 0 50%;
 }
 
 /* ── Approval gate ───────────────────────────────────────────────────────── */
@@ -465,6 +466,308 @@
 
 .hs-ring path {
   stroke-dasharray: 1;
+}
+
+/* ── The dossier: an empty card that fills as the prospect is worked ─────── */
+.hs-doss {
+  position: absolute;
+  left: 0;
+  top: 0;
+  will-change: transform;
+}
+
+.hs-doss[data-side='above']::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 100%;
+  width: 1px;
+  height: 20px;
+  background: rgb(10 10 10 / 24%);
+}
+
+.hs-doss[data-side='right']::after {
+  content: '';
+  position: absolute;
+  right: 100%;
+  top: 50%;
+  width: 22px;
+  height: 1px;
+  background: rgb(10 10 10 / 24%);
+}
+
+.hs-doss__ph {
+  position: absolute;
+  inset: 0;
+  border: 1.5px dashed rgb(10 10 10 / 28%);
+  border-radius: 14px;
+}
+
+.hs-doss__card {
+  position: absolute;
+  inset: 0;
+  box-sizing: border-box;
+  border: 1px solid rgb(10 10 10 / 16%);
+  border-radius: 14px;
+  background: var(--scaffold-surface);
+  box-shadow: 0 20px 32px -24px rgb(10 10 10 / 38%);
+  opacity: 0;
+  overflow: hidden;
+}
+
+.hs-d-who {
+  position: absolute;
+  left: 12px;
+  top: 12px;
+}
+
+.hs-d-av {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: rgb(10 10 10 / 13%);
+  box-shadow: inset 0 0 0 1px rgb(10 10 10 / 8%);
+}
+
+.hs-d-bar {
+  position: absolute;
+  left: 36px;
+  height: 5px;
+  border-radius: 3px;
+}
+
+.hs-d-bar--a {
+  top: 4px;
+  width: 58px;
+  background: rgb(10 10 10 / 72%);
+}
+
+.hs-d-bar--b {
+  top: 15px;
+  width: 40px;
+  background: rgb(10 10 10 / 14%);
+}
+
+.hs-d-gauge {
+  position: absolute;
+  right: 10px;
+  top: 8px;
+  width: 32px;
+  height: 32px;
+}
+
+.hs-d-gauge__trk,
+.hs-d-gauge__arc {
+  fill: none;
+  stroke-width: 3;
+}
+
+.hs-d-gauge__trk {
+  stroke: rgb(10 10 10 / 12%);
+}
+
+.hs-d-gauge__arc {
+  stroke: var(--color-brand);
+  stroke-linecap: round;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 0.15;
+  transform: rotate(-90deg);
+  transform-origin: 16px 16px;
+}
+
+.hs-d-gauge__ck {
+  fill: none;
+  stroke: var(--hs-ink);
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 1;
+}
+
+.hs-d-chips {
+  position: absolute;
+  left: 12px;
+  top: 50px;
+  display: flex;
+  gap: 6px;
+}
+
+.hs-d-chips i {
+  display: block;
+  height: 14px;
+  box-sizing: border-box;
+  border: 1px solid rgb(10 10 10 / 18%);
+  border-radius: 7px;
+  background: rgb(10 10 10 / 4%);
+}
+
+.hs-d-quote {
+  position: absolute;
+  left: 12px;
+  top: 72px;
+  width: 140px;
+  height: 16px;
+}
+
+.hs-d-quote b {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 2px;
+  height: 16px;
+  background: var(--color-brand);
+}
+
+.hs-d-quote i {
+  position: absolute;
+  left: 10px;
+  height: 4px;
+  border-radius: 2px;
+  background: rgb(10 10 10 / 15%);
+}
+
+.hs-d-quote i:nth-of-type(1) {
+  top: 1px;
+}
+
+.hs-d-quote i:nth-of-type(2) {
+  top: 10px;
+}
+
+.hs-d-draft {
+  position: absolute;
+  left: 12px;
+  top: 98px;
+  width: 150px;
+  height: 20px;
+}
+
+.hs-d-draft i {
+  position: absolute;
+  left: 0;
+  height: 4px;
+  border-radius: 2px;
+  background: rgb(10 10 10 / 62%);
+  transform-origin: 0 50%;
+}
+
+.hs-d-draft i:nth-of-type(1) {
+  top: 0;
+}
+
+.hs-d-draft i:nth-of-type(2) {
+  top: 8px;
+}
+
+.hs-d-draft i:nth-of-type(3) {
+  top: 16px;
+}
+
+.hs-d-caret {
+  position: absolute;
+  left: 88px;
+  top: 13px;
+  width: 2px;
+  height: 8px;
+  background: var(--color-brand);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .hs-d-caret {
+    animation: hs-blink 1s steps(2, jump-none) infinite;
+  }
+}
+
+@keyframes hs-blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+.hs-doss__ok {
+  position: absolute;
+  inset: 0;
+  box-sizing: border-box;
+  border: 1.5px solid var(--color-brand);
+  border-radius: 14px;
+  opacity: 0;
+}
+
+.hs-doss__badge {
+  position: absolute;
+  right: -9px;
+  top: -9px;
+  display: grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--color-brand);
+  color: var(--scaffold-surface);
+  opacity: 0;
+}
+
+/* ── Plane (the card, sent) and the reply bubble ─────────────────────────── */
+.hs-plane {
+  position: absolute;
+  left: 0;
+  top: 0;
+  margin: -15px 0 0 -15px;
+  color: var(--color-brand);
+  opacity: 0;
+  filter: drop-shadow(0 8px 10px rgb(255 98 0 / 28%));
+  will-change: transform;
+}
+
+.hs-bubble {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 36px;
+  height: 26px;
+  margin: -13px 0 0 -18px;
+  box-sizing: border-box;
+  border: 1.5px solid var(--hs-ink);
+  border-radius: 9px;
+  background: var(--scaffold-surface);
+  opacity: 0;
+  will-change: transform;
+}
+
+.hs-bubble::after {
+  content: '';
+  position: absolute;
+  left: 6px;
+  bottom: -6px;
+  width: 9px;
+  height: 9px;
+  box-sizing: border-box;
+  border-right: 1.5px solid var(--hs-ink);
+  border-bottom: 1.5px solid var(--hs-ink);
+  background: var(--scaffold-surface);
+  transform: rotate(45deg) skew(8deg, 8deg);
+  clip-path: polygon(100% 0, 100% 100%, 0 100%);
+}
+
+.hs-bubble i {
+  position: absolute;
+  left: 7px;
+  height: 2.5px;
+  border-radius: 2px;
+  background: rgb(10 10 10 / 55%);
+}
+
+.hs-bubble i:nth-of-type(1) {
+  top: 7px;
+  width: 20px;
+}
+
+.hs-bubble i:nth-of-type(2) {
+  top: 13px;
+  width: 12px;
 }
 
 /* ── Booked slot ─────────────────────────────────────────────────────────── */

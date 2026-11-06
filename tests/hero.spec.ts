@@ -7,7 +7,8 @@
 import { test, expect, type Page } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 import { HOME } from '../content/home';
-import { GATE_AFTER, scrollLength } from '../components/Hero/story/storyModel';
+import { STAGE_WORD } from '../content/stages';
+import { GATE_AFTER, WORD_ORDER, scrollLength } from '../components/Hero/story/storyModel';
 
 const WIDTHS = [320, 390, 768, 1024, 1440];
 
@@ -20,7 +21,7 @@ async function toProgress(page: Page, p: number) {
     .poll(async () => Number(await page.getByTestId('hero-story').getAttribute('data-progress')), {
       timeout: 5000,
     })
-    .toBeCloseTo(Math.min(1, Math.max(0, p)), 1);
+    .toBeCloseTo(Math.min(1, Math.max(0, p)), 2);
 }
 
 /** Open the page and wait until the story has hydrated and written its first frame. */
@@ -35,30 +36,91 @@ test.describe('hero', () => {
     await page.setViewportSize({ width: 1440, height: 900 });
   });
 
-  test('renders the headline, one button, and no subhead', async ({ page }) => {
+  test('renders the headline and nothing to click: no video, no buttons, no links', async ({ page }) => {
     await open(page);
     await expect(page.getByTestId('hero-headline')).toHaveAttribute('aria-label', HOME.tagline.full);
     await expect(page.getByTestId('hero-subhead')).toHaveCount(0);
-    await expect(page.getByTestId('hero').locator('button')).toHaveCount(1);
-    await expect(page.getByTestId('hero-cta-primary')).toBeVisible();
+    await expect(page.getByTestId('hero').locator('button, a, video')).toHaveCount(0);
   });
 
-  test('story stage has seven stage nodes, a gate and not a single word', async ({ page }) => {
+  test('headline: every word rose, the marker is laid on the tail, the underline struck', async ({ page }) => {
+    await open(page);
+    const h = page.getByTestId('hero-headline');
+    await expect(h.locator('.hm-w')).toHaveCount(HOME.tagline.full.split(' ').length);
+    await expect(h.locator('.hm-w--mark')).toHaveCount(HOME.tagline.highlight.split(' ').length);
+    await expect(h.locator('.hm-em__line')).toHaveCount(1);
+    // animation classes are dropped once played, so a re-parent can never replay them
+    await expect(h.locator('.hm-rise, .hm-lay, .hm-strike')).toHaveCount(0);
+    const wash = await h.locator('.hm-w--mark').first().evaluate((el) => getComputedStyle(el, '::before').backgroundColor);
+    expect(wash).not.toBe('rgba(0, 0, 0, 0)');
+    const dash = await h.locator('.hm-em__line path').evaluate((el) => getComputedStyle(el).strokeDashoffset);
+    expect(parseFloat(dash)).toBe(0);
+  });
+
+  test('story stage: seven stage nodes, a gate, and one word slot with the seven stage names', async ({ page }) => {
     await open(page);
     const story = page.getByTestId('hero-story');
     await expect(story.locator('[data-s="node"]')).toHaveCount(7);
-    await expect(story.locator('[data-s="pip"]')).toHaveCount(7);
     await expect(story.locator('[data-s="gate"]')).toHaveCount(1);
+    const faces = await story.locator('[data-s="word"]').evaluateAll((els) => els.map((e) => (e.textContent ?? '').trim()));
+    expect(faces).toEqual(WORD_ORDER.map((s) => STAGE_WORD[s]));
+    // nothing else in the stage is text
     const texts = await story.evaluate((el) => {
       const out: string[] = [];
       const walk = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
       for (let n = walk.nextNode(); n; n = walk.nextNode()) {
+        if ((n.parentElement as HTMLElement).closest('[data-s="word"]')) continue;
         const t = (n.textContent ?? '').trim();
         if (t) out.push(t);
       }
       return out;
     });
     expect(texts).toEqual([]);
+  });
+
+  test('exactly one word is on show at a time and it follows the prospect', async ({ page }) => {
+    await open(page);
+    const shown = async () =>
+      page.getByTestId('hero-story').locator('[data-s="word"]').evaluateAll((els) =>
+        els
+          .map((w) => ({
+            k: (w as HTMLElement).dataset.k,
+            vis: Array.from(w.querySelectorAll('[data-s="ch"]')).every(
+              (c) => Math.abs(new DOMMatrix(getComputedStyle(c).transform).m42) < 1,
+            ),
+          }))
+          .filter((w) => w.vis)
+          .map((w) => w.k),
+      );
+    await toProgress(page, 0.595);
+    expect(await shown()).toEqual(['2']);
+    await toProgress(page, 0.75);
+    expect(await shown()).toEqual(['4']);
+    await toProgress(page, 1);
+    expect(await shown()).toEqual(['7']);
+  });
+
+  test('the dossier card gains a layer at each stage, is stamped by a person, and is sent', async ({ page }) => {
+    await open(page);
+    const op = (sel: string) =>
+      page.getByTestId('hero-story').locator(sel).first().evaluate((el) => Number(getComputedStyle(el).opacity));
+    await toProgress(page, 0.46);
+    expect(await op('[data-s="d-ph"]')).toBeGreaterThan(0.9); // empty, dashed: waiting
+    expect(await op('[data-s="d-card"]')).toBeLessThan(0.1);
+    await toProgress(page, 0.56);
+    expect(await op('[data-s="d-card"]')).toBeGreaterThan(0.9); // discover: a person
+    await toProgress(page, 0.6);
+    expect(await op('[data-s="d-chip"]')).toBeGreaterThan(0.9); // research: evidence
+    await toProgress(page, 0.68);
+    expect(await op('[data-s="d-gauge"]')).toBeGreaterThan(0.9); // qualify: a fit score
+    await toProgress(page, 0.72);
+    expect(await op('[data-s="d-ok"]')).toBeLessThan(0.1); // not yet approved
+    await toProgress(page, 0.79);
+    expect(await op('[data-s="d-ok"]')).toBeGreaterThan(0.9); // approved by a person
+    await toProgress(page, 0.86);
+    expect(await op('[data-s="d-card"]')).toBeLessThan(0.1); // sent: the card is gone
+    await toProgress(page, 1);
+    expect(await op('[data-s="d-ph"]')).toBeGreaterThan(0.9); // the next card waits
   });
 
   test('the story is alive before any scroll: fragments float, a spark runs the tangle', async ({ page }) => {
@@ -89,6 +151,11 @@ test.describe('hero', () => {
     await expect(page.getByTestId('hero-story')).toHaveAttribute('data-live', 'true');
     await page.evaluate(() => window.scrollTo({ top: document.documentElement.scrollHeight, behavior: 'instant' }));
     await expect(page.getByTestId('hero-story')).toHaveAttribute('data-live', 'false');
+  });
+
+  test('the timeline is exactly one unit long, so scroll progress is story time', async ({ page }) => {
+    await open(page);
+    await expect(page.getByTestId('hero-story')).toHaveAttribute('data-duration', '1.000');
   });
 
   test('the story plays through its five acts as you scroll', async ({ page }) => {
@@ -206,22 +273,6 @@ test.describe('hero', () => {
     await expect(story).toBeVisible();
     await expect(page.locator('.pin-spacer')).toHaveCount(0);
     await ctx.close();
-  });
-
-  test('tab order: story pill, then Pricing link, at any scroll position', async ({ page }) => {
-    await open(page);
-    await toProgress(page, 0.6);
-    const first = page.getByTestId('hero-cta-primary');
-    await first.focus();
-    await expect(first).toBeFocused();
-    await expect(first).toBeInViewport();
-    await page.keyboard.press('Tab');
-    await expect(page.getByTestId('hero').getByRole('link', { name: 'Pricing' })).toBeFocused();
-  });
-
-  test('?story=1 opens the story dialog', async ({ page }) => {
-    await page.goto('/?story=1');
-    await expect(page.getByRole('dialog')).toBeVisible();
   });
 
   test('hero has no axe violations at the start and the end of the story', async ({ page }) => {

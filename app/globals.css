@@ -18,6 +18,9 @@
 
 /* Hero scroll story: pinned stage, thread, gate. */
 @import "./styles/story.css";
+
+/* Orbit section: rings, comets, beams, ripples. */
+@import "./styles/orbit.css";
 /* Section shells + scene vocabulary for the bands below the hero. */
 @import "./styles/sections.css";
 @import "./styles/story-home.css";

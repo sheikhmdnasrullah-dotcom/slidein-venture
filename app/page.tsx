@@ -1,6 +1,5 @@
 import Hero from '@/components/Hero/Hero';
 import ProblemSection from '@/components/Sections/ProblemSection';
-import AgenticDashboardSection from '@/components/Sections/AgenticDashboardSection';
 import CapabilitiesSection from '@/components/Sections/CapabilitiesSection';
 import ManagedSection from '@/components/Sections/ManagedSection';
 import ControlSection from '@/components/Sections/ControlSection';
@@ -13,7 +12,6 @@ export default function Home() {
     <>
       <Hero />
       <ProblemSection />
-      <AgenticDashboardSection />
       <CapabilitiesSection />
       <ManagedSection />
       <ControlSection />

@@ -1,16 +1,21 @@
 /* ═══════════════════════════════════════════════════════════════════════════
-   HERO — type-first, asymmetric. One idea, one action, one layered plate.
+   HERO — the headline and the pinned scroll story. Nothing else.
    Uses the scaffold tokens (assemble.css) and the .font-display-xl role.
    Class prefix `hm-` keeps this isolated from legacy `hero-*` rules.
 
    Composition: the hero is exactly one viewport tall (the story pins it). A
    12-column grid on the navbar's 1200px measure carries the headline; the
    tail steps in to column 3 on desktop. The story fills the remaining height.
-   Below 1180px the grid collapses to a single left-aligned stack.
+
+   Headline motion is CSS-only (no JS, no flash): each word rises out of its
+   own mask, then the orange marker is laid down word by word, and a hand-drawn
+   underline strokes under "Most Powerful". The resting state is the natural,
+   fully visible one, so no-JS and reduced motion render complete. Each element
+   drops its animation class when it ends (Hero.tsx) so a re-parent by the pin
+   can never replay it.
    ═══════════════════════════════════════════════════════════════════════════ */
 
 .hm-hero {
-  --hm-ink-2: rgb(10 10 10 / 72%); /* AA on #FDFDFD and on the marker wash */
   --hm-gap: 24px;
   --hm-ease: var(--ease-out, cubic-bezier(0.23, 1, 0.32, 1));
   position: relative;
@@ -37,11 +42,10 @@
   margin-inline: auto;
   display: grid;
   grid-template-columns: minmax(0, 1fr);
-  row-gap: clamp(0.875rem, 2.4vh, 1.5rem);
 }
 
 /* ── Headline: one face, one weight, one ink. The tail differs from the lead
-   only by the marker wash behind it, never by font, weight or colour. ───── */
+   only by the marker behind it, never by font, weight or colour. ─────────── */
 .hm-h1 {
   margin: 0;
   display: grid;
@@ -49,118 +53,76 @@
   grid-column: 1 / -1;
   color: var(--scaffold-ink);
   font-size: clamp(1.75rem, 0.9rem + 2.9vw, 3.25rem);
-  font-weight: 600; /* typography.spec caps nav/hero text at 600; display-xl is 650 */
-  line-height: 1.03;
+  font-weight: 600; /* typography.spec caps hero text at 600; display-xl is 650 */
+  line-height: 1.06;
   letter-spacing: -0.036em;
   text-wrap: balance;
 }
 
-.hm-h1__lead {
-  display: block;
-}
-
+.hm-h1__lead,
 .hm-h1__tail {
   display: block;
-  margin-top: 0.08em;
   color: inherit;
   font: inherit;
   letter-spacing: inherit;
 }
 
-/* Marker wash: translucent brand orange behind the lower half of the tail
-   only. Colour keeps its meaning: this is the single highlight. */
-.hm-h1__mark {
-  background: linear-gradient(
-    transparent 60%,
-    var(--scaffold-accent-pill) 60% 92%,
-    transparent 92%
-  );
-  -webkit-box-decoration-break: clone;
-  box-decoration-break: clone;
-  padding-inline: 0.04em;
+.hm-h1__tail {
+  margin-top: 0.06em;
 }
 
-/* ── Copy row: hairline rule, subhead, actions ───────────────────────────── */
-.hm-hero__copy {
-  display: grid;
-  grid-template-columns: subgrid;
-  grid-column: 1 / -1;
-}
-
-.hm-actions {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 14px 28px;
-}
-
-/* Primary: one paper pill, one hairline border. No beam, no glow. */
-.hm-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 12px;
-  height: 48px;
-  max-width: 100%;
-  padding: 0 22px 0 6px;
-  cursor: pointer;
-  color: var(--scaffold-ink);
-  background: var(--color-paper-25);
-  border: 1px solid var(--scaffold-rule);
-  border-radius: var(--radius-pill);
-  font-size: 15px;
-  transition:
-    background-color 200ms var(--hm-ease),
-    transform 160ms var(--hm-ease);
-}
-
-.hm-pill:active {
-  transform: scale(0.97);
-}
-
-.hm-pill:focus-visible,
-.hm-link:focus-visible {
-  outline: 2px solid color-mix(in oklch, var(--color-brand) 60%, transparent);
-  outline-offset: 3px;
-}
-
-.hm-pill__chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  height: 36px;
-  padding: 0 16px;
-  font-weight: 500;
-  border-radius: var(--radius-pill);
-  background: var(--scaffold-accent-chip);
-}
-
-.hm-pill__label {
-  color: var(--hm-ink-2);
-}
-
-/* Secondary: a plain text link. */
-.hm-link {
-  color: var(--scaffold-ink);
-  font-size: 15px;
-  text-decoration: none;
-  border-radius: var(--radius-sm);
-}
-
-.hm-link__arrow {
+/* word mask: each word rises out of its own line box. The padding/negative
+   margin pair keeps descenders (Q, g, y) from being clipped by the mask. */
+.hm-w {
   display: inline-block;
-  vertical-align: middle;
-  margin-left: 2px;
+  position: relative;
+  overflow: hidden;
+  padding: 0.04em 0.02em 0.16em;
+  margin: -0.04em -0.02em -0.16em;
+  vertical-align: top;
 }
 
-@media (hover: hover) and (pointer: fine) {
-  .hm-pill:hover {
-    background: var(--scaffold-accent-row);
-  }
+.hm-w__in {
+  display: inline-block;
+  position: relative;
+  z-index: 1;
+}
 
-  .hm-link:hover {
-    text-decoration: underline;
-    text-underline-offset: 4px;
-  }
+/* Marker: translucent brand orange behind the lower 40% of each tail word,
+   slightly slanted like a real highlighter stroke. Words are chained, so the
+   wash reads as one stroke laid left to right. */
+.hm-w--mark::before {
+  content: '';
+  position: absolute;
+  z-index: 0;
+  inset: 54% -0.22em 10%;
+  background: var(--scaffold-accent-pill);
+  clip-path: polygon(0 18%, 2.5% 0, 100% 10%, 97.5% 100%, 1.5% 88%);
+  transform-origin: 0 50%;
+}
+
+/* "Most Powerful": a hand-drawn underline, struck once after the words land. */
+.hm-em {
+  display: inline-block;
+  position: relative;
+}
+
+.hm-em__line {
+  position: absolute;
+  left: -2%;
+  bottom: -0.02em;
+  width: 104%;
+  height: 0.3em;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.hm-em__line path {
+  fill: none;
+  stroke: var(--color-brand);
+  stroke-width: 3.2;
+  stroke-linecap: round;
+  stroke-dasharray: 1;
 }
 
 /* Tablet: tail steps in slightly so the two lines still read as a pair. */
@@ -185,21 +147,30 @@
     grid-column: 3 / span 10;
     padding-left: 0;
   }
-
-  .hm-hero__copy .hm-actions {
-    grid-column: 1 / -1;
-  }
 }
 
-/* ── Entrance: one orchestrated settle, then rest ────────────────────────────
-   CSS keyframes only. No stylesheet rule hides anything: `backwards` fill
-   holds the start frame only while a delayed animation waits to run, and the
-   resting state is the element's natural, fully visible one. No-JS and
-   reduced-motion therefore render complete. transform + opacity only. */
+/* ── Entrance ────────────────────────────────────────────────────────────────
+   `backwards` fill holds the start frame only while a delayed animation waits;
+   the resting state is the natural one. transform + opacity only. */
 @media (prefers-reduced-motion: no-preference) {
   .hm-in {
     animation: hm-settle 520ms var(--hm-ease) backwards;
     animation-delay: calc(var(--i, 0) * 90ms);
+  }
+
+  .hm-rise {
+    animation: hm-rise 880ms cubic-bezier(0.19, 1, 0.22, 1) backwards;
+    animation-delay: calc(120ms + var(--w, 0) * 52ms);
+  }
+
+  .hm-w--mark.hm-lay::before {
+    animation: hm-lay 620ms cubic-bezier(0.65, 0, 0.35, 1) backwards;
+    animation-delay: calc(900ms + var(--m, 0) * 130ms);
+  }
+
+  .hm-em__line.hm-strike path {
+    animation: hm-strike 760ms cubic-bezier(0.65, 0, 0.35, 1) backwards;
+    animation-delay: 1150ms;
   }
 }
 
@@ -212,5 +183,37 @@
   to {
     opacity: 1;
     transform: none;
+  }
+}
+
+@keyframes hm-rise {
+  from {
+    opacity: 0;
+    transform: translateY(105%) rotate(2.5deg);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes hm-lay {
+  from {
+    transform: scaleX(0);
+  }
+
+  to {
+    transform: scaleX(1);
+  }
+}
+
+@keyframes hm-strike {
+  from {
+    stroke-dashoffset: 1;
+  }
+
+  to {
+    stroke-dashoffset: 0;
   }
 }
