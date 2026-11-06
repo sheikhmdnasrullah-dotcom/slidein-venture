@@ -46,9 +46,9 @@ export const ARCHIVED_HEADLINES = {
 export const HOME = {
   /* The hero tagline requested by the owner */
   tagline: {
-    lead: 'The Internet’s Most Powerful Client Acquisition Secrets,',
-    highlight: 'Unified into one actionable Framework.',
-    full: 'The Internet’s Most Powerful Client Acquisition Secrets, Unified into one actionable Framework.',
+    lead: 'Hyper-Personalised Emails',
+    highlight: 'at Scale.',
+    full: 'Hyper-Personalised Emails at Scale.',
   },
   announcement: {
     /* The primary CTA pill below the subhead (the hero's only button).

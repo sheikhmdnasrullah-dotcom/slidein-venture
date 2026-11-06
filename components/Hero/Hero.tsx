@@ -34,23 +34,20 @@ function Headline() {
   const { lead, highlight, full } = HOME.tagline;
   const leadWords = lead.split(' ');
   const tailWords = highlight.split(' ');
-  // "Most Powerful" are words 2 and 3 of the lead; they carry the underline.
-  const emFrom = leadWords.indexOf('Most');
-  const emTo = emFrom + 1;
+  // The first word of the lead carries the hand-drawn underline.
+  const emFrom = 0;
 
   const leadNodes: React.ReactNode[] = [];
   for (let i = 0; i < leadWords.length; i++) {
     if (i === emFrom) {
       leadNodes.push(
         <span className="hm-em" key={`em-${i}`}>
-          <Word text={leadWords[i]} w={i} />{' '}
-          <Word text={leadWords[emTo]} w={emTo} />
+          <Word text={leadWords[i]} w={i} />
           <svg className="hm-em__line hm-strike" viewBox="0 0 200 12" preserveAspectRatio="none" aria-hidden="true" focusable="false">
             <path d="M2 8 C 40 2, 70 11, 108 6 S 170 3, 198 7" pathLength={1} />
           </svg>
         </span>,
       );
-      i = emTo;
     } else {
       leadNodes.push(<Word key={i} text={leadWords[i]} w={i} />);
     }

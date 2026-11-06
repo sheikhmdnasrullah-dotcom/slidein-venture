@@ -52,10 +52,12 @@
   grid-template-columns: subgrid;
   grid-column: 1 / -1;
   color: var(--scaffold-ink);
-  font-size: clamp(1.75rem, 0.9rem + 2.9vw, 3.25rem);
+  font-size: clamp(1.75rem, 0.6rem + 4.6vw, 4rem);
   font-weight: 600; /* typography.spec caps hero text at 600; display-xl is 650 */
   line-height: 1.06;
-  letter-spacing: -0.036em;
+  letter-spacing: -0.024em;
+  word-spacing: 0.12em;
+  text-align: center;
   text-wrap: balance;
 }
 
@@ -101,7 +103,7 @@
   transform-origin: 0 50%;
 }
 
-/* "Most Powerful": a hand-drawn underline, struck once after the words land. */
+/* "Hyper-Personalised": a hand-drawn underline, struck once after the words land. */
 .hm-em {
   display: inline-block;
   position: relative;
@@ -110,7 +112,7 @@
 .hm-em__line {
   position: absolute;
   left: -2%;
-  bottom: -0.02em;
+  bottom: -0.1em;
   width: 104%;
   height: 0.3em;
   overflow: visible;
@@ -128,7 +130,7 @@
 /* Tablet: tail steps in slightly so the two lines still read as a pair. */
 @media (width >= 640px) {
   .hm-h1__tail {
-    padding-left: clamp(0rem, 8vw - 2rem, 4rem);
+    padding-left: 0;
   }
 }
 
@@ -140,11 +142,11 @@
   }
 
   .hm-h1__lead {
-    grid-column: 1 / span 10;
+    grid-column: 1 / -1;
   }
 
   .hm-h1__tail {
-    grid-column: 3 / span 10;
+    grid-column: 1 / -1;
     padding-left: 0;
   }
 }
