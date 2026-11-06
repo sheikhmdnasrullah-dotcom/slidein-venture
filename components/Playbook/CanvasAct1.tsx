@@ -3,7 +3,7 @@
  * ---------------------------------------------------------------------------
  * Scattered business information gets scanned:
  * - 14 architectural fragments with idle floating drift.
- * - Optical laser scan beam (1.5px ink line, 28px fade band, orange protagonist
+ * - Search lens (a magnifier that sweeps the board; no rule)
  *   dot with concentric pulse ring).
  * - 24 constellation chips pop off tethered by dotted threads.
  * - Scroll cue fades on initial scroll.
@@ -81,35 +81,46 @@ export function CanvasAct1({
         ))}
       </div>
 
-      {/* 3. Optical Laser Scan Beam with Protagonist Dot & Precision Vernier Scale */}
+      {/* 3. The lookup: a magnifier sweeps down the board in a searching zigzag.
+          The wrapper keeps the scan-beam hook (GSAP drives its y with the
+          scroll); the lens inside is driven across by .act1-lens. No rule, no
+          line: a soft warm wash follows the lens and the fragments answer it. */}
       <div
         data-testid="scan-beam"
-        className="absolute left-0 right-0 h-[36px] pointer-events-none z-30 act1-beam flex flex-col justify-end"
+        className="absolute left-0 right-0 h-[120px] pointer-events-none z-30 act1-beam"
         style={{
-          top: 0,
+          top: -60,
           background:
-            'linear-gradient(to bottom, rgba(10,10,10,0) 0%, rgba(10,10,10,0.02) 40%, rgba(10,10,10,0.08) 85%, rgba(10,10,10,0.18) 100%)',
+            'linear-gradient(to bottom, rgba(255,98,0,0) 0%, rgba(255,98,0,0.05) 50%, rgba(255,98,0,0) 100%)',
         }}
       >
-        <div className="relative w-full h-[1.5px] bg-[rgba(10,10,10,0.85)] flex items-center shadow-[0_1px_4px_rgba(0,0,0,0.15)]">
-          {/* Vernier precision hash scale */}
-          <div
-            className="absolute inset-0 opacity-25"
-            style={{
-              backgroundImage:
-                'repeating-linear-gradient(90deg, rgba(255,255,255,1) 0, rgba(255,255,255,1) 1.5px, transparent 1.5px, transparent 12px)',
-            }}
-          />
-
-          {/* Protagonist Dot on Beam leading edge with dual radar reticle */}
-          <div
-            data-protagonist="beam"
-            className="absolute right-12 flex items-center justify-center -translate-y-px"
-          >
-            <span className="absolute h-5 w-5 rounded-full border border-[var(--scaffold-accent)]/35 animate-ping pointer-events-none" />
-            <span className="absolute h-3 w-3 rounded-full border border-[var(--scaffold-accent)]/50 pointer-events-none" />
-            <span className="relative h-[8px] w-[8px] rounded-full bg-[var(--scaffold-accent)] shadow-[0_0_8px_var(--scaffold-accent)]" />
-          </div>
+        <div className="act1-lens absolute left-0 top-[24px] h-[72px] w-[72px]" data-protagonist="beam">
+          <span className="act1-lens-ping absolute left-[6px] top-[6px] h-[48px] w-[48px] rounded-full" />
+          <svg viewBox="0 0 72 72" width="72" height="72" fill="none" aria-hidden="true" focusable="false">
+            <defs>
+              <clipPath id="act1-lens-clip">
+                <circle cx="30" cy="30" r="21" />
+              </clipPath>
+              <radialGradient id="act1-lens-glass" cx="0.35" cy="0.3" r="0.9">
+                <stop offset="0" stopColor="rgb(255 255 255)" stopOpacity="0.95" />
+                <stop offset="1" stopColor="rgb(255 98 0)" stopOpacity="0.14" />
+              </radialGradient>
+            </defs>
+            {/* handle */}
+            <path d="M46 46 L64 64" stroke="rgb(10 10 10)" strokeWidth="6" strokeLinecap="round" />
+            <path d="M58 58 L64 64" stroke="var(--color-brand)" strokeWidth="6" strokeLinecap="round" />
+            {/* glass */}
+            <circle cx="30" cy="30" r="22" fill="url(#act1-lens-glass)" stroke="rgb(10 10 10)" strokeWidth="2.6" />
+            {/* what the lens reads: a line of text, enlarged, and a scan stripe */}
+            <g clipPath="url(#act1-lens-clip)">
+              <rect x="16" y="20" width="28" height="4" rx="2" fill="rgb(10 10 10 / 0.78)" />
+              <rect x="16" y="28" width="20" height="4" rx="2" fill="rgb(10 10 10 / 0.3)" />
+              <rect x="16" y="36" width="24" height="4" rx="2" fill="rgb(10 10 10 / 0.3)" />
+              <rect className="act1-lens-scan" x="6" y="14" width="48" height="3" rx="1.5" fill="var(--color-brand)" />
+            </g>
+            {/* glint */}
+            <path d="M16 24 A15 15 0 0 1 25 15" stroke="rgb(255 255 255)" strokeWidth="2.4" strokeLinecap="round" opacity="0.9" />
+          </svg>
         </div>
       </div>
 

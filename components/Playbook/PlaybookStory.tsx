@@ -189,6 +189,7 @@ export function PlaybookStory() {
         gsap.set('[data-act="distill"]', { opacity: 0, pointerEvents: 'none' });
         gsap.set('[data-act="compile"]', { opacity: 0, pointerEvents: 'none' });
         gsap.set('[data-testid="scan-beam"]', { y: 0, opacity: 1 });
+        gsap.set('.act1-lens', { x: portrait ? 56 : 150 });
         gsap.set('.act1-cue', { opacity: 0.8 });
         gsap.set('.story-caption-1', { autoAlpha: 1, y: 0 });
         gsap.set('.story-caption-2', { autoAlpha: 0, y: 16 });
@@ -221,6 +222,19 @@ export function PlaybookStory() {
             y: portrait ? CANVAS_PORTRAIT.h : CANVAS_LANDSCAPE.h,
             duration: 18,
             ease: 'none',
+          },
+          0,
+        );
+
+        // The lens zigzags across the board while the wash descends: it searches
+        const lensL = portrait ? 56 : 150;
+        const lensR = (portrait ? CANVAS_PORTRAIT.w : CANVAS_LANDSCAPE.w) - (portrait ? 150 : 230);
+        const lensM = (lensL + lensR) / 2;
+        tl.to(
+          '.act1-lens',
+          {
+            keyframes: { x: [lensR, lensL + 40, lensR - 60, lensM - 80, lensR - 20], easeEach: 'sine.inOut' },
+            duration: 18,
           },
           0,
         );

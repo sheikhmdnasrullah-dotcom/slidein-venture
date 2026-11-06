@@ -21,3 +21,34 @@
     70%, 100% { opacity: 0; transform: scale(1.7); }
   }
 }
+
+/* ── Slide 1: the search lens ─────────────────────────────────────────── */
+.act1-lens {
+  will-change: transform;
+  filter: drop-shadow(0 6px 10px rgb(10 10 10 / 14%));
+}
+
+.act1-lens-ping {
+  border: 1.5px solid var(--color-brand);
+  opacity: 0;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .act1-lens-ping {
+    animation: pb-lens-ping 2.2s var(--ease-out, cubic-bezier(0.23, 1, 0.32, 1)) infinite;
+  }
+
+  .act1-lens-scan {
+    animation: pb-lens-scan 1.9s ease-in-out infinite alternate;
+  }
+
+  @keyframes pb-lens-ping {
+    0% { opacity: 0.7; transform: scale(0.9); }
+    80%, 100% { opacity: 0; transform: scale(1.9); }
+  }
+
+  @keyframes pb-lens-scan {
+    from { transform: translateY(0); }
+    to { transform: translateY(28px); }
+  }
+}
