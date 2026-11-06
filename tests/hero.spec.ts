@@ -7,10 +7,8 @@
 import { test, expect, type Page } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 import { HOME } from '../content/home';
-import { LOOP_STAGE_ORDER, STAGE_ICON_ID, STAGE_WORD } from '../content/stages';
 import { GATE_AFTER, scrollLength } from '../components/Hero/story/storyModel';
 
-const STAGES = LOOP_STAGE_ORDER.filter((s) => STAGE_ICON_ID[s] !== null);
 const WIDTHS = [320, 390, 768, 1024, 1440];
 
 /** Scroll to progress p of the pinned range and wait for the story to settle there. */
@@ -45,14 +43,12 @@ test.describe('hero', () => {
     await expect(page.getByTestId('hero-cta-primary')).toBeVisible();
   });
 
-  test('story stage has seven stage nodes, a gate and only stage words', async ({ page }) => {
+  test('story stage has seven stage nodes, a gate and not a single word', async ({ page }) => {
     await open(page);
     const story = page.getByTestId('hero-story');
-    await expect(story).toHaveAttribute('data-ready', 'true');
     await expect(story.locator('[data-s="node"]')).toHaveCount(7);
+    await expect(story.locator('[data-s="pip"]')).toHaveCount(7);
     await expect(story.locator('[data-s="gate"]')).toHaveCount(1);
-    const words = await story.locator('[data-s="word"]').allTextContents();
-    expect(words).toEqual(STAGES.map((s) => STAGE_WORD[s]));
     const texts = await story.evaluate((el) => {
       const out: string[] = [];
       const walk = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
@@ -62,10 +58,37 @@ test.describe('hero', () => {
       }
       return out;
     });
-    const fragmentLabels = ['profile', 'prospects', 'evidence', 'icps', 'offers', 'policy', 'replies'];
-    const vocab = new Set<string>([...Object.values(STAGE_WORD), ...fragmentLabels]);
-    const extra = texts.filter((t) => !vocab.has(t));
-    expect(extra).toEqual([]);
+    expect(texts).toEqual([]);
+  });
+
+  test('the story is alive before any scroll: fragments float, a spark runs the tangle', async ({ page }) => {
+    await open(page);
+    await page.waitForTimeout(2600); // intro: fragments land, tangle draws
+    const card = page.locator('[data-s="frag"] .cv-card').first();
+    const a = await card.evaluate((el) => getComputedStyle(el).translate);
+    await page.waitForTimeout(900);
+    const b = await card.evaluate((el) => getComputedStyle(el).translate);
+    expect(a).not.toBe(b);
+    const tangle = await page.locator('[data-s="tangle"]').first().evaluate((el) => (el as SVGElement).style.strokeDashoffset);
+    expect(parseFloat(tangle)).toBe(0);
+    const spark = await page.locator('[data-s="tangle-pulse"]').first().evaluate((el) => getComputedStyle(el).opacity);
+    expect(Number(spark)).toBeGreaterThan(0.5);
+  });
+
+  test('pointer moves the layers a little, and they settle back', async ({ page }) => {
+    await open(page);
+    const px = () => page.getByTestId('hero-story').evaluate((el) => Number(getComputedStyle(el).getPropertyValue('--px')));
+    await page.mouse.move(1300, 500);
+    await expect.poll(px, { timeout: 4000 }).toBeGreaterThan(0.4);
+    await page.mouse.move(10, 500);
+    await expect.poll(px, { timeout: 4000 }).toBeLessThan(-0.4);
+  });
+
+  test('idle motion pauses when the hero is off screen', async ({ page }) => {
+    await open(page);
+    await expect(page.getByTestId('hero-story')).toHaveAttribute('data-live', 'true');
+    await page.evaluate(() => window.scrollTo({ top: document.documentElement.scrollHeight, behavior: 'instant' }));
+    await expect(page.getByTestId('hero-story')).toHaveAttribute('data-live', 'false');
   });
 
   test('the story plays through its five acts as you scroll', async ({ page }) => {

@@ -107,6 +107,7 @@
 
 /* ── Fragments (final state: gone) ───────────────────────────────────────── */
 .hs-frag {
+  position: absolute;
   left: 0;
   top: 0;
   opacity: 0;
@@ -114,10 +115,129 @@
   transform-origin: 50% 50%;
 }
 
+.hs-frag__mid {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.hs-frag .cv-card {
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  /* idle float, then pointer parallax on top (separate properties compose) */
+  animation: hs-float var(--fd, 6s) ease-in-out var(--fl, 0s) infinite;
+  transform: translate3d(calc(var(--px) * var(--d, 0) * 1px), calc(var(--py) * var(--d, 0) * 0.7px), 0);
+}
+
+@keyframes hs-float {
+  0%,
+  100% {
+    translate: 0 0;
+    rotate: 0deg;
+  }
+
+  50% {
+    translate: 0 -5px;
+    rotate: 0.5deg;
+  }
+}
+
+/* ── Layers: pointer parallax, one gentle step for the track ─────────────── */
+@property --px {
+  syntax: '<number>';
+  inherits: true;
+  initial-value: 0;
+}
+
+@property --py {
+  syntax: '<number>';
+  inherits: true;
+  initial-value: 0;
+}
+
+@property --lift {
+  syntax: '<number>';
+  inherits: false;
+  initial-value: 0;
+}
+
+.hs-layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.hs-layer--track {
+  transform: translate3d(calc(var(--px) * -3px), calc(var(--py) * -2px), 0);
+}
+
+/* idle motion rests when the hero is off screen */
+.hs[data-live='false'] *,
+.hs[data-live='false'] *::after {
+  animation-play-state: paused !important;
+}
+
+/* tangle: a spark runs along each loose thread while it is still a mess */
+.hs-tangle-pulse {
+  fill: none;
+  stroke: var(--color-brand);
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-dasharray: 10 140;
+  opacity: 0;
+  animation: hs-spark 3.2s linear infinite;
+}
+
+.hs[data-act='mess'] .hs-tangle-pulse {
+  opacity: 0.75;
+  transition: opacity 600ms ease 1.8s;
+}
+
+@keyframes hs-spark {
+  to {
+    stroke-dashoffset: -300;
+  }
+}
+
+/* light running along the live thread */
+.hs-flow {
+  fill: none;
+  stroke: rgb(255 255 255 / 55%);
+  stroke-width: 1;
+  stroke-linecap: round;
+  stroke-dasharray: 3 44;
+  animation: hs-run 1.4s linear infinite;
+  opacity: 0;
+}
+
+.hs-loop-flow {
+  fill: none;
+  stroke: rgb(255 255 255 / 55%);
+  stroke-width: 1;
+  stroke-linecap: round;
+  stroke-dasharray: 3 44;
+  animation: hs-run 1.8s linear infinite;
+  opacity: 0;
+  transition: opacity 500ms ease;
+}
+
+.hs[data-done='true'] .hs-loop-flow {
+  opacity: 1;
+}
+
+@keyframes hs-run {
+  to {
+    stroke-dashoffset: -94;
+  }
+}
+
 /* ── Stage nodes ─────────────────────────────────────────────────────────── */
 .hs-node {
   --on: 1;
   --pulse: 1;
+  transition: --lift 180ms ease;
   position: absolute;
   display: grid;
   place-items: center;
@@ -130,7 +250,38 @@
   border: 1px solid rgb(10 10 10 / calc(0.16 + var(--on) * 0.6));
   box-shadow:
     0 8px 16px -12px rgb(10 10 10 / calc(var(--on) * 30%)),
+    0 0 0 calc(var(--lift) * 3px) rgb(10 10 10 / calc(var(--lift) * 6%)),
     0 0 0 calc(var(--pulse) * 12px) color-mix(in oklch, var(--color-brand) calc((1 - var(--pulse)) * 50%), transparent);
+}
+
+.hs-node:hover {
+  --lift: 1;
+}
+
+.hs-node::after {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: 50%;
+  border: 1px solid var(--color-brand);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.hs-node[data-active='true']::after {
+  animation: hs-ping 1.8s cubic-bezier(0.2, 0.6, 0.3, 1) infinite;
+}
+
+@keyframes hs-ping {
+  0% {
+    transform: scale(1);
+    opacity: 0.7;
+  }
+
+  100% {
+    transform: scale(1.7);
+    opacity: 0;
+  }
 }
 
 .hs-node svg {
@@ -141,24 +292,30 @@
   fill: rgb(10 10 10 / 62%);
 }
 
-.hs-word {
+/* Stage pip: where a label used to be. Fills orange as the prospect arrives. */
+.hs-pip {
   position: absolute;
-  padding: 2px 6px;
-  font-size: 13px;
-  font-weight: 500;
-  line-height: 1;
-  letter-spacing: 0.01em;
-  white-space: nowrap;
-  color: var(--hs-ink);
-  background: var(--scaffold-bg);
+  width: 24px;
+  height: 3px;
+  border-radius: 2px;
+  background: rgb(10 10 10 / 12%);
+  overflow: hidden;
 }
 
-.hs-word--middle {
-  transform: translate(-50%, -50%);
+.hs-pip--middle {
+  margin-left: -12px;
 }
 
-.hs-word--start {
-  transform: translate(0, -50%);
+.hs-pip--start {
+  margin-top: -1.5px;
+}
+
+.hs-pip__fill {
+  position: absolute;
+  inset: 0;
+  display: block;
+  background: var(--color-brand);
+  transform-origin: 0 50%;
 }
 
 /* ── Prospect token ──────────────────────────────────────────────────────── */
@@ -175,6 +332,31 @@
     0 0 0 5px rgb(10 10 10 / 18%),
     0 10px 18px -8px color-mix(in oklch, var(--color-brand) 70%, transparent);
   will-change: transform;
+}
+
+.hs-token::after {
+  content: '';
+  position: absolute;
+  inset: -3px;
+  border-radius: 50%;
+  border: 1.5px solid var(--color-brand);
+  opacity: 0;
+}
+
+.hs:not([data-stage='']) .hs-token::after {
+  animation: hs-halo 1.6s ease-out infinite;
+}
+
+@keyframes hs-halo {
+  0% {
+    transform: scale(0.9);
+    opacity: 0.8;
+  }
+
+  100% {
+    transform: scale(2.1);
+    opacity: 0;
+  }
 }
 
 .hs-reply-token {
@@ -218,6 +400,16 @@
   box-sizing: border-box;
   border: 1px dashed rgb(10 10 10 / 30%);
   border-radius: 4px;
+}
+
+.hs[data-gate='closed'][data-stage='4'] .hs-gate::before {
+  animation: hs-wait 1.2s ease-in-out infinite;
+}
+
+@keyframes hs-wait {
+  50% {
+    border-color: var(--color-brand);
+  }
 }
 
 .hs-gate[data-axis='vertical']::before {
@@ -286,6 +478,18 @@
   border-radius: 10px;
   background: var(--scaffold-surface);
   overflow: hidden;
+}
+
+.hs-slot__check {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  margin: -9px 0 0 -9px;
+  color: var(--scaffold-surface);
+}
+
+.hs-slot__check path {
+  stroke-dasharray: 1;
 }
 
 .hs-slot__fill {

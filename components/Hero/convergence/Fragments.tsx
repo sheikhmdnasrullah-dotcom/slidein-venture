@@ -12,8 +12,9 @@ const Bar = ({ w, dark = false }: { w: number | string; dark?: boolean }) => (
   <i className={dark ? 'cv-bar cv-bar--dark' : 'cv-bar'} style={{ width: typeof w === 'number' ? `${w}%` : w }} />
 );
 
-export function RawFace({ kind, label }: { kind: RawKind; label: string }) {
-  const lab = <span className="cv-lab">{label}</span>;
+/** Without a label the face shows a short dark bar in its place (no words). */
+export function RawFace({ kind, label }: { kind: RawKind; label?: string }) {
+  const lab = label ? <span className="cv-lab">{label}</span> : <Bar w={38} dark />;
   switch (kind) {
     case 'doc':
       return (

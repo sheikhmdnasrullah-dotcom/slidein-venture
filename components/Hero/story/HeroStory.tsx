@@ -88,7 +88,11 @@ export function HeroStory() {
     const ringLink = one<SVGPathElement>('[data-s="ring-link"]');
     const slotLink = one<SVGPathElement>('[data-s="slot-link"]');
     const nodes = all<HTMLElement>('[data-s="node"]');
-    const words = all<HTMLElement>('[data-s="word"]');
+    const pips = all<HTMLElement>('[data-s="pip-fill"]');
+    const pipBars = all<HTMLElement>('[data-s="pip"]');
+    const mids = all<HTMLElement>('[data-s="frag-mid"]');
+    const flow = one<SVGPathElement>('[data-s="flow"]');
+    const slotCheck = one<SVGPathElement>('[data-s="slot-check"]');
     const gate = one<HTMLElement>('[data-s="gate"]');
     const bar = one<HTMLElement>('[data-s="gate-bar"]');
     const ring = one<HTMLElement>('[data-s="ring"]');
@@ -162,6 +166,16 @@ export function HeroStory() {
       }
       fill.style.strokeDashoffset = String(1 - tr.u);
       loop.style.strokeDashoffset = String(1 - lp.v);
+      /* light runs along the live part of the thread, tip to tail */
+      if (lp.v === 0 && tr.u > 0.01) {
+        flow.setAttribute(
+          'd',
+          `M${n0.x} ${n0.y}L${lerp(n0.x, n6.x, tr.u).toFixed(1)} ${lerp(n0.y, n6.y, tr.u).toFixed(1)}`,
+        );
+        flow.style.opacity = '1';
+      } else {
+        flow.style.opacity = '0';
+      }
       const pt = reply.getPointAtLength(rp.v * replyLen);
       gsap.set(replyToken, { x: pt.x, y: pt.y });
     };
@@ -171,7 +185,9 @@ export function HeroStory() {
       gsap.set(tangles, { strokeDashoffset: 1, opacity: 1 });
       gsap.set(rail, { strokeDashoffset: 1 });
       gsap.set(nodes, { opacity: 0, scale: 0.8, '--on': 0 });
-      gsap.set(words, { opacity: 0 });
+      gsap.set(pips, { scaleX: 0 });
+      gsap.set(pipBars, { opacity: 0 });
+      gsap.set(slotCheck, { strokeDashoffset: 1 });
       gsap.set(gate, { opacity: 0 });
       gsap.set(ring, { opacity: 0, scale: 0.6 });
       gsap.set(check, { strokeDashoffset: 1 });
@@ -195,12 +211,6 @@ export function HeroStory() {
           0,
         );
       });
-      tl.fromTo(
-        tangles,
-        { strokeDashoffset: 1 },
-        { strokeDashoffset: 0, duration: 0.16, ease: 'power1.out', stagger: 0.02 },
-        0.02,
-      );
       if (cue) tl.fromTo(cue, { opacity: 1 }, { opacity: 0, duration: 0.05 }, 0);
 
       /* 2 · converge: fragments pull into one thread */
@@ -227,6 +237,9 @@ export function HeroStory() {
           0.3 + i * 0.018,
         );
       });
+      pipBars.forEach((b, i) => {
+        tl.fromTo(b, { opacity: 0 }, { opacity: 1, duration: 0.05, immediateRender: false }, 0.3 + i * 0.018);
+      });
       tl.fromTo(
         token,
         { opacity: 0, scale: 0 },
@@ -244,11 +257,11 @@ export function HeroStory() {
         );
       for (let i = 0; i < 4; i++) hop(i / 6, (i + 1) / 6, T.hop(i) + 0.014, 0.0485);
 
-      /* node i lights up as the prospect arrives; its word follows */
+      /* node i lights up as the prospect arrives; its pip fills */
       nodes.forEach((n, i) => {
         const at = stageTime(i);
         tl.fromTo(n, { '--on': 0 }, { '--on': 1, duration: 0.025, immediateRender: false }, at - 0.025);
-        tl.fromTo(words[i], { opacity: 0 }, { opacity: 1, duration: 0.03, immediateRender: false }, at - 0.02);
+        tl.fromTo(pips[i], { scaleX: 0 }, { scaleX: 1, duration: 0.03, ease: 'power2.out', immediateRender: false }, at - 0.02);
       });
 
       /* 4 · gate: a person approves, the bar lifts, outreach, reply */
@@ -290,6 +303,7 @@ export function HeroStory() {
       /* booked: the slot draws in and fills */
       tl.fromTo(slotLink, { strokeDashoffset: 1 }, { strokeDashoffset: 0, duration: 0.015, immediateRender: false }, T.converse);
       tl.fromTo(slot, { opacity: 0 }, { opacity: 1, duration: 0.015, immediateRender: false }, T.converse + 0.005);
+      tl.fromTo(slotCheck, { strokeDashoffset: 1 }, { strokeDashoffset: 0, duration: 0.02, ease: 'power2.out', immediateRender: false }, T.booked + 0.025);
       tl.fromTo(slotFill, { scaleY: 0 }, { scaleY: 1, duration: 0.03, ease: 'power3.out', immediateRender: false }, T.booked);
 
       /* 5 · loop: the line curls back to configure, the prospect with it */
@@ -313,6 +327,7 @@ export function HeroStory() {
         stage.dataset.stage = a === null ? '' : String(a);
         stage.dataset.gate = gateOpenAt(p) ? 'open' : 'closed';
         stage.dataset.booked = String(bookedAt(p));
+        stage.dataset.done = String(p >= 0.985);
         nodes.forEach((n, i) => {
           if (a === i) n.setAttribute('data-active', 'true');
           else n.removeAttribute('data-active');
@@ -334,6 +349,26 @@ export function HeroStory() {
       tl.progress(0);
       placeAll();
       apply(0);
+
+      /* Load intro (time-based, once): the fragments drift in and settle, then
+         their tangle draws itself. The scrub timeline owns everything else. */
+      gsap.from(mids, {
+        opacity: 0,
+        y: 26,
+        scale: 0.92,
+        duration: 1.1,
+        ease: 'power3.out',
+        stagger: { each: 0.09, from: 'random' },
+        delay: 0.2,
+        clearProps: 'opacity,transform',
+      });
+      gsap.to(tangles, {
+        strokeDashoffset: 0,
+        duration: 1.3,
+        ease: 'power2.inOut',
+        stagger: 0.12,
+        delay: 1.0,
+      });
       ScrollTrigger.create({
         animation: tl,
         trigger: hero,
@@ -347,7 +382,35 @@ export function HeroStory() {
         onUpdate: (self) => apply(clamp01(self.progress)),
         onRefresh: (self) => apply(clamp01(self.progress)),
       });
+
+      /* Pointer parallax: fine pointers only. quickTo keeps it to one tween. */
+      const mm = gsap.matchMedia();
+      mm.add('(hover: hover) and (pointer: fine)', () => {
+        const qx = gsap.quickTo(stage, '--px', { duration: 1.1, ease: 'power3.out' });
+        const qy = gsap.quickTo(stage, '--py', { duration: 1.1, ease: 'power3.out' });
+        const move = (e: PointerEvent) => {
+          const r = hero.getBoundingClientRect();
+          qx(((e.clientX - r.left) / r.width - 0.5) * 2);
+          qy(((e.clientY - r.top) / r.height - 0.5) * 2);
+        };
+        const leave = () => {
+          qx(0);
+          qy(0);
+        };
+        hero.addEventListener('pointermove', move, { passive: true });
+        hero.addEventListener('pointerleave', leave);
+        return () => {
+          hero.removeEventListener('pointermove', move);
+          hero.removeEventListener('pointerleave', leave);
+        };
+      });
     }, wrap);
+
+    /* Idle motion rests while the hero is off screen. */
+    const io = new IntersectionObserver(([entry]) => {
+      stage.dataset.live = String(entry.isIntersecting);
+    });
+    io.observe(stage);
 
     stage.dataset.ready = 'true';
     const settle = () => ScrollTrigger.refresh();
@@ -355,6 +418,7 @@ export function HeroStory() {
 
     return () => {
       ro.disconnect();
+      io.disconnect();
       ctx.revert();
     };
   }, [mode, still]);
