@@ -47,9 +47,9 @@ export function PlaybookHeading({ drawn = false, className }: HeadingSwashProps)
         >
           <svg
             className={cn(
-              'hero-swash-shape transition-all duration-500 ease-out',
+              'hero-swash-shape transition-all duration-700 ease-out',
               drawn
-                ? '[clip-path:inset(-8%_-1%_-8%_-1%)] opacity-100'
+                ? '[clip-path:inset(-8%_-1%_-8%_-1%)] opacity-[0.42] origin-bottom scale-y-[0.62]'
                 : '[clip-path:inset(-8%_101%_-8%_-1%)] opacity-0',
             )}
             viewBox="0 0 120 26"

@@ -355,16 +355,7 @@ export function PlaybookStory() {
         tl.to('[data-act="distill"]', { opacity: 1, duration: 1 }, 27);
 
         // ICP column spotlight and spokes
-        tl.to(
-          '[data-col-id="col-icps"]',
-          { scale: 1.05, duration: 3.5, ease: 'power2.out' },
-          33,
-        );
-        tl.to(
-          ['[data-col-id="col-profile"]', '[data-col-id="col-offers"]'],
-          { scale: 0.95, opacity: 0.75, duration: 3.5, ease: 'power2.out' },
-          33,
-        );
+        // (the three columns stay one size: the ring and spokes carry the emphasis)
 
         if (!portrait) {
           tl.to(
@@ -386,11 +377,6 @@ export function PlaybookStory() {
         }
 
         // Settle at Rest 2 (columns return to equal scale 1.0)
-        tl.to(
-          ['[data-col-id="col-icps"]', '[data-col-id="col-profile"]', '[data-col-id="col-offers"]'],
-          { scale: 1.0, opacity: 1.0, duration: 2.8, ease: 'power2.out' },
-          43,
-        );
 
         // ==========================================
         // TRANSITION 2: SCENE 02 -> SCENE 03 (47 to 57)
@@ -794,7 +780,8 @@ export function PlaybookStory() {
         data-testid="playbook-stage-card"
         className="relative w-full max-w-[1280px] rounded-[40px] border border-[rgba(10,10,10,0.06)] bg-white overflow-hidden flex items-center justify-center"
         style={{
-          height: 'min(640px, calc(100svh - 190px))',
+          // portrait: the card hugs the scaled canvas instead of floating it in empty space
+          height: isPortrait ? Math.round(baseH * canvasScale) : 'min(640px, calc(100svh - 190px))',
           backgroundImage:
             'radial-gradient(ellipse 60% 70% at 82% 78%, rgb(255 98 0 / 9%), transparent 70%), radial-gradient(ellipse 50% 60% at 6% 4%, rgb(10 10 10 / 4%), transparent 70%)',
           boxShadow: 'var(--scaffold-shadow-object)',

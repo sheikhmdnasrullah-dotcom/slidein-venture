@@ -72,7 +72,7 @@ export function KineticTypography({
           'kinetic-scene kinetic-scene-1 story-caption-1 will-change-transform',
           isPortrait
             ? 'absolute left-8 top-10 flex flex-col items-start text-left max-w-[620px]'
-            : 'absolute left-8 md:left-[80px] top-[150px] flex flex-col items-start text-left max-w-[440px]',
+            : 'absolute left-8 md:left-[95px] top-[150px] flex flex-col items-start text-left max-w-[440px]',
           staticAct !== undefined && staticAct !== 1 && 'hidden',
         )}
       >
@@ -107,7 +107,7 @@ export function KineticTypography({
           'kinetic-scene kinetic-scene-2 story-caption-2 will-change-transform',
           isPortrait
             ? 'absolute left-8 top-8 flex flex-col items-start text-left max-w-[620px]'
-            : 'absolute left-8 md:left-[80px] top-10 md:top-12 right-[80px] flex items-center justify-between max-w-[1120px]',
+            : 'absolute left-8 md:left-[95px] top-10 md:top-12 right-[80px] flex items-center justify-between max-w-[1120px]',
           staticAct !== undefined && staticAct !== 2 && 'hidden',
         )}
       >
@@ -141,7 +141,7 @@ export function KineticTypography({
           'kinetic-scene kinetic-scene-3 story-caption-3 will-change-transform',
           isPortrait
             ? 'absolute left-8 top-10 flex flex-col items-start text-left max-w-[620px]'
-            : 'absolute left-8 md:left-[80px] top-[150px] flex flex-col items-start text-left max-w-[420px]',
+            : 'absolute left-8 md:left-[95px] top-[206px] flex flex-col items-start text-left max-w-[420px]',
           staticAct !== undefined && staticAct !== 3 && 'hidden',
         )}
       >
@@ -189,7 +189,7 @@ export function KineticTypography({
           'kinetic-scene kinetic-scene-4 story-caption-4 will-change-transform',
           isPortrait
             ? 'absolute left-8 top-10 flex flex-col items-start text-left max-w-[620px]'
-            : 'absolute left-8 md:left-[80px] top-[150px] flex flex-col items-start text-left max-w-[420px]',
+            : 'absolute left-8 md:left-[95px] top-[182px] flex flex-col items-start text-left max-w-[420px]',
           staticAct !== undefined && staticAct !== 4 && 'hidden',
         )}
       >

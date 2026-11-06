@@ -119,9 +119,25 @@ export function CanvasAct3({
                   <span className="h-1.5 w-1.5 rounded-full bg-[rgba(10,10,10,0.2)]" />
                 </div>
               </div>
-              <div className="h-2 w-5/6 rounded-full bg-[rgba(10,10,10,0.08)]" />
-              <div className="h-2 w-4/6 rounded-full bg-[rgba(10,10,10,0.08)]" />
-              <div className="h-2 w-full rounded-full bg-[rgba(10,10,10,0.08)]" />
+              {/* one row per chapter, same marks as the tabs */}
+              {book.tabs.map((tab, i) => (
+                <div
+                  key={tab.title}
+                  className="act3-rule-row flex h-9 items-center gap-2.5 rounded-[10px] border border-[rgba(10,10,10,0.07)] bg-white px-3"
+                >
+                  <span
+                    className={cn(
+                      'h-[7px] w-[7px] shrink-0',
+                      tab.lead === 'circle' && 'rounded-full',
+                      tab.lead === 'square' && 'rounded-[1.5px]',
+                      tab.lead === 'diamond' && 'rotate-45 rounded-[1px]',
+                      i === 0 ? 'bg-[rgba(10,10,10,0.82)]' : 'bg-[var(--color-brand)]',
+                    )}
+                  />
+                  <span className={cn('h-2 rounded-full bg-[rgba(10,10,10,0.14)]', ['w-3/5', 'w-1/2', 'w-2/3'][i])} />
+                  <span className="ml-auto h-1.5 w-6 rounded-full bg-[rgba(10,10,10,0.08)]" />
+                </div>
+              ))}
             </div>
 
             {/* 3 Chapter Tabs on right edge */}
@@ -133,13 +149,13 @@ export function CanvasAct3({
                   className="act3-chapter-tab flex items-center gap-2 h-6 px-3 rounded-r-[8px] bg-gradient-to-r from-white to-[#F9F9FB] border border-l-0 border-[rgba(10,10,10,0.09)] shadow-[0_2px_4px_rgba(0,0,0,0.03)] cursor-pointer select-none hover:bg-[rgba(10,10,10,0.02)] transition-colors"
                 >
                   {tab.lead === 'circle' && (
-                    <span className="h-[5px] w-[5px] rounded-full bg-[rgba(10,10,10,0.75)] shadow-2xs" />
+                    <span className="h-[5px] w-[5px] rounded-full bg-[rgba(10,10,10,0.82)] shadow-2xs" />
                   )}
                   {tab.lead === 'square' && (
-                    <span className="h-[5px] w-[5px] rounded-[1px] bg-[rgba(10,10,10,0.75)] shadow-2xs" />
+                    <span className="h-[5px] w-[5px] rounded-[1px] bg-[var(--color-brand)] shadow-2xs" />
                   )}
                   {tab.lead === 'diamond' && (
-                    <span className="h-[5px] w-[5px] rotate-45 rounded-[0.5px] bg-[rgba(10,10,10,0.75)] shadow-2xs" />
+                    <span className="h-[5px] w-[5px] rotate-45 rounded-[0.5px] bg-[var(--color-brand)] shadow-2xs" />
                   )}
                   <span className="text-[12px] font-medium text-[rgba(10,10,10,0.8)] leading-none">
                     {tab.title}
