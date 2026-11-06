@@ -1,0 +1,56 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   BAND BACKDROPS — quiet structure behind each section, so a band is never a
+   bare colour. Static (no motion), masked away toward the edges, one layer of
+   line or dot texture and one warm glow per band. The techniques: a masked
+   hairline grid and a single soft glow (21st.dev, Magic UI), a lifted tray
+   edge (Mobbin), and a lit top rule. Nothing here carries content.
+     flat  → line grid fading from the top centre + a warm glow above
+     soft  → dot field + a warm glow low on the right
+     dark  → white line grid + an ember glow rising from below
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.band::before,
+.band::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* the lit top rule: a hairline that fades out toward both sides */
+.band::after {
+  inset: 0 0 auto;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgb(255 98 0 / 28%) 50%, transparent);
+}
+
+.band-flat::before {
+  background-image:
+    radial-gradient(ellipse 60% 38% at 50% 0%, rgb(255 98 0 / 7%), transparent 72%),
+    linear-gradient(rgb(10 10 10 / 3.5%) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(10 10 10 / 3.5%) 1px, transparent 1px);
+  background-size: 100% 100%, 64px 64px, 64px 64px;
+  mask-image: linear-gradient(to bottom, black 0%, black 28%, transparent 78%);
+}
+
+.band-soft::before {
+  background-image:
+    radial-gradient(ellipse 50% 55% at 92% 100%, rgb(255 98 0 / 8%), transparent 70%),
+    radial-gradient(circle, rgb(10 10 10 / 10%) 1px, transparent 1.2px);
+  background-size: 100% 100%, 24px 24px;
+  mask-image: radial-gradient(ellipse 90% 80% at 50% 45%, black 25%, transparent 85%);
+}
+
+.band-dark::before {
+  background-image:
+    radial-gradient(ellipse 60% 45% at 50% 108%, rgb(255 98 0 / 16%), transparent 70%),
+    linear-gradient(rgb(255 255 255 / 4%) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(255 255 255 / 4%) 1px, transparent 1px);
+  background-size: 100% 100%, 64px 64px, 64px 64px;
+  mask-image: linear-gradient(to top, black 0%, black 40%, transparent 92%);
+}
+
+.band-dark::after {
+  background: linear-gradient(90deg, transparent, rgb(255 255 255 / 22%) 50%, transparent);
+}
