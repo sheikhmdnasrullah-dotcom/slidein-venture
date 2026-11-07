@@ -1,50 +1,34 @@
 'use client';
 
 /**
- * NAVBAR — the scaffold bar, to spec
+ * NAVBAR — Architectural Header & Editorial Navigation System
  * ---------------------------------------------------------------------------
- * Full width, no background, no border: a flat 72px bar (32px gutters) with
- * the existing wordmark left and one centered 8px-gap row right — text-link
- * pills, a 1px × 20px hairline, the GitHub ghost button, the dark CTA.
- * After 24px of scroll the bar gains a hairline bottom border and a flat
- * rgba(253,253,253,0.9) ground. No blur, ever.
- *
- * Links are 15px/500 pills with a 150ms ink-and-tint hover; the active page
- * carries a 4px accent dot centered 6px below the text. Every control shares
- * one focus treatment: a 2px accent ring at 60% with a 2px offset.
- *
- * The GitHub mark is hugeicons' stroke outline (1.5px, no fill) at 20px —
- * the light-glyph equivalent the spec allows, from the family already
- * installed, so no new dependency ships for one icon. Hrefs and aria-labels
- * are unchanged.
- *
- * Mobile: logo left, one 40px ghost menu button right, full-screen sheet
- * with 28px/500 pill links. Escape closes; the page freezes behind the
- * sheet.
+ * Designed with the typographic restraint and tactile precision of Linear,
+ * Stripe, Apple, and Vercel:
+ *  - Balanced 72px header aligned to the 1200px structural container
+ *  - Preserves the SlideIn wordmark lockup (`LogoWordmark`) with optical
+ *    baseline alignment and signature hover period motion
+ *  - Switzer 500 link typography (14.5px, -0.012em tracking) with a shared
+ *    gliding hover capsule and a 1.5px brand-orange active baseline bar
+ *  - Tactile hardware-keycap `Connect` CTA with an integrated launch well
+ *  - Warm ivory paper sticky transition past 20px scroll (zero heavy blur)
+ *  - Recomposed editorial mobile sheet with indexed rows and 68px targets
  */
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { GithubIcon } from 'hugeicons-react';
 import { LogoWordmark } from '@/components/Brand/Logo';
 import { TextSlot } from '@/components/Hero/Skeleton';
 import { NAV_SLOTS } from '@/content/home';
 
 const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
-/* One focus treatment for every nav control: 2px accent at 60% + 2px offset
-   over the page ground. */
 const FOCUS_RING =
   'outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--scaffold-bg)] focus-visible:ring-[color-mix(in_oklch,var(--color-brand)_60%,transparent)]';
 
-/* The shared hover tint: ink text on a 5% ink wash, 150ms. */
-const HOVER_TINT =
-  'transition-[color,background-color] duration-150 hover:bg-[rgb(10_10_10/_5%)] hover:text-[var(--scaffold-ink)]';
-
-/* Official latest GitHub Invertocat mark (solid silhouette) */
-function GitHubMark({ size = 20, className }: { size?: number; className?: string }) {
+function GitHubMark({ size = 19, className }: { size?: number; className?: string }) {
   return (
     <svg
       width={size}
@@ -63,18 +47,18 @@ function GitHubMark({ size = 20, className }: { size?: number; className?: strin
   );
 }
 
-function ArrowIcon({ className }: { className?: string }) {
+function LaunchArrowIcon({ size = 13, className }: { size?: number; className?: string }) {
   return (
     <svg
-      width="16"
-      height="16"
-      viewBox="0 0 16 16"
+      width={size}
+      height={size}
+      viewBox="0 0 14 14"
       fill="none"
       aria-hidden="true"
       className={className}
     >
       <path
-        d="M3.5 12.5 L12.5 3.5 M12.5 3.5 H6.5 M12.5 3.5 V9.5"
+        d="M3.25 10.75 L10.75 3.25 M10.75 3.25 H5.25 M10.75 3.25 V8.75"
         stroke="currentColor"
         strokeWidth="1.5"
         strokeLinecap="round"
@@ -84,17 +68,16 @@ function ArrowIcon({ className }: { className?: string }) {
   );
 }
 
-/* Hamburger ↔ close morph (pure CSS transitions on two spans). */
 function MenuGlyph({ open }: { open: boolean }) {
   return (
-    <span className="relative block h-[12px] w-[16px]" aria-hidden="true">
+    <span className="relative block h-[10px] w-[16px]" aria-hidden="true">
       <span
-        className="absolute left-0 top-0 block h-[2px] w-full rounded-full bg-[var(--scaffold-ink)] transition-transform duration-200 ease-out"
-        style={{ transform: open ? 'translateY(5px) rotate(45deg)' : 'none' }}
+        className="absolute left-0 top-0 block h-[1.5px] w-full rounded-full bg-[var(--scaffold-ink)] transition-transform duration-200 ease-out"
+        style={{ transform: open ? 'translateY(4.25px) rotate(45deg)' : 'none' }}
       />
       <span
-        className="absolute bottom-0 left-0 block h-[2px] w-full rounded-full bg-[var(--scaffold-ink)] transition-transform duration-200 ease-out"
-        style={{ transform: open ? 'translateY(-5px) rotate(-45deg)' : 'none' }}
+        className="absolute bottom-0 left-0 block h-[1.5px] w-full rounded-full bg-[var(--scaffold-ink)] transition-transform duration-200 ease-out"
+        style={{ transform: open ? 'translateY(-4.25px) rotate(-45deg)' : 'none' }}
       />
     </span>
   );
@@ -104,9 +87,10 @@ export default function Navbar() {
   const pathname = usePathname() || '/';
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [hoveredHref, setHoveredHref] = useState<string | null>(null);
   const { links, cta } = NAV_SLOTS;
 
-  /* Keyboard: Escape closes the sheet. */
+  /* Keyboard: Escape closes the mobile sheet. */
   useEffect(() => {
     if (!open) return;
     const onKey = (e: KeyboardEvent) => {
@@ -116,7 +100,7 @@ export default function Navbar() {
     return () => window.removeEventListener('keydown', onKey);
   }, [open]);
 
-  /* The sheet is full-screen: freeze the page behind it. */
+  /* Freeze page scroll while mobile sheet is open. */
   useEffect(() => {
     document.body.style.overflow = open ? 'hidden' : '';
     return () => {
@@ -124,9 +108,9 @@ export default function Navbar() {
     };
   }, [open]);
 
-  /* Sticky hairline: past 24px the bar gains its border and ground. */
+  /* Scroll surface state: transitions cleanly past 20px. */
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 24);
+    const onScroll = () => setScrolled(window.scrollY > 20);
     onScroll();
     window.addEventListener('scroll', onScroll, { passive: true });
     return () => window.removeEventListener('scroll', onScroll);
@@ -134,150 +118,180 @@ export default function Navbar() {
 
   return (
     <>
-      {/* 72px tall with 32px gutters; the right row centers every control —
-          40px pills, 40px icon button, 48px CTA — on one axis. (A literal
-          24px vertical padding cannot coexist with a 48px CTA in a 72px
-          bar, so the height carries the vertical rhythm instead.) */}
       <motion.nav
-        className="fixed inset-x-0 top-0 z-[1000] flex h-[72px] items-center justify-between px-[max(2rem,calc((100%_-_1200px)/2))] transition-[background-color,border-color] duration-150"
-        style={
-          scrolled
-            ? {
-                borderBottom: '1px solid var(--scaffold-hairline)',
-                background: 'rgb(253 253 253 / 90%)',
-              }
-            : { borderBottom: '1px solid transparent' }
-        }
-        initial={{ opacity: 0, y: 12 }}
+        aria-label="Primary"
+        data-testid="navbar"
+        data-scrolled={scrolled ? 'true' : 'false'}
+        className="sn-nav"
+        initial={{ opacity: 0, y: -8 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, ease: EASE }}
+        transition={{ duration: 0.55, ease: EASE }}
       >
-        {/* Left — logo slides in smoothly and frictionlessly from the top-left corner */}
-        <motion.div
-          initial={{ opacity: 0, x: -28 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1], delay: 0.05 }}
-        >
-          <Link href="/" className={`inline-flex items-center ${FOCUS_RING} rounded-sm`} onClick={() => setOpen(false)}>
-            <LogoWordmark size="26px" />
-          </Link>
-        </motion.div>
-
-        {/* Right — links, divider, GitHub, CTA in one 8px row (desktop) */}
-        <div className="hidden items-center gap-2 lg:flex">
-          {links.map((link) => {
-            const isActive =
-              pathname === link.href || pathname.startsWith(`${link.href}/`);
-            return (
-              <Link
-                key={link.href}
-                href={link.href}
-                aria-current={isActive ? 'page' : undefined}
-                className={`relative inline-flex h-10 items-center rounded-full px-[14px] text-[15px] font-semibold transition-all duration-150 ${HOVER_TINT} ${FOCUS_RING} ${
-                  isActive ? 'text-[var(--scaffold-ink)] font-bold' : 'text-[rgba(10,10,10,0.82)] hover:text-[var(--scaffold-ink)]'
-                }`}
-                style={{ letterSpacing: '-0.01em' }}
-              >
-                <TextSlot text={link.label} barWidth="3.4em" />
-                {/* Active dot: 4px, centered 6px below the text's baseline
-                    zone — inside the pill's lower half. */}
-                {isActive && (
-                  <span
-                    aria-hidden="true"
-                    className="absolute left-1/2 top-1/2 h-1 w-1 rounded-full shadow-[0_0_8px_var(--scaffold-accent)]"
-                    style={{
-                      background: 'var(--scaffold-accent-dot)',
-                      transform: 'translate(-50%, 14px)',
-                    }}
-                  />
-                )}
-              </Link>
-            );
-          })}
-          <span
-            aria-hidden="true"
-            className="h-5 w-px shrink-0"
-            style={{ background: 'var(--scaffold-hairline)' }}
-          />
-          <a
-            href="https://github.com/sheikhmdnasrullah-dotcom/SlideIn"
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label="SlideIn GitHub repository"
-            className={`flex h-10 w-10 items-center justify-center rounded-full text-[rgba(10,10,10,0.88)] transition-all duration-200 hover:text-[var(--scaffold-ink)] hover:scale-110 hover:bg-[rgb(10_10_10/_6%)] ${FOCUS_RING}`}
-          >
-            <GitHubMark size={20} />
-          </a>
+        <div className="sn-nav__inner">
+          {/* Left — SlideIn Wordmark Lockup */}
           <Link
-            href={cta.href}
-            className={`inline-flex h-[48px] items-center gap-2 rounded-full bg-[var(--scaffold-button)] px-7 text-[15px] font-semibold text-white transition-all duration-200 ease-out hover:-translate-y-px hover:shadow-[0_12px_24px_-8px_rgba(18,18,20,0.22)] active:scale-[0.98] ${FOCUS_RING}`}
-            style={{ boxShadow: 'var(--scaffold-shadow-button)', letterSpacing: '-0.01em' }}
+            href="/"
+            className={`sn-brand group ${FOCUS_RING}`}
+            onClick={() => setOpen(false)}
           >
-            <TextSlot text={cta.label} barWidth="3.2em" onDark />
-            <ArrowIcon />
+            <LogoWordmark size="24px" />
           </Link>
-        </div>
 
-        {/* Right — one 40px ghost button (mobile) */}
-        <button
-          type="button"
-          onClick={() => setOpen(!open)}
-          aria-expanded={open}
-          aria-label="Toggle menu"
-          className={`flex h-10 w-10 items-center justify-center rounded-full text-[var(--scaffold-ink)] ${HOVER_TINT} ${FOCUS_RING} lg:hidden`}
-        >
-          <MenuGlyph open={open} />
-        </button>
+          {/* Right — Desktop Navigation Track + Utility & CTA Cluster */}
+          <div className="sn-cluster">
+            <div
+              className="sn-track"
+              onMouseLeave={() => setHoveredHref(null)}
+            >
+              {links.map((link) => {
+                const isActive =
+                  pathname === link.href || pathname.startsWith(`${link.href}/`);
+                const isHovered = hoveredHref === link.href;
+
+                return (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    aria-current={isActive ? 'page' : undefined}
+                    onMouseEnter={() => setHoveredHref(link.href)}
+                    onFocus={() => setHoveredHref(link.href)}
+                    onBlur={() => setHoveredHref(null)}
+                    className={`sn-link ${FOCUS_RING}`}
+                  >
+                    {isHovered && (
+                      <motion.span
+                        layoutId="nav-hover-pill"
+                        aria-hidden="true"
+                        className="sn-link__hover-pill"
+                        transition={{
+                          type: 'spring',
+                          stiffness: 420,
+                          damping: 34,
+                          mass: 0.6,
+                        }}
+                      />
+                    )}
+                    <span className="sn-link__label">
+                      <TextSlot text={link.label} barWidth="3.4em" />
+                    </span>
+                    {isActive && (
+                      <motion.span
+                        layoutId="nav-active-bar"
+                        aria-hidden="true"
+                        className="sn-link__active-bar"
+                        transition={{
+                          type: 'spring',
+                          stiffness: 440,
+                          damping: 34,
+                        }}
+                      />
+                    )}
+                  </Link>
+                );
+              })}
+            </div>
+
+            <span aria-hidden="true" className="sn-divider" />
+
+            <div className="sn-actions">
+              <a
+                href="https://github.com/sheikhmdnasrullah-dotcom/SlideIn"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="SlideIn GitHub repository"
+                className={`sn-github ${FOCUS_RING}`}
+              >
+                <GitHubMark size={19} />
+              </a>
+
+              <Link
+                href={cta.href}
+                className={`sn-cta ${FOCUS_RING}`}
+              >
+                <span>
+                  <TextSlot text={cta.label} barWidth="3.2em" onDark />
+                </span>
+                <span aria-hidden="true" className="sn-cta__well">
+                  <LaunchArrowIcon size={13} className="sn-cta__arrow" />
+                </span>
+              </Link>
+            </div>
+          </div>
+
+          {/* Mobile Menu Trigger */}
+          <button
+            type="button"
+            onClick={() => setOpen(!open)}
+            aria-expanded={open}
+            aria-label="Toggle menu"
+            className={`sn-mobile-trigger ${FOCUS_RING}`}
+          >
+            <MenuGlyph open={open} />
+          </button>
+        </div>
       </motion.nav>
 
-      {/* ── Full-screen sheet ── */}
+      {/* ── Editorial Mobile Navigation Sheet ── */}
       <AnimatePresence>
         {open && (
           <motion.div
-            className="fixed inset-0 z-[1100] flex flex-col bg-[var(--scaffold-bg)] px-8 pb-10 pt-6 lg:hidden"
+            className="sn-sheet"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.25, ease: EASE }}
+            transition={{ duration: 0.22, ease: EASE }}
           >
-            <div className="flex h-[72px] items-center justify-between">
-              <Link href="/" onClick={() => setOpen(false)}>
+            <div className="sn-sheet__header">
+              <Link
+                href="/"
+                className={`sn-brand ${FOCUS_RING}`}
+                onClick={() => setOpen(false)}
+              >
                 <LogoWordmark size="22px" />
               </Link>
               <button
                 type="button"
                 onClick={() => setOpen(false)}
                 aria-label="Close menu"
-                className={`flex h-10 w-10 items-center justify-center rounded-full text-[var(--scaffold-ink)] ${HOVER_TINT} ${FOCUS_RING}`}
+                className={`sn-mobile-trigger ${FOCUS_RING}`}
               >
-                <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
-                  <path d="M2 2 L12 12 M12 2 L2 12" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
-                </svg>
+                <MenuGlyph open={true} />
               </button>
             </div>
 
-            <div className="flex flex-1 flex-col justify-center gap-3">
-              {links.map((link, i) => (
-                <motion.div
-                  key={link.href}
-                  initial={{ opacity: 0, y: 12 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5, ease: EASE, delay: 0.06 * i }}
-                >
-                  <Link
-                    href={link.href}
-                    onClick={() => setOpen(false)}
-                    className={`inline-flex min-h-[56px] items-center rounded-full px-5 py-2 text-[28px] font-semibold text-[var(--scaffold-ink)] ${HOVER_TINT} ${FOCUS_RING}`}
-                    style={{ letterSpacing: '-0.01em' }}
+            <div className="sn-sheet__list">
+              {links.map((link, i) => {
+                const isActive =
+                  pathname === link.href || pathname.startsWith(`${link.href}/`);
+                return (
+                  <motion.div
+                    key={link.href}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.4, ease: EASE, delay: 0.04 * i }}
                   >
-                    <TextSlot text={link.label} barWidth="4em" />
-                  </Link>
-                </motion.div>
-              ))}
+                    <Link
+                      href={link.href}
+                      aria-current={isActive ? 'page' : undefined}
+                      onClick={() => setOpen(false)}
+                      className={`sn-sheet__row ${FOCUS_RING}`}
+                    >
+                      <span className="sn-sheet__row-left">
+                        <span className="sn-sheet__index">0{i + 1}</span>
+                        <span>
+                          <TextSlot text={link.label} barWidth="4em" />
+                        </span>
+                      </span>
+                      <LaunchArrowIcon size={15} />
+                    </Link>
+                  </motion.div>
+                );
+              })}
+
               <motion.div
-                initial={{ opacity: 0, y: 12 }}
+                initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, ease: EASE, delay: 0.06 * links.length }}
+                transition={{ duration: 0.4, ease: EASE, delay: 0.04 * links.length }}
               >
                 <a
                   href="https://github.com/sheikhmdnasrullah-dotcom/SlideIn"
@@ -285,28 +299,37 @@ export default function Navbar() {
                   rel="noopener noreferrer"
                   onClick={() => setOpen(false)}
                   aria-label="SlideIn GitHub repository"
-                  className={`inline-flex min-h-[56px] items-center gap-3 rounded-full px-5 py-2 text-[28px] font-semibold text-[rgba(10,10,10,0.88)] ${HOVER_TINT} ${FOCUS_RING}`}
-                  style={{ letterSpacing: '-0.01em' }}
+                  className={`sn-sheet__row ${FOCUS_RING}`}
                 >
-                  <GitHubMark size={24} />
-                  <span>GitHub</span>
+                  <span className="sn-sheet__row-left">
+                    <span className="sn-sheet__index">0{links.length + 1}</span>
+                    <span className="inline-flex items-center gap-2.5">
+                      <span>GitHub</span>
+                      <GitHubMark size={20} />
+                    </span>
+                  </span>
+                  <LaunchArrowIcon size={15} />
                 </a>
               </motion.div>
             </div>
 
             <motion.div
-              initial={{ opacity: 0, y: 12 }}
+              className="sn-sheet__footer"
+              initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, ease: EASE, delay: 0.22 }}
+              transition={{ duration: 0.4, ease: EASE, delay: 0.18 }}
             >
               <Link
                 href={cta.href}
                 onClick={() => setOpen(false)}
-                className="flex h-[52px] w-full items-center justify-center gap-2.5 rounded-full bg-[var(--scaffold-button)] text-[16px] font-medium text-white"
-                style={{ boxShadow: 'var(--scaffold-shadow-button)' }}
+                className={`sn-cta justify-between !h-[48px] !pl-5 !pr-2 !text-[15px] ${FOCUS_RING}`}
               >
-                <span className="h-2 w-2 rounded-full bg-[var(--scaffold-accent)]" aria-hidden="true" />
-                <TextSlot text={cta.label} barWidth="3.4em" onDark />
+                <span>
+                  <TextSlot text={cta.label} barWidth="3.4em" onDark />
+                </span>
+                <span aria-hidden="true" className="sn-cta__well !h-[34px] !w-[34px]">
+                  <LaunchArrowIcon size={14} className="sn-cta__arrow" />
+                </span>
               </Link>
             </motion.div>
           </motion.div>

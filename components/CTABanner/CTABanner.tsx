@@ -44,7 +44,7 @@ export default function CTABanner({
             </p>
           )}
 
-          <h2 className="text-[clamp(2.25rem,5vw,4rem)] font-[620] leading-[1.08] tracking-[-0.035em] text-black mb-5">
+          <h2 className="font-display-xl text-[clamp(2.25rem,5vw,4rem)] text-black mb-5">
             {headline}
           </h2>
 

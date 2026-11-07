@@ -1,0 +1,45 @@
+{
+  "icon": {
+    "desktop": {
+      "darkIconTransformation": {
+        "type": "none",
+        "backgroundColor": "#ffffff",
+        "backgroundRadius": 0.7,
+        "imageScale": 0.7,
+        "brightness": 1
+      },
+      "darkIconType": "none",
+      "regularIconTransformation": {
+        "type": "none",
+        "backgroundRadius": 0,
+        "backgroundColor": "#F6F4F0",
+        "imageScale": 1,
+        "brightness": 1
+      }
+    },
+    "touch": {
+      "appTitle": "SlideIn",
+      "transformation": {
+        "type": "background",
+        "backgroundRadius": 0,
+        "backgroundColor": "#F6F4F0",
+        "imageScale": 0.74,
+        "brightness": 1
+      }
+    },
+    "webAppManifest": {
+      "name": "SlideIn",
+      "shortName": "SlideIn",
+      "backgroundColor": "#F6F4F0",
+      "themeColor": "#F6F4F0",
+      "transformation": {
+        "type": "background",
+        "backgroundRadius": 0,
+        "backgroundColor": "#F6F4F0",
+        "imageScale": 0.62,
+        "brightness": 1
+      }
+    }
+  },
+  "path": "/"
+}

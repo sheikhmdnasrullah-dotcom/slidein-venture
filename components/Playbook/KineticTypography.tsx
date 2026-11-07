@@ -15,6 +15,7 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
 import { HOME } from '@/content/home';
+import { HandRule } from '@/components/Typography/HandRule';
 
 interface KineticTypographyProps {
   className?: string;
@@ -22,28 +23,9 @@ interface KineticTypographyProps {
   staticAct?: 1 | 2 | 3 | 4;
 }
 
-/* ─── Hand-drawn hairline under the accent word ────────────────────────────── */
-function AccentRule() {
-  return (
-    <svg
-      className="accent-underline text-[var(--scaffold-accent)]"
-      viewBox="0 0 100 6"
-      preserveAspectRatio="none"
-      aria-hidden="true"
-      style={{ bottom: '0.06em' }}
-    >
-      <path
-        d="M0,3.1 Q25,1.9 50,3 T100,3.1"
-        pathLength="100"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="1.8"
-        strokeLinecap="round"
-        className="underline-draw"
-      />
-    </svg>
-  );
-}
+/* The shared hand-drawn rule (components/Typography/HandRule) replaces the old
+   one-off hairline so every underline on the site is drawn the same way. */
+const AccentRule = HandRule;
 
 export function KineticTypography({
   className,
@@ -52,10 +34,10 @@ export function KineticTypography({
 }: KineticTypographyProps) {
   const captions = HOME.playbookCaptions;
 
-  const wordsScene1 = captions.scene1.split(' '); // ['From', 'scattered', 'business', 'information']
-  const wordsScene2 = captions.scene2.split(' '); // ['to', 'preparing', 'offers', 'and', 'Ideal', 'Client', 'Profile']
-  const wordsScene3 = captions.scene3.split(' '); // ['to', 'organized', 'Master', 'Playbook,', 'which', 'has', 'all', 'the', 'context', 'about', 'your', 'business']
-  const wordsScene4 = captions.scene4.split(' '); // ['to', 'a', 'persistent', 'knowledge', 'from', 'the', 'master', 'playbook', 'that', 'evolves', 'every', 'time', 'you', 'interact', 'with', 'it.']
+  const wordsScene1 = captions.scene1.split(' '); 
+  const wordsScene2 = captions.scene2.split(' '); 
+  const wordsScene3 = captions.scene3.split(' ');
+  const wordsScene4 = captions.scene4.split(' ');
 
   return (
     <div
@@ -79,10 +61,9 @@ export function KineticTypography({
         <div className="overflow-visible pt-2 pb-5 pr-6 pl-0">
           <h2
             className={cn(
-              'font-[650] tracking-[-0.03em] leading-[1.12] select-none text-left text-[#0A0A0A]',
+              'font-display-xl select-none text-left text-[#0A0A0A]',
               isPortrait ? 'text-[40px]' : 'text-[38px] sm:text-[44px] md:text-[48px] lg:text-[50px]',
             )}
-            style={{ fontFamily: 'var(--font-display), Georgia, serif' }}
           >
             <span className="block">
               <span>{wordsScene1[0]}</span> <span>{wordsScene1[1]}</span>
@@ -114,10 +95,9 @@ export function KineticTypography({
         <div className="overflow-visible pt-1 pb-3 pr-4 pl-0">
           <h2
             className={cn(
-              'font-[650] tracking-[-0.03em] leading-[1.12] select-none text-left text-[#0A0A0A]',
+              'font-display-xl select-none text-left text-[#0A0A0A]',
               isPortrait ? 'text-[32px]' : 'text-[38px] sm:text-[44px] md:text-[48px] lg:text-[50px]',
             )}
-            style={{ fontFamily: 'var(--font-display), Georgia, serif' }}
           >
             <span>
               {wordsScene2[0].charAt(0).toUpperCase() + wordsScene2[0].slice(1)}{' '}
@@ -148,10 +128,9 @@ export function KineticTypography({
         <div className="overflow-visible pt-2 pb-4 pr-6 pl-0">
           <h2
             className={cn(
-              'font-[650] tracking-[-0.03em] leading-[1.12] select-none text-left text-[#0A0A0A]',
+              'font-display-xl select-none text-left text-[#0A0A0A]',
               isPortrait ? 'text-[40px]' : 'text-[38px] sm:text-[44px] md:text-[48px] lg:text-[50px]',
             )}
-            style={{ fontFamily: 'var(--font-display), Georgia, serif' }}
           >
             <span className="block">To organized</span>
             <span className="relative inline-block text-[var(--scaffold-accent)] pb-2 pr-2">
@@ -196,10 +175,9 @@ export function KineticTypography({
         <div className="overflow-visible pt-2 pb-4 pr-6 pl-0">
           <h2
             className={cn(
-              'font-[650] tracking-[-0.03em] leading-[1.12] select-none text-left text-[#0A0A0A]',
+              'font-display-xl select-none text-left text-[#0A0A0A]',
               isPortrait ? 'text-[40px]' : 'text-[38px] sm:text-[44px] md:text-[48px] lg:text-[50px]',
             )}
-            style={{ fontFamily: 'var(--font-display), Georgia, serif' }}
           >
             <span className="block">To a persistent</span>
             <span className="relative inline-block text-[var(--scaffold-accent)] pb-2 pr-2">

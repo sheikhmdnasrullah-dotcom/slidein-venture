@@ -1,283 +1,308 @@
 /* ═══════════════════════════════════════════════════════════════════════════
    ORBIT — the "one platform, two ways to run it" visual (ManagedSection).
-   Rings truly orbit (opposite directions) while every tile counter-rotates to
-   stay upright. A comet of orange light chases round each ring, satellites
-   circle the platform, light pulses run down the beams into it, and ripples
-   leave the centre like a heartbeat. All CSS, compositor-friendly, paused by
-   the section when off screen, and absent under reduced motion.
+   ---------------------------------------------------------------------------
+   One coordinate system: a 1080 x 540 stage of design units. `--u` converts a
+   unit to pixels from the container's own width (cqw), so geometry, objects
+   and shadows scale as one piece. Light comes from the upper left for every
+   object. Idle motion is a slow float and one bead; both pause off screen and
+   are absent under prefers-reduced-motion.
    ═══════════════════════════════════════════════════════════════════════════ */
 
-.orbit {
-  --orbit-orange: var(--color-brand);
+.orbit-wrap {
+  container-type: inline-size;
 }
 
-.orbit-ring {
+.orbit {
+  --u: calc(100cqw / 1080);
+  --graphite: oklch(0.3 0.008 55);
+  --graphite-deep: oklch(0.2 0.008 55);
+  --ivory: oklch(0.985 0.005 80);
+  --ivory-deep: oklch(0.93 0.012 75);
+  --orange: var(--color-brand);
+
+  position: relative;
+}
+
+.orbit-stage {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 2 / 1;
+}
+
+/* a pool of warm light under the object; the global backdrop does the rest */
+.orbit-light {
+  position: absolute;
+  left: calc(540 * var(--u));
+  top: calc(300 * var(--u));
+  width: calc(520 * var(--u));
+  height: calc(300 * var(--u));
+  translate: -50% -50%;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, color-mix(in oklch, var(--orange) 9%, transparent), transparent);
+  pointer-events: none;
+}
+
+.orbit-svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.og-line {
+  fill: none;
+  stroke: rgb(10 10 10 / 11%);
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+}
+
+.og-line--square { stroke: rgb(10 10 10 / 9%); }
+
+.og-accent {
+  fill: none;
+  stroke: var(--orange);
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  vector-effect: non-scaling-stroke;
+}
+
+.og-node { fill: var(--orange); }
+
+.og-bead { animation: og-turn 60s linear infinite; transform-box: view-box; }
+.og-bead circle { fill: var(--orange); }
+
+@keyframes og-turn { to { transform: rotate(360deg); } }
+
+.orbit[data-live='false'] .og-bead,
+.orbit[data-live='false'] .ao-float,
+.orbit[data-live='false'] .ao-shadow { animation-play-state: paused; }
+
+/* ── placement ───────────────────────────────────────────────────────────── */
+
+.orbit-pos {
+  position: absolute;
+  left: calc(var(--x) * var(--u));
+  top: calc(var(--y) * var(--u));
+  translate: -50% -50%;
+}
+
+.orbit-slot { width: calc(190 * var(--u)); min-width: 150px; translate: -50% 0; }
+
+/* ── artifact tile ───────────────────────────────────────────────────────── */
+
+.ao {
+  --size: calc(var(--s) * var(--u));
+  position: relative;
+  width: var(--size);
+  height: var(--size);
+}
+
+.ao--flow { --size: calc(var(--s) * 1px); }
+
+.ao-float {
   position: relative;
   width: 100%;
   height: 100%;
-  box-sizing: border-box;
-  border-radius: 50%;
-  border: 1px solid rgb(10 10 10 / 7%);
+  animation: ao-drift var(--fp) ease-in-out var(--fd) infinite;
 }
 
-/* the comet: a short bright arc that rides the ring */
-.orbit-trail {
-  position: absolute;
-  inset: -1px;
-  border-radius: 50%;
-  pointer-events: none;
-  background: conic-gradient(
-    from 0deg,
-    transparent 0 58%,
-    color-mix(in oklch, var(--orbit-orange) 0%, transparent) 58%,
-    color-mix(in oklch, var(--orbit-orange) 70%, transparent) 100%
-  );
-  -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 2px), rgb(0 0 0) calc(100% - 2px));
-  mask: radial-gradient(farthest-side, transparent calc(100% - 2px), rgb(0 0 0) calc(100% - 2px));
+@keyframes ao-drift {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(calc(var(--size) * -0.055)); }
 }
 
-.orbit-tile {
-  transition: translate 260ms cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-.orbit-pop:hover .orbit-tile {
-  translate: 0 -5px;
-}
-
-/* satellites: two orange beads on a close ring around the platform */
-.orbit-sat {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  border-radius: 50%;
-  pointer-events: none;
-}
-
-.orbit-sat i {
-  position: absolute;
-  left: 50%;
-  top: -4px;
-  width: 8px;
-  height: 8px;
-  margin-left: -4px;
-  border-radius: 50%;
-  background: var(--orbit-orange);
-  box-shadow: 0 0 0 3px color-mix(in oklch, var(--orbit-orange) 18%, transparent);
-}
-
-.orbit-sat i:nth-child(2) {
-  top: auto;
-  bottom: -4px;
-  width: 5px;
-  height: 5px;
-  margin-left: -2.5px;
-  background: rgb(10 10 10 / 55%);
-  box-shadow: none;
-}
-
-/* ripples leave the platform like a heartbeat */
-.orbit-ripple {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  border-radius: 28%;
-  border: 1px solid color-mix(in oklch, var(--orbit-orange) 55%, transparent);
-  opacity: 0;
-  pointer-events: none;
-}
-
-/* the platform and the anchors breathe */
-.orbit-centre {
-  transition: transform 500ms cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-.orbit-glow {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  border-radius: 50%;
-  pointer-events: none;
-  background: radial-gradient(circle, color-mix(in oklch, var(--orbit-orange) 22%, transparent), transparent 68%);
-  transform: translate(-50%, -50%);
-  opacity: 0.55;
-}
-
-/* beams: a hairline, and a bead of light that runs down it */
-.orbit-beam {
-  fill: none;
-  stroke: rgb(10 10 10 / 8%);
-  stroke-width: 1;
-}
-
-.orbit-beam-run {
-  fill: none;
-  stroke: var(--orbit-orange);
-  stroke-width: 2;
-  stroke-linecap: round;
-  stroke-dasharray: 0.07 1;
-  stroke-dashoffset: 0.07;
-  opacity: 0;
-}
-
-.orbit-halo {
+.ao-face,
+.ao-edge {
   position: absolute;
   inset: 0;
-  border-radius: 28%;
-  border: 1px solid color-mix(in oklch, var(--orbit-orange) 50%, transparent);
-  opacity: 0;
-  pointer-events: none;
+  border-radius: 31%;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .orbit-ring--cw {
-    animation: orbit-turn var(--dur, 80s) linear infinite;
-  }
-
-  .orbit-ring--ccw {
-    animation: orbit-turn var(--dur, 80s) linear infinite reverse;
-  }
-
-  /* tiles hold their uprightness against whichever way the ring turns */
-  .orbit-ring--cw [data-orbit-counter] {
-    animation: orbit-turn var(--dur, 80s) linear infinite reverse;
-  }
-
-  .orbit-ring--ccw [data-orbit-counter] {
-    animation: orbit-turn var(--dur, 80s) linear infinite;
-  }
-
-  .orbit-sat {
-    animation: orbit-turn var(--dur, 16s) linear infinite;
-  }
-
-  .orbit-ripple {
-    animation: orbit-ripple 3.6s cubic-bezier(0.2, 0.6, 0.3, 1) infinite;
-    animation-delay: var(--rd, 0s);
-  }
-
-  .orbit-glow {
-    animation: orbit-breathe 3.6s ease-in-out infinite;
-  }
-
-  .orbit-beam-run {
-    animation: orbit-run 3.6s cubic-bezier(0.45, 0, 0.35, 1) infinite;
-    animation-delay: var(--bd, 0s);
-  }
-
-  .orbit-halo {
-    animation: orbit-halo 3.6s cubic-bezier(0.2, 0.6, 0.3, 1) infinite;
-    animation-delay: var(--hd, 0s);
-  }
-
-  .orbit-float {
-    animation: orbit-float 6.5s ease-in-out infinite;
-    animation-delay: var(--fd, 0s);
-  }
-
-  .orbit[data-live='false'] *,
-  .orbit[data-live='false'] *::before,
-  .orbit[data-live='false'] *::after {
-    animation-play-state: paused !important;
-  }
+.ao-edge {
+  translate: 0 calc(var(--size) * 0.055);
+  background: linear-gradient(180deg, var(--graphite), var(--graphite-deep));
 }
 
-@keyframes orbit-turn {
-  to {
-    rotate: 360deg;
-  }
+.ao-face {
+  display: grid;
+  place-items: center;
+  background: linear-gradient(152deg, var(--ivory) 0%, var(--ivory-deep) 100%);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 95%),
+    inset 0 -1px 0 rgb(10 10 10 / 6%),
+    0 0 0 1px rgb(10 10 10 / 8%);
 }
 
-@keyframes orbit-ripple {
-  0% {
-    transform: translate(-50%, -50%) scale(1);
-    opacity: 0.55;
-  }
-
-  100% {
-    transform: translate(-50%, -50%) scale(2.6);
-    opacity: 0;
-  }
+.ao-glyph {
+  display: block;
+  width: 40%;
+  height: 40%;
+  color: var(--color-ink);
 }
 
-@keyframes orbit-breathe {
-  50% {
-    transform: translate(-50%, -50%) scale(1.12);
-    opacity: 0.8;
-  }
+.ao-glyph svg { display: block; }
+
+.ao-pip {
+  position: absolute;
+  right: 15%;
+  top: 15%;
+  width: 7%;
+  height: 7%;
+  border-radius: 50%;
+  background: var(--orange);
 }
 
-@keyframes orbit-run {
-  0% {
-    stroke-dashoffset: 0.07;
-    opacity: 0;
-  }
-
-  12% {
-    opacity: 1;
-  }
-
-  70% {
-    opacity: 1;
-  }
-
-  100% {
-    stroke-dashoffset: -1;
-    opacity: 0;
-  }
+/* contact shadow on the ground beneath a floating object: it breathes
+   opposite the object, wider and fainter as the object rises */
+.ao-shadow {
+  position: absolute;
+  left: 10%;
+  right: 4%;
+  bottom: -30%;
+  height: 16%;
+  border-radius: 50%;
+  background: rgb(10 10 10 / 26%);
+  filter: blur(calc(var(--size) * 0.1));
+  animation: ao-ground var(--fp) ease-in-out var(--fd) infinite;
 }
 
-@keyframes orbit-halo {
-  0% {
-    transform: scale(1);
-    opacity: 0.7;
-  }
-
-  60%,
-  100% {
-    transform: scale(1.5);
-    opacity: 0;
-  }
+@keyframes ao-ground {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(0.9); opacity: 0.7; }
 }
 
-@keyframes orbit-float {
-  50% {
-    translate: 0 -7px;
-  }
+.ao-word {
+  position: absolute;
+  bottom: calc(100% + calc(var(--size) * 0.18));
+  left: 50%;
+  translate: -50% 0;
 }
 
-/* mobile connector: a bead runs down the hairline */
-.orbit-drip {
+/* ── the Playbook: three machined slabs, exploded along Z ────────────────── */
+
+.orbit-pos--centre { width: calc(150 * var(--u)); height: calc(150 * var(--u)); }
+
+.ps {
+  --gap: 32;
+  position: relative;
+  width: 100%;
+  height: 100%;
+  perspective: calc(900 * var(--u));
+}
+
+.ps-tilt {
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
+}
+
+.ps-rig {
   position: absolute;
   left: 50%;
-  top: 0;
-  width: 6px;
-  height: 6px;
-  margin-left: -3px;
+  top: 50%;
+  width: calc(118 * var(--u));
+  height: calc(118 * var(--u));
+  margin: calc(-59 * var(--u)) 0 0 calc(-59 * var(--u));
+  transform-style: preserve-3d;
+  transform: translateY(calc(26 * var(--u))) rotateX(55deg) rotateZ(-40deg);
+}
+
+.ps-slab {
+  --h: 75;
+  --c: 0.01;
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
+  transform: translateZ(calc(var(--i) * var(--gap) * var(--u)));
+}
+
+.ps-slab b {
+  position: absolute;
+  inset: 0;
+  border-radius: 29%;
+  transform: translateZ(calc(var(--k) * 1.6 * var(--u)));
+  background: oklch(calc(var(--l) - (5 - var(--k)) * 0.022) var(--c) var(--h));
+}
+
+.ps-slab--0 { --l: 0.34; --c: 0.008; --h: 55; }
+.ps-slab--1 { --l: 0.905; }
+.ps-slab--2 { --l: 0.988; }
+
+/* top faces catch the key light: a diagonal sheen and a 1px specular edge */
+.ps-slab b:last-of-type {
+  box-shadow:
+    inset 0 0 0 1px rgb(255 255 255 / 55%),
+    0 0 0 1px rgb(10 10 10 / 10%);
+}
+
+.ps-slab--0 b:last-of-type {
+  background: linear-gradient(150deg, oklch(0.4 0.008 55), oklch(0.27 0.008 55));
+  box-shadow: inset 0 0 0 1px rgb(255 255 255 / 10%);
+}
+
+.ps-slab--2 b:last-of-type {
+  background: linear-gradient(150deg, oklch(0.998 0.003 85), oklch(0.955 0.01 75));
+}
+
+.ps-inset,
+.ps-inlay {
+  position: absolute;
+  transform: translateZ(calc(5 * 1.6 * var(--u) + 0.5px));
+}
+
+.ps-inset {
+  inset: 16%;
+  border-radius: 24%;
+  border: 1px solid rgb(10 10 10 / 9%);
+}
+
+.ps-inlay {
+  right: 24%;
+  bottom: 24%;
+  width: 16%;
+  height: 7%;
+  border-radius: 999px;
+  background: var(--orange);
+}
+
+/* the contact shadow on the ground under the whole object */
+.ps-ground {
+  position: absolute;
+  left: 8%;
+  right: -4%;
+  bottom: calc(-14 * var(--u));
+  height: calc(26 * var(--u));
   border-radius: 50%;
-  background: var(--color-brand);
-  opacity: 0;
+  background: rgb(10 10 10 / 15%);
+  filter: blur(calc(12 * var(--u)));
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .orbit-drip {
-    animation: orbit-drip 2.4s cubic-bezier(0.45, 0, 0.35, 1) infinite;
-    animation-delay: var(--bd, 0s);
-  }
+.ps-word {
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + calc(38 * var(--u)));
+  translate: -50% 0;
 }
 
-@keyframes orbit-drip {
-  0% {
-    transform: translateY(0);
-    opacity: 0;
-  }
+/* ── small screens ───────────────────────────────────────────────────────── */
 
-  15%,
-  70% {
-    opacity: 1;
-  }
+.orbit-mobile { --u: 1.15px; --graphite: oklch(0.3 0.008 55); --graphite-deep: oklch(0.2 0.008 55); --ivory: oklch(0.985 0.005 80); --ivory-deep: oklch(0.93 0.012 75); --orange: var(--color-brand); }
 
-  100% {
-    transform: translateY(42px);
-    opacity: 0;
-  }
+.orbit-mobile-centre { width: calc(150 * var(--u)); height: calc(170 * var(--u)); }
+
+.orbit-connector {
+  width: 1px;
+  height: 44px;
+  margin-block: 22px 20px;
+  background: linear-gradient(to bottom, rgb(10 10 10 / 14%), var(--orange));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* the scroll-driven slab separation rests at its neutral value */
+  .ps { --gap: 32 !important; }
+
+  .ao-float,
+  .ao-shadow,
+  .og-bead { animation: none; }
 }

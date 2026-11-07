@@ -5,26 +5,23 @@
  * work becomes one loop that runs for the client. No buttons, no video: the
  * headline and the story carry the page. The subhead is retired from the hero
  * (it stays in content/home.ts). Copy is read from content/home.ts and never
- * altered here. Headline motion is CSS-only (hero.css); each animated element
+ * altered here. Headline motion is CSS-only (hero.css + emphasis.css); each animated element
  * drops its animation class when it ends so pinning (which re-parents the
  * hero) can never replay it.
  */
 
 import { useEffect, useRef } from 'react';
 import { HeroStory } from './story/HeroStory';
+import { HandRule } from '@/components/Typography/HandRule';
 import { HOME } from '@/content/home';
 import { BAND_DISORDER } from '@/content/stages';
 
 type Css = React.CSSProperties;
 
-/** One word, in its own rising mask. `m` chains the marker. */
-function Word({ text, w, m }: { text: string; w: number; m?: number }) {
-  const marked = m !== undefined;
+/** One word, in its own rising mask. */
+function Word({ text, w }: { text: string; w: number }) {
   return (
-    <span
-      className={`hm-w hm-rise${marked ? ' hm-w--mark hm-lay' : ''}`}
-      style={{ '--w': w, ...(marked ? { '--m': m } : {}) } as Css}
-    >
+    <span className="hm-w hm-rise" style={{ '--w': w } as Css}>
       <span className="hm-w__in">{text}</span>
     </span>
   );
@@ -41,11 +38,9 @@ function Headline() {
   for (let i = 0; i < leadWords.length; i++) {
     if (i === emFrom) {
       leadNodes.push(
-        <span className="hm-em" key={`em-${i}`}>
+        <span className="hm-em em-draw" key={`em-${i}`}>
           <Word text={leadWords[i]} w={i} />
-          <svg className="hm-em__line hm-strike" viewBox="0 0 200 12" preserveAspectRatio="none" aria-hidden="true" focusable="false">
-            <path d="M2 8 C 40 2, 70 11, 108 6 S 170 3, 198 7" pathLength={1} />
-          </svg>
+          <HandRule />
         </span>,
       );
     } else {
@@ -60,12 +55,15 @@ function Headline() {
         {leadNodes}
       </span>{' '}
       <span className="hm-h1__tail" aria-hidden="true">
-        {tailWords.map((t, i) => (
-          <span key={i}>
-            <Word text={t} w={leadWords.length + i} m={i} />
-            {i < tailWords.length - 1 ? ' ' : null}
-          </span>
-        ))}
+        {/* one continuous marker stroke behind the whole phrase */}
+        <span className="hm-mark em-mark em-paint">
+          {tailWords.map((t, i) => (
+            <span key={i}>
+              <Word text={t} w={leadWords.length + i} />
+              {i < tailWords.length - 1 ? ' ' : null}
+            </span>
+          ))}
+        </span>
       </span>
     </h1>
   );
@@ -84,9 +82,12 @@ export default function Hero() {
       const el = e.target as HTMLElement;
       if (e.animationName === 'hm-settle') el.classList.remove('hm-in');
       if (e.animationName === 'hm-rise') el.classList.remove('hm-rise');
-      if (e.animationName === 'hm-lay') el.classList.remove('hm-lay');
-      // the stroke animates the <path>, but the class lives on its <svg>
-      if (e.animationName === 'hm-strike') el.closest('.hm-strike')?.classList.remove('hm-strike');
+      // marker: the animation runs on the wrapper's ::before
+      if (e.animationName === 'em-paint') el.classList.remove('em-paint');
+      // underline: the hairline is drawn last, so it releases the class
+      if (e.animationName === 'em-draw' && el.classList.contains('em-rule__wipe--hair')) {
+        el.closest('.em-draw')?.classList.remove('em-draw');
+      }
     };
     hero.addEventListener('animationend', done);
     return () => hero.removeEventListener('animationend', done);
@@ -97,7 +98,7 @@ export default function Hero() {
       ref={heroRef}
       data-testid="hero"
       data-disorder={BAND_DISORDER.hero}
-      className="hm-hero bg-[var(--scaffold-bg)]"
+      className="hm-hero"
     >
       <div className="hm-hero__grid">
         <Headline />

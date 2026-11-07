@@ -33,7 +33,7 @@
   padding: clamp(5rem, 10vh, 6rem) 32px 20px;
   overflow: clip;
   color: var(--hw-ink);
-  background-color: var(--scaffold-bg);
+  background-color: transparent;
   background-image:
     radial-gradient(ellipse 60% 50% at 85% 100%, rgb(255 98 0 / 7%), transparent 70%),
     radial-gradient(ellipse 50% 40% at 8% 0%, rgb(10 10 10 / 4%), transparent 70%);
@@ -78,10 +78,7 @@
 
 .hw-title h2 {
   margin: 0;
-  font-family: var(--font-display, inherit);
-  font-size: 18px;
-  font-weight: 600;
-  letter-spacing: -0.01em;
+  font-size: 18px; /* typeset by .font-display-sm (the shared headline stack) */
 }
 
 .hw-count {

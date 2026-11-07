@@ -126,9 +126,9 @@ function build(mode: TrackMode): Geometry {
   if (mode === 'h') {
     const W = 1200;
     const H = 440;
-    const y = 262;
-    const x0 = 90;
-    const x6 = 1010;
+    const y = 308;
+    const x0 = 120;
+    const x6 = 1080;
     const nodes = Array.from({ length: 7 }, (_, i) => ({ x: lerp(x0, x6, i / 6), y }));
     const gate = { x: (nodes[4].x + nodes[5].x) / 2, y };
     const uGate = (gate.x - x0) / (x6 - x0);
@@ -142,30 +142,30 @@ function build(mode: TrackMode): Geometry {
       uHold: uGate - 0.04,
       gate,
       gateAxis: 'vertical',
-      ring: { x: gate.x, y: y + 78 },
-      ringLink: `M${gate.x} ${y + 60}V${y + 30}`,
-      slot: { x: 1150, y },
-      slotLink: `M${x6} ${y}H1130`,
-      archPath: `M${x5} ${y - 28}C${x5} 70 ${x6} 70 ${x6} ${y - 28}`,
-      loopPath: `M${x6} ${y}C${x6} 410 ${x0} 410 ${x0} ${y}`,
-      card: { w: 172, h: 124, dx: 0, dy: -(30 + 124), side: 'above' },
-      word: { x: 0, y: 34, follows: true },
+      ring: { x: gate.x, y: y + 72 },
+      ringLink: `M${gate.x} ${y + 54}V${y + 26}`,
+      slot: { x: 1156, y },
+      slotLink: `M${x6} ${y}H1136`,
+      archPath: `M${x5} ${y - 26}C${x5} 140 ${x6} 140 ${x6} ${y - 26}`,
+      loopPath: `M${x6} ${y}C${x6} 418 ${x0} 418 ${x0} ${y}`,
+      card: { w: 172, h: 120, dx: 0, dy: -(44 + 120), side: 'above' },
+      word: { x: 0, y: 18, follows: true },
       scatter: [
-        { x: 70, y: 262, r: -4 },
-        { x: 310, y: 50, r: 2.5 },
-        { x: 610, y: 40, r: 1.8 },
-        { x: 930, y: 110, r: -3 },
-        { x: 130, y: 120, r: 4 },
-        { x: 560, y: 200, r: -2.5 },
-        { x: 780, y: 300, r: 2 },
+        { x: 70, y: 268, r: -4 },
+        { x: 310, y: 52, r: 2.5 },
+        { x: 610, y: 42, r: 1.8 },
+        { x: 930, y: 112, r: -3 },
+        { x: 130, y: 122, r: 4 },
+        { x: 560, y: 204, r: -2.5 },
+        { x: 780, y: 304, r: 2 },
       ],
     };
   }
   const W = 358;
   const H = 560;
-  const x = 80;
-  const y0 = 100;
-  const y6 = 460;
+  const x = 68;
+  const y0 = 112;
+  const y6 = 472;
   const nodes = Array.from({ length: 7 }, (_, i) => ({ x, y: lerp(y0, y6, i / 6) }));
   const gate = { x, y: (nodes[4].y + nodes[5].y) / 2 };
   const uGate = (gate.y - y0) / (y6 - y0);
@@ -179,14 +179,14 @@ function build(mode: TrackMode): Geometry {
     uHold: uGate - 0.05,
     gate,
     gateAxis: 'horizontal',
-    ring: { x: 322, y: gate.y },
-    ringLink: `M${x + 30} ${gate.y}H300`,
+    ring: { x: 20, y: gate.y },
+    ringLink: `M38 ${gate.y}H${x - 22}`,
     slot: { x: 322, y: y6 },
     slotLink: `M${x} ${y6}H302`,
-    archPath: `M${x + 28} ${y5}C350 ${y5 - 20} 350 ${y6 + 20} ${x + 28} ${y6}`,
-    loopPath: `M${x} ${y6}C-26 ${y6} -26 ${y0} ${x} ${y0}`,
-    card: { w: 172, h: 124, dx: 40, dy: -62, side: 'right' },
-    word: { x: W / 2, y: 30, follows: false },
+    archPath: `M${x + 26} ${y5}C236 ${y5 - 12} 236 ${y6 + 12} ${x + 26} ${y6}`,
+    loopPath: `M${x} ${y6}C-18 ${y6} -18 ${y0} ${x} ${y0}`,
+    card: { w: 172, h: 120, dx: 40, dy: -44, side: 'right' },
+    word: { x: W / 2, y: 12, follows: false },
     scatter: [
       { x: 14, y: 330, r: -5 },
       { x: 200, y: 30, r: 3 },
@@ -205,12 +205,13 @@ export function geometry(mode: TrackMode): Geometry {
   return CACHE[mode];
 }
 
-/** Top-left of the dossier card for a prospect at (tx, ty), kept inside the canvas. */
+/** Top-left of the dossier card for a prospect at (tx, ty), kept inside Region B. */
 export function dossierPos(g: Geometry, tx: number, ty: number): Pt {
   const { w, h, dx, dy, side } = g.card;
   if (side === 'above') {
-    const cx = Math.min(g.W - 8 - w / 2, Math.max(8 + w / 2, tx + dx));
-    return { x: cx - w / 2, y: ty + dy };
+    const cx = Math.min(g.W - 12 - w / 2, Math.max(12 + w / 2, tx + dx));
+    const top = Math.min(g.nodes[0].y - h - 40, Math.max(92, ty + dy));
+    return { x: cx - w / 2, y: top };
   }
-  return { x: tx + dx, y: Math.min(g.H - h - 8, Math.max(8, ty + dy)) };
+  return { x: tx + dx, y: Math.min(g.H - h - 12, Math.max(72, ty + dy)) };
 }

@@ -1,4 +1,8 @@
 /**
+ * SUPERSEDED (kept for history, do not run): the favicon is now the SlideIn mark, built from
+ * brand/favicon (public/ assets + metadata.icons in app/layout.tsx). Running this would recreate
+ * app/icon.svg and a second, conflicting favicon.
+ *
  * Build browser/OS icons from the master logo SVG.
  *
  *   node scripts/build-icons.mjs

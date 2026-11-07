@@ -1,23 +1,13 @@
 /**
  * STORY STAGE — the markup of the hero scroll story, drawn on a fixed design
- * canvas (storyModel.geometry) that CSS scales to fit. Pure markup: it renders
- * the *finished* loop (what reduced-motion and no-JS visitors see). HeroStory
- * moves everything else into its starting state before first paint and then
- * scrubs it back to this.
+ * canvas (storyModel.geometry) that CSS scales to fit.
  *
- * What the picture says: scattered business material is pulled into one
- * thread. ONE prospect walks it. A dossier card travels with the prospect and
- * gains a layer at each stage (who they are, the evidence, a fit score, a
- * written draft). A person approves at the gate. The card folds into a plane
- * and leaves; a reply comes back; a slot is booked; the line curls back to
- * configure and the next, empty card is ready.
+ * Clean, single-rail progression:
+ *   Configure → Discover → Research → Qualify → Personalize → Outreach → Converse
  *
- * The only words are the seven stage names, one at a time, in a single
- * animated slot that follows the prospect (content/stages.ts vocabulary).
- *
- * Layers (so independent motion never fights): `.hs-layer--track` and
- * `.hs-layer--frags` each take their own pointer parallax. Fragments are three
- * nested boxes: outer = scroll scrub, mid = load intro, inner = idle float.
+ * Monochromatic by default (near-black, muted graphite, warm ivory canvas),
+ * with SlideIn orange reserved strictly for the active progress segment and
+ * active stage state.
  */
 
 import { STAGE_ICON_ID, STAGE_WORD } from '@/content/stages';
@@ -72,11 +62,18 @@ export function StoryStage({ mode }: { mode: TrackMode }) {
               <path key={i} d={d} pathLength={1} data-s="tangle" className="hs-tangle" />
             ))}
             {tangle.map((d, i) => (
-              <path key={'p' + i} d={d} data-s="tangle-pulse" className="hs-tangle-pulse" style={{ animationDelay: `${i * -0.7}s` }} />
+              <path
+                key={'p' + i}
+                d={d}
+                data-s="tangle-pulse"
+                className="hs-tangle-pulse"
+                style={{ animationDelay: `${i * -0.7}s` }}
+              />
             ))}
             {RAW.map((r) => (
               <path key={r.id} data-s="pull" data-id={r.id} className="hs-pull" d="" />
             ))}
+            {/* Single thin neutral baseline + restrained orange progress segment */}
             <path d={g.trackPath} pathLength={1} data-s="rail" className="hs-rail" />
             <path d={g.trackPath} pathLength={1} data-s="fill" className="hs-fill" />
             <path data-s="flow" className="hs-flow" d="" />
@@ -95,11 +92,12 @@ export function StoryStage({ mode }: { mode: TrackMode }) {
                 key={stage}
                 data-s="node"
                 data-i={i}
+                data-stage-slug={stage}
                 className="hs-node"
                 style={{ left: px(n.x), top: px(n.y) }}
               >
                 {Glyph && STAGE_ICON_ID[stage] ? (
-                  <Glyph id={`hs-${stage}`} size={stage === 'discover' ? 26 : 22} />
+                  <Glyph id={`hero-${stage}`} size={mode === 'h' ? 21 : 18} />
                 ) : null}
               </div>
             );
@@ -134,10 +132,15 @@ export function StoryStage({ mode }: { mode: TrackMode }) {
             <i data-s="gate-bar" className="hs-gate__bar" />
           </div>
           <div data-s="ring" className="hs-ring" style={{ left: px(g.ring.x), top: px(g.ring.y) }}>
-            {/* a person: the approval is human */}
             <svg viewBox="0 0 24 24" width="16" height="16" focusable="false">
-              <circle cx="12" cy="8.5" r="3.6" fill="none" stroke="currentColor" strokeWidth="1.8" />
-              <path d="M5 20c.8-4 3.7-6 7-6s6.2 2 7 6" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+              <circle cx="12" cy="8.5" r="3.6" fill="none" stroke="currentColor" strokeWidth="1.75" />
+              <path
+                d="M5 20c.8-4 3.7-6 7-6s6.2 2 7 6"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.75"
+                strokeLinecap="round"
+              />
             </svg>
           </div>
           <div data-s="slot" className="hs-slot" style={{ left: px(g.slot.x), top: px(g.slot.y) }}>
@@ -149,14 +152,14 @@ export function StoryStage({ mode }: { mode: TrackMode }) {
                 data-s="slot-check"
                 fill="none"
                 stroke="currentColor"
-                strokeWidth="2.6"
+                strokeWidth="2.2"
                 strokeLinecap="round"
                 strokeLinejoin="round"
               />
             </svg>
           </div>
 
-          {/* the dossier: an empty card that fills as the prospect is worked */}
+          {/* the dossier: restrained monochromatic card that fills as the prospect progresses */}
           <div
             data-s="doss"
             className="hs-doss"
@@ -173,7 +176,12 @@ export function StoryStage({ mode }: { mode: TrackMode }) {
               <svg data-s="d-gauge" className="hs-d-gauge" viewBox="0 0 32 32" focusable="false">
                 <circle cx="16" cy="16" r="12" className="hs-d-gauge__trk" />
                 <circle cx="16" cy="16" r="12" pathLength={1} data-s="d-arc" className="hs-d-gauge__arc" />
-                <path d="M11 16.5l3.6 3.6L21.5 12" pathLength={1} data-s="d-gcheck" className="hs-d-gauge__ck" />
+                <path
+                  d="M11 16.5l3.6 3.6L21.5 12"
+                  pathLength={1}
+                  data-s="d-gcheck"
+                  className="hs-d-gauge__ck"
+                />
               </svg>
               <span className="hs-d-chips">
                 <i data-s="d-chip" style={{ width: 38 }} />
@@ -194,15 +202,21 @@ export function StoryStage({ mode }: { mode: TrackMode }) {
             </div>
             <div data-s="d-ok" className="hs-doss__ok" />
             <i data-s="d-badge" className="hs-doss__badge">
-              <svg viewBox="0 0 24 24" width="12" height="12" focusable="false">
-                <path d="M6 12.5l4 4 8-9" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
+              <svg viewBox="0 0 24 24" width="11" height="11" focusable="false">
+                <path
+                  d="M6 12.5l4 4 8-9"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.6"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
               </svg>
             </i>
           </div>
 
-          <svg data-s="plane" className="hs-plane" viewBox="0 0 24 24" width="30" height="30" focusable="false">
+          <svg data-s="plane" className="hs-plane" viewBox="0 0 24 24" width="24" height="24" focusable="false">
             <path d="M2.5 11.3 21.5 3 14.2 21l-3.3-7.4-8.4-2.3Z" fill="currentColor" />
-            <path d="m10.9 13.6 5.2-5.2" stroke="var(--scaffold-bg)" strokeWidth="1.4" strokeLinecap="round" />
           </svg>
           <div data-s="reply-token" className="hs-bubble">
             <i />
@@ -210,6 +224,7 @@ export function StoryStage({ mode }: { mode: TrackMode }) {
           </div>
           <i
             data-s="token"
+            data-protagonist="hero"
             className="hs-token"
             style={{ left: px(g.nodes[0].x), top: px(g.nodes[0].y) }}
           />

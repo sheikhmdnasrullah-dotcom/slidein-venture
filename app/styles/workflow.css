@@ -18,7 +18,7 @@
   --wf-top-gap: clamp(48px, 8vh, 72px);
   --wf-hairline-solid: color-mix(in oklch, var(--color-ink) 6%, #fff);
   position: relative;
-  background: var(--scaffold-bg);
+  background: transparent;
   overflow-x: clip;
 }
 
@@ -2333,7 +2333,7 @@
 
 .wf-planes {
   position: relative;
-  background: var(--scaffold-panel);
+  background: color-mix(in oklch, var(--scaffold-panel) 48%, transparent);
   border-block: 1px solid var(--scaffold-hairline);
   padding: clamp(48px, 8vw, 96px) clamp(20px, 4vw, 48px);
   overflow: hidden;

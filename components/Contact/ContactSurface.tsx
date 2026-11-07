@@ -20,12 +20,6 @@ import {
   useTransform,
   useReducedMotion,
 } from 'framer-motion';
-import { GlossTile } from '@/components/Sections/primitives';
-import {
-  CalendarIcon as SectionCalendarIcon,
-  EnvelopeIcon as SectionEnvelopeIcon,
-  SendIcon as SectionSendIcon,
-} from '@/components/Sections/icons';
 import { SocialGlyph, SOCIAL_BRAND } from './SocialGlyphs';
 import type { SocialEntry } from '@/content/contact';
 import {
@@ -200,6 +194,7 @@ function PortraitPlate({ still }: { still: boolean }) {
           </div>
         </div>
 
+
         {/* SlideIn verified brand seal attached to plate */}
         <div
           className="absolute -bottom-3 -right-3"
@@ -292,42 +287,9 @@ export default function ContactSurface() {
   const socials = SOCIALS.filter((s) => s.href.trim().length > 0);
 
   return (
-    <div className="relative min-h-screen w-full overflow-x-clip bg-[var(--page-fill)] text-[var(--scaffold-ink)]">
+    <div className="relative min-h-screen w-full overflow-x-clip bg-transparent text-[var(--scaffold-ink)]">
       {/* Precision stationery dot grid background */}
       <div className="dot-grid absolute inset-0 pointer-events-none opacity-40" aria-hidden="true" />
-
-      {/* ── Ambient SlideIn Gloss Tiles framing the spread (depth-of-field blur) ── */}
-      <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
-        {/* Upper-left calendar booking gloss tile */}
-        <motion.div
-          animate={still ? undefined : { y: [0, -8, 0], rotate: [0, 1.5, 0] }}
-          transition={{ duration: 7.6, repeat: Infinity, ease: 'easeInOut' }}
-          className="absolute -left-6 top-[180px] hidden xl:block opacity-65"
-          style={{ filter: 'blur(2px)' }}
-        >
-          <GlossTile size={105} rotate={-8} icon={<SectionCalendarIcon />} shadow={false} />
-        </motion.div>
-
-        {/* Lower-left outreach envelope gloss tile */}
-        <motion.div
-          animate={still ? undefined : { y: [0, 8, 0], rotate: [0, -1.5, 0] }}
-          transition={{ duration: 8.4, repeat: Infinity, ease: 'easeInOut', delay: 1 }}
-          className="absolute left-8 bottom-[120px] hidden 2xl:block opacity-55"
-          style={{ filter: 'blur(2.5px)' }}
-        >
-          <GlossTile size={92} rotate={10} icon={<SectionEnvelopeIcon />} shadow={false} />
-        </motion.div>
-
-        {/* Lower-right direct dispatch gloss tile */}
-        <motion.div
-          animate={still ? undefined : { y: [0, -7, 0], rotate: [0, 1.2, 0] }}
-          transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut', delay: 0.5 }}
-          className="absolute -right-8 bottom-[140px] hidden xl:block opacity-65"
-          style={{ filter: 'blur(2px)' }}
-        >
-          <GlossTile size={115} rotate={12} icon={<SectionSendIcon />} shadow={false} />
-        </motion.div>
-      </div>
 
       {/* ── Main Content Spread ─────────────────────────────────────────── */}
       <div className="relative z-10 mx-auto flex min-h-screen w-full max-w-[1140px] flex-col justify-center px-6 pb-20 pt-[calc(var(--hero-nav-h)+48px)] md:px-12">
@@ -341,7 +303,7 @@ export default function ContactSurface() {
 
             <motion.h1
               {...rise(0.24, still)}
-              className="hero-h1 mt-8 text-[clamp(2.2rem,4.5vw,3.2rem)] font-bold tracking-[-0.035em] text-[var(--scaffold-ink)]"
+              className="font-display-xl mt-8 text-center text-[clamp(2.5rem,5vw,4rem)] text-[var(--scaffold-ink)]"
             >
               {PROFILE.name}
             </motion.h1>

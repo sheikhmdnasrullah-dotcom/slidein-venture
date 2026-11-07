@@ -20,6 +20,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import AgenticDashboard, { SCROLL_STAGES } from '@/components/DashboardPreview/AgenticDashboard';
 import { Band, Reveal } from '@/components/Sections/primitives';
 import { HOME } from '@/content/home';
+import { BRUSH_D, BRUSH_VIEWBOX } from '@/components/Typography/brush';
 import { useSettledStill } from '@/lib/useSettledStill';
 
 if (typeof window !== 'undefined') {
@@ -38,7 +39,7 @@ function DashboardTagline() {
   /* isolate on the h2 contains the z--1 swash so the section's own flat
      background can never paint over it. */
   return (
-    <h2 className="isolate text-[clamp(1.75rem,3.2vw,3rem)] font-[600] tracking-[-0.032em] text-[var(--scaffold-ink)] leading-[1.12] text-center text-balance">
+    <h2 className="font-display-xl isolate text-[clamp(1.75rem,3.2vw,3rem)] text-[var(--scaffold-ink)] text-center">
       {preWords.map((word, i) => (
         <React.Fragment key={`pre-${i}`}>
           <span>{word}</span>{' '}
@@ -52,26 +53,15 @@ function DashboardTagline() {
             data-testid="dashboard-swash"
             className="hero-swash"
             aria-hidden="true"
-            style={{
-              zIndex: -1,
-            }}
+            style={{ zIndex: -1, inset: '47% -0.18em -0.04em', transform: 'rotate(-0.7deg)' }}
           >
             <svg
-              className="hero-swash-shape [clip-path:inset(-8%_-1%_-8%_-1%)] opacity-100"
-              viewBox="0 0 120 26"
+              className="hero-swash-shape"
+              viewBox={BRUSH_VIEWBOX}
               preserveAspectRatio="none"
               focusable="false"
             >
-              <defs>
-                <linearGradient id="dashboard-swash-grad" x1="0" y1="0" x2="0.985" y2="0.17">
-                  <stop offset="0" style={{ stopColor: 'var(--hero-accent-300)' }} />
-                  <stop offset="1" style={{ stopColor: 'var(--hero-accent-500)' }} />
-                </linearGradient>
-              </defs>
-              <path
-                d="M2.5 17.5 C4.5 12.5 7.5 9.5 12.5 8.2 L30 6.6 C35 6.3 37.5 4.3 43.5 4.5 C49.5 4.7 51.5 6.5 57.5 6.3 L70 6.1 C75.5 5.9 77.5 4.1 83.5 4.3 C89.5 4.5 91.5 6.1 97.5 6.3 L109.5 6.7 C114.5 6.9 117.5 9.2 117.5 13 C117.5 16.8 114.5 19.2 109.5 19.6 L96 20.4 C88 20.8 80 20.4 72 20.8 C60 21.4 48 20.8 36 21.2 C26 21.5 16 21.2 10.5 20.2 C5.5 19.4 3 18.7 2.5 17.5 Z"
-                fill="url(#dashboard-swash-grad)"
-              />
+              <path d={BRUSH_D} style={{ fill: 'var(--em-mark)' }} />
             </svg>
           </span>
           <span className="relative z-10">

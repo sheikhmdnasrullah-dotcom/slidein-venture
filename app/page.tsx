@@ -1,5 +1,4 @@
 import Hero from '@/components/Hero/Hero';
-import HowItWorks from '@/components/HowItWorks/HowItWorks';
 import ProblemSection from '@/components/Sections/ProblemSection';
 import CapabilitiesSection from '@/components/Sections/CapabilitiesSection';
 import ManagedSection from '@/components/Sections/ManagedSection';
@@ -12,7 +11,6 @@ export default function Home() {
   return (
     <>
       <Hero />
-      <HowItWorks />
       <ProblemSection />
       <CapabilitiesSection />
       <ManagedSection />

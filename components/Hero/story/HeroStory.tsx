@@ -51,8 +51,8 @@ gsap.registerPlugin(ScrollTrigger);
 const ACT_STARTS = [0, ACT_BOUNDS.converge[0], ACT_BOUNDS.journey[0], ACT_BOUNDS.gate[0], ACT_BOUNDS.loop[0]];
 const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
 /** letter roll distance in design px (the word is 46px tall, masked) */
-const ROLL_IN = 58;
-const ROLL_OUT = -62;
+const ROLL_IN = 66;
+const ROLL_OUT = -70;
 const clamp01 = (n: number) => Math.min(1, Math.max(0, n));
 
 export function HeroStory() {
@@ -206,16 +206,18 @@ export function HeroStory() {
         flow.style.opacity = '0';
       }
 
-      /* the dossier rides with the prospect, but stays at outreach to fold */
-      const dx = lp.v > 0 ? tx : lerp(n0.x, n6.x, Math.min(tr.u, 5 / 6));
-      const dy = lp.v > 0 ? ty : lerp(n0.y, n6.y, Math.min(tr.u, 5 / 6));
+      /* the dossier rides with the prospect in Region B, stays at outreach to fold,
+         and parks cleanly at Configure (n0) during the return loop so it never
+         drags across the timeline or stage icons. */
+      const dx = lp.v > 0 ? n0.x : lerp(n0.x, n6.x, Math.min(tr.u, 5 / 6));
+      const dy = lp.v > 0 ? n0.y : lerp(n0.y, n6.y, Math.min(tr.u, 5 / 6));
       const dp = dossierPos(g, dx, dy);
       gsap.set(doss, { x: dp.x - base.x, y: dp.y - base.y });
 
-      /* the stage word follows the prospect, kept inside the canvas */
+      /* the stage word follows the prospect inside Region A, kept inside the canvas */
       wordEls.forEach((w, k) => {
-        const half = wordW[k] / 2 + 6;
-        const x = g.word.follows ? Math.min(g.W - half, Math.max(half, tx)) : 0; // left is set in markup
+        const half = wordW[k] / 2 + 12;
+        const x = g.word.follows ? Math.min(g.W - half, Math.max(half, tx)) : 0;
         gsap.set(w, { x, xPercent: -50 });
       });
 
@@ -276,17 +278,22 @@ export function HeroStory() {
       });
       if (cue) tl.fromTo(cue, { opacity: 1 }, { opacity: 0, duration: 0.05 }, 0);
 
-      /* 2 · converge: fragments pull into one thread */
+      /* 2 · converge: fragments pull into one thread before journey begins */
       ft(tangles, { opacity: 1 }, { opacity: 0, duration: 0.1, stagger: 0.01 }, T.convergeStart);
       fs.forEach((f, i) => {
-        ft(f, { p: 0 }, { p: 1, duration: 0.15, ease: 'power3.inOut' }, T.convergeStart + i * 0.015);
+        ft(f, { p: 0 }, { p: 1, duration: 0.12, ease: 'power3.inOut' }, T.convergeStart + i * 0.012);
       });
-      ft(rail, { strokeDashoffset: 1 }, { strokeDashoffset: 0, duration: 0.16, ease: 'power2.inOut' }, 0.27);
+      ft(rail, { strokeDashoffset: 1 }, { strokeDashoffset: 0, duration: 0.15, ease: 'power2.inOut' }, 0.26);
       nodes.forEach((n, i) => {
-        ft(n, { opacity: 0, scale: 0.8 }, { opacity: 1, scale: 1, duration: 0.05, ease: 'back.out(1.6)' }, 0.3 + i * 0.018);
+        ft(
+          n,
+          { opacity: 0, scale: 0.8 },
+          { opacity: 1, scale: 1, duration: 0.05, ease: 'back.out(1.6)' },
+          0.29 + i * 0.016,
+        );
       });
-      ft(token, { opacity: 0, scale: 0 }, { opacity: 1, scale: 1, duration: 0.05, ease: 'back.out(2)' }, T.tokenIn);
-      ft(doss, { opacity: 0 }, { opacity: 1, duration: 0.05 }, T.tokenIn);
+      ft(token, { opacity: 0, scale: 0 }, { opacity: 1, scale: 1, duration: 0.045, ease: 'back.out(2)' }, T.tokenIn);
+      ft(doss, { opacity: 0 }, { opacity: 1, duration: 0.045 }, T.tokenIn);
 
       /* 3 · journey: the prospect walks configure → personalize */
       const hop = (from: number, to: number, at: number, dur: number, ease = 'power2.inOut') =>
@@ -297,17 +304,39 @@ export function HeroStory() {
         ft(n, { '--on': 0 }, { '--on': 1, duration: 0.025 }, stageTime(i) - 0.025);
       });
 
-      /* the word: eight faces. Each swap is a ticker roll: the old letters roll
-         up and out as the new ones roll up in, then an orange bar strikes under. */
-      const swapAt = (k: number) => (k < 7 ? stageTime(k) - 0.03 : T.loop[1] - 0.045);
+      /* the word: eight faces. Strictly sequential non-overlapping ticker roll:
+         old letters roll completely out of the mask before new letters enter. */
+      const swapAt = (k: number) =>
+        k === 0
+          ? stageTime(0) - 0.03
+          : k < 6
+            ? stageTime(k) - 0.015
+            : k === 6
+              ? 0.835
+              : T.loop[1] - 0.045;
       WORD_ORDER.forEach((_, k) => {
-        const inAt = swapAt(k);
-        ft(wordChars[k], { y: ROLL_IN }, { y: 0, duration: 0.028, ease: 'power3.out', stagger: 0.0015 }, inAt);
-        ft(wordBars[k], { scaleX: 0 }, { scaleX: 1, duration: 0.035, ease: 'power3.inOut' }, inAt + 0.012);
+        const inAt = swapAt(k) + (k > 0 ? 0.014 : 0);
+        ft(
+          wordChars[k],
+          { y: ROLL_IN },
+          { y: 0, duration: 0.014, ease: 'power3.out', stagger: 0.0004 },
+          inAt,
+        );
+        ft(
+          wordBars[k],
+          { scaleX: 0 },
+          { scaleX: 1, duration: 0.016, ease: 'power3.inOut' },
+          inAt + 0.004,
+        );
         if (k < 7) {
           const outAt = swapAt(k + 1);
-          ft(wordChars[k], { y: 0 }, { y: ROLL_OUT, duration: 0.024, ease: 'power2.in', stagger: 0.0015 }, outAt);
-          ft(wordBars[k], { opacity: 1 }, { opacity: 0, duration: 0.02 }, outAt);
+          ft(
+            wordChars[k],
+            { y: 0 },
+            { y: ROLL_OUT, duration: 0.011, ease: 'power2.in', stagger: 0.0003 },
+            outAt,
+          );
+          ft(wordBars[k], { opacity: 1 }, { opacity: 0, duration: 0.01 }, outAt);
         }
       });
 
@@ -316,7 +345,12 @@ export function HeroStory() {
       ft(dPh, { opacity: 1 }, { opacity: 0, duration: 0.02 }, dAt(1)); // discover: the card appears
       ft(dCard, { opacity: 0 }, { opacity: 1, duration: 0.02 }, dAt(1));
       ft(dWho, { opacity: 0 }, { opacity: 1, duration: 0.02 }, dAt(1) + 0.004);
-      ft(dChips, { opacity: 0, scale: 0.4 }, { opacity: 1, scale: 1, duration: 0.025, ease: 'back.out(2)', stagger: 0.008 }, dAt(2)); // research
+      ft(
+        dChips,
+        { opacity: 0, scale: 0.4 },
+        { opacity: 1, scale: 1, duration: 0.025, ease: 'back.out(2)', stagger: 0.008 },
+        dAt(2),
+      ); // research
       ft(dQuote, { opacity: 0 }, { opacity: 1, duration: 0.025 }, dAt(2) + 0.016);
       ft(dGauge, { opacity: 0 }, { opacity: 1, duration: 0.015 }, dAt(3)); // qualify
       ft(dArc, { strokeDashoffset: 1 }, { strokeDashoffset: 0.15, duration: 0.03, ease: 'power2.out' }, dAt(3));
@@ -330,7 +364,12 @@ export function HeroStory() {
       ft(ring, { opacity: 0, scale: 0.6 }, { opacity: 1, scale: 1, duration: 0.02, ease: 'back.out(1.8)' }, 0.715);
       ft(ringLink, { strokeDashoffset: 1 }, { strokeDashoffset: 0, duration: 0.02 }, 0.715);
       ft(dOk, { opacity: 0 }, { opacity: 1, duration: 0.016 }, T.approve[0] + 0.012);
-      ft(dBadge, { opacity: 0, scale: 0.4 }, { opacity: 1, scale: 1, duration: 0.018, ease: 'back.out(2.4)' }, T.approve[0] + 0.02);
+      ft(
+        dBadge,
+        { opacity: 0, scale: 0.4 },
+        { opacity: 1, scale: 1, duration: 0.018, ease: 'back.out(2.4)' },
+        T.approve[0] + 0.02,
+      );
       ft(
         bar,
         { x: 0, y: 0, opacity: 1 },
@@ -368,7 +407,6 @@ export function HeroStory() {
 
       /* 5 · loop: the line curls back to configure, the prospect with it; the next empty card waits */
       ft(lp, { v: 0 }, { v: 1, duration: T.loop[1] - T.loop[0], ease: 'power2.inOut' }, T.loop[0]);
-      ft(nodes[0], { '--pulse': 0 }, { '--pulse': 1, duration: 0.02, ease: 'power2.out' }, T.loop[1] - 0.005);
       ft(dPh, { opacity: 0 }, { opacity: 1, duration: 0.014 }, T.loop[1] - 0.02);
 
       if (progressFill) tl.fromTo(progressFill, { scaleX: 0 }, { scaleX: 1, duration: 1, ease: 'none' }, 0);
@@ -436,9 +474,6 @@ export function HeroStory() {
         anticipatePin: 1,
         scrub: true,
         invalidateOnRefresh: true,
-        /* placeAll runs from ScrollTrigger (after it has scrubbed the timeline),
-           not from a timeline callback: a refresh re-renders the timeline with
-           events suppressed, which would leave the DOM one frame stale. */
         onUpdate: (self) => {
           placeAll();
           apply(clamp01(self.progress));

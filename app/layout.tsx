@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import Navbar from "@/components/Navbar/Navbar";
 import { SmoothScroll } from "@/components/SmoothScroll";
+import BackgroundWallpaper from "@/components/BackgroundWallpaper/BackgroundWallpaper";
 
 import { displayFace, bodyFace, monoFace } from "./fonts";
 import { cn } from "@/lib/utils";
@@ -10,6 +11,21 @@ export const metadata: Metadata = {
   title: "SlideIn",
   description:
     "Software to research prospects, prepare personalized email, send with a controlled workflow, and monitor delivery — with a managed service for teams that would rather we run it.",
+  /* Brand icons live in /public (source + build: brand/favicon). Declared here, once, so
+     there is no second favicon source: app/icon.svg was removed on purpose.
+     ?v= busts browser favicon caches that still hold the old wordmark chip. */
+  icons: {
+    icon: [
+      { url: "/favicon.svg?v=2", type: "image/svg+xml" },
+      { url: "/favicon-32x32.png?v=2", sizes: "32x32", type: "image/png" },
+      { url: "/favicon-16x16.png?v=2", sizes: "16x16", type: "image/png" },
+      { url: "/favicon-96x96.png?v=2", sizes: "96x96", type: "image/png" },
+      { url: "/favicon.ico?v=2", sizes: "48x48" },
+    ],
+    apple: [{ url: "/apple-touch-icon.png?v=2", sizes: "180x180", type: "image/png" }],
+  },
+  manifest: "/site.webmanifest?v=2",
+  appleWebApp: { title: "SlideIn" },
 };
 
 /* One theme, so one colour. This is the paper the page is made of — it tells
@@ -65,9 +81,10 @@ export default function RootLayout({
           from top to bottom — it flattened every band it crossed. Ambient
           light now belongs to the section that is the light source. */}
       <body className="antialiased">
+        <BackgroundWallpaper />
         <SmoothScroll />
         <Navbar />
-        <main>{children}</main>
+        <main className="relative z-[1]">{children}</main>
         {/* No footer. The terminal band — wordmark, link columns, the consent
             line and the copyright bar — was unmounted by decision, not
             deleted: components/Footer/Footer.tsx stays in the codebase and

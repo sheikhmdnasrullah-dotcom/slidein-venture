@@ -1,0 +1,106 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   EMPHASIS — the site's one highlighter and one underline.
+   .em-mark   a painted brush stroke behind the lower half of a phrase (the
+              shape is the mask, the colour is a token, so hover/tone can retint it)
+   .em-rule   a tapered pen underline (components/Typography/HandRule.tsx)
+   Both are resting-state-complete. Entrances are opt-in (.em-paint, .em-draw)
+   and drop away on animationend, so a re-parent can never replay them.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+:root {
+  --em-mark: color-mix(in oklch, var(--color-brand) 34%, transparent);
+  --em-mark-hover: color-mix(in oklch, var(--color-brand) 46%, transparent);
+  --em-ease: cubic-bezier(0.65, 0, 0.35, 1);
+}
+
+.em-mark {
+  position: relative;
+  display: inline-block;
+  isolation: isolate;
+}
+
+.em-mark::before {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  inset: 47% -0.18em -0.04em;
+  background: var(--em-mark);
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 60' preserveAspectRatio='none'%3E%3Cpath d='M5 27 C 6 17%2C 18 13%2C 40 14 C 70 10%2C 100 15%2C 140 12 C 180 9%2C 214 14%2C 250 11 C 270 9.5%2C 286 11%2C 292 15 L 300 19 L 295 25 C 298 33%2C 294 42%2C 288 48 C 258 50%2C 226 47%2C 196 50 C 150 54%2C 104 49%2C 66 52 C 40 54%2C 18 52%2C 9 50 C 3 46%2C 4 40%2C 5 34 C 5 31%2C 4 29%2C 5 27 Z'/%3E%3C/svg%3E") 0 0 / 100% 100% no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 60' preserveAspectRatio='none'%3E%3Cpath d='M5 27 C 6 17%2C 18 13%2C 40 14 C 70 10%2C 100 15%2C 140 12 C 180 9%2C 214 14%2C 250 11 C 270 9.5%2C 286 11%2C 292 15 L 300 19 L 295 25 C 298 33%2C 294 42%2C 288 48 C 258 50%2C 226 47%2C 196 50 C 150 54%2C 104 49%2C 66 52 C 40 54%2C 18 52%2C 9 50 C 3 46%2C 4 40%2C 5 34 C 5 31%2C 4 29%2C 5 27 Z'/%3E%3C/svg%3E") 0 0 / 100% 100% no-repeat;
+  transform: rotate(-0.7deg);
+  transition: background-color 320ms var(--ease-out, ease-out);
+}
+
+.em-rule {
+  position: absolute;
+  left: -2%;
+  bottom: -0.2em;
+  width: 104%;
+  height: 0.42em;
+  overflow: visible;
+  color: var(--color-brand);
+  fill: currentcolor;
+  pointer-events: none;
+  transform-origin: 0 50%;
+  transition: transform 360ms var(--ease-out, ease-out);
+}
+
+.em-rule__wipe {
+  fill: none;
+  stroke: white;
+  stroke-width: 40;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 0;
+}
+
+.em-rule__hair {
+  opacity: 0.7;
+}
+
+/* secondary emphasis, pointer devices only: nothing moves, nothing replays */
+@media (hover: hover) and (pointer: fine) {
+  :is(h1, h2, h3):hover .em-mark::before {
+    background: var(--em-mark-hover);
+  }
+
+  :is(h1, h2, h3):hover .em-rule {
+    transform: scaleY(1.25);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .em-paint::before {
+    animation: em-paint 760ms var(--em-ease) backwards;
+    animation-delay: var(--em-delay, 1000ms);
+  }
+
+  .em-draw .em-rule__wipe {
+    animation: em-draw 900ms var(--em-ease) backwards;
+    animation-delay: var(--em-delay, 780ms);
+  }
+
+  .em-draw .em-rule__wipe--hair {
+    animation-duration: 640ms;
+    animation-delay: calc(var(--em-delay, 780ms) + 170ms);
+  }
+}
+
+@keyframes em-paint {
+  from {
+    clip-path: inset(0 100% 0 0);
+  }
+
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+@keyframes em-draw {
+  from {
+    stroke-dashoffset: 1;
+  }
+
+  to {
+    stroke-dashoffset: 0;
+  }
+}

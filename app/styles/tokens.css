@@ -149,25 +149,34 @@
   /* Tightened one step across the display ladder when the weights went fat.
      Heavier strokes eat their own sidebearings, so a value that was correct at
      340 leaves visible gaps at 700 and the line stops reading as one shape. */
-  --tracking-display-xl:  -0.036em;   /* 48px+ — counters close up cleanly */
-  --tracking-display-md:  -0.024em;   /* 28–48px */
-  --tracking-display-sm:  -0.015em;   /* 20–28px */
+  /* ONE headline stack. The hero headline is the reference; every display role
+     (xl / md / sm, .display-headline, .section-headline) resolves to these five
+     values, so no heading is typeset differently from another. Only the size
+     changes per heading, never the weight, tracking, leading, word gap or cut. */
+  --hl-weight:            600;
+  --hl-tracking:         -0.024em;
+  --hl-leading:           1.06;
+  --hl-word-spacing:      0.12em;
+  --hl-opsz:              144;
+  --tracking-display-xl:  var(--hl-tracking);
+  --tracking-display-md:  var(--hl-tracking);
+  --tracking-display-sm:  var(--hl-tracking);
   --tracking-body:        -0.005em;   /* comfortable text measure */
   --tracking-label:        0.04em;    /* restrained micro labels */
   --tracking-label-wide:   0.08em;    /* isolated single-word tags */
   --tracking-smallcaps:    0.04em;
 
   /* ── LEADING ─────────────────────────────────────────────────────────── */
-  --leading-display-xl:    0.95;
-  --leading-display-md:    1.08;
-  --leading-display-sm:    1.16;
+  --leading-display-xl:    var(--hl-leading);
+  --leading-display-md:    var(--hl-leading);
+  --leading-display-sm:    var(--hl-leading);
   --leading-body:          1.58;
   --leading-tight:         1.22;
 
   /* ── WEIGHT — Geist Sans full variable spectrum (100–900 loaded) ──────── */
-  --font-weight-display-xl: 650;
-  --font-weight-display-md: 600;
-  --font-weight-display-sm: 550;
+  --font-weight-display-xl: var(--hl-weight);
+  --font-weight-display-md: var(--hl-weight);
+  --font-weight-display-sm: var(--hl-weight);
   --font-weight-body:       400;
   --font-weight-body-md:    500;
   --font-weight-label:      500;
@@ -177,8 +186,8 @@
      face has no opsz axis, so the settings no-op. Retained for a future
      variable display face. */
   --opsz-display-xl:       144;
-  --opsz-display-md:       72;
-  --opsz-display-sm:       36;
+  --opsz-display-md:       var(--hl-opsz);
+  --opsz-display-sm:       var(--hl-opsz);
 
   /* ── SPACING — 8pt base, 4pt half-steps ────────────────────────────── */
   --spacing-section-y:  clamp(5rem, 3rem + 10vw, 11rem);
@@ -238,8 +247,8 @@
 
   /* Same trap: --opsz-* is not a Tailwind namespace either. */
   --opsz-display-xl: 144;
-  --opsz-display-md: 72;
-  --opsz-display-sm: 36;
+  --opsz-display-md: var(--hl-opsz);
+  --opsz-display-sm: var(--hl-opsz);
 
   /* Legacy variation-axis values from the Fraunces era. Inert under Inter
      Tight (the face carries no opsz/SOFT/WONK axes); retained so a future

@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="SlideIn">
+  <title>SlideIn mark</title>
+  <!--
+    SlideIn mark — two folded paper ribbons that interlock into an S. Where one
+    sheet slides over the other they share exactly one square: the black stop,
+    the brand's full stop in solid form. 512 grid, y down.
+
+    Ribbon width 96, centreline corner radius 56, so every corner is concentric
+    (outer radius 104, inner 8). Ribbon 2 is ribbon 1 turned 180° about (256,256), baked into its path (no transforms).
+    The same centrelines drive the Blender model (source/build_mark.py).
+  -->
+  <path id="ribbon-1" fill="#C94700"
+        d="M440 60H164A104 104 0 0 0 60 164V200A104 104 0 0 0 164 304H304V208H164A8 8 0 0 1 156 200V164A8 8 0 0 1 164 156H440Z"/>
+  <path id="ribbon-2" fill="#FF6200"
+        d="M72 452H348A104 104 0 0 0 452 348V312A104 104 0 0 0 348 208H208V304H348A8 8 0 0 1 356 312V348A8 8 0 0 1 348 356H72Z"/>
+  <rect id="stop" x="208" y="208" width="96" height="96" fill="#0B0B0C"/>
+</svg>

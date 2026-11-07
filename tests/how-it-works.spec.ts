@@ -1,7 +1,8 @@
 /**
- * HOW IT WORKS — the pinned scroll story at the foot of the hero. Driven
- * through window.__howitworks.seek(p) (p = share of the 62 s story) and asserted
- * on the DOM, so scrubbing forward, backward and by jump must all be exact.
+ * HOW IT WORKS — the pinned scroll story at the top of the process page.
+ * Driven through window.__howitworks.seek(p) (p = share of the 62 s story)
+ * and asserted on the DOM, so scrubbing forward, backward and by jump must
+ * all be exact.
  */
 
 import { test, expect, type Page } from '@playwright/test';
@@ -9,7 +10,7 @@ import AxeBuilder from '@axe-core/playwright';
 import { SCENES, TOTAL_DURATION } from '../how-it-works-video/data/scenes.config';
 
 async function open(page: Page) {
-  await page.goto('/');
+  await page.goto('/process');
   await expect(page.getByTestId('how-it-works')).toBeAttached();
   await page.waitForFunction(() => !!window.__howitworks, null, { timeout: 15000 });
   await page.waitForTimeout(600);
@@ -28,12 +29,13 @@ test.describe('how it works', () => {
     await page.setViewportSize({ width: 1440, height: 900 });
   });
 
-  test('is the next section after the hero, with one rail node per scene', async ({ page }) => {
+  test('is the first section on the process page, with one rail node per scene', async ({ page }) => {
     await open(page);
     const order = await page.evaluate(() => {
-      const hero = document.querySelector('[data-testid="hero"]')!;
+      const main = document.querySelector('main')!;
       const hiw = document.querySelector('[data-testid="how-it-works"]')!;
-      return Boolean(hero.compareDocumentPosition(hiw) & Node.DOCUMENT_POSITION_FOLLOWING);
+      const first = main.querySelector('section, [data-testid]');
+      return first === hiw;
     });
     expect(order).toBe(true);
     await expect(page.locator('.hw-node')).toHaveCount(SCENES.length);
@@ -117,7 +119,7 @@ test.describe('how it works', () => {
   test('reduced motion: no pin, the finished frame, and the full script as text', async ({ browser }) => {
     const ctx = await browser.newContext({ reducedMotion: 'reduce', viewport: { width: 1440, height: 900 } });
     const page = await ctx.newPage();
-    await page.goto('/');
+    await page.goto('/process');
     await expect(page.locator('.hw[data-still="true"]')).toBeAttached();
     await expect(page.locator('.hw-script li')).toHaveCount(SCENES.length);
     expect(await page.evaluate(() => !!window.__howitworks)).toBe(false);

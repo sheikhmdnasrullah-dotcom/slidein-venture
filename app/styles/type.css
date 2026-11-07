@@ -19,69 +19,26 @@
 }
 
 /* ── 1 · DISPLAY ──────────────────────────────────────────────────────────
-   The display roles predate the single-face system: they dialled Fraunces'
-   opsz/SOFT/WONK axes through font-variation-settings. Inter Tight carries
-   no such axes, so the declarations below are inert — the axes are ignored
-   and the roles resolve through font-weight/tracking/leading alone. They
-   are left in place so the class contract (.font-display-*) keeps working;
-   the weight tokens they reference clamp to the loaded 400–600 instances. */
+   One headline stack. xl / md / sm and the legacy .display-headline /
+   .section-headline are the SAME typesetting (Fraunces, weight, tracking,
+   leading, word gap and optical cut all come from the --hl-* tokens, taken
+   from the hero headline). A heading chooses a size, never its own
+   typography. Do not add per-heading weight, tracking or leading. */
 .font-display-xl,
 .font-display-md,
 .font-display-sm,
-.display-headline .wonk,
-.section-headline .wonk,
-.wonk {
+.display-headline,
+.section-headline {
+  font-family: var(--font-display);
+  font-weight: var(--hl-weight);
+  letter-spacing: var(--hl-tracking);
+  line-height: var(--hl-leading);
+  word-spacing: var(--hl-word-spacing);
   font-variation-settings:
-    'opsz' var(--axis-opsz),
-    'SOFT' var(--axis-soft),
-    'WONK' var(--axis-wonk);
-}
-
-.font-display-xl {
-  font-family: var(--font-display);
-  /* --axis-opsz/--axis-soft are Inter Tight-era leftovers: the variation
-     settings below no-op on the current face. Kept so the role structure
-     survives a future variable display face. */
-  --axis-opsz: var(--opsz-display-md);
-  --axis-soft: 0;
-  font-weight: var(--font-weight-display-xl);
-  letter-spacing: var(--tracking-display-xl);
-  line-height: var(--leading-display-xl);
+    'opsz' var(--hl-opsz),
+    'SOFT' 0,
+    'WONK' 0;
   text-wrap: balance;
-}
-
-@media (width >= 768px) {
-  .font-display-xl {
-    --axis-opsz: var(--opsz-display-xl);
-  }
-}
-
-.font-display-md {
-  font-family: var(--font-display);
-
-  --axis-opsz: var(--opsz-display-md);
-  --axis-soft: 8;
-  font-weight: var(--font-weight-display-md);
-  letter-spacing: var(--tracking-display-md);
-  line-height: var(--leading-display-md);
-  text-wrap: balance;
-}
-
-.font-display-sm {
-  font-family: var(--font-display);
-
-  --axis-opsz: var(--opsz-display-sm);
-  --axis-soft: 22;
-  font-weight: var(--font-weight-display-sm);
-  letter-spacing: var(--tracking-display-sm);
-  line-height: var(--leading-display-sm);
-  text-wrap: balance;
-}
-
-/* The wonk axis belonged to the Fraunces era and no-ops on Inter Tight.
-   The class remains for any future variable display face. */
-.wonk {
-  --axis-wonk: 1;
 }
 
 /* ── 2 · BODY ─────────────────────────────────────────────────────────────

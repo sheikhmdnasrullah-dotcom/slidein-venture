@@ -47,13 +47,15 @@ test.describe('hero', () => {
     await open(page);
     const h = page.getByTestId('hero-headline');
     await expect(h.locator('.hm-w')).toHaveCount(HOME.tagline.full.split(' ').length);
-    await expect(h.locator('.hm-w--mark')).toHaveCount(HOME.tagline.highlight.split(' ').length);
-    await expect(h.locator('.hm-em__line')).toHaveCount(1);
+    // one continuous marker stroke behind the whole highlighted phrase
+    await expect(h.locator('.hm-mark')).toHaveCount(1);
+    await expect(h.locator('.hm-mark .hm-w')).toHaveCount(HOME.tagline.highlight.split(' ').length);
+    await expect(h.locator('.em-rule')).toHaveCount(1);
     // animation classes are dropped once played, so a re-parent can never replay them
-    await expect(h.locator('.hm-rise, .hm-lay, .hm-strike')).toHaveCount(0);
-    const wash = await h.locator('.hm-w--mark').first().evaluate((el) => getComputedStyle(el, '::before').backgroundColor);
+    await expect(h.locator('.hm-rise, .em-paint, .em-draw')).toHaveCount(0);
+    const wash = await h.locator('.hm-mark').evaluate((el) => getComputedStyle(el, '::before').backgroundColor);
     expect(wash).not.toBe('rgba(0, 0, 0, 0)');
-    const dash = await h.locator('.hm-em__line path').evaluate((el) => getComputedStyle(el).strokeDashoffset);
+    const dash = await h.locator('.em-rule__wipe').first().evaluate((el) => getComputedStyle(el).strokeDashoffset);
     expect(parseFloat(dash)).toBe(0);
   });
 
@@ -217,7 +219,7 @@ test.describe('hero', () => {
     await page.waitForTimeout(300);
     const gap = await page.evaluate(() => {
       const hero = document.querySelector('[data-testid="hero"]')!.getBoundingClientRect();
-      const next = document.querySelector('[data-testid="how-it-works"]')!.getBoundingClientRect();
+      const next = document.querySelector('[data-testid="band-problem"]')!.getBoundingClientRect();
       return Math.round(next.top - hero.bottom);
     });
     expect(Math.abs(gap)).toBeLessThanOrEqual(1);
@@ -259,10 +261,10 @@ test.describe('hero', () => {
     await expect(page.getByTestId('hero-story')).toHaveAttribute('data-mode', 'wide');
     await page.setViewportSize({ width: 800, height: 900 });
     await expect(page.getByTestId('hero-story')).toHaveAttribute('data-mode', 'narrow');
-    await expect(page.locator('.pin-spacer')).toHaveCount(2); // the hero story, then How it works
+    await expect(page.locator('.pin-spacer')).toHaveCount(1); // the hero story alone on this page
     await page.setViewportSize({ width: 1300, height: 900 });
     await expect(page.getByTestId('hero-story')).toHaveAttribute('data-mode', 'wide');
-    await expect(page.locator('.pin-spacer')).toHaveCount(2); // the hero story, then How it works
+    await expect(page.locator('.pin-spacer')).toHaveCount(1); // the hero story alone on this page
   });
 
   test('reduced motion: no pin, finished loop shown', async ({ browser }) => {

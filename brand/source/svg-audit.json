@@ -1,0 +1,308 @@
+[
+ {
+  "f": "logo/compact/slidein-logo-compact-black.svg",
+  "ok": true,
+  "bad": false,
+  "forbid": [],
+  "transforms": 0,
+  "paths": 3,
+  "bytes": 4777
+ },
+ {
+  "f": "logo/compact/slidein-logo-compact-gray.svg",
+  "ok": true,
+  "bad": false,
+  "forbid": [],
+  "transforms": 0,
+  "paths": 5,
+  "bytes": 4883
+ },
+ {
+  "f": "logo/compact/slidein-logo-compact-orange.svg",
+  "ok": true,
+  "bad": false,
+  "forbid": [],
+  "transforms": 0,
+  "paths": 3,
+  "bytes": 4777
+ },
+ {
+  "f": "logo/compact/slidein-logo-compact-reversed.svg",
+  "ok": true,
+  "bad": false,
+  "forbid": [],
+  "transforms": 0,
+  "paths": 5,
+  "bytes": 4889
+ },
+ {
+  "f": "logo/compact/slidein-logo-compact-white.svg",
+  "ok": true,
+  "bad": false,
+  "forbid": [],
+  "transforms": 0,
+  "paths": 3,
+  "bytes": 4768
+ },
+ {
+  "f": "logo/compact/slidein-logo-compact.svg",
+  "ok": true,
+  "bad": false,
+  "forbid": [],
+  "transforms": 0,
+  "paths": 5,
+  "bytes": 4889
+ },
+ {
+  "f": "logo/primary/slidein-logo-horizontal-black.svg",
+  "ok": true,
+  "bad": false,
+  "forbid": [],
+  "transforms": 0,
+  "paths": 3,
+  "bytes": 4792
+ },
+ {
+  "f": "logo/primary/slidein-logo-horizontal-gray.svg",
+  "ok": true,
+  "bad": false,
+  "forbid": [],
+  "transforms": 0,
+  "paths": 5,
+  "bytes": 4898
+ },
+ {
+  "f": "logo/primary/slidein-logo-horizontal-orange.svg",
+  "ok": true,
+  "bad": false,
+  "forbid": [],
+  "transforms": 0,
+  "paths": 3,
+  "bytes": 4792
+ },
+ {
+  "f": "logo/primary/slidein-logo-horizontal-reversed.svg",
+  "ok": true,
+  "bad": false,
+  "forbid": [],
+  "transforms": 0,
+  "paths": 5,
+  "bytes": 4904
+ },
+ {
+  "f": "logo/primary/slidein-logo-horizontal-white.svg",
+  "ok": true,
+  "bad": false,
+  "forbid": [],
+  "transforms": 0,
+  "paths": 3,
+  "bytes": 4783
+ },
+ {
+  "f": "logo/primary/slidein-logo-horizontal.svg",
+  "ok": true,
+  "bad": false,
+  "forbid": [],
+  "transforms": 0,
+  "paths": 5,
+  "bytes": 4904
+ },
+ {
+  "f": "logo/stacked/slidein-logo-stacked-black.svg",
+  "ok": true,
+  "bad": false,
+  "forbid": [],
+  "transforms": 0,
+  "paths": 3,
+  "bytes": 4323
+ },
+ {
+  "f": "logo/stacked/slidein-logo-stacked-gray.svg",
+  "ok": true,
+  "bad": false,
+  "forbid": [],
+  "transforms": 0,
+  "paths": 5,
+  "bytes": 4429
+ },
+ {
+  "f": "logo/stacked/slidein-logo-stacked-orange.svg",
+  "ok": true,
+  "bad": false,
+  "forbid": [],
+  "transforms": 0,
+  "paths": 3,
+  "bytes": 4323
+ },
+ {
+  "f": "logo/stacked/slidein-logo-stacked-reversed.svg",
+  "ok": true,
+  "bad": false,
+  "forbid": [],
+  "transforms": 0,
+  "paths": 5,
+  "bytes": 4435
+ },
+ {
+  "f": "logo/stacked/slidein-logo-stacked-white.svg",
+  "ok": true,
+  "bad": false,
+  "forbid": [],
+  "transforms": 0,
+  "paths": 3,
+  "bytes": 4314
+ },
+ {
+  "f": "logo/stacked/slidein-logo-stacked.svg",
+  "ok": true,
+  "bad": false,
+  "forbid": [],
+  "transforms": 0,
+  "paths": 5,
+  "bytes": 4435
+ },
+ {
+  "f": "logo/symbol/slidein-symbol-black.svg",
+  "ok": true,
+  "bad": false,
+  "forbid": [],
+  "transforms": 0,
+  "paths": 1,
+  "bytes": 538
+ },
+ {
+  "f": "logo/symbol/slidein-symbol-gray.svg",
+  "ok": true,
+  "bad": false,
+  "forbid": [],
+  "transforms": 0,
+  "paths": 3,
+  "bytes": 647
+ },
+ {
+  "f": "logo/symbol/slidein-symbol-orange.svg",
+  "ok": true,
+  "bad": false,
+  "forbid": [],
+  "transforms": 0,
+  "paths": 1,
+  "bytes": 538
+ },
+ {
+  "f": "logo/symbol/slidein-symbol-reversed.svg",
+  "ok": true,
+  "bad": false,
+  "forbid": [],
+  "transforms": 0,
+  "paths": 3,
+  "bytes": 650
+ },
+ {
+  "f": "logo/symbol/slidein-symbol-white.svg",
+  "ok": true,
+  "bad": false,
+  "forbid": [],
+  "transforms": 0,
+  "paths": 1,
+  "bytes": 535
+ },
+ {
+  "f": "logo/symbol/slidein-symbol.svg",
+  "ok": true,
+  "bad": false,
+  "forbid": [],
+  "transforms": 0,
+  "paths": 3,
+  "bytes": 650
+ },
+ {
+  "f": "logo/wordmark/slidein-wordmark-black.svg",
+  "ok": true,
+  "bad": false,
+  "forbid": [],
+  "transforms": 0,
+  "paths": 2,
+  "bytes": 4489
+ },
+ {
+  "f": "logo/wordmark/slidein-wordmark-gray.svg",
+  "ok": true,
+  "bad": false,
+  "forbid": [],
+  "transforms": 0,
+  "paths": 2,
+  "bytes": 4486
+ },
+ {
+  "f": "logo/wordmark/slidein-wordmark-orange.svg",
+  "ok": true,
+  "bad": false,
+  "forbid": [],
+  "transforms": 0,
+  "paths": 2,
+  "bytes": 4489
+ },
+ {
+  "f": "logo/wordmark/slidein-wordmark-reversed.svg",
+  "ok": true,
+  "bad": false,
+  "forbid": [],
+  "transforms": 0,
+  "paths": 2,
+  "bytes": 4489
+ },
+ {
+  "f": "logo/wordmark/slidein-wordmark-white.svg",
+  "ok": true,
+  "bad": false,
+  "forbid": [],
+  "transforms": 0,
+  "paths": 2,
+  "bytes": 4483
+ },
+ {
+  "f": "logo/wordmark/slidein-wordmark.svg",
+  "ok": true,
+  "bad": false,
+  "forbid": [],
+  "transforms": 0,
+  "paths": 2,
+  "bytes": 4489
+ },
+ {
+  "f": "source/slidein-logo-horizontal-master.svg",
+  "ok": true,
+  "bad": false,
+  "forbid": [],
+  "transforms": 0,
+  "paths": 5,
+  "bytes": 7924
+ },
+ {
+  "f": "source/slidein-logo-stacked-master.svg",
+  "ok": true,
+  "bad": false,
+  "forbid": [],
+  "transforms": 0,
+  "paths": 5,
+  "bytes": 7258
+ },
+ {
+  "f": "source/slidein-symbol-master.svg",
+  "ok": true,
+  "bad": false,
+  "forbid": [],
+  "transforms": 0,
+  "paths": 2,
+  "bytes": 1045
+ },
+ {
+  "f": "source/slidein-wordmark-master.svg",
+  "ok": true,
+  "bad": false,
+  "forbid": [],
+  "transforms": 0,
+  "paths": 2,
+  "bytes": 7146
+ }
+]

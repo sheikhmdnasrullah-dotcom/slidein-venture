@@ -22,10 +22,10 @@
   .band { padding-block: 128px; }
 }
 
-.band-flat { background: var(--scaffold-bg); }
+.band-flat { background: transparent; }
 
 .band-soft {
-  background: var(--scaffold-panel);
+  background: rgb(246 243 237 / 52%);
   border-block: 1px solid var(--scaffold-hairline);
 }
 
@@ -33,7 +33,10 @@
    white at 10%, and the type primitives pick up light inks — all through
    the same --scaffold-* names, so no component needs to know. */
 .band-dark {
-  background: rgb(15 15 15 / 100%);
+  background-color: rgb(15 15 15 / 96%);
+  background-image:
+    radial-gradient(ellipse 68% 36% at 50% 0%, rgb(255 98 0 / 5.5%), transparent 72%),
+    radial-gradient(ellipse 62% 34% at 50% 100%, rgb(255 98 0 / 4%), transparent 72%);
 
   --scaffold-skeleton: rgb(255 255 255 / 12%);
   --scaffold-hairline: rgb(255 255 255 / 10%);
@@ -259,11 +262,11 @@
   to { left: calc(100% - 28px); }
 }
 
+/* Scanned rows earn a whisper of wash as the line passes — hover-only. */
 .cap-well:hover .cap-scan {
   animation: cap-scan-sweep 1.5s var(--ease-expo) 1;
 }
 
-/* Scanned rows earn a whisper of wash as the line passes — hover-only. */
 .cap-well .cap-row {
   transition: background-color 0.4s var(--ease-expo);
   border-radius: var(--radius-sm);

@@ -147,7 +147,7 @@ export function HowItWorks() {
       <div className="hw-top">
         <div className="hw-title">
           <i aria-hidden="true" />
-          <h2>How it works</h2>
+          <h2 className="font-display-sm">How it works</h2>
           <span ref={countRef} className="hw-count" aria-hidden="true">01 / 08</span>
         </div>
         <nav className="hw-rail" aria-label="Steps">

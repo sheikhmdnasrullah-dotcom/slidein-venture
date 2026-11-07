@@ -12,6 +12,7 @@
    tone layer so its --page-fill override (flat #FDFDFD) wins at :root. */
 @import "./styles/assemble.css";
 /* Hero: type-first headline, actions, stage plate. */
+@import "./styles/emphasis.css";
 @import "./styles/hero.css";
 /* Fragment faces (.cv-*) used by the hero story. */
 @import "./styles/convergence.css";
@@ -20,9 +21,11 @@
 @import "./styles/story.css";
 
 /* Orbit section: rings, comets, beams, ripples. */
-@import "./styles/orbit.css";
 @import "./styles/playbook.css";
+@import "./styles/orbit.css";
 @import "./styles/backdrops.css";
+@import "./styles/navbar.css";
+@import "./styles/howitworks.css";
 /* Section shells + scene vocabulary for the bands below the hero. */
 @import "./styles/sections.css";
 @import "./styles/story-home.css";
@@ -33,9 +36,6 @@
 @import "../how-it-works-video/styles/video-player.css";
 @import "lenis/dist/lenis.css";
 @import "tw-animate-css";
-/* layer() keeps xyflow in the base cascade. Wrapping an @import inside
-   `@layer base { ... }` is an invalid at-rule position in CSS. */
-@import "@xyflow/react/dist/style.css" layer(base);
 @import "shadcn/tailwind.css";
 
 /* The site has ONE theme — paper. Sections vary by TONE, never by theme.
@@ -290,36 +290,8 @@ body {
 
      These live in @layer base so the real role classes (unlayered) win when
      both are present on an element. */
-  .display-headline {
-    font-family: var(--font-display);
-
-    --axis-opsz: var(--opsz-display-md);
-    --axis-soft: 8;
-    font-variation-settings:
-      'opsz' var(--axis-opsz),
-      'SOFT' var(--axis-soft),
-      'WONK' var(--axis-wonk);
-    font-weight: var(--font-weight-display-md);
-    letter-spacing: var(--tracking-display-md);
-    line-height: var(--leading-display-md);
-    text-wrap: balance;
-  }
-
-  .section-headline {
-    font-family: var(--font-display);
-
-    --axis-opsz: var(--opsz-display-sm);
-    --axis-soft: 22;
-    font-variation-settings:
-      'opsz' var(--axis-opsz),
-      'SOFT' var(--axis-soft),
-      'WONK' var(--axis-wonk);
-    font-weight: var(--font-weight-display-sm);
-    letter-spacing: var(--tracking-display-sm);
-    line-height: var(--leading-display-sm);
-    text-wrap: balance;
-  }
-
+  /* .display-headline and .section-headline now live in styles/type.css as
+     part of the single headline stack. */
   .body-copy {
     font-family: var(--font-sans);
     font-weight: var(--font-weight-body);
