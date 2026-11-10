@@ -1,22 +1,18 @@
 import Hero from '@/components/Hero/Hero';
 import ProblemSection from '@/components/Sections/ProblemSection';
-import CapabilitiesSection from '@/components/Sections/CapabilitiesSection';
-import ManagedSection from '@/components/Sections/ManagedSection';
-import ControlSection from '@/components/Sections/ControlSection';
-import UseCasesSection from '@/components/Sections/UseCasesSection';
-import ClosingSection from '@/components/Sections/ClosingSection';
+import WorkflowStages from '@/components/Sections/WorkflowStages';
+import ServerBoundarySection from '@/components/Sections/ServerBoundarySection';
 import SiteFooter from '@/components/Sections/SiteFooter';
 
+/* Headline, then the playbook it all starts from, then the seven stages one
+   by one, then where it runs. */
 export default function Home() {
   return (
     <>
       <Hero />
       <ProblemSection />
-      <CapabilitiesSection />
-      <ManagedSection />
-      <ControlSection />
-      <UseCasesSection />
-      <ClosingSection />
+      <WorkflowStages />
+      <ServerBoundarySection />
       <SiteFooter />
     </>
   );

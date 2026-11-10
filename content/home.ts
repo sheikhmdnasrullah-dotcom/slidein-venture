@@ -17,7 +17,7 @@ export const NAV_SLOTS = {
   /* Navigation links and dark CTA button */
   links: [
     { label: 'Process', href: '/process' },
-    { label: 'Insights', href: '/insights' },
+    { label: 'Use Cases', href: '/use-cases' },
     { label: 'Pricing', href: '/pricing' },
   ],
   cta: { label: 'Connect', href: '/contact' },
@@ -46,7 +46,7 @@ export const ARCHIVED_HEADLINES = {
 export const HOME = {
   /* The hero tagline requested by the owner */
   tagline: {
-    lead: 'Hyper-Personalised Emails',
+    lead: '',
     highlight: 'at Scale.',
     full: 'Hyper-Personalised Emails at Scale.',
   },
@@ -90,7 +90,13 @@ export const HOME = {
     primaryHref: '/contact', // the existing conversion URL
     secondaryHref: '/process',
   },
-  icpTagline: 'Everything gets started with preparing the Master Business Playbook',
+  /* The three hero lines; the word at the end of line 2 rotates (needs / behavior / intent). */
+  heroLines: {
+    line1: 'An agentic system that',
+    line2: "analyzes each customer's",
+    line3: 'and sends hyper-personalized emails at scale.',
+  },
+  icpTagline: 'Everything starts with preparing your Master Business Playbook',
   persistentKnowledgeTagline:
     'to a persistent knowledge from the master playbook that evolves every time you interact with it.',
   playbookHeadlines: {
@@ -100,10 +106,10 @@ export const HOME = {
     scene4: 'Persistent Knowledge',
   },
   playbookCaptions: {
-    scene1: 'From scattered business information',
-    scene2: 'to preparing offers and Ideal Client Profile',
-    scene3: 'to organized Master Playbook, which has all the context about your business',
-    scene4: 'to a persistent knowledge from the master playbook that evolves every time you interact with it.',
+    scene1: 'Your business details, scattered across files and people.',
+    scene2: 'Sorted into clear offers and an ideal client profile.',
+    scene3: 'One playbook that holds the full context of your business.',
+    scene4: 'Knowledge that grows every time you use it.',
   },
   multiAgentTitle: 'Multi-Agent Orchestration',
   /* The agentic dashboard's tagline, rendered as the dashboard section
@@ -135,6 +141,8 @@ export type HomeSection = {
     | 'closing';
   eyebrow: string;
   title: string;
+  /* Optional phrase inside `title` that carries the brand marker stroke. */
+  emphasis?: string;
   lead: string;
   /* One entry per repeated element in the section. */
   items: { title: string; body: string }[];
@@ -157,39 +165,21 @@ export const HOME_CONTENT: {
       eyebrow: '',
       title: '',
       lead: '',
-      items: [
-        { title: '', body: '' },
-        { title: '', body: '' },
-        { title: '', body: '' },
-        { title: '', body: '' },
-        { title: '', body: '' },
-      ],
+      items: [],
     },
     {
       id: 'workflow',
       eyebrow: '',
       title: '',
       lead: '',
-      items: [
-        { title: '', body: '' },
-        { title: '', body: '' },
-        { title: '', body: '' },
-        { title: '', body: '' },
-        { title: '', body: '' },
-      ],
+      items: [],
     },
     {
       id: 'platform',
       eyebrow: '',
       title: '',
       lead: '',
-      items: [
-        { title: '', body: '' },
-        { title: '', body: '' },
-        { title: '', body: '' },
-        { title: '', body: '' },
-        { title: '', body: '' },
-      ],
+      items: [],
     },
     {
       id: 'capabilities',
@@ -197,20 +187,21 @@ export const HOME_CONTENT: {
       title: '',
       lead: '',
       items: [
-        { title: '', body: '' },
-        { title: '', body: '' },
-        { title: '', body: '' },
-        { title: '', body: '' },
+        { title: 'Qualify', body: 'Evaluate each prospect against your criteria and match them to a relevant offer, with reasons recorded.' },
+        { title: 'Personalize', body: 'Create a one-to-one email draft, linking personalized lines to the research that supports them.' },
+        { title: 'Outreach', body: 'Check each message against sending safeguards. If a required check fails, the message is held instead of sent.' },
+        { title: 'Converse', body: 'Connect incoming replies to their original conversations, classify intent, and feed opt-outs into suppression.' },
       ],
     },
     {
       id: 'managed',
       eyebrow: '',
-      title: '',
+      title: 'Same platform. Two ways to run it.',
+      emphasis: 'Two ways',
       lead: '',
       items: [
-        { title: '', body: '' },
-        { title: '', body: '' },
+        { title: 'Run it yourself', body: 'You operate the workflow inside the platform.' },
+        { title: 'We run it for you', body: 'Our team configures and operates the workflow for you.' },
       ],
     },
     {
@@ -229,45 +220,25 @@ export const HOME_CONTENT: {
     {
       id: 'use-cases',
       eyebrow: '',
-      title: '',
+      title: 'Built for outreach that cannot be automated into a template',
+      emphasis: 'cannot be automated',
       lead: '',
-      items: [
-        { title: '', body: '' },
-        { title: '', body: '' },
-        { title: '', body: '' },
-      ],
+      items: [],
     },
     {
       id: 'closing',
       eyebrow: '',
-      title: '',
+      title: 'See the platform, or let us run it.',
+      emphasis: 'let us run it',
       lead: '',
       items: [],
-      cta: { label: '', href: '/contact' },
+      cta: { label: 'Connect', href: '/contact' },
     },
   ],
   footer: {
     columns: [
-      {
-        heading: '',
-        links: [
-          { label: '', href: '/process' },
-          { label: '', href: '/insights' },
-          { label: '', href: '/pricing' },
-        ],
-      },
-      {
-        heading: '',
-        links: [
-          { label: '', href: '/process' },
-          { label: '', href: '/insights' },
-          { label: '', href: '/pricing' },
-        ],
-      },
-      {
-        heading: '',
-        links: [{ label: '', href: '/contact' }],
-      },
+      { heading: '', links: [{ label: 'Process', href: '/process' }, { label: 'Use Cases', href: '/use-cases' }, { label: 'Pricing', href: '/pricing' }] },
+      { heading: '', links: [{ label: 'Connect', href: '/contact' }] },
     ],
   },
 };

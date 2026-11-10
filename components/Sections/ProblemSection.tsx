@@ -12,7 +12,7 @@
 import { cn } from '@/lib/utils';
 import { HOME_CONTENT } from '@/content/home';
 import { BAND_DISORDER } from '@/content/stages';
-import { PlaybookStory } from '@/components/Playbook/PlaybookStory';
+import { PlaybookSimple } from '@/components/Playbook/PlaybookSimple';
 import {
   Band,
   ItemSlot,
@@ -25,7 +25,7 @@ export default function ProblemSection() {
   return (
     <Band id={section.id} disorder={BAND_DISORDER.problem}>
       <div className="section-visual w-full">
-        <PlaybookStory />
+        <PlaybookSimple />
       </div>
 
       {/* the five pain slots — one hairline-separated ledger row */}

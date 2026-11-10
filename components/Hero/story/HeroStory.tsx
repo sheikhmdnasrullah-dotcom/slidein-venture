@@ -32,7 +32,9 @@ import { RAW } from '../convergence/layout';
 import { StoryStage } from './StoryStage';
 import {
   ACT_BOUNDS,
+  CAPTIONS,
   T,
+  beatAt,
   WORD_ORDER,
   actAt,
   activeStage,
@@ -130,6 +132,7 @@ export function HeroStory() {
     const progressFill = wrap.querySelector<HTMLElement>('.hs-progress__fill');
     const ticks = Array.from(wrap.querySelectorAll<HTMLElement>('.hs-progress__tick'));
     const cue = wrap.querySelector<HTMLElement>('.hs-cue');
+    const caps = Array.from(wrap.querySelectorAll<HTMLElement>('.hs-cap'));
 
     const n0 = g.nodes[0];
     const n6 = g.nodes[6];
@@ -431,6 +434,9 @@ export function HeroStory() {
         gate.setAttribute('data-open', String(gateOpenAt(p)));
         slot.toggleAttribute('data-booked', bookedAt(p));
         ticks.forEach((t, i) => t.setAttribute('data-on', String(p >= ACT_STARTS[i] + (i === 0 ? 0 : 0.0001))));
+        /* the caption for this beat; the ones before it leave upward, the ones after wait below */
+        const b = beatAt(p);
+        caps.forEach((c, i) => c.setAttribute('data-state', i < b ? 'past' : i === b ? 'on' : 'next'));
       };
 
       if (still) {
@@ -534,6 +540,13 @@ export function HeroStory() {
   return (
     <div ref={wrapRef} className="hs-wrap hm-in" style={{ '--i': 3 } as React.CSSProperties}>
       <StoryStage key={mode} mode={mode} />
+      <div className="hs-caps" aria-live="polite">
+        {CAPTIONS.map((c, i) => (
+          <p key={c.lead} className="hs-cap" data-state={i === 0 ? 'on' : 'next'}>
+            <b>{c.lead}</b> {c.text}
+          </p>
+        ))}
+      </div>
       <div className="hs-cue" aria-hidden="true" />
       <div className="hs-progress" aria-hidden="true">
         <i className="hs-progress__rail" />

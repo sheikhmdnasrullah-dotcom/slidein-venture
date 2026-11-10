@@ -64,6 +64,23 @@ export function BackgroundWallpaper() {
     return () => mq.removeEventListener('change', onMqChange);
   }, []);
 
+  /* Home: the floating objects belong to the hero. They fade out as it scrolls
+     away so they never sit behind the playbook and stage text. */
+  useEffect(() => {
+    const el = rootRef.current;
+    if (!el || routeProfile !== 'home') return;
+    const apply = () => {
+      const t = Math.min(1, Math.max(0, window.scrollY / (window.innerHeight * 0.6)));
+      el.style.opacity = String(1 - t * 0.92);
+    };
+    apply();
+    window.addEventListener('scroll', apply, { passive: true });
+    return () => {
+      window.removeEventListener('scroll', apply);
+      el.style.opacity = '';
+    };
+  }, [routeProfile]);
+
   useEffect(() => {
     const el = rootRef.current;
     if (!el) return;

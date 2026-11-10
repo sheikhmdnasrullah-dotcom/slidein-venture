@@ -215,3 +215,32 @@ export function dossierPos(g: Geometry, tx: number, ty: number): Pt {
   }
   return { x: tx + dx, y: Math.min(g.H - h - 12, Math.max(72, ty + dy)) };
 }
+
+/* ── The narration: one line under the stage for every beat of the story ──
+   Problem, the guide, the seven stages with the approval in its real place,
+   then the result. Plain words; the lead names the beat. */
+export const CAPTIONS = [
+  { lead: 'The problem.', text: 'What you know about your customers is scattered across files, tools and people.' },
+  { lead: 'One playbook.', text: 'SlideIn pulls it into one place it can work from.' },
+  { lead: 'Configure.', text: 'You set your offers, your ideal customer and your rules once.' },
+  { lead: 'Discover.', text: 'It finds people who fit, from your own records and lawful sources.' },
+  { lead: 'Research.', text: 'It reads what each person has said in public and keeps the source of every fact.' },
+  { lead: 'Qualify.', text: 'Each one is scored against your ideal customer. Only strong fits move on.' },
+  { lead: 'Personalize.', text: 'It writes one email from that person’s own research. No templates.' },
+  { lead: 'Your approval.', text: 'You approve the campaign. Nothing is sent until you do.' },
+  { lead: 'Outreach.', text: 'It sends from your own domain, once every safety check has passed.' },
+  { lead: 'Converse.', text: 'Replies are sorted by intent, and interested people book a meeting.' },
+  { lead: 'It learns.', text: 'Every result goes back into the playbook, so the next run starts sharper.' },
+] as const;
+
+/** Which caption belongs to progress p. */
+export function beatAt(p: number): number {
+  if (p < T.convergeStart) return 0;
+  if (p < stageTime(0) - 0.02) return 1;
+  if (p >= T.loop[0]) return 10;
+  const a = activeStage(p) ?? 0;
+  if (a >= 6) return 9;
+  if (a === 5) return 8;
+  if (p >= T.approve[0]) return 7;
+  return 2 + a;
+}

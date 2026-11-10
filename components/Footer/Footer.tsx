@@ -63,7 +63,7 @@ export default function Footer() {
               <FooterLink href="/pricing">Pricing</FooterLink>
             </li>
             <li>
-              <FooterLink href="/insights">Insights</FooterLink>
+              <FooterLink href="/use-cases">Use Cases</FooterLink>
             </li>
             <li>
               <FooterLink href="/contact">Contact</FooterLink>

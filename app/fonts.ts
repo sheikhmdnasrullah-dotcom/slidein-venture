@@ -13,8 +13,7 @@
  * --font-sans, --font-mono) map onto them in app/globals.css.
  */
 
-import { Fraunces, JetBrains_Mono } from 'next/font/google';
-import localFont from 'next/font/local';
+import { Fraunces, Geist, Geist_Mono } from 'next/font/google';
 
 /* ── Display ──────────────────────────────────────────────────────────────
    axes are opt-in: without this array next/font ships wght only and
@@ -29,34 +28,21 @@ export const displayFace = Fraunces({
 });
 
 /* ── Body ─────────────────────────────────────────────────────────────────
-   Fontshare variable TTFs subset to latin + punctuation + currency + arrows
-   and compressed to woff2. Located in app/fonts/Switzer-Variable-subset.woff2. */
-export const bodyFace = localFont({
-  src: [
-    {
-      path: './fonts/Switzer-Variable-subset.woff2',
-      style: 'normal',
-      weight: '100 900',
-    },
-    {
-      path: './fonts/Switzer-VariableItalic-subset.woff2',
-      style: 'italic',
-      weight: '100 900',
-    },
-  ],
+   Geist (variable, 100–900) — the face behind the Diffusion Studio design
+   system this site now follows (see references/diffusion-studio-analysis).
+   The weights it uses (470 body-headings, 400 text) need the variable axis. */
+export const bodyFace = Geist({
+  subsets: ['latin'],
   display: 'swap',
   variable: '--font-face-body',
   fallback: ['system-ui', 'arial'],
-  adjustFontFallback: 'Arial',
 });
 
 /* ── Mono ─────────────────────────────────────────────────────────────────
-   400/500 only. Anything heavier stops reading as system metadata. */
-export const monoFace = JetBrains_Mono({
+   Geist Mono — labels, coordinates, timestamps. Never body. */
+export const monoFace = Geist_Mono({
   subsets: ['latin'],
   display: 'swap',
   variable: '--font-face-mono',
-  weight: ['400', '500'],
   fallback: ['ui-monospace', 'SFMono-Regular', 'monospace'],
 });
-

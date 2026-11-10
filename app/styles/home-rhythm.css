@@ -1,0 +1,35 @@
+/* HOME RHYTHM: one type scale for the whole page, so a size means one thing.
+     display  hero headline and section titles
+     title    the name of each workflow step
+     card     card titles
+     lead     the line under a step name
+   Spacing steps are shared too: sections breathe the same amount everywhere. */
+:root {
+  --t-display: clamp(2.25rem, 1rem + 3.2vw, 3.5rem);
+  --t-title: clamp(2rem, 1rem + 2.2vw, 2.75rem);
+  --t-card: clamp(1.25rem, 0.9rem + 0.9vw, 1.625rem);
+  --t-lead: clamp(1.0625rem, 0.95rem + 0.4vw, 1.25rem);
+  --s-section: clamp(72px, 9vh, 96px);
+}
+
+/* titles */
+.hm-h1, .hm-h1 > * { font-size: var(--t-display) !important; line-height: 1.1 !important; }
+.section-head :is(h1, h2) { font-size: var(--t-display) !important; line-height: 1.1 !important; letter-spacing: -0.035em; }
+.sb-h { font-size: var(--t-display); line-height: 1.1; letter-spacing: -0.035em; font-weight: 600; max-width: 14em; }
+.wf-row .dx-split-h span { font-size: var(--t-title); letter-spacing: -0.04em; }
+.wf-row .dx-split-h { font-size: var(--t-lead); line-height: 1.42; max-width: 19em; }
+.pbx-copy h3 { font-size: var(--t-card); }
+.pbx-copy p { font-size: 1rem; }
+
+/* spacing: sections and rows share one step */
+main > .band { padding-block: var(--s-section); }
+main > .band + .band { padding-top: 0; }
+main > .hm-hero + .band { padding-top: 24px; }
+.wf-rows { gap: var(--s-section); padding-top: 0; }
+.sb { gap: clamp(28px, 4vw, 48px); }
+.pbx-flow { margin-top: clamp(32px, 4vw, 48px); }
+
+/* pictures: one plate size across the steps so no visual is a different weight */
+.wf-row .wf-stage { min-height: clamp(300px, 30vw, 380px); }
+.wf-row .wf-stage > * { max-width: 520px; }
+.wf-row[data-layout="dark"] .wf-stage { min-height: 0; }

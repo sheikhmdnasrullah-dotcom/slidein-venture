@@ -72,3 +72,4 @@ public/_next-video
 /playwright-report/
 /.playwright/
 .next/analyze/
+.ref/

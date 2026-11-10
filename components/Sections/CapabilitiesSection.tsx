@@ -332,7 +332,7 @@ export default function CapabilitiesSection() {
   const [scan, compose, queue, reply] = section.items;
 
   return (
-    <Band tone="soft" id={section.id} disorder={BAND_DISORDER.capabilities}>
+    <Band tone="flat" id={section.id} disorder={BAND_DISORDER.capabilities}>
       <SectionHeader section={section} align="center" />
 
       <Reveal className="section-visual" y={16}>

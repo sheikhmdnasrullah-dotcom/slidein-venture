@@ -41,16 +41,16 @@ const T3 = rawRecords[0];
 function S1() {
   return (
     <div className="hw-s" data-s="1">
-      <div className="hw-card s1-sheet" style={P(160, 160, 960, 400)}>
-        <svg className="s1-border" viewBox="0 0 960 400" aria-hidden="true">
-          <rect x="0.5" y="0.5" width="959" height="399" rx="16" pathLength={1} />
+      <div className="hw-card s1-sheet" style={P(160, 184, 960, 352)}>
+        <svg className="s1-border" viewBox="0 0 960 352" aria-hidden="true">
+          <rect x="0.5" y="0.5" width="959" height="351" rx="12" pathLength={1} />
         </svg>
-        <div className="s1-col" style={P(32, 32, 288)}>
+        <div className="s1-col s1-col--div" style={P(32, 32, 288)}>
           <p className="hw-lab">Business</p>
           <p className="s1-name">{business.name}</p>
           <p className="s1-line">{business.line}</p>
         </div>
-        <div className="s1-col" style={P(336, 32, 288)}>
+        <div className="s1-col s1-col--div" style={P(336, 32, 288)}>
           <p className="hw-lab">Offers</p>
           {business.offers.map((o, i) => {
             const G = GLYPH[i];
@@ -67,7 +67,7 @@ function S1() {
             <span key={c} className="hw-chip s1-chip">{c}</span>
           ))}
         </div>
-        <div className="s1-foot" style={{ left: 32, right: 32, bottom: 28 }}>
+        <div className="s1-foot" style={{ left: 32, right: 32, bottom: 24 }}>
           <span className="hw-tag hw-tag--ink s1-ver" data-m="s1-ver">{business.profile}</span>
           <button type="button" tabIndex={-1} className="hw-btn s1-save" data-m="s1-save">
             <span className="s1-save-a">Save setup</span>
@@ -107,7 +107,7 @@ function S2() {
         <p>{r1.source} · {r1.meta}</p>
         <p>{r2.source} · {r2.meta}</p>
       </div>
-      <p className="s2-count" style={P(280, 600)}>
+      <p className="s2-count" style={P(280, 428)}>
         <b data-c="rec">3</b> records, <b data-c="pro">2</b> prospects
       </p>
       <Thr />
@@ -127,9 +127,8 @@ function S3() {
   );
   return (
     <div className="hw-s" data-s="3">
-      <div className="hw-card s3-win" style={P(400, 112, 480, 488)}>
+      <div className="hw-card s3-win" style={P(400, 112, 480, 420)}>
         <div className="s3-bar">
-          <i /><i /><i />
           <span className="s3-url hw-mono">calloway.io/podcast/41</span>
         </div>
         <div className="s3-page">
@@ -208,7 +207,7 @@ function S5() {
           <span className="s3-dom hw-mono">{f.source}</span>
         </div>
       ))}
-      <div className="hw-card s5-comp" style={P(448, 96, 768, 528)}>
+      <div className="hw-card s5-comp" style={P(448, 96, 768, 448)}>
         <div className="s5-field"><span className="hw-mono">To</span><b className="s5-to">{email.to}</b></div>
         <div className="s5-field"><span className="hw-mono">Subject</span><b className="s5-sub">{email.subject}</b></div>
         <div className="s5-body">
@@ -295,8 +294,8 @@ function S7() {
           {n}
         </div>
       ))}
- <i className="s7-ev s7-ev0" /><i className="s7-ev s7-ev1" />
-      <div className="hw-card s7-sup" style={P(920, 424, 296, 200)} data-m="sup">
+      <i className="s7-ev s7-ev0" /><i className="s7-ev s7-ev1" />
+      <div className="hw-card s7-sup" style={P(920, 384, 296, 128)} data-m="sup">
         <p className="hw-lab">Suppression</p>
         <div className="s7-sr">
           <b>daniel@fernhill.ai</b>
@@ -319,7 +318,6 @@ function S8() {
         {ledger.map(([t, x], i) => (
           <div key={t} className={`s8-r s8-r${i}`} data-m={`lr${i}`}>
             <span className="hw-mono">{t}</span>
-            <i />
             <span>{x}</span>
           </div>
         ))}
@@ -366,7 +364,6 @@ export function Persist() {
   return (
     <>
       <div className="hw-hud" style={P(64, 40)} data-m="hud" aria-hidden="true">
-        <i className="hw-hud-bead" />
         <b>{business.profile}</b>
         <span className="hw-tag hw-tag--ink">Saved</span>
         <span className="hw-tag hw-tag--next" data-m="hud-next">Next run</span>

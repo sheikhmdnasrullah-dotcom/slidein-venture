@@ -14,7 +14,6 @@
  */
 
 import { cn } from '@/lib/utils';
-import { Bar } from '@/components/Hero/Skeleton';
 
 type Align = 'left' | 'center';
 
@@ -25,8 +24,6 @@ const alignClass: Record<Align, string> = {
 
 function Slot({
   text,
-  barWidth,
-  className,
   children,
 }: {
   text: string;
@@ -35,8 +32,7 @@ function Slot({
   children: (text: string) => React.ReactNode;
 }) {
   if (text) return <>{children(text)}</>;
-  if (!barWidth) return null;
-  return <Bar width={barWidth} className={className} />;
+  return null;
 }
 
 /* ─── Heading ─────────────────────────────────────────────────────────── */
@@ -61,6 +57,7 @@ export function Heading({
   variant,
   as,
   text,
+  emphasis,
   barWidth,
   align = 'left',
   className,
@@ -68,13 +65,15 @@ export function Heading({
   variant: HeadingVariant;
   as?: HeadingTag;
   text: string;
+  /** Phrase inside `text` that carries the brand marker stroke. */
+  emphasis?: string;
   barWidth?: string;
   align?: Align;
   className?: string;
 }) {
   const Tag = as ?? headingTag[variant];
   const v = headingVar[variant];
-  const isDisplay = variant === 'display' || variant === 'h2';
+  const isDisplay = variant === 'display';
   return (
     <Slot text={text} barWidth={barWidth} className={cn(alignClass[align], className)}>
       {(t) => (
@@ -89,7 +88,15 @@ export function Heading({
             color: 'var(--scaffold-ink)',
           }}
         >
-          {t}
+          {emphasis && t.includes(emphasis) ? (
+            <>
+              <span style={{ color: 'var(--scaffold-muted)' }}>{t.slice(0, t.indexOf(emphasis))}</span>
+              <span className="em-mark em-strong">{emphasis}</span>
+              <span style={{ color: 'var(--scaffold-muted)' }}>{t.slice(t.indexOf(emphasis) + emphasis.length)}</span>
+            </>
+          ) : (
+            t
+          )}
         </Tag>
       )}
     </Slot>
@@ -188,10 +195,10 @@ export function Eyebrow({
         <Tag
           className={cn(alignClass[align], className)}
           style={{
-            fontFamily: 'var(--font-mono), monospace',
-            fontSize: '12px',
-            fontWeight: 500,
-            letterSpacing: '0.12em',
+            fontFamily: 'var(--font-sans), sans-serif',
+            fontSize: 'var(--scaffold-eyebrow-size)',
+            fontWeight: 'var(--scaffold-eyebrow-weight)',
+            letterSpacing: 'var(--scaffold-eyebrow-tracking)',
             textTransform: 'uppercase',
             color: 'var(--scaffold-accent, var(--accent, #E05A1B))',
           }}

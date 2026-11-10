@@ -10,7 +10,7 @@ import { cn } from "@/lib/utils";
 export const metadata: Metadata = {
   title: "SlideIn",
   description:
-    "Software to research prospects, prepare personalized email, send with a controlled workflow, and monitor delivery — with a managed service for teams that would rather we run it.",
+    "SlideIn researches each customer, writes a personal email for each one, and sends at scale from your own domain.",
   /* Brand icons live in /public (source + build: brand/favicon). Declared here, once, so
      there is no second favicon source: app/icon.svg was removed on purpose.
      ?v= busts browser favicon caches that still hold the old wordmark chip. */

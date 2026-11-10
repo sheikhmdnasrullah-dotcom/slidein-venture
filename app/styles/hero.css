@@ -21,6 +21,7 @@
   position: relative;
   display: flex;
   flex-direction: column;
+  justify-content: center;
   height: 100svh;
   min-height: 600px;
   box-sizing: border-box;
@@ -44,7 +45,7 @@
   margin-inline: auto;
   display: grid;
   grid-template-columns: minmax(0, 1fr);
-  margin-bottom: clamp(1.25rem, 5.5vh, 3.5rem); /* air between the headline and the story */
+  margin-bottom: 0;
 }
 
 /* ── Headline: typeset by the shared .font-display-xl stack (type.css); this rule only
@@ -168,3 +169,4 @@
     transform: none;
   }
 }
+

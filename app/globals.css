@@ -36,6 +36,10 @@
 @import "../how-it-works-video/styles/video-player.css";
 @import "lenis/dist/lenis.css";
 @import "tw-animate-css";
+@import "./styles/diffusion-day.css";
+@import "./styles/home-fixes.css";
+@import "./styles/home-rhythm.css";
+@import "./styles/navbar-refine.css";
 @import "shadcn/tailwind.css";
 
 /* The site has ONE theme — paper. Sections vary by TONE, never by theme.

@@ -10,61 +10,107 @@
  * hero) can never replay it.
  */
 
-import { useEffect, useRef } from 'react';
-import { HeroStory } from './story/HeroStory';
-import { HandRule } from '@/components/Typography/HandRule';
+import { useEffect, useRef, useState } from 'react';
+import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import { HOME } from '@/content/home';
 import { BAND_DISORDER } from '@/content/stages';
 
-type Css = React.CSSProperties;
+const WORDS = ['needs', 'behavior', 'intent'] as const;
+const EASE_WORD = [0.65, 0, 0.35, 1] as const; // ease-in-out
+const EASE_OUT = [0.22, 1, 0.36, 1] as const;
+const MOVE_S = 0.45;
+const HOLD_MS = 2000;
+const FIRST_CHANGE_MS = 3000; // entrance (~1.6s) + one full hold
 
-/** One word, in its own rising mask. */
-function Word({ text, w }: { text: string; w: number }) {
+/** Entrance for a line: small rise + fade. */
+const rise = (delay: number, reduce: boolean | null) => ({
+  initial: reduce ? false : { opacity: 0, y: 16 },
+  animate: { opacity: 1, y: 0 },
+  transition: { duration: 0.55, delay, ease: EASE_OUT },
+});
+
+/**
+ * Inline vertical word rotator. The slot is as wide as "behavior" so nothing
+ * around it moves; the word is the one orange thing on the first line pair.
+ */
+function Rotator() {
+  const reduce = useReducedMotion();
+  const [i, setI] = useState(0);
+
+  useEffect(() => {
+    if (reduce) return;
+    let timer: ReturnType<typeof setTimeout>;
+    const next = (delay: number) => {
+      timer = setTimeout(() => {
+        setI((n) => (n + 1) % WORDS.length);
+        next(HOLD_MS + MOVE_S * 1000);
+      }, delay);
+    };
+    next(FIRST_CHANGE_MS);
+    return () => clearTimeout(timer);
+  }, [reduce]);
+
   return (
-    <span className="hm-w hm-rise" style={{ '--w': w } as Css}>
-      <span className="hm-w__in">{text}</span>
+    <span
+      className="relative inline-block overflow-hidden align-bottom"
+      style={{ padding: '0.04em 0.02em 0.16em', margin: '-0.04em -0.02em -0.16em' }}
+    >
+      <span className="invisible" aria-hidden="true">
+        behavior
+      </span>
+      <AnimatePresence initial={true}>
+        <motion.span
+          key={WORDS[i]}
+          className="absolute left-0"
+          style={{ top: '0.04em', color: 'var(--color-brand)' }}
+          initial={reduce ? false : { y: '110%' }}
+          animate={{ y: 0, transition: { duration: MOVE_S, ease: EASE_WORD, delay: i === 0 && !reduce ? 0.35 : 0 } }}
+          exit={{ y: '-110%', transition: { duration: MOVE_S, ease: EASE_WORD, delay: 0 } }}
+        >
+          {WORDS[i]}
+        </motion.span>
+      </AnimatePresence>
     </span>
   );
 }
 
+/* All three lines at full ink so nothing is faint. The orange word and the one marker carry the emphasis. */
 function Headline() {
-  const { lead, highlight, full } = HOME.tagline;
-  const leadWords = lead.split(' ');
-  const tailWords = highlight.split(' ');
-  // The first word of the lead carries the hand-drawn underline.
-  const emFrom = 0;
-
-  const leadNodes: React.ReactNode[] = [];
-  for (let i = 0; i < leadWords.length; i++) {
-    if (i === emFrom) {
-      leadNodes.push(
-        <span className="hm-em em-draw" key={`em-${i}`}>
-          <Word text={leadWords[i]} w={i} />
-          <HandRule />
-        </span>,
-      );
-    } else {
-      leadNodes.push(<Word key={i} text={leadWords[i]} w={i} />);
-    }
-    if (i < leadWords.length - 1) leadNodes.push(' ');
-  }
+  const reduce = useReducedMotion();
+  const { line1, line2, line3 } = HOME.heroLines;
+  const marked = line3.match(/^(.*?)(hyper-personalized)(.*)$/);
 
   return (
-    <h1 data-testid="hero-headline" className="hm-h1 font-display-xl" aria-label={full}>
-      <span className="hm-h1__lead" aria-hidden="true">
-        {leadNodes}
-      </span>{' '}
-      <span className="hm-h1__tail" aria-hidden="true">
-        {/* one continuous marker stroke behind the whole phrase */}
-        <span className="hm-mark em-mark em-paint">
-          {tailWords.map((t, i) => (
-            <span key={i}>
-              <Word text={t} w={leadWords.length + i} />
-              {i < tailWords.length - 1 ? ' ' : null}
+    <h1
+      data-testid="hero-headline"
+      className="hm-h1 font-display-xl"
+      aria-label={`${line1} ${line2} ${WORDS[0]} ${line3}`}
+      style={{
+        fontSize: 'clamp(2rem, 0.9rem + 3.5vw, 3.75rem)',
+        lineHeight: 1.1,
+        maxWidth: '20em',
+        marginInline: 'auto',
+      }}
+    >
+      <motion.span className="hm-h1__lead" aria-hidden="true" {...rise(0.05, reduce)}>
+        {line1}
+      </motion.span>
+      <motion.span className="hm-h1__lead" aria-hidden="true" {...rise(0.18, reduce)}>
+        {line2} <Rotator />
+      </motion.span>
+      <motion.span className="hm-h1__lead" aria-hidden="true" style={{ marginTop: '0.22em' }} {...rise(0.7, reduce)}>
+        {marked ? (
+          <>
+            {marked[1]}
+            <span className="hm-mark em-mark em-paint" style={{ ['--em-delay' as string]: '1.4s' }}>
+              {marked[2]}
             </span>
-          ))}
-        </span>
-      </span>
+            {marked[3]}
+          </>
+        ) : (
+          line3
+        )}
+      </motion.span>
     </h1>
   );
 }
@@ -103,8 +149,8 @@ export default function Hero() {
       <div className="hm-hero__grid">
         <Headline />
       </div>
+      <span className="hm-cue" aria-hidden="true" />
 
-      <HeroStory />
     </section>
   );
 }

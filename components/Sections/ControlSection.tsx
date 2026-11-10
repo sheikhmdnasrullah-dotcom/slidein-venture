@@ -29,10 +29,9 @@ import {
   Reveal,
   Scene,
   SectionHeader,
-  TileWord,
 } from '@/components/Sections/primitives';
-import { ChatIcon } from '@/components/Sections/icons';
-import { Bar, TextSlot } from '@/components/Hero/Skeleton';
+import { ShieldIcon } from '@/components/Sections/icons';
+import { TextSlot } from '@/components/Hero/Skeleton';
 
 /* The 36px round toggle: plus → cross. */
 function Toggle({ open }: { open: boolean }) {
@@ -100,17 +99,9 @@ function Row({
             transition={{ duration: 0.4, ease: EASE }}
             className="overflow-hidden"
           >
-            {/* body slot — two stacked bars, body scale */}
-            <div className="flex flex-col gap-3 pb-7 pr-14">
-              <Bar
-                width="min(52ch, 100%)"
-                className="text-[17px] leading-normal"
-              />
-              <Bar
-                width="min(38ch, 88%)"
-                className="text-[17px] leading-normal"
-              />
-            </div>
+            <p className="pb-7 pr-14 text-[17px] leading-normal text-[var(--scaffold-small-ink)]">
+              {item.body}
+            </p>
           </motion.div>
         ) : null}
       </AnimatePresence>
@@ -124,9 +115,8 @@ function StickyTile() {
   return (
     <div className="sticky top-40 hidden self-start md:block">
       <Scene>
-        <GlossTile size={120} icon={<ChatIcon size="52%" />} rotate={-4} />
+        <GlossTile size={120} icon={<ShieldIcon size="52%" />} rotate={-4} />
       </Scene>
-      <TileWord w="converse" className="mt-5 ml-3" />
     </div>
   );
 }
@@ -136,7 +126,7 @@ export default function ControlSection() {
   const [open, setOpen] = useState<number>(0);
 
   return (
-    <Band tone="dark" id={section.id} disorder={BAND_DISORDER.control}>
+    <Band tone="flat" id={section.id} disorder={BAND_DISORDER.control}>
       <SectionHeader section={section} align="center" />
       <Reveal className="section-visual" y={16}>
         <div className="mx-auto flex max-w-[1080px] items-start gap-16">

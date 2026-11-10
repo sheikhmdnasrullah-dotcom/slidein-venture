@@ -16,6 +16,7 @@ import '@/app/styles/howitworks.css';
 import { Check } from 'lucide-react';
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import gsap from 'gsap';
+import { motion, useMotionValue, useReducedMotion, useSpring } from 'framer-motion';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { SCENES } from '@/how-it-works-video/data/scenes.config';
 import { useSettledStill } from '@/lib/useSettledStill';
@@ -43,6 +44,27 @@ export function HowItWorks() {
   const countRef = useRef<HTMLSpanElement>(null);
   const triggerRef = useRef<ScrollTrigger | null>(null);
   const [scene, setScene] = useState(0);
+  const reduce = useReducedMotion();
+
+  /* Depth: the stage tilts a little toward the pointer, on a spring. */
+  const tx = useMotionValue(0);
+  const ty = useMotionValue(0);
+  const rotateY = useSpring(tx, { stiffness: 120, damping: 20, mass: 0.6 });
+  const rotateX = useSpring(ty, { stiffness: 120, damping: 20, mass: 0.6 });
+  const tilt = !still && !reduce;
+  const onMove = useCallback(
+    (e: React.PointerEvent<HTMLDivElement>) => {
+      if (!tilt || e.pointerType !== 'mouse') return;
+      const r = e.currentTarget.getBoundingClientRect();
+      tx.set(((e.clientX - r.left) / r.width - 0.5) * 3);
+      ty.set(-((e.clientY - r.top) / r.height - 0.5) * 3);
+    },
+    [tilt, tx, ty],
+  );
+  const onLeave = useCallback(() => {
+    tx.set(0);
+    ty.set(0);
+  }, [tx, ty]);
 
   /* Fit the artboard into the space left by the header and the caption. */
   useLayoutEffect(() => {
@@ -174,17 +196,45 @@ export function HowItWorks() {
       </div>
 
       <div ref={slotRef} className="hw-slot">
-        <div ref={stageRef} className="hw-stage" data-scene={scene + 1}>
+        <motion.div
+          ref={stageRef}
+          className="hw-stage"
+          data-scene={scene + 1}
+          onPointerMove={onMove}
+          onPointerLeave={onLeave}
+          style={{ rotateX, rotateY, transformPerspective: 1800 }}
+        >
+          {/* ambient layer: a light that follows the action, slow geometry behind the work */}
+          <div className="hw-amb" aria-hidden="true">
+            <i className="hw-amb-spot" />
+            <i className="hw-amb-glow" />
+            <svg className="hw-amb-geo" viewBox="0 0 400 400">
+              <circle className="hw-amb-r1" cx="200" cy="200" r="190" />
+              <circle className="hw-amb-r2" cx="200" cy="200" r="140" />
+              <circle className="hw-amb-r3" cx="200" cy="200" r="90" />
+              <g className="hw-amb-orbit"><circle cx="200" cy="10" r="4" /></g>
+            </svg>
+          </div>
           <div ref={artRef} className="hw-art" aria-hidden="true">
             <div className="hw-cam">
               <Scenes />
               <Persist />
             </div>
           </div>
-        </div>
+          {/* a sweep of light marks each change of scene */}
+          {!still && <i key={scene} className="hw-wipe" aria-hidden="true" />}
+        </motion.div>
       </div>
 
       <div className="hw-dock">
+        <div className="hw-cmark" aria-hidden="true">
+          <svg viewBox="0 0 44 44">
+            <circle className="hw-cring-bg" cx="22" cy="22" r="20" />
+            <circle className="hw-cring" cx="22" cy="22" r="20" pathLength={1} />
+          </svg>
+          <span key={scene} className="hw-cnum">{String(scene + 1).padStart(2, '0')}</span>
+        </div>
+        <div className="hw-caps">
         {SCENES.map((s, i) => (
           <p key={s.id} className="hw-cap" data-cap={i} aria-hidden="true">
             {tokenize(s.caption, s.emphasis).map((w, k) => (
@@ -195,6 +245,7 @@ export function HowItWorks() {
             ))}
           </p>
         ))}
+        </div>
       </div>
 
       {/* The same script as text: for screen readers always, and for everyone when motion is off. */}

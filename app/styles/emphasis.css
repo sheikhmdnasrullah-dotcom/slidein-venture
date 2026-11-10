@@ -20,15 +20,21 @@
 }
 
 .em-mark::before {
+  /* a chisel-tip highlighter: slanted ends, a darker patch where the pen lands
+     and lifts, dry streaks along the stroke, a slightly wavering edge */
   content: '';
   position: absolute;
   z-index: -1;
-  inset: 47% -0.18em -0.04em;
-  background: var(--em-mark);
-  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 60' preserveAspectRatio='none'%3E%3Cpath d='M5 27 C 6 17%2C 18 13%2C 40 14 C 70 10%2C 100 15%2C 140 12 C 180 9%2C 214 14%2C 250 11 C 270 9.5%2C 286 11%2C 292 15 L 300 19 L 295 25 C 298 33%2C 294 42%2C 288 48 C 258 50%2C 226 47%2C 196 50 C 150 54%2C 104 49%2C 66 52 C 40 54%2C 18 52%2C 9 50 C 3 46%2C 4 40%2C 5 34 C 5 31%2C 4 29%2C 5 27 Z'/%3E%3C/svg%3E") 0 0 / 100% 100% no-repeat;
-  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 60' preserveAspectRatio='none'%3E%3Cpath d='M5 27 C 6 17%2C 18 13%2C 40 14 C 70 10%2C 100 15%2C 140 12 C 180 9%2C 214 14%2C 250 11 C 270 9.5%2C 286 11%2C 292 15 L 300 19 L 295 25 C 298 33%2C 294 42%2C 288 48 C 258 50%2C 226 47%2C 196 50 C 150 54%2C 104 49%2C 66 52 C 40 54%2C 18 52%2C 9 50 C 3 46%2C 4 40%2C 5 34 C 5 31%2C 4 29%2C 5 27 Z'/%3E%3C/svg%3E") 0 0 / 100% 100% no-repeat;
-  transform: rotate(-0.7deg);
-  transition: background-color 320ms var(--ease-out, ease-out);
+  inset: 40% -0.16em -0.02em -0.12em;
+  background: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20400%2060'%20preserveAspectRatio='none'%3E%3Cpath%20fill='%23ff7417'%20fill-opacity='.52'%20d='M6%2017%20L21%2010%20C60%2012%2098%208%20140%2010.5%20C184%2013%20226%208.5%20268%2010%20C310%2011.5%20352%208%20394%2011%20L386%2047%20C350%2050.5%20312%2047%20270%2049.5%20C226%2052%20184%2048%20140%2050.5%20C98%2053%2058%2049%2016%2052%20Z'/%3E%3Cpath%20fill='%23ff6a00'%20fill-opacity='.22'%20d='M6%2017%20L21%2010%20C30%2010.4%2040%2010.6%2050%2010.8%20L56%2051.2%20C44%2051.5%2030%2051.8%2016%2052%20Z'/%3E%3Cpath%20fill='%23ff6a00'%20fill-opacity='.18'%20d='M352%209.6%20C366%209.9%20380%2010.2%20394%2011%20L386%2047%20C374%2047.8%20362%2048.4%20348%2048.8%20Z'/%3E%3Cpath%20fill='none'%20stroke='%23fff'%20stroke-opacity='.22'%20stroke-width='1.4'%20d='M24%2019%20C110%2017%20200%2021%20300%2018%20C340%2017%20370%2018%20386%2019'/%3E%3Cpath%20fill='none'%20stroke='%23fff'%20stroke-opacity='.14'%20stroke-width='2.2'%20d='M30%2033%20C130%2035%20230%2031%20330%2034%20C360%2035%20374%2033%20384%2033'/%3E%3Cpath%20fill='none'%20stroke='%23fff'%20stroke-opacity='.2'%20stroke-width='1'%20d='M20%2043%20C120%2041%20220%2045%20320%2042%20C350%2041%20370%2042%20384%2042'/%3E%3Cpath%20fill='none'%20stroke='%23e85a00'%20stroke-opacity='.16'%20stroke-width='1.6'%20d='M26%2026%20C126%2024%20226%2028%20326%2025%20C356%2024%20376%2026%20388%2026'/%3E%3C/svg%3E") 0 0 / 100% 100% no-repeat;
+  transform: rotate(-0.9deg) skewX(-4deg);
+  transform-origin: left center;
+  transition: opacity 320ms var(--ease-out, ease-out);
+}
+
+.em-strong {
+  font-weight: 560;
+  color: var(--scaffold-ink);
 }
 
 .em-rule {
@@ -60,7 +66,7 @@
 /* secondary emphasis, pointer devices only: nothing moves, nothing replays */
 @media (hover: hover) and (pointer: fine) {
   :is(h1, h2, h3):hover .em-mark::before {
-    background: var(--em-mark-hover);
+    opacity: 0.85;
   }
 
   :is(h1, h2, h3):hover .em-rule {

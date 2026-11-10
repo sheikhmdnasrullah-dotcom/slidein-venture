@@ -17,7 +17,6 @@
 
 import { HOME_CONTENT } from '@/content/home';
 import { Bar } from '@/components/Hero/Skeleton';
-import { LogoWordmark } from '@/components/Brand/Logo';
 
 export default function SiteFooter() {
   const { columns } = HOME_CONTENT.footer;
@@ -34,9 +33,7 @@ export default function SiteFooter() {
                   <span className="font-mono text-[12px] font-semibold uppercase tracking-[0.12em] text-[var(--scaffold-accent)]">
                     {col.heading}
                   </span>
-                ) : (
-                  <Bar width="5em" className="text-[13px]" />
-                )}
+                ) : null}
                 <ul className="flex flex-col items-start gap-3.5">
                   {col.links.map((link, j) => (
                     <li key={j}>
@@ -62,15 +59,6 @@ export default function SiteFooter() {
             ))}
           </div>
 
-          {/* the oversized watermark wordmark, cropped by the band edge */}
-          <div
-            aria-hidden="true"
-            className="pointer-events-none relative flex justify-center overflow-hidden"
-          >
-            <div style={{ opacity: 0.12, transform: 'translateY(38%)' }}>
-              <LogoWordmark size="clamp(140px, 21vw, 300px)" />
-            </div>
-          </div>
         </div>
       </div>
     </footer>

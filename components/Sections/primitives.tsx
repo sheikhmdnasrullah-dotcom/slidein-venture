@@ -73,7 +73,7 @@ export function SectionHeader({
   section,
   align = 'center',
 }: {
-  section: Pick<HomeSection, 'eyebrow' | 'title' | 'lead'>;
+  section: Pick<HomeSection, 'eyebrow' | 'title' | 'lead'> & { emphasis?: string };
   align?: 'left' | 'center';
 }) {
   return (
@@ -90,6 +90,7 @@ export function SectionHeader({
         <Heading
           variant="h2"
           text={section.title}
+          emphasis={section.emphasis}
           barWidth="14em"
           align={align}
           className={cn(align === 'center' && 'mx-auto')}
@@ -245,14 +246,10 @@ export function Scene({
 
 export function WordTag({ w }: { w: EquationWord }) {
   return (
-    <span className="inline-flex items-center gap-1.5" aria-hidden="true">
+    <span className="inline-flex items-center" aria-hidden="true">
       <span
-        className="block h-[5px] w-[5px] shrink-0 rounded-full"
-        style={{ background: 'rgba(10,10,10,0.35)' }}
-      />
-      <span
-        className="whitespace-nowrap text-[12px] font-medium leading-[18px]"
-        style={{ color: 'rgba(10,10,10,0.55)', letterSpacing: '-0.01em' }}
+        className="whitespace-nowrap font-mono text-[11px] font-medium uppercase leading-[16px]"
+        style={{ color: 'rgba(10,10,10,0.55)', letterSpacing: '0.05em' }}
       >
         {word(w)}
       </span>
@@ -269,12 +266,11 @@ export function TileWord({ w, className }: { w: EquationWord; className?: string
     <span
       aria-hidden="true"
       className={cn(
-        'inline-flex items-center gap-1.5 whitespace-nowrap rounded-full border border-[var(--scaffold-rule)] bg-[var(--scaffold-surface)] px-2.5 py-[3px] text-[12px] font-medium leading-[16px] text-[var(--scaffold-small-ink)]',
+        'inline-flex items-center whitespace-nowrap rounded-[6px] border border-[var(--scaffold-rule)] bg-[var(--scaffold-surface)] px-2.5 py-[3px] font-mono text-[11px] font-medium uppercase leading-[16px] text-[var(--scaffold-small-ink)]',
         className,
       )}
-      style={{ letterSpacing: '-0.01em' }}
+      style={{ letterSpacing: '0.04em' }}
     >
-      <span className="block h-[5px] w-[5px] rounded-full bg-[var(--scaffold-accent)]" />
       {word(w)}
     </span>
   );

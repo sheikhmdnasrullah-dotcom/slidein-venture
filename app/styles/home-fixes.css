@@ -1,0 +1,14 @@
+/* Home page rhythm fixes: bands were stacking 128px + 128px of padding between
+   neighbours, leaving ~250px dead gaps around every section header. */
+main > .band + .band { padding-top: 0; }
+main > .band { padding-block: 72px; }
+main > .hm-hero + .band { padding-top: 24px; }
+@media (width >= 768px) {
+  main > .band { padding-block: 96px; }
+  main > .hm-hero + .band { padding-top: 32px; }
+}
+/* the wallpaper objects fade once the hero is scrolled away (see BackgroundWallpaper) */
+.bw-root { transition: opacity 200ms linear; }
+
+/* Process page: plain paper only. The floating glossy 3D objects belong to the home hero. */
+.bw-root[data-backdrop-route="process"] { opacity: 0 !important; visibility: hidden; }

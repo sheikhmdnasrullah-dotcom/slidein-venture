@@ -51,15 +51,14 @@ export function buildTimeline(root: HTMLElement, art: HTMLElement): Built {
   const cursor = one('.hw-cursor');
   const cam = one('.hw-cam');
 
-  /* ── Scene visibility and the slow camera push ─────────────────────── */
+  /* ── Scene visibility ──────────────────────────────────────────────── */
   S.forEach((s, i) => {
     const el = sceneEl(i + 1);
     if (i === 0) tl.set(el, { autoAlpha: 1 }, 0);
     else tl.fromTo(el, { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.3, ease: 'none' }, s.t - 0.15);
     if (i < S.length - 1) tl.to(el, { autoAlpha: 0, duration: 0.3, ease: 'none' }, s.e - 0.05);
-    tl.fromTo(cam, { scale: 1 }, { scale: 1.03, duration: s.d - 0.3, ease: 'none' }, s.t);
-    if (i < S.length - 1) tl.to(cam, { scale: 1, duration: 0.3, ease: EASE.settle }, s.e - 0.3);
   });
+  gsap.set(cam, { scale: 1 });
 
   /* ── Rail fill: node i sits at i/7, reached at scene i's start ─────── */
   const fill = one('.hw-rail-fill');
@@ -73,17 +72,30 @@ export function buildTimeline(root: HTMLElement, art: HTMLElement): Built {
     const words = cap.querySelectorAll<HTMLElement>('.hw-cw');
     const toks = tokenize(sc.caption, sc.emphasis);
     const total = toks.reduce((a, w) => a + w.weight, 0);
-    const from = S[i].t + 0.6;
-    const win = S[i].d - 0.9 - 0.6;
-    ft(cap, { autoAlpha: 0, y: 10 }, { autoAlpha: 1, y: 0, duration: 0.35 }, S[i].t + 0.1);
+    const from = S[i].t + 0.35;
+    const win = S[i].d - 0.7 - 0.35;
+    if (i === 0) {
+      tl.set(cap, { autoAlpha: 1, y: 0 }, 0);
+    } else {
+      ft(cap, { autoAlpha: 0, y: 6 }, { autoAlpha: 1, y: 0, duration: 0.3 }, S[i].t + 0.08);
+    }
     let acc = 0;
     words.forEach((w, k) => {
       const at = from + (acc / total) * win;
       acc += toks[k].weight;
-      tl.to(w, { color: INK, duration: 0.14, ease: 'none' }, at);
+      // each word arrives out of a soft blur as it is spoken
+      tl.fromTo(
+        w,
+        { color: 'rgb(10 10 10 / 22%)', opacity: 0.35, filter: 'blur(5px)', y: 5 },
+        { color: INK, opacity: 1, filter: 'blur(0px)', y: 0, duration: 0.32, ease: EASE.out },
+        at,
+      );
       if (toks[k].em) tl.fromTo(w, { '--hl': 0 }, { '--hl': 1, duration: 0.35, ease: EASE.out }, at + 0.05);
     });
-    if (i < S.length - 1) tl.to(cap, { autoAlpha: 0, y: -10, duration: 0.3, ease: EASE.inout }, S[i].e - 0.4);
+    if (i < S.length - 1) tl.to(cap, { autoAlpha: 0, y: -6, duration: 0.25, ease: EASE.inout }, S[i].e - 0.35);
+    // the ring beside the caption fills over the scene
+    const ring = root.querySelector('.hw-cring');
+    if (ring) tl.fromTo(ring, { strokeDashoffset: 1 }, { strokeDashoffset: 0, duration: S[i].d, ease: 'none', immediateRender: i === 0 }, S[i].t);
   });
 
   /* ═══ 1 · Setup ═══════════════════════════════════════════════════════ */
@@ -93,20 +105,17 @@ export function buildTimeline(root: HTMLElement, art: HTMLElement): Built {
     const save = one('.s1-save');
     const sv = M['s1-save'];
     const ver = M['s1-ver'];
-    ft(sheet, { opacity: 0, scale: 0.985 }, { opacity: 1, scale: 1, duration: 0.7, ease: EASE.expo }, t);
-    tl.fromTo(q('.s1-border rect'), { strokeDasharray: '1 2', strokeDashoffset: 1 }, { strokeDashoffset: 0, duration: 1.3, ease: EASE.inout }, t);
-    typeIn(tl, q('.s1-name'), 18, t + 0.5, 0.9);
-    ft(q('.s1-line'), { opacity: 0, y: 8 }, { opacity: 1, y: 0, duration: 0.5 }, t + 1.3);
-    ft(q('.s1-offer'), { opacity: 0, y: 10 }, { opacity: 1, y: 0, stagger: 0.14 }, t + 1.8);
-    ft(q('.s1-chip'), { opacity: 0, y: 10 }, { opacity: 1, y: 0, stagger: 0.12, duration: 0.45 }, t + 3.0);
+    tl.set(sheet, { opacity: 1, scale: 1, x: 0, y: 0 }, t);
+    tl.set(q('.s1-border rect'), { strokeDashoffset: 0 }, t);
+    tl.set(q('.s1-name, .s1-line'), { opacity: 1, y: 0 }, t);
+    ft(q('.s1-offer'), { opacity: 0.35, y: 4 }, { opacity: 1, y: 0, stagger: 0.12, duration: 0.4 }, t + 0.3);
+    ft(q('.s1-chip'), { opacity: 0.35, y: 4 }, { opacity: 1, y: 0, stagger: 0.1, duration: 0.35 }, t + 0.8);
     // the cursor walks to Save
     tl.fromTo(cursor, { opacity: 0 }, { opacity: 1, duration: 0.2, ease: 'none' }, t + 4.5);
     cursorPath(tl, cursor, [W + 20, H - 20], [sv.x + sv.w / 2 + 8, sv.y + sv.h / 2 + 8], t + 4.6, 1.0, 50);
-    // press, ripple, Save -> Saved
-    tl.to(save, { scale: 0.97, duration: 0.1, ease: 'none' }, t + 5.5);
+    // press, Save -> Saved
+    tl.to(save, { scale: 0.98, duration: 0.1, ease: 'none' }, t + 5.5);
     tl.to(save, { scale: 1, duration: 0.2, ease: EASE.out }, t + 5.6);
-    tl.fromTo(q('.s1-ripple'), { opacity: 0, scale: 1 }, { opacity: 0.6, duration: 0.05, ease: 'none' }, t + 5.5);
-    tl.to(q('.s1-ripple'), { opacity: 0, scale: 1.5, duration: 0.55, ease: EASE.out }, t + 5.55);
     tl.to(q('.s1-save-a'), { opacity: 0, duration: 0.15, ease: 'none' }, t + 5.5);
     tl.to(q('.s1-save-b'), { opacity: 1, duration: 0.2, ease: 'none' }, t + 5.6);
     // the version tag appears and a thread draws from the button to it
@@ -123,7 +132,7 @@ export function buildTimeline(root: HTMLElement, art: HTMLElement): Built {
       x: hd.x + hd.w / 2 - (160 + 480), y: hd.y + hd.h / 2 - (160 + 200), scale: 0.1, opacity: 0.0,
       duration: 0.9, ease: EASE.inout,
     }, t + 7.0);
-    ft(hud, { opacity: 0, scale: 0.9, y: -6 }, { opacity: 1, scale: 1, y: 0, duration: 0.45 }, t + 7.35);
+    ft(hud, { opacity: 0, scale: 0.94, y: -4 }, { opacity: 1, scale: 1, y: 0, duration: 0.45 }, t + 7.35);
   }
 
   /* ═══ 2 · Sources ═════════════════════════════════════════════════════ */
@@ -420,7 +429,7 @@ export function buildTimeline(root: HTMLElement, art: HTMLElement): Built {
     const src = [M.ln0, M.sup];
     const dst = [lr6, lr7];
     ev.forEach((e, i) => {
-      const s0 = i === 0 ? { x: src[0].x + src[0].w / 2, y: src[0].y0 } : { x: src[1].x + 30, y: M.sup.y + 100 };
+      const s0 = i === 0 ? { x: src[0].x + src[0].w / 2, y: src[0].y0 } : { x: src[1].x + 30, y: M.sup.y + 84 };
       gsap.set(e, { x: s0.x - 10, y: s0.y - 10 });
       tl.fromTo(e, { opacity: 0, scale: 0.6 }, { opacity: 1, scale: 1, duration: 0.25 }, t + 7.7 + i * 0.1);
       tl.to(e, { x: dst[i].x + 20, y: dst[i].y0 - 10, duration: 0.9, ease: EASE.inout }, t + 7.95 + i * 0.1);

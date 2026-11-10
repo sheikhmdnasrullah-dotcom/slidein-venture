@@ -70,23 +70,23 @@
   --scaffold-display-weight:   600;
   --scaffold-display-leading:  0.98;
   --scaffold-display-tracking: -0.045em;
-  --scaffold-h2-size:     clamp(2.25rem, 4.6vw, 4rem);
-  --scaffold-h2-weight:   600;
-  --scaffold-h2-leading:  1.02;
-  --scaffold-h2-tracking: -0.035em;
-  --scaffold-h3-size:     clamp(1.375rem, 2vw, 1.75rem);
-  --scaffold-h3-weight:   600;
-  --scaffold-h3-leading:  1.15;
-  --scaffold-h3-tracking: -0.025em;
+  --scaffold-h2-size:     clamp(1.9rem, 1.1rem + 2.3vw, 2.75rem);  /* 44px at desktop */
+  --scaffold-h2-weight:   440;
+  --scaffold-h2-leading:  1.12;
+  --scaffold-h2-tracking: -0.032em;
+  --scaffold-h3-size:     1.125rem;
+  --scaffold-h3-weight:   470;
+  --scaffold-h3-leading:  1.375;
+  --scaffold-h3-tracking: -0.01em;
   --scaffold-lead-size:     clamp(1.125rem, 1.6vw, 1.5rem);
   --scaffold-lead-weight:   400;
   --scaffold-lead-leading:  1.45;
   --scaffold-lead-tracking: -0.01em;
   --scaffold-lead-ink:      rgb(10 10 10 / 60%);   /* 5.24:1 on #FDFDFD */
   --scaffold-lead-measure:  40ch;
-  --scaffold-body-size:     17px;
+  --scaffold-body-size:     18px;
   --scaffold-body-weight:   400;
-  --scaffold-body-leading:  1.6;
+  --scaffold-body-leading:  1.625;
   --scaffold-body-tracking: -0.005em;
   --scaffold-body-ink:      rgb(10 10 10 / 62%);   /* 5.64:1 on #FDFDFD */
   --scaffold-body-measure:  62ch;
@@ -96,9 +96,9 @@
   /* 57%, not the specified 55%: 55% measures 4.40:1 and fails AA, while 57%
      clears it at 4.73:1. The closest compliant value. */
   --scaffold-small-ink:     rgb(10 10 10 / 57%);
-  --scaffold-eyebrow-size:     13px;
-  --scaffold-eyebrow-weight:   500;
-  --scaffold-eyebrow-tracking: 0.01em;
+  --scaffold-eyebrow-size:     11px;
+  --scaffold-eyebrow-weight:   470;
+  --scaffold-eyebrow-tracking: 0.1em;
   --scaffold-eyebrow-ink:      rgb(10 10 10 / 60%);
 
   /* ── Hero accent ramp — derived ONLY from --color-brand (#FF6200) ──

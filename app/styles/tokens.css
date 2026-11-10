@@ -76,6 +76,9 @@
        brand-hi on graphite-900  6.47:1  ✓
        signal   on paper-50      4.50:1  ✓ AA at any size                  */
   --color-brand:        oklch(0.691 0.207 42.28);  /* exact #FF6200 */
+  /* Secondary accent — the deck's deep teal; used sparingly beside the orange. */
+  --color-teal:         #0e5a5f;
+  --color-teal-tint:    #d2e4e5;
   --color-brand-hi:     oklch(0.700 0.198 42.28);  /* orange on dark surfaces */
   --color-signal:       oklch(0.563 0.168 42.28);  /* the only orange for small text */
   --color-signal-deep:  oklch(0.542 0.163 42.28);  /* signal one step down — orange text still

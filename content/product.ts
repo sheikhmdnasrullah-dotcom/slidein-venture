@@ -78,37 +78,37 @@ export const WORKFLOW = {
      must understand sending is not a button press — it is gated on
      authentication, configuration, eligibility and a human approval step,
      which is exactly how the workflow actually runs. */
-  gate: 'Nothing sends until authentication is verified, the list is clean, and a person has approved the batch.',
+  gate: 'Nothing sends until the domain is verified, the list is clean, and you approve the campaign.',
   stages: [
     {
       index: '01',
       name: 'Research',
       detail:
-        'Write down what makes a business worth contacting, then build the list against that bar. Every prospect is found and verified by hand, with the research notes attached to the record.',
+        'Define who is worth contacting, then build the list to match. Every prospect is verified, with research notes attached.',
     },
     {
       index: '02',
       name: 'Review',
       detail:
-        'A person reads every record and every draft before anything is approved to send. Anything that cannot be traced to a source is dropped, not softened.',
+        'You approve each campaign before anything is sent. Any claim without a source is dropped.',
     },
     {
       index: '03',
       name: 'Personalize',
       detail:
-        'Each email is written from that prospect own research record — what they said recently, what they are working on, what they use. There is no template underneath.',
+        'Each email is written from that prospect\'s own research: what they said, what they work on, what they use. No templates.',
     },
     {
       index: '04',
       name: 'Send',
       detail:
-        'Sending runs from verified domains with the authentication records in place, across a staged schedule. Anyone who replies leaves the sequence immediately.',
+        'Emails go out from verified domains on a staged schedule. Anyone who replies leaves the sequence at once.',
     },
     {
       index: '05',
       name: 'Monitor',
       detail:
-        'Delivery events are read daily: what was accepted, what bounced, what was complained about, what was replied to. Lists stay clean and suppression is permanent.',
+        'Every day it reads what was delivered, bounced, flagged or answered. Opt-outs are suppressed for good.',
     },
   ],
 } as const;
@@ -294,7 +294,7 @@ export const CLOSING = {
 export const NAV = {
   links: [
     { label: 'Process', href: '/process' },
-    { label: 'Insights', href: '/insights' },
+    { label: 'Use Cases', href: '/use-cases' },
     { label: 'Pricing', href: '/pricing' },
   ],
   cta: { label: 'Connect', href: '/contact' },
