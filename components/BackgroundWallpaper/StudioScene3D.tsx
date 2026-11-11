@@ -1348,14 +1348,16 @@ function StudioStageContent({
 export default function StudioScene3D({
   routeProfile,
   reducedMotion,
+  paused = false,
 }: {
   routeProfile: string;
   reducedMotion: boolean;
+  paused?: boolean;
 }) {
   return (
     <Canvas
       dpr={[1, 1.75]}
-      frameloop={reducedMotion ? 'demand' : 'always'}
+      frameloop={reducedMotion ? 'demand' : paused ? 'never' : 'always'}
       camera={{ position: [0, 0, 9.2], fov: 36, near: 0.1, far: 40 }}
       gl={{
         alpha: true,

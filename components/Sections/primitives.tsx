@@ -72,9 +72,12 @@ export function Band({
 export function SectionHeader({
   section,
   align = 'center',
+  as,
 }: {
   section: Pick<HomeSection, 'eyebrow' | 'title' | 'lead'> & { emphasis?: string };
   align?: 'left' | 'center';
+  /** Heading level. Defaults to h2; a page's own title passes h1. */
+  as?: 'h1' | 'h2';
 }) {
   return (
     <div className="section-head" data-align={align}>
@@ -89,6 +92,7 @@ export function SectionHeader({
       <Reveal delay={0.07}>
         <Heading
           variant="h2"
+          as={as}
           text={section.title}
           emphasis={section.emphasis}
           barWidth="14em"

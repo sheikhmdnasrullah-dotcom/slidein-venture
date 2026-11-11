@@ -51,6 +51,8 @@ export function BackgroundWallpaper() {
   const routeProfile = resolveBackdropRoute(pathname);
 
   const [webglReady, setWebglReady] = useState(false);
+  /* once the hero has scrolled away the objects are invisible; stop drawing them so scroll stays light */
+  const [offscreen, setOffscreen] = useState(false);
   const [reducedMotion, setReducedMotion] = useState(false);
 
   useEffect(() => {
@@ -72,6 +74,7 @@ export function BackgroundWallpaper() {
     const apply = () => {
       const t = Math.min(1, Math.max(0, window.scrollY / (window.innerHeight * 0.6)));
       el.style.opacity = String(1 - t * 0.92);
+      setOffscreen(window.scrollY > window.innerHeight * 1.1);
     };
     apply();
     window.addEventListener('scroll', apply, { passive: true });
@@ -311,7 +314,7 @@ export function BackgroundWallpaper() {
       {/* ── LAYER 4: Primary React Three Fiber 3D Studio Environment ─────── */}
       {webglReady ? (
         <div className="bw-webgl-stage">
-          <StudioScene3D routeProfile={routeProfile} reducedMotion={reducedMotion} />
+          <StudioScene3D routeProfile={routeProfile} reducedMotion={reducedMotion} paused={offscreen} />
         </div>
       ) : (
         /* Static Fallback for Devices Without WebGL Support */

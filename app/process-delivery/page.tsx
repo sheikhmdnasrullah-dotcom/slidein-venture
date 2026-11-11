@@ -8,7 +8,8 @@ import LeadFlow from '@/components/Delivery/LeadFlow';
 import { ClientWork, Guardrails, Numbers, WhoFor } from '@/components/Delivery/DeliveryRest';
 
 export const metadata: Metadata = {
-  title: 'How We Build It · SlideIn',
+  robots: { index: false, follow: false },
+  title: 'How we build it · SlideIn',
   description: DELIVERY_META.description,
 };
 

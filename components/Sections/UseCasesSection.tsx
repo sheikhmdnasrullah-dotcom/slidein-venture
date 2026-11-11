@@ -416,7 +416,7 @@ export default function UseCasesSection() {
 
   return (
     <Band tone="flat" id="use-cases" disorder={BAND_DISORDER['use-cases']}>
-      <SectionHeader section={{ eyebrow: '', title: USE_CASES_TITLE, lead: '' }} align="center" />
+      <SectionHeader section={{ eyebrow: '', title: USE_CASES_TITLE, lead: '' }} align="center" as="h1" />
 
       <div className="uc-frame mx-auto mt-14 max-w-[1080px]">
         {/* registration marks at the four corners of the grid */}

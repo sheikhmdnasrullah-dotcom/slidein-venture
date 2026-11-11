@@ -91,6 +91,7 @@ function VerifiedSeal({ size = 32 }: { size?: number }) {
         height: size,
         boxShadow: '0 4px 14px -2px rgba(10,10,10,0.12), 0 1px 3px rgba(10,10,10,0.06)',
       }}
+      role="img"
       aria-label="Verified"
     >
       <svg width="60%" height="60%" viewBox="0 0 24 24" fill="none" aria-hidden="true">

@@ -43,6 +43,7 @@
 @import "./styles/industry.css";
 @import "./styles/fontlock.css";
 @import "./styles/hero-polish.css";
+@import "./styles/scroll-motion.css";
 @import "shadcn/tailwind.css";
 
 /* The site has ONE theme — paper. Sections vary by TONE, never by theme.

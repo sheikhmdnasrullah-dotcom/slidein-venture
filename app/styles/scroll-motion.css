@@ -1,0 +1,102 @@
+/* SCROLL MOTION: every section arrives in its own way.
+   Scroll-driven animations (animation-timeline: view()): the motion is tied to scroll
+   position itself, runs off the main thread, can be scrubbed backwards, and can never
+   flash, because an element that is already on screen is simply at its finished state.
+   Only translate, scale, rotate and clip-path move; nothing fades text. Browsers without
+   the feature, and anyone who asks for reduced motion, get the finished page. */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+
+    /* shared timing: arrive over the first 60% of the element's entry, with a long soft settle */
+    :root { --sm-in: entry 0% cover 49%; --sm-ease: cubic-bezier(0.2, 0.8, 0.2, 1); }
+
+    @keyframes sm-rise      { from { translate: 0 150px; scale: 0.95; filter: blur(8px); } }
+    @keyframes sm-left      { from { translate: -120px 110px; filter: blur(10px); } }
+    @keyframes sm-right     { from { translate: 120px 110px; filter: blur(10px); } }
+    @keyframes sm-tilt      { from { transform: perspective(1500px) rotateX(16deg) translateY(130px) scale(0.92); transform-origin: 50% 0; filter: blur(12px); } to { transform: perspective(1500px) rotateX(0) translateY(0) scale(1); transform-origin: 50% 0; filter: blur(0); } }
+    @keyframes sm-wipe      { from { clip-path: inset(0 100% 0 0 round 20px); filter: blur(8px); } to { clip-path: inset(0 0 0 0 round 20px); filter: blur(0); } }
+    @keyframes sm-grow      { from { scale: 0.84; translate: 0 100px; filter: blur(10px); } }
+    @keyframes sm-swing     { from { translate: 0 150px; rotate: 4deg; filter: blur(10px); } }
+    @keyframes sm-spin      { from { rotate: -70deg; scale: 0.84; filter: blur(12px); } }
+    @keyframes sm-pop       { from { scale: 0.3; rotate: -40deg; } }
+    @keyframes sm-draw      { from { scale: 0 1; } }
+    @keyframes sm-hero-out  { to { translate: 0 -70px; scale: 0.93; } }
+    @keyframes sm-aurora    { to { translate: 0 140px; } }
+    @keyframes sm-cue       { to { translate: 0 30px; } }
+
+    /* hero: the headline lifts and settles back as you leave; the light underneath trails it */
+    .hm-hero__grid { animation: sm-hero-out linear both; animation-timeline: view(); animation-range: exit 0% exit 100%; }
+    .hm-aurora     { animation: sm-aurora linear both; animation-timeline: view(); animation-range: exit 0% exit 100%; }
+
+    /* playbook: the title rises, then the four cards climb in one after another, each higher than the last */
+    .section-head { animation: sm-rise var(--sm-ease) both; animation-timeline: view(); animation-range: var(--sm-in); }
+    .pbx-step { animation: sm-rise var(--sm-ease) both; animation-timeline: view(); animation-range: entry calc(var(--i) * 6%) cover calc(40% + var(--i) * 4%); }
+
+    /* the hinge arrives as a line, then the seven steps each come in their own way */
+
+    .wf-row[data-layout="split"]   .wf-copy  { animation: sm-left  linear both; animation-timeline: view(); animation-range: var(--sm-in); }
+    .wf-row[data-layout="split"]   .wf-stage { animation: sm-right var(--sm-ease) both; animation-timeline: view(); animation-range: var(--sm-in); }
+
+    .wf-row[data-layout="top"]     .wf-copy  { animation: sm-rise  linear both; animation-timeline: view(); animation-range: var(--sm-in); }
+    .wf-row[data-layout="top"]     .wf-stage { animation: sm-tilt  linear both; animation-timeline: view(); animation-range: entry 0% cover 51%; }
+
+    .wf-row[data-layout="flip"]    .wf-copy  { animation: sm-right var(--sm-ease) both; animation-timeline: view(); animation-range: var(--sm-in); }
+    .wf-row[data-layout="flip"]    .wf-stage { animation: sm-left  linear both; animation-timeline: view(); animation-range: var(--sm-in); }
+
+    .wf-row[data-layout="below"]   .wf-stage { animation: sm-wipe  linear both; animation-timeline: view(); animation-range: entry 5% cover 50%; }
+    .wf-row[data-layout="below"]   .wf-copy  { animation: sm-rise  linear both; animation-timeline: view(); animation-range: entry 25% cover 51%; }
+
+    .wf-row[data-layout="dark"]    { animation: sm-grow var(--sm-ease) both; animation-timeline: view(); animation-range: entry 0% cover 50%; }
+
+    .wf-row[data-layout="stagger"] .wf-copy  { animation: sm-rise  linear both; animation-timeline: view(); animation-range: var(--sm-in); }
+    .wf-row[data-layout="stagger"] .wf-stage { animation: sm-swing var(--sm-ease) both; animation-timeline: view(); animation-range: entry 0% cover 51%; }
+
+    .wf-row[data-layout="center"]  .wf-copy  { animation: sm-rise  linear both; animation-timeline: view(); animation-range: var(--sm-in); }
+    .wf-row[data-layout="center"]  .wf-stage { animation: sm-grow  linear both; animation-timeline: view(); animation-range: entry 5% cover 51%; }
+
+    /* who it's for: the names come up one by one */
+    .uw-wall li { animation: sm-rise var(--sm-ease) both; animation-timeline: view(); animation-range: entry calc(var(--i, 0) * 5%) cover calc(36% + var(--i, 0) * 2.5%); }
+    .uw-all     { animation: sm-rise var(--sm-ease) both; animation-timeline: view(); animation-range: entry 20% cover 51%; }
+
+    /* dashboard: it tips up out of the page like a screen being raised */
+    .dsh-card    { animation: sm-tilt var(--sm-ease) both; animation-timeline: view(); animation-range: entry 0% cover 51%; }
+
+    /* privacy: the box settles, the lock snaps on to its edge, the wall draws out to the team */
+    .sb-lead   { animation: sm-rise var(--sm-ease) both; animation-timeline: view(); animation-range: entry 15% cover 51%; }
+    .sb-server { animation: sm-grow var(--sm-ease) both; animation-timeline: view(); animation-range: entry 0% cover 50%; }
+    .sb-lock   { animation: sm-pop  linear both; animation-timeline: view(); animation-range: entry 30% cover 51%; }
+    .sb-wall   { transform-origin: left; animation: sm-draw var(--sm-ease) both; animation-timeline: view(); animation-range: entry 35% cover 51%; }
+    .sb-out    { animation: sm-right var(--sm-ease) both; animation-timeline: view(); animation-range: entry 30% cover 51%; }
+
+    /* titles: each word rises out of its own mask, one after another */
+    @keyframes sm-word { from { translate: 0 118%; } }
+    .sw__in { animation: sm-word var(--sm-ease) both; animation-timeline: view(); animation-range: entry calc(var(--i, 0) * 6%) cover calc(33% + var(--i, 0) * 2.4%); }
+
+    /* depth: the details on a plate drift against the scroll, so the plate has layers */
+    @keyframes sm-depth-a { from { translate: 0 22px; } to { translate: 0 -22px; } }
+    @keyframes sm-depth-b { from { translate: 0 -18px; } to { translate: 0 18px; } }
+    .wf-row[data-layout="split"]   .wf-stage::before, .wf-row[data-layout="top"] .wf-stage::before,
+    .wf-row[data-layout="stagger"] .wf-stage::before { animation: sm-depth-a linear both; animation-timeline: view(); animation-range: cover 0% cover 100%; }
+    .wf-row[data-layout="split"]   .wf-stage::after, .wf-row[data-layout="stagger"] .wf-stage::after { animation: sm-depth-b linear both; animation-timeline: view(); animation-range: cover 0% cover 100%; }
+    .wf-row[data-layout="flip"]    .wf-stage::before { animation: sm-depth-a linear both; animation-timeline: view(); animation-range: cover 0% cover 100%; }
+    .wf-row[data-layout="flip"]    .wf-stage::after  { animation: sm-depth-b linear both; animation-timeline: view(); animation-range: cover 0% cover 100%; }
+    .sb-card::before { animation: sm-depth-b linear both; animation-timeline: view(); animation-range: cover 0% cover 100%; }
+
+    /* use cases page: tiles climb in a diagonal wave (replaces the fade-and-blur load-in) */
+    .uc-cell { animation: sm-rise var(--sm-ease) both; animation-timeline: view(); animation-range: entry calc(var(--d, 0) * 5%) cover calc(38% + var(--d, 0) * 3%); }
+
+    /* closing: the ring spins into place while the words rise */
+    .cl-lead, .cl-cta { animation: sm-rise var(--sm-ease) both; animation-timeline: view(); animation-range: entry 20% cover 51%; }
+    .cl-ring  { animation: sm-spin var(--sm-ease) both; animation-timeline: view(); animation-range: entry 0% cover 52%; }
+    .cl-core  { animation: sm-grow var(--sm-ease) both; animation-timeline: view(); animation-range: entry 10% cover 51%; }
+  }
+}
+
+/* the masks the words rise out of (kept outside the feature query so the heading never changes shape) */
+.sw { display: inline-block; overflow: hidden; vertical-align: top; padding-bottom: 0.16em; margin-bottom: -0.16em; padding-top: 0.04em; margin-top: -0.04em; }
+.sw__in { display: inline-block; }
+
+/* smoother everywhere: let the browser keep scroll on the compositor */
+html { overscroll-behavior-y: none; }
+main { overflow-x: clip; }
+.dsh-card, .pbx-card, .wf-stage, .cl-ring, .sb-card { backface-visibility: hidden; }

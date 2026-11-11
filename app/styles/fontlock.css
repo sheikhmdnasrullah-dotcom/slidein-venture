@@ -24,3 +24,7 @@ h1, h2, h3, h4,
 .wf-row .dx-split-h, .pbx-copy p, .pbk-cap, .section-lead, .section-lead * { color: #1d1d1f !important; }
 .pbx-card[data-k="book"] .pbx-copy p { color: oklch(92% 0 0) !important; }
 .section-head :is(h1, h2), .section-head :is(h1, h2) span, .section-head :is(h1, h2) strong { color: #1d1d1f !important; }
+
+/* dark feature card: the description is light, never black on black */
+.wf-row[data-layout="dark"] .dx-split-h { color: oklch(94% 0 0) !important; }
+.wf-row[data-layout="dark"] .dx-split-h span { color: oklch(99% 0 0) !important; }

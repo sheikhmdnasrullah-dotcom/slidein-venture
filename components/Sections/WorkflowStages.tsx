@@ -23,6 +23,8 @@ import {
   type LucideIcon,
 } from 'lucide-react';
 import '@/app/styles/workflow-layouts.css';
+import '@/app/styles/home-sections.css';
+import SplitTitle from '@/components/Sections/SplitTitle';
 import { Band } from '@/components/Sections/primitives';
 import { Window as EmailWindow } from '@/components/Sections/TraceSection';
 import { ChecksPanel, QualifyPanel, RepliesPanel } from '@/components/Sections/SafeguardsSection';
@@ -225,6 +227,7 @@ function Row({ s, i }: { s: Stage; i: number }) {
 export default function WorkflowStages() {
   return (
     <Band id="workflow" tone="flat">
+      <SplitTitle className="sb-h wf-hinge" parts={['Then it runs, ', { mark: 'one person at a time' }, '.']} />
       <div className="wf-rows mx-auto max-w-[1272px]">
         {STAGES.map((s, i) => (
           <Row key={s.id} s={s} i={i} />

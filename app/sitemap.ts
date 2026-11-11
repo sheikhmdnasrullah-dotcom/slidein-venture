@@ -20,7 +20,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { path: '/pricing', changeFrequency: 'monthly', priority: 0.8 },
     { path: '/portfolio', changeFrequency: 'monthly', priority: 0.6 },
     { path: '/contact', changeFrequency: 'yearly', priority: 0.6 },
-    { path: '/connect', changeFrequency: 'yearly', priority: 0.6 },
   ].map(({ path, changeFrequency, priority }) => ({
     url: `${SITE_ORIGIN}${path}`,
     lastModified: new Date(),

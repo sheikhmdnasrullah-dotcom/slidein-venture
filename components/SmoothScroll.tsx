@@ -20,7 +20,14 @@ export function SmoothScroll() {
     const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
     if (mq.matches) return;
 
-    const lenis = new Lenis({ lerp: 0.12, smoothWheel: true, wheelMultiplier: 1, anchors: true });
+    const lenis = new Lenis({
+      duration: 1.25,
+      easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)), // expo-out: fast to answer, long to settle
+      smoothWheel: true,
+      wheelMultiplier: 0.9,
+      touchMultiplier: 1.4,
+      anchors: true,
+    });
     // ScrollTrigger reads the same eased position Lenis writes to the page.
     lenis.on('scroll', ScrollTrigger.update);
 
