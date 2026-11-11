@@ -1,9 +1,8 @@
 import type { Metadata } from 'next';
 import UseCasesSection from '@/components/Sections/UseCasesSection';
-import SiteFooter from '@/components/Sections/SiteFooter';
 
 export const metadata: Metadata = {
-  title: 'Use Cases · SlideIn',
+  title: 'Use cases · SlideIn',
   description: 'How SlideIn fits each industry.',
 };
 
@@ -13,7 +12,6 @@ export default function UseCasesPage() {
     <>
       <div className="h-16" aria-hidden="true" />
       <UseCasesSection />
-      <SiteFooter />
     </>
   );
 }

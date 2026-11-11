@@ -6,11 +6,11 @@ export const business = {
   profile: "Profile v3",
 };
 
-export const sources = ["csv", "directory", "conference"];
+export const sources = ["CSV", "directory", "conference"];
 
 export const rawRecords = [
-  { name: "Priya Raman", title: "Head of Marketing", org: "Calloway Systems", source: "csv", meta: "imported Oct 12 · row 214" },
-  { name: "P. Raman", title: "Marketing Lead", org: "calloway.io", source: "directory", meta: "lookup" },
+  { name: "Emily Foster", title: "Head of Marketing", org: "Calloway Systems", source: "CSV", meta: "imported Oct 12 · row 214" },
+  { name: "E. Foster", title: "Marketing Lead", org: "calloway.io", source: "directory", meta: "lookup" },
   { name: "Daniel Reyes", title: "Founder", org: "Fernhill AI", source: "conference", meta: "attendee list" },
 ];
 
@@ -35,11 +35,11 @@ export const match = {
 };
 
 export const email = {
-  to: "priya@calloway.io",
+  to: "emily@calloway.io",
   subject: "Three clips from episode 41",
   lines: [
-    "Hi Priya,",
-    "I've been listening to your weekly podcast, and episode 41 on moving off spreadsheets stayed with me.",
+    "Hi Emily,",
+    "I’ve been listening to your weekly podcast, and episode 41 on moving off spreadsheets stayed with me.",
     "We turn podcast episodes into short clips your team can post the same week.",
     "Want me to cut three from episode 41?",
     "Sam, Tidewater Creative",
@@ -55,17 +55,17 @@ export const warmup = { label: "Warmup", y: 330 };
 export const held = { who: "Marcus Webb", reason: "Address failed verification" };
 
 export const replies = [
-  { from: "Priya Raman", text: "Sounds good, send the three clips.", intent: "Interested" },
+  { from: "Emily Foster", text: "Sounds good, send the three clips.", intent: "Interested" },
   { from: "Daniel Reyes", text: "Please take me off your list.", intent: "Opt-out" },
 ];
 export const intents = ["Interested", "Objection", "Away", "Opt-out"];
 
 export const ledger = [
   ["08:02", "Profile v3 saved"],
-  ["08:03", "2 records merged (csv, directory)"],
+  ["08:03", "2 records merged (CSV, directory)"],
   ["08:05", "3 findings linked to sources"],
   ["08:06", "Matched: Podcast to shorts"],
-  ["08:07", "Draft created: Priya Raman"],
+  ["08:07", "Draft created: Emily Foster"],
   ["08:09", "Held: address failed verification"],
   ["08:41", "Reply classified: Interested"],
   ["09:12", "Suppressed: daniel@fernhill.ai"],

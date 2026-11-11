@@ -107,7 +107,7 @@ export const WORKSPACE_COPY = {
     title: 'Your whole outreach, on one canvas.',
     lead: 'See every stage from configure to converse in one place, with the work on each prospect laid out on a timeline underneath. Nothing sends until you approve it in the dashboard.',
     primary: { label: 'Connect', href: '/contact' },
-    secondary: { label: 'See how it works', href: '/process' },
+    secondary: { label: 'See how it works', href: '/#workflow' },
   },
   canvas: { label: 'Canvas', zoomOut: 'Zoom out', zoomIn: 'Zoom in', fit: 'Fit' },
   timeline: { label: 'Timeline', playhead: 'Playhead' },

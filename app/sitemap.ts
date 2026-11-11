@@ -16,7 +16,6 @@ import { SITE_ORIGIN } from '@/lib/site';
 export default function sitemap(): MetadataRoute.Sitemap {
   const staticRoutes: MetadataRoute.Sitemap = [
     { path: '', changeFrequency: 'weekly', priority: 1 },
-    { path: '/process', changeFrequency: 'monthly', priority: 0.8 },
     { path: '/use-cases', changeFrequency: 'monthly', priority: 0.8 },
     { path: '/pricing', changeFrequency: 'monthly', priority: 0.8 },
     { path: '/portfolio', changeFrequency: 'monthly', priority: 0.6 },

@@ -1,9 +1,9 @@
 /**
- * USE CASE EMAILS: one complete email per industry, written to SlideIn's own
+ * USE CASE EMAILS: one complete email per industry, written to SlideIn’s own
  * email framework (outreach-phases.ts "The Script", Client Acquisition System
  * Stage 5, slidein-cold-email skill):
  *   - the angle is the problem the offer removes for this person
- *   - the opening lines come from the person's record or from public research,
+ *   - the opening lines come from the person’s record or from public research,
  *     and every personalized line is traceable to where it came from
  *   - then the need, then the one matched offer
  *   - one low-friction ask, with a graceful way to say no
@@ -77,11 +77,11 @@ export const EMAILS: Record<string, UseCaseEmail> = {
   },
   'mid-sized-companies': {
     from: { name: 'Sam Carter', role: 'Account Manager', company: 'Ledgerly', address: 'sam@ledgerly.io' },
-    to: { name: 'Priya Nair', address: 'priya.nair@brightwell-logistics.com' },
+    to: { name: 'Natalie Ross', address: 'natalie.ross@brightwell-logistics.com' },
     date: 'Wed, 11:20 AM',
     subject: 'Two offices, one admin screen',
     paragraphs: [
-      'Hi Priya,',
+      'Hi Natalie,',
       'Congratulations on [[1|opening the Leeds office]]. I saw the announcement this week.',
       'Your team has also [[2|grown from 25 to 35 seats since spring]], and [[3|your last two support tickets were about setting up new users]]. That is usually the point where running two sites from one admin screen starts to get painful.',
       '[[4|Our multi-site admin view]] lets you manage users, permissions and billing per office from one place. I can switch it on for your account for a month, free, so you can see if it helps before deciding anything.',
@@ -91,7 +91,7 @@ export const EMAILS: Record<string, UseCaseEmail> = {
     sources: [
       { kind: 'research', note: 'Company announcement, posted publicly' },
       { kind: 'record', note: 'Seat count in your billing system' },
-      { kind: 'record', note: 'Support tickets from Priya’s team' },
+      { kind: 'record', note: 'Support tickets from Natalie’s team' },
       { kind: 'offer', note: 'Multi-site admin add-on, one-month trial' },
       { kind: 'ask', note: 'Yes or no, in one reply' },
     ],
@@ -195,17 +195,17 @@ export const EMAILS: Record<string, UseCaseEmail> = {
     ],
   },
   'commercial-banks': {
-    from: { name: 'Farzana Ahmed', role: 'Relationship Manager', company: 'Meridian Bank', address: 'farzana.ahmed@meridianbank.com.bd' },
-    to: { name: 'Mr. Karim, Rupali Knit Ltd', address: 'md@rupaliknit.com' },
+    from: { name: 'Jessica Hall', role: 'Relationship Manager', company: 'Meridian Bank', address: 'jessica.hall@meridianbank.com.bd' },
+    to: { name: 'Mr. Warren, Rupali Knit Ltd', address: 'md@rupaliknit.com' },
     date: 'Sun, 10:00 AM',
     subject: 'Payroll for your second factory',
     paragraphs: [
-      'Dear Mr. Karim,',
+      'Dear Mr. Warren,',
       '[[1|Rupali Knit’s payroll runs have doubled since March]], and [[2|your new factory in Gazipur was registered last month]]. Congratulations on the expansion.',
       'With two sites, payroll gets harder to manage by hand. [[3|We can run payroll automatically from your current account, and schedule your monthly supplier payments abroad]] at the same time, so both run on dates you approve.',
       'This doesn’t involve any new credit. [[4|Could I take 20 minutes this week to walk you through it?]] If the timing isn’t right, just reply and I’ll check back next quarter.',
     ],
-    signature: ['Farzana Ahmed', 'Relationship Manager, Meridian Bank, Gulshan', '+880 2 5555 0142'],
+    signature: ['Jessica Hall', 'Relationship Manager, Meridian Bank, Gulshan', '+880 2 5555 0142'],
     sources: [
       { kind: 'record', note: 'Transaction patterns, read inside the bank' },
       { kind: 'research', note: 'Public business registration' },
@@ -214,17 +214,17 @@ export const EMAILS: Record<string, UseCaseEmail> = {
     ],
   },
   'national-banks': {
-    from: { name: 'Farhana Rahman', role: 'Relationship Officer', company: 'Meridian Bank', address: 'farhana.rahman@meridianbank.com.bd' },
-    to: { name: 'Tanvir Hasan', address: 'tanvir.hasan@gmail.com' },
+    from: { name: 'Hannah Coleman', role: 'Relationship Officer', company: 'Meridian Bank', address: 'hannah.coleman@meridianbank.com.bd' },
+    to: { name: 'Brian Turner', address: 'brian.turner@gmail.com' },
     date: 'Sun, 11:30 AM',
     subject: 'The car loan you were looking at',
     paragraphs: [
-      'Dear Mr. Hasan,',
+      'Dear Mr. Turner,',
       'You [[1|looked at car loans around Tk 15 lakh in our app last week]], so I wanted to write to you personally instead of sending a general offer.',
       'Because [[2|your salary has arrived in your account with us every month for the past year]], [[3|our salaried car loan may suit you]]. The final decision depends on the bank’s standard checks, but I can show you the monthly payment, the documents you’d need and how long approval usually takes.',
       '[[4|Could you visit the Gulshan branch on Sunday, or would a phone call suit you better?]] If you’re no longer looking for a car, just tell me and I’ll not contact you about it again.',
     ],
-    signature: ['Farhana Rahman', 'Relationship Officer, Meridian Bank, Gulshan', '+880 2 5555 0177'],
+    signature: ['Hannah Coleman', 'Relationship Officer, Meridian Bank, Gulshan', '+880 2 5555 0177'],
     sources: [
       { kind: 'record', note: 'Car loan pages viewed in the bank’s app' },
       { kind: 'record', note: 'Salary credits, read inside the bank' },
@@ -233,17 +233,17 @@ export const EMAILS: Record<string, UseCaseEmail> = {
     ],
   },
   'mfs-providers': {
-    from: { name: 'Nusrat Jahan', role: 'Customer Care', company: 'TakaPay', address: 'care@takapay.com.bd' },
-    to: { name: 'Rina Akter', address: 'rina.akter@gmail.com' },
+    from: { name: 'Olivia Grant', role: 'Customer Care', company: 'TakaPay', address: 'care@takapay.com.bd' },
+    to: { name: 'Emma Walsh', address: 'emma.walsh@gmail.com' },
     date: 'Sat, 6:20 PM',
     subject: 'Pay your electricity bill on time, automatically',
     paragraphs: [
-      'Hi Rina,',
+      'Hi Emma,',
       'You [[1|pay your electricity bill by hand in the app every month]], and [[2|a few payments went through a day after the due date]].',
       '[[3|With scheduled bill pay, you set it once]] and the bill is paid on time every month. We remind you two days before each payment, and you can pause or cancel it anytime.',
       '[[4|Want to set it up? It takes about a minute: open Bills, then Schedule.]] If you prefer paying by hand, that’s completely fine, and we’ll not remind you about this again.',
     ],
-    signature: ['Nusrat Jahan', 'Customer Care, TakaPay', 'Helpline 16000'],
+    signature: ['Olivia Grant', 'Customer Care, TakaPay', 'Helpline 16000'],
     sources: [
       { kind: 'record', note: 'Bill payments inside the app' },
       { kind: 'record', note: 'Payment dates against due dates' },
@@ -252,17 +252,17 @@ export const EMAILS: Record<string, UseCaseEmail> = {
     ],
   },
   'consumer-lenders': {
-    from: { name: 'Sadia Islam', role: 'Customer Support', company: 'BrightCredit', address: 'sadia@brightcredit.com.bd' },
-    to: { name: 'Rahim Uddin', address: 'rahim.uddin@gmail.com' },
+    from: { name: 'Megan Powell', role: 'Customer Support', company: 'BrightCredit', address: 'megan@brightcredit.com.bd' },
+    to: { name: 'Kevin Doyle', address: 'kevin.doyle@gmail.com' },
     date: 'Wed, 12:05 PM',
-    subject: 'Finish your application, Rahim',
+    subject: 'Finish your application, Kevin',
     paragraphs: [
-      'Hi Rahim,',
+      'Hi Kevin,',
       'You [[1|started a laptop loan application on Monday]] and [[2|stopped at the documents step]]. I wanted to make sure nothing went wrong.',
       'You only need [[3|two documents: your NID and your latest salary slip]]. Take a photo of each with your phone and upload them in a few minutes. Our team reviews applications the same day, and the decision follows our standard checks.',
       '[[4|Would it help if I called you to walk through the upload?]] If you’ve decided not to go ahead, just reply and I’ll close the application.',
     ],
-    signature: ['Sadia Islam', 'Customer Support, BrightCredit', '+880 9 6555 0110'],
+    signature: ['Megan Powell', 'Customer Support, BrightCredit', '+880 9 6555 0110'],
     sources: [
       { kind: 'record', note: 'Application started in your system' },
       { kind: 'record', note: 'The step where it stopped' },
@@ -271,17 +271,17 @@ export const EMAILS: Record<string, UseCaseEmail> = {
     ],
   },
   'telecom-companies': {
-    from: { name: 'Asif Karim', role: 'Customer Care', company: 'Brightline Mobile', address: 'care@brightline.com.bd' },
-    to: { name: 'Arif Hossain', address: 'arif.hossain@gmail.com' },
+    from: { name: 'Ryan Cooper', role: 'Customer Care', company: 'Brightline Mobile', address: 'care@brightline.com.bd' },
+    to: { name: 'Jason Miller', address: 'jason.miller@gmail.com' },
     date: 'Fri, 7:45 PM',
     subject: 'A plan that costs less than your top-ups',
     paragraphs: [
-      'Hi Arif,',
+      'Hi Jason,',
       'You [[1|topped up 10 GB of data four times this month]], mostly [[2|on weekday evenings]].',
       'Those four top-ups cost more than [[3|our 40 GB monthly plan]], which would cover how you use your phone now and leave some room. You keep your number and your current balance.',
       '[[4|Want me to switch you from your next bill?]] Reply "yes" and it’s done. You can switch back anytime, and if you’re happy with top-ups, there’s nothing you need to do.',
     ],
-    signature: ['Asif Karim', 'Customer Care, Brightline Mobile', 'Dial 121'],
+    signature: ['Ryan Cooper', 'Customer Care, Brightline Mobile', 'Dial 121'],
     sources: [
       { kind: 'record', note: 'Top-up history on the account' },
       { kind: 'record', note: 'Usage pattern by time of day' },
@@ -290,17 +290,17 @@ export const EMAILS: Record<string, UseCaseEmail> = {
     ],
   },
   'large-insurers': {
-    from: { name: 'Omar Siddique', role: 'Customer Advisor', company: 'Greenshield Insurance', address: 'omar.siddique@greenshield.com.bd' },
-    to: { name: 'Nabila Chowdhury', address: 'nabila.c@gmail.com' },
+    from: { name: 'Greg Sullivan', role: 'Customer Advisor', company: 'Greenshield Insurance', address: 'greg.sullivan@greenshield.com.bd' },
+    to: { name: 'Laura Hughes', address: 'laura.hughes@gmail.com' },
     date: 'Tue, 3:30 PM',
     subject: 'Your car renewal and your new home',
     paragraphs: [
-      'Dear Ms. Chowdhury,',
+      'Dear Ms. Hughes,',
       'You [[1|updated your address with us last month]], so congratulations on the move. [[2|Your car insurance renews in six weeks]], and we don’t have home cover for you on file.',
       '[[3|We could review your car cover and look at home cover for the new place in one short call]], and set both to renew on the same date, so there’s one renewal to think about instead of two.',
       '[[4|Would a 15-minute call this Thursday work?]] If your home is already insured elsewhere, that’s fine, just let me know and I’ll only handle your car renewal.',
     ],
-    signature: ['Omar Siddique', 'Customer Advisor, Greenshield Insurance', '+880 2 5555 0155'],
+    signature: ['Greg Sullivan', 'Customer Advisor, Greenshield Insurance', '+880 2 5555 0155'],
     sources: [
       { kind: 'record', note: 'Address change on her policy' },
       { kind: 'record', note: 'Car policy renewal date' },
@@ -310,12 +310,12 @@ export const EMAILS: Record<string, UseCaseEmail> = {
   },
   'private-hospitals': {
     from: { name: 'Appointments Desk', role: 'Department of Medicine', company: 'Lakeview Hospital', address: 'appointments@lakeviewhospital.com.bd' },
-    to: { name: 'Mr. Hossain', address: 'm.hossain@gmail.com' },
+    to: { name: 'Mr. Dawson', address: 'm.dawson@gmail.com' },
     date: 'Mon, 9:10 AM',
-    subject: 'Your follow-up with Dr. Karim',
+    subject: 'Your follow-up with Dr. Patterson',
     paragraphs: [
-      'Dear Mr. Hossain,',
-      '[[1|Dr. Karim asked to see you again six months after your visit in May]], and that time has come.',
+      'Dear Mr. Marsh,',
+      '[[1|Dr. Patterson asked to see you again six months after your visit in May]], and that time has come.',
       'We have [[2|morning slots]] open next week, which we know you prefer. [[3|The follow-up takes about 20 minutes]], and you only need to bring your previous report.',
       '[[4|Reply with a day that suits you and we’ll confirm the time.]] If you’ve already booked or seen another doctor, just let us know and we’ll update your record.',
     ],
@@ -329,11 +329,11 @@ export const EMAILS: Record<string, UseCaseEmail> = {
   },
   'superstore-chains': {
     from: { name: 'DailyMart Gulshan', role: 'Member Services', company: 'DailyMart', address: 'members@dailymart.com.bd' },
-    to: { name: 'Farzana Begum', address: 'farzana.begum@gmail.com' },
+    to: { name: 'Karen Whitfield', address: 'karen.whitfield@gmail.com' },
     date: 'Wed, 5:00 PM',
     subject: 'Your usual rice is on offer this week',
     paragraphs: [
-      'Hi Farzana,',
+      'Hi Karen,',
       'You usually [[1|pick up the 5 kg Miniket rice bag about once a month]], and [[2|your last one was 26 days ago]].',
       '[[3|It’s on offer at the Gulshan branch until Sunday]], so if your Friday shop is coming up, it’s a good week to stock up. [[4|Your loyalty points also cover home delivery]] if you’d rather order from the app.',
       '[[5|Want us to set one aside for Friday?]] Just reply and we’ll keep it at the counter. If you’re stocked up, there’s nothing you need to do.',
@@ -349,13 +349,13 @@ export const EMAILS: Record<string, UseCaseEmail> = {
   },
   'diagnostic-centers': {
     from: { name: 'Home Collection Team', role: 'Patient Services', company: 'ClearPath Diagnostics', address: 'homecollection@clearpath.com.bd' },
-    to: { name: 'Mr. Alam', address: 'r.alam@gmail.com' },
+    to: { name: 'Mr. Gordon', address: 'r.gordon@gmail.com' },
     date: 'Mon, 8:30 AM',
     subject: 'Your follow-up test is due this week',
     paragraphs: [
-      'Dear Mr. Alam,',
-      '[[1|Dr. Rahman suggested a repeat test three months after your first one]], and that falls this week.',
-      'Last time you [[2|used our home sample collection]], so we can do the same again. [[3|A collector can visit between 7 and 10 AM]], and the report goes to you and to Dr. Rahman.',
+      'Dear Mr. Gordon,',
+      '[[1|Dr. Mercer suggested a repeat test three months after your first one]], and that falls this week.',
+      'Last time you [[2|used our home sample collection]], so we can do the same again. [[3|A collector can visit between 7 and 10 AM]], and the report goes to you and to Dr. Mercer.',
       '[[4|Reply with a morning that suits you and we’ll book it.]] If you’ve already had the test done somewhere else, just let us know.',
     ],
     signature: ['Home Collection Team', 'ClearPath Diagnostics', '+880 2 5555 0199'],
@@ -367,7 +367,7 @@ export const EMAILS: Record<string, UseCaseEmail> = {
     ],
   },
   'export-houses': {
-    from: { name: 'Shafiq Rahman', role: 'Merchandising Manager', company: 'Meghna Knit Composite', address: 'shafiq@meghnaknit.com' },
+    from: { name: 'Dennis Parker', role: 'Merchandising Manager', company: 'Meghna Knit Composite', address: 'dennis@meghnaknit.com' },
     to: { name: 'Anna Becker, Nordlicht Fashion', address: 'a.becker@nordlicht-fashion.de' },
     date: 'Thu, 11:00 AM',
     subject: 'Your autumn knitwear window',
@@ -375,9 +375,9 @@ export const EMAILS: Record<string, UseCaseEmail> = {
       'Dear Anna,',
       'Congratulations on [[1|the three new Nordlicht stores opening in Hamburg in October]]. I saw the announcement last week.',
       'Last year, [[2|your knit top reorder came in on 6 September]]. With new stores opening, the autumn volume may be larger, so I wanted to flag that [[3|our production slots for the knit line open this month]]. Booking now keeps last year’s ship date, with room for extra quantity.',
-      '[[4|Shall I hold capacity for you while you finalise numbers?]] If you’re sourcing this season elsewhere, just let me know.',
+      '[[4|Shall I hold capacity for you while you finalize numbers?]] If you’re sourcing this season elsewhere, just let me know.',
     ],
-    signature: ['Shafiq Rahman', 'Merchandising Manager, Meghna Knit Composite', '+880 1555 010 233'],
+    signature: ['Dennis Parker', 'Merchandising Manager, Meghna Knit Composite', '+880 1555 010 233'],
     sources: [
       { kind: 'research', note: 'The buyer’s public store announcement' },
       { kind: 'record', note: 'Order history: last year’s reorder date' },
@@ -386,17 +386,17 @@ export const EMAILS: Record<string, UseCaseEmail> = {
     ],
   },
   'restaurant-chains': {
-    from: { name: 'Rafi Ahmed', role: 'Manager', company: 'Saffron Table, Banani', address: 'rafi@saffrontable.com.bd' },
-    to: { name: 'Nadia Karim', address: 'nadia.karim@gmail.com' },
+    from: { name: 'Chris Dalton', role: 'Manager', company: 'Saffron Table, Banani', address: 'chris@saffrontable.com.bd' },
+    to: { name: 'Jenna Morgan', address: 'jenna.morgan@gmail.com' },
     date: 'Wed, 1:15 PM',
-    subject: 'A table for Friday, Nadia?',
+    subject: 'A table for Friday, Jenna?',
     paragraphs: [
-      'Hi Nadia,',
+      'Hi Jenna,',
       'You’ve [[1|booked dinner with us most Fridays this month]], and [[2|you almost always go for the grilled fish]].',
       'This Friday [[3|the chef is serving a grilled hilsa special]] that we think you will like. And since your review [[4|mentioned the window tables]], we would be happy to keep one for you.',
       '[[5|Shall we hold a window table for two at 8 PM?]] Just reply "yes". If you’ve other plans, see you another week.',
     ],
-    signature: ['Rafi Ahmed', 'Manager, Saffron Table, Banani', '+880 1555 010 456'],
+    signature: ['Chris Dalton', 'Manager, Saffron Table, Banani', '+880 1555 010 456'],
     sources: [
       { kind: 'record', note: 'Reservation history' },
       { kind: 'record', note: 'Her usual order' },
@@ -406,17 +406,17 @@ export const EMAILS: Record<string, UseCaseEmail> = {
     ],
   },
   'local-conglomerates': {
-    from: { name: 'Tasnim Ahmed', role: 'Customer Advisor', company: 'Northstar Insurance', address: 'tasnim@northstarinsurance.com.bd' },
-    to: { name: 'Imran Hossain', address: 'imran.hossain@gmail.com' },
+    from: { name: 'Rebecca Shaw', role: 'Customer Advisor', company: 'Northstar Insurance', address: 'rebecca@northstarinsurance.com.bd' },
+    to: { name: 'Steven Marsh', address: 'steven.marsh@gmail.com' },
     date: 'Tue, 12:40 PM',
     subject: 'Cover for your new flat',
     paragraphs: [
-      'Dear Mr. Hossain,',
+      'Dear Mr. Marsh,',
       'You [[1|financed your flat with Northstar Homes in Bashundhara]], and [[2|your handover is scheduled for next month]]. Congratulations.',
       'We’re writing from Northstar Insurance, part of the same group, because [[3|we have no home cover on file for your flat]]. [[4|We can cover it from the day you get the keys]], and since your documents are already with Northstar Homes, there’s very little paperwork.',
       '[[5|Would you like a short call to go through the options?]] If you’ve already arranged insurance, that’s fine, just reply and we’ll not contact you about it again.',
     ],
-    signature: ['Tasnim Ahmed', 'Customer Advisor, Northstar Insurance', '+880 2 5555 0166'],
+    signature: ['Rebecca Shaw', 'Customer Advisor, Northstar Insurance', '+880 2 5555 0166'],
     sources: [
       { kind: 'record', note: 'Group record, shared with his consent' },
       { kind: 'record', note: 'Handover date from the housing company' },

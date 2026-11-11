@@ -17,7 +17,7 @@ export const build: SceneBuilder = (ctx, sceneIndex) => {
   if (!prospect) {
     const rec = rawRecords[0];
     prospect = card('', 64, 120, 336, 168, 'e2');
-    const av = avatar('PR', 36);
+    const av = avatar('EF', 36);
     av.style.cssText += 'position:absolute;left:16px;top:16px;';
     const nm = h('div', 'vp-name', rec.name);
     nm.style.cssText = 'position:absolute;left:62px;top:17px;';

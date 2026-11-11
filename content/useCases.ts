@@ -1,20 +1,20 @@
 /**
  * USE CASES: one short slide article per industry.
  * ---------------------------------------------------------------------------
- * Each article is four 16:9 slides that follow SlideIn's real workflow
+ * Each article is four 16:9 slides that follow SlideIn’s real workflow
  * (Business Playbook / knowledge.md):
  *   1. Why it fits      the situation in this industry, plus one sourced fact
  *   2. Read + research  SlideIn reads the records the business already holds,
  *                       inside its own server, then researches one person:
- *                       public presence and buying behaviour for businesses
+ *                       public presence and buying behavior for businesses
  *                       that sell to companies or the public; for banks,
  *                       hospitals and other regulated businesses only what the
  *                       customer does with that business, with consent
- *   3. Match            it pairs that person's need and intent with an offer
- *                       the business really has; people who don't fit get
+ *   3. Match            it pairs that person’s need and intent with an offer
+ *                       the business really has; people who don’t fit get
  *                       nothing
  *   4. Write + send     one email built on that intent, checked, sent from the
- *                       business's own domain once the campaign is approved
+ *                       business’s own domain once the campaign is approved
  *
  * Rules held from knowledge.md: the client approves each campaign (never "a
  * person approves every email"); SlideIn never makes credit decisions; no
@@ -46,7 +46,7 @@ export type UseCase = {
   person: { who: string; signals: string[]; offer: string };
 };
 
-export const USE_CASES_TITLE = "Use Cases";
+export const USE_CASES_TITLE = "Use cases";
 
 /** Slide titles, in order. */
 export const SLIDE_TITLES = [
@@ -91,7 +91,7 @@ export const USE_CASES: UseCase[] = [
     slug: "mortgage-brokers",
     name: "Mortgage brokers",
     situation:
-      "You know every client's deal. What slips is the timing. A term ends, a client moves on, and the first person they hear from is a lender's mass email.",
+      "You know every client’s deal. What slips is the timing. A term ends, a client moves on, and the first person they hear from is a lender’s mass email.",
     fact: {
       stat: "65%",
       text: "of UK mortgage holders said they could not have bought their home without a broker.",
@@ -100,7 +100,7 @@ export const USE_CASES: UseCase[] = [
     },
     data: ["Your CRM and past deals", "Fixed-term end dates", "Lender panel and current products", "Notes from client calls"],
     research:
-      "SlideIn looks at each client's public presence for changes a lender would care about: a move, a new business, a second property.",
+      "SlideIn looks at each client’s public presence for changes a lender would care about: a move, a new business, a second property.",
     person: {
       who: "David, a past client",
       signals: ["His fixed term ends in March", "He registered a new limited company last month", "He asked about buy-to-let on your last call"],
@@ -111,18 +111,18 @@ export const USE_CASES: UseCase[] = [
     slug: "mid-sized-companies",
     name: "Mid-sized companies",
     situation:
-      "You have a product, a customer list and a few offers. You don't have the hours to write to each customer properly, so everyone gets the same newsletter.",
+      "You have a product, a customer list and a few offers. You don’t have the hours to write to each customer properly, so everyone gets the same newsletter.",
     fact: {
       stat: "71%",
-      text: "of consumers expect companies to deliver personalized interactions, and 76% get frustrated when it doesn't happen.",
+      text: "of consumers expect companies to deliver personalized interactions, and 76% get frustrated when it doesn’t happen.",
       source: "McKinsey & Company, 2021",
       url: "https://www.mckinsey.com/capabilities/growth-marketing-and-sales/our-insights/the-value-of-getting-personalization-right-or-wrong-is-multiplying",
     },
     data: ["Customer and account records", "Purchase history", "Product usage", "Support tickets"],
     research:
-      "SlideIn looks up each customer's company and role in public: hiring, new offices, launches, recent news.",
+      "SlideIn looks up each customer’s company and role in public: hiring, new offices, launches, recent news.",
     person: {
-      who: "Priya, operations lead at a client company",
+      who: "Natalie, operations lead at a client company",
       signals: ["Her team opened a second office this month", "Seat count up 40% since spring", "Two support tickets about user setup"],
       offer: "The multi-site admin add-on",
     },
@@ -140,7 +140,7 @@ export const USE_CASES: UseCase[] = [
     },
     data: ["Policies and renewal dates", "Claims history", "Household details clients shared", "Quotes that never closed"],
     research:
-      "SlideIn checks each client's public presence for a life change: a home they bought, a new business, a teenager who just started driving.",
+      "SlideIn checks each client’s public presence for a life change: a home they bought, a new business, a teenager who just started driving.",
     person: {
       who: "Maria, a client for six years",
       signals: ["Her home policy renews on the 14th", "Her address changed on a public record", "She added a teenage driver last month"],
@@ -151,7 +151,7 @@ export const USE_CASES: UseCase[] = [
     slug: "real-estate-firms",
     name: "Real estate firms",
     situation:
-      "Buyers and sellers leave signals everywhere: saved searches, viewings, a listing gone quiet. Your agents can't follow every one by hand.",
+      "Buyers and sellers leave signals everywhere: saved searches, viewings, a listing gone quiet. Your agents can’t follow every one by hand.",
     fact: {
       stat: "88%",
       text: "of US home buyers worked with an agent, and 91% of them would recommend that agent.",
@@ -160,7 +160,7 @@ export const USE_CASES: UseCase[] = [
     },
     data: ["Leads and enquiries", "Saved searches and viewings", "Past clients and sale dates", "Current listings"],
     research:
-      "SlideIn looks at each person's public presence for intent: a job move to the area, a growing family, a home they listed with someone else.",
+      "SlideIn looks at each person’s public presence for intent: a job move to the area, a growing family, a home they listed with someone else.",
     person: {
       who: "James and Lena, buyers",
       signals: ["Saved two homes near Oak Park last month", "Asked about gardens on a viewing", "James started a job nearby in September"],
@@ -180,7 +180,7 @@ export const USE_CASES: UseCase[] = [
     },
     data: ["Orders and returns", "Carts and wishlists", "Browsing on your store", "Reviews customers left"],
     research:
-      "SlideIn studies each shopper's buying behaviour and the public reviews they've written to understand their taste and size.",
+      "SlideIn studies each shopper’s buying behavior and the public reviews they’ve written to understand their taste and size.",
     person: {
       who: "Tom, a repeat customer",
       signals: ["Left the olive jacket in medium in his cart", "Bought two jackets from you last winter", "Reviewed one as 'runs small'"],
@@ -200,7 +200,7 @@ export const USE_CASES: UseCase[] = [
     },
     data: ["Signups and trial data", "Product events", "Plan history", "Support threads"],
     research:
-      "SlideIn looks up each user's company and role in public to understand what they're building and why they signed up.",
+      "SlideIn looks up each user’s company and role in public to understand what they’re building and why they signed up.",
     person: {
       who: "Leo, CTO at a 20-person agency",
       signals: ["Started a data import on Tuesday and stopped at step two", "His agency just announced a CRM migration", "Trial ends in five days"],
@@ -220,7 +220,7 @@ export const USE_CASES: UseCase[] = [
     },
     data: ["Client accounts and contracts", "Past projects and results", "Meeting notes", "Contract end dates"],
     research:
-      "SlideIn follows each client's public news: product launches, funding, new leadership, new markets.",
+      "SlideIn follows each client’s public news: product launches, funding, new leadership, new markets.",
     person: {
       who: "A retail client you ran a campaign for in spring",
       signals: ["Announced a new product line this week", "Your spring campaign wrapped last month", "Their new marketing head started in October"],
@@ -240,7 +240,7 @@ export const USE_CASES: UseCase[] = [
     },
     data: ["Accounts and product holdings", "Transaction patterns", "Relationship manager notes", "Contact consent"],
     research:
-      "Running on your own servers, SlideIn reviews each business client's public footprint: expansion, hiring, new markets. Customer data never leaves your bank.",
+      "Running on your own servers, SlideIn reviews each business client’s public footprint: expansion, hiring, new markets. Customer data never leaves your bank.",
     person: {
       who: "A garment exporter banking with you",
       signals: ["Payroll runs doubled since spring", "Opened a second factory, per public filings", "Pays suppliers abroad every month"],
@@ -254,7 +254,7 @@ export const USE_CASES: UseCase[] = [
       "Millions of customers, many products, and most people only ever hear from you in bulk. A student gets the same car-loan email as a business owner.",
     fact: {
       stat: "2025",
-      text: "Bangladesh's Personal Data Protection Ordinance made explicit consent the rule, and keeps confidential data inside the country.",
+      text: "Bangladesh’s Personal Data Protection Ordinance made explicit consent the rule, and keeps confidential data inside the country.",
       source: "The Daily Star, 2025",
       url: "https://www.thedailystar.net/tech-startup/news/bangladeshs-personal-data-protection-ordinance-2025-key-takeaways-4015401",
     },
@@ -280,9 +280,9 @@ export const USE_CASES: UseCase[] = [
     },
     data: ["Transactions and top-ups", "Bill payments", "Merchant payments", "Consent records"],
     research:
-      "SlideIn studies each user's routine inside your app, and only that, to find a feature that would save them time or money.",
+      "SlideIn studies each user’s routine inside your app, and only that, to find a feature that would save them time or money.",
     person: {
-      who: "Rina, a user in Chattogram",
+      who: "Emma, a user in Chattogram",
       signals: ["Pays the same electricity bill by hand every month", "Pays a day late about half the time", "Has never used scheduled payments"],
       offer: "Scheduled bill payments",
     },
@@ -294,9 +294,9 @@ export const USE_CASES: UseCase[] = [
       "Good repayers and half-finished applications are already in your records. Both deserve a careful, honest next step, not a blast.",
     data: ["Loan and repayment history", "Unfinished applications", "Customer service notes", "Consent records"],
     research:
-      "SlideIn looks at each person's activity with you, with consent, to understand what they were trying to do and where they stopped.",
+      "SlideIn looks at each person’s activity with you, with consent, to understand what they were trying to do and where they stopped.",
     person: {
-      who: "Rahim, an applicant",
+      who: "Kevin, an applicant",
       signals: ["Stopped at the documents step on Monday", "Opened the app twice since", "Applied for a laptop loan"],
       offer: "Help finishing the application. Your rules and your team decide who gets credit.",
     },
@@ -308,9 +308,9 @@ export const USE_CASES: UseCase[] = [
       "Usage tells you who is outgrowing a plan and who is about to leave. The offer they get is usually the same one everyone gets.",
     data: ["Plans and bills", "Data and minute usage", "Top-ups", "Contract end dates"],
     research:
-      "SlideIn studies each customer's usage with you, with consent, and finds the plan that actually fits how they use their phone.",
+      "SlideIn studies each customer’s usage with you, with consent, and finds the plan that actually fits how they use their phone.",
     person: {
-      who: "Arif, a prepaid customer",
+      who: "Jason, a prepaid customer",
       signals: ["Topped up data four times this month", "Uses most data on weekday evenings", "Has been with you for three years"],
       offer: "A bigger monthly plan that costs less than his top-ups",
     },
@@ -328,7 +328,7 @@ export const USE_CASES: UseCase[] = [
     },
     data: ["Policies across lines", "Claims and renewals", "Service history", "Consent records"],
     research:
-      "Inside your environment, SlideIn reviews each policyholder's activity with you for a life change, like a new address or a new car on file.",
+      "Inside your environment, SlideIn reviews each policyholder’s activity with you for a life change, like a new address or a new car on file.",
     person: {
       who: "A customer with car cover only",
       signals: ["Updated their address last month", "Car policy renews in six weeks", "No home cover on file"],
@@ -339,7 +339,7 @@ export const USE_CASES: UseCase[] = [
     slug: "private-hospitals",
     name: "Private hospitals",
     situation:
-      "Patients don't ignore their care. They forget it. A generic reminder is easy to miss, and a missed follow-up is a gap in someone's treatment.",
+      "Patients don’t ignore their care. They forget it. A generic reminder is easy to miss, and a missed follow-up is a gap in someone’s treatment.",
     fact: {
       stat: "23.1% to 13.6%",
       text: "In one randomized clinic trial, missed visits fell from 23.1% with no reminder to 13.6% with a personal reminder from staff.",
@@ -348,9 +348,9 @@ export const USE_CASES: UseCase[] = [
     },
     data: ["Appointment history", "Departments visited", "Follow-up schedules", "Consent records"],
     research:
-      "SlideIn reviews each patient's visits with you, with consent. Medical records never leave your servers, and it never targets anyone by a sensitive condition.",
+      "SlideIn reviews each patient’s visits with you, with consent. Medical records never leave your servers, and it never targets anyone by a sensitive condition.",
     person: {
-      who: "Mr. Hossain, an outpatient",
+      who: "Mr. Dawson, an outpatient",
       signals: ["Last check-up was in May", "His doctor asked for a six-month follow-up", "Prefers morning appointments"],
       offer: "A follow-up check-up slot",
     },
@@ -359,20 +359,20 @@ export const USE_CASES: UseCase[] = [
     slug: "superstore-chains",
     name: "Superstore chains",
     situation:
-      "Your loyalty data knows each household's shopping list. The weekly flyer still sends everyone the same offers.",
+      "Your loyalty data knows each household’s shopping list. The weekly flyer still sends everyone the same offers.",
     fact: {
       stat: "76%",
-      text: "of consumers say they get frustrated when a company's offers aren't personalized to them.",
+      text: "of consumers say they get frustrated when a company’s offers aren’t personalized to them.",
       source: "McKinsey & Company, 2021",
       url: "https://www.mckinsey.com/capabilities/growth-marketing-and-sales/our-insights/the-value-of-getting-personalization-right-or-wrong-is-multiplying",
     },
     data: ["Loyalty purchases", "Store visits", "Basket patterns", "Consent records"],
     research:
-      "SlideIn reads each member's buying rhythm with you: what they buy, how often, and at which branch.",
+      "SlideIn reads each member’s buying rhythm with you: what they buy, how often, and at which branch.",
     person: {
       who: "A family in Gulshan",
       signals: ["Buys the 5 kg rice bag about once a month", "Shops at the Gulshan branch on Fridays", "Last rice purchase was 26 days ago"],
-      offer: "This week's rice offer at their branch",
+      offer: "This week’s rice offer at their branch",
     },
   },
   {
@@ -388,9 +388,9 @@ export const USE_CASES: UseCase[] = [
     },
     data: ["Test history and report dates", "Referring doctors", "Home collection requests", "Consent records"],
     research:
-      "SlideIn reviews each patient's tests with you, with consent, to see what their doctor asked for and when it's due.",
+      "SlideIn reviews each patient’s tests with you, with consent, to see what their doctor asked for and when it’s due.",
     person: {
-      who: "A patient referred by Dr. Rahman",
+      who: "A patient referred by Dr. Mercer",
       signals: ["Doctor asked for a repeat test after three months", "First test was three months ago this week", "Used home sample collection last time"],
       offer: "A home sample collection slot",
     },
@@ -399,10 +399,10 @@ export const USE_CASES: UseCase[] = [
     slug: "export-houses",
     name: "Export houses",
     situation:
-      "A few large buyers, each across a border, each on their own season. Miss one buyer's reorder window and the order goes to someone else.",
+      "A few large buyers, each across a border, each on their own season. Miss one buyer’s reorder window and the order goes to someone else.",
     data: ["Buyer accounts", "Order and shipment history", "Product specs and costings", "Production capacity"],
     research:
-      "SlideIn follows each buyer's public news: new stores, new seasons, sourcing announcements.",
+      "SlideIn follows each buyer’s public news: new stores, new seasons, sourcing announcements.",
     person: {
       who: "A European fashion buyer",
       signals: ["Reordered knit tops in early September last year", "Announced new stores opening in October", "Your knitwear line has slots this month"],
@@ -416,17 +416,17 @@ export const USE_CASES: UseCase[] = [
       "A small group of regulars keeps your tables full. The messages they get are the same discount everyone else gets.",
     fact: {
       stat: "7%",
-      text: "of a restaurant's guests, its regulars, can drive up to half of all orders.",
+      text: "of a restaurant’s guests, its regulars, can drive up to half of all orders.",
       source: "Toast and Resy Regulars Report, 2026",
       url: "https://pos.toasttab.com/blog/data/restaurant-regular-customer-report",
     },
     data: ["Orders and reservations", "Delivery history", "Feedback", "Consent records"],
     research:
-      "SlideIn reads each guest's habits with you and the public reviews they've written to learn what they love.",
+      "SlideIn reads each guest’s habits with you and the public reviews they’ve written to learn what they love.",
     person: {
-      who: "Nadia, a regular",
+      who: "Jenna, a regular",
       signals: ["Booked Friday dinner most weeks this month", "Always orders the grilled fish", "Wrote a review praising the window tables"],
-      offer: "A held window table and this week's fish special",
+      offer: "A held window table and this week’s fish special",
     },
   },
   {
@@ -436,13 +436,13 @@ export const USE_CASES: UseCase[] = [
       "Many companies under one group, and customers who know only one of them. The introduction that would help them never gets made.",
     fact: {
       stat: "2025",
-      text: "Bangladesh's data protection ordinance treats companies as custodians of personal data, not owners. Sharing needs consent.",
+      text: "Bangladesh’s data protection ordinance treats companies as custodians of personal data, not owners. Sharing needs consent.",
       source: "The Daily Star, 2025",
       url: "https://www.thedailystar.net/tech-startup/news/bangladeshs-personal-data-protection-ordinance-2025-key-takeaways-4015401",
     },
     data: ["Customer records across group companies, where sharing is allowed", "Purchases and contracts", "Service history", "Consent records"],
     research:
-      "SlideIn looks at each customer's activity across the group, with consent, to find a need another group company can meet.",
+      "SlideIn looks at each customer’s activity across the group, with consent, to find a need another group company can meet.",
     person: {
       who: "A customer of your housing company",
       signals: ["Financed a flat with your housing company", "Handover is next month", "No home insurance on file anywhere in the group"],

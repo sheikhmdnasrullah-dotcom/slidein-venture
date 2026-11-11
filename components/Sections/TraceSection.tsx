@@ -60,7 +60,7 @@ export function Window() {
       <div className="tr-body">
         <aside className="tr-side">
           <div className="tr-who">
-            <span className="tr-av">PR</span>
+            <span className="tr-av">EF</span>
             <span>
               <b>{p.name}</b>
               <em>{p.org}</em>
@@ -121,7 +121,7 @@ export default function TraceSection() {
             <span>One email for one person.</span> Every line keeps its source.
           </h2>
           <Link href="/use-cases" className="dx-textlink">
-            See Use Cases <ArrowRight size={15} strokeWidth={1.8} />
+            See use cases <ArrowRight size={15} strokeWidth={1.8} />
           </Link>
         </div>
         <div className="tr-stage">

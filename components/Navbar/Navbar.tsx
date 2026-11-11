@@ -15,7 +15,7 @@
  *  - Recomposed editorial mobile sheet with indexed rows and 68px targets
  */
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -88,7 +88,6 @@ export default function Navbar() {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [hoveredHref, setHoveredHref] = useState<string | null>(null);
-  const navRef = useRef<HTMLElement>(null);
   const { links, cta } = NAV_SLOTS;
 
   /* Keyboard: Escape closes the mobile sheet. */
@@ -111,11 +110,7 @@ export default function Navbar() {
 
   /* Scroll surface state: transitions cleanly past 20px. */
   useEffect(() => {
-    const onScroll = () => {
-      setScrolled(window.scrollY > 20);
-      const max = document.documentElement.scrollHeight - window.innerHeight;
-      navRef.current?.style.setProperty('--sp', String(max > 0 ? Math.min(1, window.scrollY / max) : 0));
-    };
+    const onScroll = () => setScrolled(window.scrollY > 20);
     onScroll();
     window.addEventListener('scroll', onScroll, { passive: true });
     return () => window.removeEventListener('scroll', onScroll);
@@ -124,7 +119,6 @@ export default function Navbar() {
   return (
     <>
       <motion.nav
-        ref={navRef}
         aria-label="Primary"
         data-testid="navbar"
         data-scrolled={scrolled ? 'true' : 'false'}
@@ -134,7 +128,6 @@ export default function Navbar() {
         transition={{ duration: 0.55, ease: EASE }}
       >
         <div className="sn-nav__inner">
-          <i className="sn-progress" aria-hidden="true" />
           {/* Left — SlideIn Wordmark Lockup */}
           <Link
             href="/"

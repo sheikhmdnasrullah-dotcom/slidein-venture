@@ -14,7 +14,7 @@ import { LogoWordmark } from '@/components/Brand/Logo';
 import { useLive } from '@/components/Sections/TraceSection';
 
 const PEOPLE = [
-  ['PR', 'Priya Raman'],
+  ['EF', 'Emily Foster'],
   ['DR', 'Daniel Reyes'],
   ['MW', 'Marcus Webb'],
   ['AL', 'Ana Lopez'],

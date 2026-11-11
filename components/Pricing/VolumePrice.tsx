@@ -97,7 +97,7 @@ export default function VolumePrice() {
       </span>
       <span className="block">outreach emails per month</span>
       <span className="block" aria-live="polite">
-        for ${fmt(monthlyPriceUsd(emails))}/month
+        for ${fmt(monthlyPriceUsd(emails))}
       </span>
     </h1>
   );

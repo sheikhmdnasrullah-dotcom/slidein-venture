@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import "./globals.css";
 import Navbar from "@/components/Navbar/Navbar";
 import { SmoothScroll } from "@/components/SmoothScroll";
-import BackgroundWallpaper from "@/components/BackgroundWallpaper/BackgroundWallpaper";
 
-import { displayFace, bodyFace, monoFace } from "./fonts";
+import BackgroundWallpaper from "@/components/BackgroundWallpaper/BackgroundWallpaper";
+import { displayFace } from "./fonts";
 import { cn } from "@/lib/utils";
 
 export const metadata: Metadata = {
@@ -64,9 +64,7 @@ export default function RootLayout({
       suppressHydrationWarning
       className={cn(
         "font-sans",
-        displayFace.variable,
-        bodyFace.variable,
-        monoFace.variable
+        displayFace.variable
       )}
     >
       {/* Roles come from the CSS layer (body { font-family: var(--font-sans) }),

@@ -40,6 +40,9 @@
 @import "./styles/home-fixes.css";
 @import "./styles/home-rhythm.css";
 @import "./styles/navbar-refine.css";
+@import "./styles/industry.css";
+@import "./styles/fontlock.css";
+@import "./styles/hero-polish.css";
 @import "shadcn/tailwind.css";
 
 /* The site has ONE theme — paper. Sections vary by TONE, never by theme.
@@ -59,9 +62,9 @@
 @theme {
   /* Semantic roles → faces. Faces are declared in app/fonts.ts and injected
      as --font-face-* on <html>. Components use the roles, never the faces. */
-  --font-sans: var(--font-face-body), system-ui, -apple-system, sans-serif;
+  --font-sans: var(--font-face-display), georgia, serif; /* locked: one family, the hero's */
   --font-serif: var(--font-face-display), georgia, serif;
-  --font-mono: var(--font-face-mono), ui-monospace, monospace;
+  --font-mono: var(--font-face-display), georgia, serif; /* locked: one family, the hero's */
   --font-display: var(--font-face-display), georgia, serif;
 
   /* Legacy semantic aliases. These used to name a fixed token; they now point

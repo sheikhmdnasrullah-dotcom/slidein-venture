@@ -57,7 +57,7 @@ export default function Footer() {
               <FooterLink href="/#managed">Managed service</FooterLink>
             </li>
             <li>
-              <FooterLink href="/process">How it works</FooterLink>
+              <FooterLink href="/#workflow">How it works</FooterLink>
             </li>
             <li>
               <FooterLink href="/pricing">Pricing</FooterLink>

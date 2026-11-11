@@ -20,7 +20,7 @@ export const build: SceneBuilder = (ctx, sceneIndex) => {
   if (!prospect) {
     // Fallback if scene 2 has not produced it yet: build it to contract.
     prospect = card('', 64, 232, 288, 192, 'e2');
-    const av = avatar('PR', 36);
+    const av = avatar('EF', 36);
     av.style.cssText += 'position:absolute;left:16px;top:16px;';
     const nm = h('div', 'vp-name', prospectRecord.name);
     nm.style.cssText = 'position:absolute;left:62px;top:17px;';
@@ -94,7 +94,7 @@ export const build: SceneBuilder = (ctx, sceneIndex) => {
   // Paragraph assembled from finding strings (F1 / F3 wording)
   const s1 = mkSentence(128, 262);
   const hl1 = mkHl('weekly podcast');
-  s1.body.insertBefore(document.createTextNode('Priya Raman hosts a '), s1.underline);
+  s1.body.insertBefore(document.createTextNode('Emily Foster hosts a '), s1.underline);
   s1.body.insertBefore(hl1, s1.underline);
   s1.body.insertBefore(document.createTextNode('.'), s1.underline);
 

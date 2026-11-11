@@ -16,8 +16,7 @@
 export const NAV_SLOTS = {
   /* Navigation links and dark CTA button */
   links: [
-    { label: 'Process', href: '/process' },
-    { label: 'Use Cases', href: '/use-cases' },
+    { label: 'Use cases', href: '/use-cases' },
     { label: 'Pricing', href: '/pricing' },
   ],
   cta: { label: 'Connect', href: '/contact' },
@@ -51,7 +50,7 @@ export const HOME = {
     full: 'Hyper-Personalised Emails at Scale.',
   },
   announcement: {
-    /* The primary CTA pill below the subhead (the hero's only button).
+    /* The primary CTA pill below the subhead (the hero’s only button).
        Grounded, claim-free copy: "Video" names the medium (the pill opens
        the How-It-Works video modal); "See how it works" reuses the
        existing secondary-CTA words verbatim. Empty slots render skeleton
@@ -75,35 +74,35 @@ export const HOME = {
       'An end-to-end system that finds and researches each prospect, matches them to your offers, and writes each one a personal email. It keeps working until they are convinced.',
     line2: '',
     /* Optional accent-tinted phrase, split out of line1 by the component.
-       EMPTY — nothing is tinted over the owner's copy. Fill it with a
+       EMPTY — nothing is tinted over the owner’s copy. Fill it with a
        substring of line1 to switch the tint on. */
     emphasis: '',
   },
   cta: {
     primary: 'Connect',
-    /* The story-player's own label. Signed-off user copy. Currently
+    /* The story-player’s own label. Signed-off user copy. Currently
        unmounted — the pill CTA uses the announcement slots above — and
        preserved verbatim for recall. */
     primaryVideo: 'See How It Works',
     /* Secondary is text-only with a chevron, wired to the existing route. */
     secondary: 'See how it works',
     primaryHref: '/contact', // the existing conversion URL
-    secondaryHref: '/process',
+    secondaryHref: '/#workflow',
   },
   /* The three hero lines; the word at the end of line 2 rotates (needs / behavior / intent). */
   heroLines: {
     line1: 'An agentic system that',
-    line2: "analyzes each customer's",
+    line2: "analyzes each customer’s",
     line3: 'and sends hyper-personalized emails at scale.',
   },
   icpTagline: 'Everything starts with preparing your Master Business Playbook',
   persistentKnowledgeTagline:
     'to a persistent knowledge from the master playbook that evolves every time you interact with it.',
   playbookHeadlines: {
-    scene1: 'Scattered Information',
-    scene2: 'Structured Context',
+    scene1: 'Scattered information',
+    scene2: 'Structured context',
     scene3: 'Master Playbook',
-    scene4: 'Persistent Knowledge',
+    scene4: 'Persistent knowledge',
   },
   playbookCaptions: {
     scene1: 'Your business details, scattered across files and people.',
@@ -112,7 +111,7 @@ export const HOME = {
     scene4: 'Knowledge that grows every time you use it.',
   },
   multiAgentTitle: 'Multi-Agent Orchestration',
-  /* The agentic dashboard's tagline, rendered as the dashboard section
+  /* The agentic dashboard’s tagline, rendered as the dashboard section
      header. Owner-ordered copy, verbatim. `highlight` must stay an exact
      substring of `full` — the component wraps it in the brand marker
      swash (orange) while the rest sets in ink black. */
@@ -237,7 +236,7 @@ export const HOME_CONTENT: {
   ],
   footer: {
     columns: [
-      { heading: '', links: [{ label: 'Process', href: '/process' }, { label: 'Use Cases', href: '/use-cases' }, { label: 'Pricing', href: '/pricing' }] },
+      { heading: '', links: [{ label: 'Use cases', href: '/use-cases' }, { label: 'Pricing', href: '/pricing' }] },
       { heading: '', links: [{ label: 'Connect', href: '/contact' }] },
     ],
   },

@@ -205,6 +205,9 @@ export function BackgroundWallpaper() {
     };
   }, []);
 
+  /* The floating objects belong to the home hero only. */
+  if (routeProfile !== 'home') return null;
+
   return (
     <div
       ref={rootRef}

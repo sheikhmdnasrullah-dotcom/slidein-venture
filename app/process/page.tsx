@@ -1,7 +1,6 @@
 import type { Metadata } from 'next';
 
 import ProcessTimeline from '@/components/ProcessBook/ProcessTimeline';
-import SiteFooter from '@/components/Sections/SiteFooter';
 
 export const metadata: Metadata = {
   title: 'How it works · SlideIn',
@@ -19,7 +18,6 @@ export default function ProcessPage() {
   return (
     <>
       <ProcessTimeline />
-      <SiteFooter />
     </>
   );
 }

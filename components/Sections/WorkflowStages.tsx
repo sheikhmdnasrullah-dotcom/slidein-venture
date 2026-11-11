@@ -86,15 +86,15 @@ function DiscoverVisual() {
       <Bar title="Prospects" />
       <ul className="wf-list">
         <li className="wf-rec">
-          <span className="sg-av">PR</span>
+          <span className="sg-av">EF</span>
           <b>{a.name}</b>
           <span className="wf-src">
-            <span className="wf-chip wf-chip--soft">csv</span>
+            <span className="wf-chip wf-chip--soft">CSV</span>
             <span className="wf-chip wf-chip--soft wf-merged">directory</span>
           </span>
         </li>
         <li className="wf-rec wf-rec--dup">
-          <span className="sg-av">PR</span>
+          <span className="sg-av">EF</span>
           <b>{b.name}</b>
           <span className="wf-src">
             <span className="wf-chip wf-chip--soft">directory</span>
@@ -177,7 +177,7 @@ type Stage = {
 };
 
 const STAGES: Stage[] = [
-  { id: 'configure', name: 'Configure', line: 'Your offers, ideal customer and rules, set once.', Icon: SlidersHorizontal, Visual: ConfigureVisual, layout: 'split' },
+  { id: 'configure', name: 'Configure', line: 'Your offers, ideal customers and rules, set once.', Icon: SlidersHorizontal, Visual: ConfigureVisual, layout: 'split' },
   { id: 'discover', name: 'Discover', line: 'It finds the people who fit.', Icon: Radar, Visual: DiscoverVisual, layout: 'top' },
   { id: 'research', name: 'Research', line: 'It learns what each person cares about.', Icon: Search, Visual: ResearchVisual, layout: 'flip' },
   { id: 'qualify', name: 'Qualify', line: 'Only strong fits move on.', Icon: BadgeCheck, Visual: QualifyPanel, layout: 'below' },
@@ -211,7 +211,7 @@ function Row({ s, i }: { s: Stage; i: number }) {
         </h3>
         {s.link ? (
           <Link href="/use-cases" className="dx-textlink">
-            See Use Cases <ArrowRight size={15} strokeWidth={1.8} />
+            See use cases <ArrowRight size={15} strokeWidth={1.8} />
           </Link>
         ) : null}
       </div>

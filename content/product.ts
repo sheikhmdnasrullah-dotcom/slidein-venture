@@ -286,14 +286,13 @@ export const CLOSING = {
   heading: 'See the platform, or let us run it.',
   body: 'A walkthrough covers how the workflow would run for your business, what the managed service would take off your desk, and what software access is open today.',
   primaryCta: { label: 'Book a walkthrough', href: '/contact' },
-  secondaryCta: { label: 'See how it works', href: '/process' },
+  secondaryCta: { label: 'See how it works', href: '/#workflow' },
 } as const;
 
 /* ── Navigation ───────────────────────────────────────────────────────────── */
 
 export const NAV = {
   links: [
-    { label: 'Process', href: '/process' },
     { label: 'Use Cases', href: '/use-cases' },
     { label: 'Pricing', href: '/pricing' },
   ],

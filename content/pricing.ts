@@ -1,6 +1,6 @@
 export const META = {
   title: 'Pricing · SlideIn',
-  description: "We'll manage your outreach emails per month.",
+  description: "We’ll manage your outreach emails every month, at a price that follows your volume.",
 } as const;
 
 /**
@@ -8,7 +8,7 @@ export const META = {
  * Anchor (founder): 500 outreach emails a month cost $750 a month = $1.50 per
  * email, with $750 as the monthly minimum.
  * Volume bands (pricing-strategy method: cost sets the floor, value the ceiling,
- * and bulk senders get a graduated, marginal discount — each band's rate applies
+ * and bulk senders get a graduated, marginal discount — each band’s rate applies
  * only to the emails inside that band, so a bigger volume never costs less).
  * The lowest band stays above 3x the heaviest AI cost per email in
  * pricing-strategy.md (about $0.06 for deep research), the floor rule used there.

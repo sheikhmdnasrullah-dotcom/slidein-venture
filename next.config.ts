@@ -37,10 +37,13 @@ const nextConfig: NextConfig = {
     NEXT_PUBLIC_BUILD_SHA: BUILD_SHA,
   },
   async redirects() {
+    /* /process repeated the homepage workflow step for step, so it is retired. Temporary (307) so it can come back. */
+    const retired = [{ source: "/process", destination: "/#workflow", permanent: false }];
     /* /insights/[slug] is the canonical article location. The old direct
        article route lives on as a permanent redirect so external links and
        the article's previously shared URL keep working. */
     return [
+      ...retired,
       {
         source: "/ai-pipeline-emas",
         destination: "/insights/ai-pipeline-emas",

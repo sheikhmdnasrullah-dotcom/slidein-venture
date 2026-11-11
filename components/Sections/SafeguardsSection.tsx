@@ -83,7 +83,7 @@ export function ChecksPanel() {
 export function RepliesPanel() {
   const [a, b] = replies;
   const rows = [
-    { av: 'PR', who: a.from, tag: a.intent, tone: 'sg-tag--yes' },
+    { av: 'EF', who: a.from, tag: a.intent, tone: 'sg-tag--yes' },
     { av: 'MW', who: 'Marcus Webb', tag: 'Away', tone: '' },
     { av: 'DR', who: b.from, tag: 'Suppressed', tone: 'sg-tag--out' },
   ];

@@ -1,7 +1,7 @@
 /* PROCESS TIMELINE: one spine, two sides. Paper records, mono times. */
 .ptl { --rule: rgb(10 10 10 / 10%); --soft: rgb(10 10 10 / 58%); --paper: #fbf9f4; --tl: 0;
   max-width: 1120px; margin: 0 auto; padding: 112px 24px 96px; }
-.ptl-title { margin: 0 0 clamp(36px, 5vw, 64px); font-size: var(--t-display, 3.5rem); line-height: 1.1; font-weight: 600; letter-spacing: -0.035em; text-align: center; }
+.ptl-title { margin: 0 0 clamp(32px, 4vw, 56px); line-height: 1.1; font-weight: 600; letter-spacing: -0.035em; text-align: center; }
 .ptl-list { position: relative; list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: clamp(40px, 6vw, 72px); }
 
 .ptl-spine { position: absolute; top: 12px; bottom: 12px; left: 50%; width: 2px; margin-left: -1px; background: var(--rule); border-radius: 2px; }

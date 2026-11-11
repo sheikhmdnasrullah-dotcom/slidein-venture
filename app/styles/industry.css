@@ -1,0 +1,59 @@
+/* INDUSTRY PASS: the small, consistent rules that separate a site from a product.
+   Apple: optical tracking by size, instant press feedback, translucent chrome, restraint.
+   Vercel: hairlines, one radius scale, tight display type, one accent.
+   Notion: calm secondary text, balanced line breaks, quiet hover states. */
+:root {
+  --r-sm: 8px;   /* chips, tags, small controls */
+  --r-md: 14px;  /* windows, inner panels */
+  --r-lg: 20px;  /* cards, plates, feature blocks */
+  --hair: oklch(20.5% 0 0 / 0.1);
+  --ink-2: oklch(20.5% 0 0 / 0.66);  /* secondary text */
+  --ease-ui: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* one radius scale */
+.pbx-card, .wf-stage, .sb-card, .ptl-rec, .wf-row[data-layout="dark"], .pbk-page, .pbk-spread { border-radius: var(--r-lg); }
+.wf-row[data-layout="stagger"] .wf-stage { border-radius: 0; }
+.sv-win, .tr-win, .sg-panel { border-radius: var(--r-md); }
+.sb-out { border-radius: var(--r-md); }
+
+/* hairlines: one weight, one tone */
+.pbx-card:not([data-k="book"]), .wf-stage, .ptl-rec { border-color: var(--hair); }
+
+/* type: tracking follows size (tighter as it grows), headings balance, paragraphs avoid orphans */
+:is(h1, .hm-h1) { letter-spacing: -0.035em; }
+:is(h2, .section-head h2, .sb-h, .pbk-h) { letter-spacing: -0.03em; }
+:is(h3, .pbx-copy h3) { letter-spacing: -0.02em; }
+:is(h1, h2, h3) { text-wrap: balance; }
+p, li { text-wrap: pretty; }
+.wf-row .dx-split-h, .pbx-copy p, .pbk-cap { color: var(--ink-2); letter-spacing: -0.011em; }
+
+/* feedback is on the press, instant */
+:is(button, a.sn-cta, .sn-link, .dx-textlink, .pbk-tab, [data-testid="closing-cta"]):active { transform: scale(0.97); transition: transform 100ms ease-out; }
+.pbx-card:hover { transform: translateY(-2px); }
+
+/* focus: one ring everywhere */
+:focus-visible { outline: 2px solid var(--color-brand); outline-offset: 2px; border-radius: 6px; }
+
+/* selection in the brand tint */
+::selection { background: color-mix(in oklch, var(--color-brand) 26%, transparent); }
+
+@media (prefers-reduced-motion: reduce) { :is(button, .sn-cta, .sn-link):active { transition: none; } }
+
+/* ═══ APPLE PASS: neutral ground, sans display, quiet greys, one accent ═══ */
+:root { --apple-bg: #fbfbfd; --apple-alt: #f5f5f7; --apple-ink: #1d1d1f; --apple-2: #6e6e73; --ink-2: #6e6e73; --hair: rgb(0 0 0 / 0.1); }
+html, body { background: var(--apple-bg); }
+body { color: var(--apple-ink); }
+
+:is(h1, h2, h3) { color: var(--apple-ink); }
+
+/* the floating 3D wallpaper is gone: a clean ground, sections alternate white and light grey */
+#problem { background: var(--apple-alt); }
+.hm-hero { background: var(--apple-bg); padding-top: 96px; }
+
+/* secondary text: Apple's grey */
+.wf-row .dx-split-h, .pbx-copy p, .pbk-cap, .section-lead { color: var(--apple-2); }
+.pbx-card:not([data-k="book"]) { border-color: transparent; box-shadow: 0 1px 2px rgb(0 0 0 / 0.04); }
+
+/* page-turn feel when anchors or links jump: gentle, not instant */
+html { scroll-padding-top: 64px; }

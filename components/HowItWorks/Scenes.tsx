@@ -95,7 +95,7 @@ function S2() {
     <div className="hw-s" data-s="2">
       {[176, 256, 336].map((y, i) => (
         <div key={i} className="s2-inlet" style={P(64, y, 136, 64)} data-m={`s2-in${i}`}>
-          <span className="hw-mono">{rawRecords[i].source === 'csv' ? 'CSV IMPORT' : rawRecords[i].source === 'directory' ? 'DIRECTORY' : 'CONFERENCE'}</span>
+          <span className="hw-mono">{rawRecords[i].source === 'CSV' ? 'CSV IMPORT' : rawRecords[i].source === 'directory' ? 'DIRECTORY' : 'CONFERENCE'}</span>
         </div>
       ))}
       <div className="s2-br" style={P(268, 168, 960, 160)} />

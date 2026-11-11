@@ -1,0 +1,26 @@
+/* FONT LOCK: one typeface, the hero headline's. Fraunces everywhere.
+   Headlines carry the hero's exact typesetting (weight, optical size, word gap).
+   Body, labels, captions and code use the same family at regular weight with the
+   optical size following the text size, so small text stays sharp. Nothing else
+   on the site sets a font family. */
+:root, html, body { --font-sans: var(--font-face-display), georgia, serif; --font-mono: var(--font-face-display), georgia, serif; font-family: var(--font-face-display), georgia, serif; font-optical-sizing: auto; }
+body, button, input, textarea, select, code, kbd, samp, pre, time, small { font-family: var(--font-face-display), georgia, serif; }
+
+h1, h2, h3, h4,
+.font-display-xl, .font-display-md, .font-display-sm, .display-headline, .section-headline,
+.hm-h1, .hm-h1 > *, .sb-h, .pbk-h, .ptl-title, .section-head :is(h1, h2),
+.wf-row .dx-split-h span, .pbx-copy h3 {
+  font-family: var(--font-display) !important;
+  font-weight: var(--hl-weight) !important;
+  font-variation-settings: 'opsz' var(--hl-opsz), 'SOFT' 0, 'WONK' 0 !important;
+  word-spacing: var(--hl-word-spacing);
+}
+
+/* labels that were set in a mono: same family, tabular figures, no synthetic style */
+.sv-lab, .tr-pill, time, code, .pbk-no, .pbk-k, .sg-av, .tr-av { font-variant-numeric: tabular-nums; font-style: normal; }
+
+/* ── subtext: clear ink, not grey. Titles keep their weight; descriptions are plain black. ── */
+:root { --ink-2: #1d1d1f; --apple-2: #1d1d1f; }
+.wf-row .dx-split-h, .pbx-copy p, .pbk-cap, .section-lead, .section-lead * { color: #1d1d1f !important; }
+.pbx-card[data-k="book"] .pbx-copy p { color: oklch(92% 0 0) !important; }
+.section-head :is(h1, h2), .section-head :is(h1, h2) span, .section-head :is(h1, h2) strong { color: #1d1d1f !important; }

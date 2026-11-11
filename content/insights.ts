@@ -63,7 +63,7 @@ export const ARTICLES: InsightArticle[] = [
   {
     date: "2026-10-13",
     formattedDate: "October 13, 2026",
-    category: "Pipeline Systems",
+    category: "Pipeline systems",
     topic:
       "Building an AI-Powered Buyer Pipeline for Executive Mortgage Advisors",
     slug: "ai-pipeline-emas",
@@ -72,7 +72,7 @@ export const ARTICLES: InsightArticle[] = [
     author: "Nasrullah Tanim",
     featured: true,
     title:
-      "You Have 6 Referrals This Month. Last Month It Was 11. The Month Before That, 14.",
+      "You have 6 referrals this month. Last month it was 11. The month before that, 14.",
     excerpt:
       "Marcus has been a loan officer for nine years. He is a good closer with strong agent relationships and a clear sense of his rates. Last quarter was his best in two years. This quarter has been different.",
     intro: [

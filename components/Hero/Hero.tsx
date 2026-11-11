@@ -74,49 +74,102 @@ function Rotator() {
   );
 }
 
-/* All three lines at full ink so nothing is faint. The orange word and the one marker carry the emphasis. */
+const EASE_EXPO = [0.16, 1, 0.3, 1] as const;
+
+/** One word, rising out of its own line box (the .hm-w mask clips it). */
+function W({ children, delay, reduce }: { children: React.ReactNode; delay: number; reduce: boolean | null }) {
+  return (
+    <span className="hm-w" aria-hidden="true">
+      <motion.span
+        className="hm-w__in"
+        initial={reduce ? false : { y: '118%' }}
+        animate={{ y: 0 }}
+        transition={{ duration: 0.95, delay, ease: EASE_EXPO }}
+      >
+        {children}
+      </motion.span>
+    </span>
+  );
+}
+
+/** A run of plain words, each on its own stagger. */
+function Run({ text, start, reduce }: { text: string; start: number; reduce: boolean | null }) {
+  return (
+    <>
+      {text
+        .trim()
+        .split(/\s+/)
+        .map((w, i) => (
+          <span key={`${w}-${i}`}>
+            <W delay={start + i * 0.07} reduce={reduce}>
+              {w}
+            </W>{' '}
+          </span>
+        ))}
+    </>
+  );
+}
+
+/* Three lines, one idea each. Every word rises on its own beat; the rotating word is the one
+   orange thing in the first pair; the promise ends on "hyper-personalized", whose letters
+   ripple once on arrival and again whenever the pointer crosses it. */
 function Headline() {
   const reduce = useReducedMotion();
   const { line1, line2, line3 } = HOME.heroLines;
   const marked = line3.match(/^(.*?)(hyper-personalized)(.*)$/);
+  const n1 = line1.trim().split(/\s+/).length;
+  const l2 = 0.12 + n1 * 0.07;
+  const n2 = line2.trim().split(/\s+/).length;
+  const l3 = l2 + (n2 + 1) * 0.07 + 0.1;
+  const pre = marked ? marked[1].trim().split(/\s+/).length : 0;
 
   return (
     <h1
       data-testid="hero-headline"
       className="hm-h1 font-display-xl"
       aria-label={`${line1} ${line2} ${WORDS[0]} ${line3}`}
-      style={{
-        fontSize: 'clamp(2rem, 0.9rem + 3.5vw, 3.75rem)',
-        lineHeight: 1.1,
-        maxWidth: '20em',
-        marginInline: 'auto',
-      }}
+      style={{ lineHeight: 1.1, maxWidth: '20em', marginInline: 'auto' }}
     >
-      <motion.span className="hm-h1__lead" aria-hidden="true" {...rise(0.05, reduce)}>
-        {line1}
-      </motion.span>
-      <motion.span className="hm-h1__lead" aria-hidden="true" {...rise(0.18, reduce)}>
-        {line2} <Rotator />
-      </motion.span>
-      <motion.span className="hm-h1__lead" aria-hidden="true" style={{ marginTop: '0.22em' }} {...rise(0.7, reduce)}>
+      <span className="hm-h1__lead" aria-hidden="true">
+        <Run text={line1} start={0.1} reduce={reduce} />
+      </span>
+      <span className="hm-h1__lead" aria-hidden="true">
+        <Run text={line2} start={l2} reduce={reduce} />
+        <W delay={l2 + n2 * 0.07} reduce={reduce}>
+          <Rotator />
+        </W>
+      </span>
+      <span className="hm-h1__lead" aria-hidden="true" style={{ marginTop: '0.22em' }}>
         {marked ? (
           <>
-            {marked[1]}
-            <span className="hm-mark em-mark em-paint" style={{ ['--em-delay' as string]: '1.4s' }}>
-              {marked[2]}
-            </span>
-            {marked[3]}
+            <Run text={marked[1]} start={l3} reduce={reduce} />
+            <W delay={l3 + pre * 0.07} reduce={reduce}>
+              <span className="hm-mark em-mark em-paint hm-hyper" style={{ ['--em-delay' as string]: `${l3 + 0.9}s` }}>
+                {[...marked[2]].map((c, i) => (
+                  <i key={i} className="hm-l" style={{ ['--i' as string]: i }}>
+                    {c}
+                  </i>
+                ))}
+              </span>
+            </W>{' '}
+            <Run text={marked[3]} start={l3 + (pre + 1) * 0.07} reduce={reduce} />
           </>
         ) : (
-          line3
+          <Run text={line3} start={l3} reduce={reduce} />
         )}
-      </motion.span>
+      </span>
     </h1>
   );
 }
 
 export default function Hero() {
   const heroRef = useRef<HTMLElement>(null);
+  const onMove = (e: React.PointerEvent<HTMLElement>) => {
+    if (e.pointerType !== 'mouse') return;
+    const r = e.currentTarget.getBoundingClientRect();
+    e.currentTarget.style.setProperty('--mx', `${((e.clientX - r.left) / r.width) * 100}%`);
+    e.currentTarget.style.setProperty('--my', `${((e.clientY - r.top) / r.height) * 100}%`);
+  };
 
   /* Each animated element drops its class the moment its animation ends; its
      resting state is its natural one. Pinning re-parents the hero, which would
@@ -145,7 +198,15 @@ export default function Hero() {
       data-testid="hero"
       data-disorder={BAND_DISORDER.hero}
       className="hm-hero"
+      onPointerMove={onMove}
     >
+      <div className="hm-aurora" aria-hidden="true">
+        <i className="hm-aurora__a" />
+        <i className="hm-aurora__b" />
+        <i className="hm-aurora__c" />
+        <i className="hm-aurora__grid" />
+        <i className="hm-aurora__spot" />
+      </div>
       <div className="hm-hero__grid">
         <Headline />
       </div>

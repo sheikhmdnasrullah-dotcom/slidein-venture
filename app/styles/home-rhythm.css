@@ -1,25 +1,27 @@
-/* HOME RHYTHM: one type scale for the whole page, so a size means one thing.
-     display  hero headline and section titles
-     title    the name of each workflow step
-     card     card titles
-     lead     the line under a step name
-   Spacing steps are shared too: sections breathe the same amount everywhere. */
+/* TYPE SCALE: four sizes, used everywhere, fluid from a 390px phone to a wide desktop.
+     h1    page headline (hero, page titles)      32px -> 48px
+     h2    section titles and step names          26px -> 36px
+     h3    card titles                            18px -> 22px
+     lead  the line under a title, intro text     16px -> 18px
+   Body stays 16px, small text 14px. Nothing else sets a heading size. */
 :root {
-  --t-display: clamp(2.25rem, 1rem + 3.2vw, 3.5rem);
-  --t-title: clamp(2rem, 1rem + 2.2vw, 2.75rem);
-  --t-card: clamp(1.25rem, 0.9rem + 0.9vw, 1.625rem);
-  --t-lead: clamp(1.0625rem, 0.95rem + 0.4vw, 1.25rem);
-  --s-section: clamp(72px, 9vh, 96px);
+  --t-h1: clamp(2rem, 1.5rem + 2.1vw, 3rem);
+  --t-h2: clamp(1.625rem, 1.3rem + 1.3vw, 2.25rem);
+  --t-h3: clamp(1.125rem, 1rem + 0.5vw, 1.375rem);
+  --t-lead: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
+  --s-section: clamp(64px, 8vh, 88px);
 }
 
-/* titles */
-.hm-h1, .hm-h1 > * { font-size: var(--t-display) !important; line-height: 1.1 !important; }
-.section-head :is(h1, h2) { font-size: var(--t-display) !important; line-height: 1.1 !important; letter-spacing: -0.035em; }
-.sb-h { font-size: var(--t-display); line-height: 1.1; letter-spacing: -0.035em; font-weight: 600; max-width: 14em; }
-.wf-row .dx-split-h span { font-size: var(--t-title); letter-spacing: -0.04em; }
-.wf-row .dx-split-h { font-size: var(--t-lead); line-height: 1.42; max-width: 19em; }
-.pbx-copy h3 { font-size: var(--t-card); }
-.pbx-copy p { font-size: 1rem; }
+/* h1 */
+.hm-h1, .hm-h1 > *, main h1.font-display-xl, .ptl-title { font-size: var(--t-h1) !important; line-height: 1.1 !important; letter-spacing: -0.03em; }
+/* h2 */
+.section-head :is(h1, h2), .sb-h, .wf-row .dx-split-h span, .pbk-h { font-size: var(--t-h2) !important; line-height: 1.15 !important; letter-spacing: -0.03em; }
+.sb-h { max-width: 16em; }
+/* h3 */
+.pbx-copy h3 { font-size: var(--t-h3) !important; line-height: 1.25 !important; letter-spacing: -0.02em; }
+/* lead */
+.wf-row .dx-split-h, .pbk-cap { font-size: var(--t-lead) !important; line-height: 1.5 !important; }
+.pbx-copy p { font-size: 1rem; line-height: 1.5; }
 
 /* spacing: sections and rows share one step */
 main > .band { padding-block: var(--s-section); }
@@ -33,3 +35,17 @@ main > .hm-hero + .band { padding-top: 24px; }
 .wf-row .wf-stage { min-height: clamp(300px, 30vw, 380px); }
 .wf-row .wf-stage > * { max-width: 520px; }
 .wf-row[data-layout="dark"] .wf-stage { min-height: 0; }
+
+/* ── emphasis: one clean orange underline, never a brush ── */
+.em-mark::before {
+  inset: auto 0 -0.04em 0; height: 0.085em; border-radius: 99px; transform: none;
+  background: var(--color-brand); -webkit-mask: none; mask: none;
+}
+.sb-h mark { background: linear-gradient(var(--color-brand), var(--color-brand)) left 100% / 100% 0.085em no-repeat; padding: 0 0 0.1em; }
+.wf-row .dx-split-h span {
+  background: linear-gradient(var(--color-brand), var(--color-brand)) left 100% / 100% 0.085em no-repeat !important;
+  box-shadow: none !important; padding: 0 0 0.12em !important;
+}
+.wf-row[data-layout="dark"] .dx-split-h span { color: oklch(97% 0 0) !important; }
+.pbk-cap mark { background: none; box-shadow: inset 0 -0.1em 0 var(--color-brand); }
+.pbk-pers { box-shadow: inset 0 -0.1em 0 var(--color-brand); }
