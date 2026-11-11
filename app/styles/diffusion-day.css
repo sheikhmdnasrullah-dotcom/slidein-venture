@@ -308,7 +308,7 @@ body,
   animation: uc-cell-in 760ms cubic-bezier(0.23, 1, 0.32, 1) both;
   animation-delay: calc(var(--d, 0) * 55ms + 120ms);
 }
-@keyframes uc-cell-in { from { opacity: 0; transform: translateY(10px); filter: blur(6px); } }
+@keyframes uc-cell-in { from { opacity: 0; transform: translateY(10px); } }
 
 .uc-tile {
   position: relative;
@@ -400,7 +400,6 @@ body,
   /* closed state = folded back into the tile that opened it */
   opacity: 0;
   transform: translate(var(--ox, 0px), var(--oy, 14px)) scale(0.28);
-  filter: blur(8px);
   transition:
     opacity 240ms cubic-bezier(0.23, 1, 0.32, 1),
     transform 340ms cubic-bezier(0.77, 0, 0.175, 1),
@@ -417,7 +416,7 @@ body,
     overlay 520ms allow-discrete,
     display 520ms allow-discrete;
 }
-@starting-style { .uc-pop[open] { opacity: 0; transform: translate(var(--ox, 0px), var(--oy, 14px)) scale(0.28); filter: blur(8px); } }
+@starting-style { .uc-pop[open] { opacity: 0; transform: translate(var(--ox, 0px), var(--oy, 14px)) scale(0.28); } }
 .uc-pop::backdrop {
   background: oklch(20.5% 0 0 / 0%);
   backdrop-filter: blur(0);
@@ -490,7 +489,6 @@ body,
   opacity: 0; visibility: hidden; pointer-events: none;
   /* the slide you leave slides out the far side, softly */
   transform: translateX(calc(var(--dir, 1) * -3cqw));
-  filter: blur(6px);
   transition: opacity 260ms cubic-bezier(0.23, 1, 0.32, 1), transform 380ms cubic-bezier(0.77, 0, 0.175, 1), filter 260ms ease, visibility 0s linear 380ms;
 }
 .uc-slide[data-active] {
@@ -498,7 +496,7 @@ body,
   transition: visibility 0s;
   animation: uc-slide-in 560ms cubic-bezier(0.23, 1, 0.32, 1) both;
 }
-@keyframes uc-slide-in { from { opacity: 0; transform: translateX(calc(var(--dir, 1) * 3cqw)); filter: blur(6px); } }
+@keyframes uc-slide-in { from { opacity: 0; transform: translateX(calc(var(--dir, 1) * 3cqw)); } }
 .uc-slide__title {
   margin: 0 0 2.6cqw;
   font-size: 1.05cqw; font-weight: 520; letter-spacing: 0.08em; text-transform: uppercase;
@@ -684,7 +682,7 @@ body,
 .uc-ctrl__btn:active:not(:disabled) { transform: scale(0.94); }
 .uc-close:active { transform: scale(0.94); }
 
-@keyframes uc-rise { from { opacity: 0; transform: translateY(1.4cqw); filter: blur(4px); } }
+@keyframes uc-rise { from { opacity: 0; transform: translateY(1.4cqw); } }
 @keyframes uc-pop-in { from { opacity: 0; transform: scale(0.6); } }
 @keyframes uc-line-y { from { transform: scaleY(0); } }
 @keyframes uc-sweep { from { background-size: 0% 100%; } }
@@ -879,7 +877,7 @@ body,
   overflow: hidden;
 }
 .hm-cta__arrow svg { transition: transform 320ms cubic-bezier(0.77, 0, 0.175, 1); }
-@keyframes hm-cta-in { from { opacity: 0; transform: translateY(10px); filter: blur(4px); } }
+@keyframes hm-cta-in { from { opacity: 0; transform: translateY(10px); } }
 @keyframes hm-cta-arrow { 0% { transform: translateX(0); } 49% { transform: translateX(22px); } 50% { transform: translateX(-22px); } 100% { transform: translateX(0); } }
 @media (hover: hover) and (pointer: fine) {
   .hm-cta:hover { box-shadow: 0 1px 0 oklch(100% 0 0 / 0.12) inset, 0 14px 30px -12px oklch(20.5% 0 0 / 0.6); }
@@ -943,7 +941,7 @@ body,
   font-size: 12px; line-height: 1.5; color: var(--dx-foreground);
 }
 .tr-row[data-seen] .tr-win { animation: tr-in 900ms cubic-bezier(0.23, 1, 0.32, 1) both; }
-@keyframes tr-in { from { opacity: 0; transform: translateY(24px) scale(0.985); filter: blur(6px); } }
+@keyframes tr-in { from { opacity: 0; transform: translateY(24px) scale(0.985); } }
 .tr-bar { display: flex; align-items: center; gap: 12px; height: 38px; padding: 0 14px; border-bottom: 1px solid var(--dx-input); background: var(--dx-card); }
 .tr-dots { display: flex; gap: 6px; }
 .tr-dots i { width: 9px; height: 9px; border-radius: 50%; background: oklch(20.5% 0 0 / 0.14); }
