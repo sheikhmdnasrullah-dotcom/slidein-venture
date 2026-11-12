@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import Navbar from "@/components/Navbar/Navbar";
 import { SmoothScroll } from "@/components/SmoothScroll";
+import { IntercomMessenger } from "@/components/IntercomMessenger";
 
 import BackgroundWallpaper from "@/components/BackgroundWallpaper/BackgroundWallpaper";
 import { displayFace } from "./fonts";
@@ -81,6 +82,7 @@ export default function RootLayout({
       <body className="antialiased">
         <BackgroundWallpaper />
         <SmoothScroll />
+        <IntercomMessenger />
         <Navbar />
         <main className="relative z-[1]">{children}</main>
         {/* No footer. The terminal band — wordmark, link columns, the consent
