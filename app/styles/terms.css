@@ -1,0 +1,23 @@
+/* TERMS — Bengali typesetting for /terms.
+   The site's one typeface has no Bengali glyphs, so Bengali text falls through
+   to a Bengali face on the reader's system. The stack lists the faces that ship
+   with macOS, iOS, Windows, Android and Linux, in that order of likelihood.
+   Headings are re-pointed here because fontlock.css forces the display face on
+   h1-h4 with !important; the attribute selector is more specific, so it wins.
+   Bengali has no tracking or optical-size axis, so both are reset. */
+.terms-doc[lang="bn"],
+.terms-doc[lang="bn"] :is(h1, h2, h3, p, li, a, span, time, button) {
+  font-family: "Hind Siliguri", "Noto Sans Bengali", "Kohinoor Bangla", "Bangla Sangam MN", "Nirmala UI", "Shonar Bangla", "Vrinda", sans-serif;
+}
+.terms-doc[lang="bn"] :is(h1, h2) {
+  font-family: "Hind Siliguri", "Noto Sans Bengali", "Kohinoor Bangla", "Bangla Sangam MN", "Nirmala UI", "Shonar Bangla", "Vrinda", sans-serif !important;
+  font-weight: 600 !important;
+  font-variation-settings: normal !important;
+  letter-spacing: 0 !important;
+  word-spacing: 0;
+  line-height: 1.35;
+}
+.terms-doc[lang="bn"] :is(p, li) { line-height: 1.95; letter-spacing: 0; }
+.terms-doc[lang="bn"] nav a { line-height: 1.6; }
+/* the language buttons keep their own script whichever language is showing */
+.terms-doc button[lang="bn"] { font-family: "Hind Siliguri", "Noto Sans Bengali", "Kohinoor Bangla", "Bangla Sangam MN", "Nirmala UI", sans-serif; }

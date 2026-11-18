@@ -95,7 +95,10 @@ export default function Footer() {
       {/* ── Bottom bar ─────────────────────────────────────────────── */}
       <div className="mx-auto mt-[clamp(2.5rem,5vw,4rem)] flex w-full max-w-[1100px] flex-col-reverse gap-6 border-t border-[var(--rule-strong)] pt-6 md:flex-row md:items-center md:justify-between">
         <div className="flex flex-col gap-2">
-          <Text variant="small" text={`© ${new Date().getFullYear()} SlideIn Venture. All rights reserved.`} />
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+            <Text variant="small" text={`© ${new Date().getFullYear()} SlideIn Venture. All rights reserved.`} />
+            <FooterLink href="/terms">Terms and Conditions</FooterLink>
+          </div>
           <Text
             variant="small"
             text="We only contact people who match a brief you approve. Every email carries a working unsubscribe, and a no is permanent."
