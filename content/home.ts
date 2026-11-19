@@ -18,6 +18,7 @@ export const NAV_SLOTS = {
   links: [
     { label: 'Use cases', href: '/use-cases' },
     { label: 'Pricing', href: '/pricing' },
+    { label: 'Terms', href: '/terms' },
   ],
   cta: { label: 'Connect', href: '/contact' },
 } as const;
